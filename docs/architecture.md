@@ -39,7 +39,7 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 | Camada | Escolha | Versão |
 |---|---|---|
 | Runtime | Node.js | 24 LTS |
-| Framework | Next.js — App Router, Server Components | 15+ |
+| Framework | Next.js — App Router, Server Components, Turbopack | 16.3+ |
 | Linguagem | TypeScript — `strict: true` | 5+ |
 | Gerenciador | pnpm | 11+ |
 | Estilo | CSS Modules + custom properties do [Design System](design-system.md) | — |
@@ -48,6 +48,8 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 | Validação | **Zod** — schema único compartilhado cliente/servidor | — |
 | Áudio | Web Audio API + `<audio>` — medição de escuta própria | — |
 | Testes | Vitest (unitário) · Playwright (E2E) | — |
+
+> **Versões resolvidas na R0:** Next 16.3.4 · React 19.2.8 · TypeScript 5.9 · pnpm 11.5.2 · Vitest 5.
 
 > **Node 24.** O Node 20 saiu de suporte em abril de 2026. A versão fica travada em três lugares que precisam concordar: `.nvmrc`, `engines.node` no `package.json` e a configuração de runtime da Vercel.
 

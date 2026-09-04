@@ -11,13 +11,13 @@ Plataforma web de marketplace bilateral que conecta artistas independentes a cur
 | Camada | Escolha |
 |---|---|
 | Runtime | Node.js 24 LTS · pnpm 11 |
-| Framework | Next.js 15+ — App Router, Server Components, Server Actions |
+| Framework | Next.js 16 — App Router, Server Components, Server Actions, Turbopack |
 | Linguagem | TypeScript `strict` |
 | Estilo | CSS Modules + custom properties (**sem Tailwind**) |
 | Estado de servidor | TanStack Query 5 |
 | Formulários e validação | React Hook Form + Zod (schema único cliente/servidor) |
 | Banco, auth, storage, jobs | Supabase — Postgres 17, RLS, Auth, Storage, Edge Functions |
-| Testes | Vitest (unitário) · Playwright (E2E) |
+| Testes | Vitest 5 (unitário) · Playwright (E2E) |
 | Hospedagem | Vercel — Production Branch `main`, funções em `pdx1` |
 
 Arquitetura, camadas e convenções: [`docs/architecture.md`](docs/architecture.md).

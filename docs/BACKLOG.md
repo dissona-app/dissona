@@ -42,14 +42,14 @@ Detalhamento e perguntas objetivas em [open-questions](open-questions.md).
 Setup; não consome horas do banco de 74h. Ver [plano · R0](implementation-plan.md#r0--fundação-técnica).
 
 ### Repositório e toolchain
-- [ ] Criar repositório e configurar Next.js App Router com TypeScript `strict`
-- [ ] Configurar pnpm 11, Node 24 (`.nvmrc` + `engines`) e scripts (`dev`, `build`, `lint`, `typecheck`, `test`, `e2e`)
-- [ ] Configurar ESLint e Prettier
-- [ ] Configurar CI com typecheck, lint, testes e build
+- [x] Criar repositório e configurar Next.js App Router com TypeScript `strict`
+- [x] Configurar pnpm 11, Node 24 (`.nvmrc` + `engines`) e scripts (`dev`, `build`, `lint`, `typecheck`, `test`, `e2e`)
+- [x] Configurar ESLint e Prettier
+- [x] Configurar CI com typecheck, lint, testes e build
 
 ### Plataforma de dados
 Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcibjzmowcjkdrqyvi` / `us-west-2`. Staging e produção viram [#25](open-questions.md#25-projetos-dedicados-de-staging-e-produção).
-- [ ] Apontar `.env.local` para o projeto `dissona` — hoje carrega as chaves do projeto `metrya`
+- [x] Apontar `.env.local` para o projeto `dissona` — hoje carrega as chaves do projeto `metrya`
 - [ ] Instalar o Supabase CLI como devDependency e linkar o projeto
 - [ ] Configurar o fluxo local de migrations (`supabase db reset` reconstrói do zero)
 - [ ] Criar `lib/supabase` (cliente, servidor, middleware) e geração de `tipos-bd.ts`
@@ -72,7 +72,7 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [ ] Criar shell do ambiente autenticado com header, navegação e troca de papel
 
 ### Entrega e conformidade
-- [ ] Criar `.gitignore` **antes** do primeiro commit — `.env*.local` e `.mcp.json` carregam segredo
+- [x] Criar `.gitignore` **antes** do primeiro commit — `.env*.local` e `.mcp.json` carregam segredo
 - [ ] Configurar Playwright e estrutura de `e2e`
 - [ ] Conectar o repositório à Vercel: Production Branch `main`, funções em `pdx1`, Node 24
 - [ ] Configurar as env vars da Vercel nos escopos Production e Preview
