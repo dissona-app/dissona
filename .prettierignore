@@ -1,0 +1,12 @@
+.next/
+out/
+node_modules/
+pnpm-lock.yaml
+coverage/
+playwright-report/
+test-results/
+src/lib/supabase/tipos-bd.ts
+
+# Markdown é mantido à mão — tabelas e protótipos não devem ser reflowados.
+*.md
+docs/

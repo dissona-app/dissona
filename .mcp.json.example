@@ -1,0 +1,24 @@
+{
+  "_comentario": [
+    "Copie para .mcp.json e preencha o token — .mcp.json está no .gitignore.",
+    "Prefira exportar SUPABASE_ACCESS_TOKEN no ambiente a colar o token neste arquivo:",
+    "um PAT sbp_ dá acesso de gestão a TODOS os projetos da organização, não só a este.",
+    "A flag --read-only impõe a decisão de architecture.md §2.2: o MCP do Supabase é",
+    "para inspeção; migration é só pelo Supabase CLI."
+  ],
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only",
+        "--project-ref",
+        "fhqcibjzmowcjkdrqyvi"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_SEU_TOKEN_AQUI"
+      }
+    }
+  }
+}

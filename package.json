@@ -1,0 +1,58 @@
+{
+  "name": "dissona",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Marketplace de avaliação estruturada e paga de músicas — artistas independentes e curadores profissionais.",
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=11"
+  },
+  "packageManager": "pnpm@11.5.2",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest --passWithNoTests",
+    "e2e": "playwright test",
+    "supabase": "supabase",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "db:tipos": "supabase gen types typescript --local > src/lib/supabase/tipos-bd.ts",
+    "db:tipos:remoto": "supabase gen types typescript --linked > src/lib/supabase/tipos-bd.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.114.0",
+    "@tanstack/react-query": "^5.102.8",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.87.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.4",
+    "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^30.0.1",
+    "prettier": "^3.9.6",
+    "supabase": "^2.116.0",
+    "typescript": "^5",
+    "vitest": "^5.0.0"
+  }
+}

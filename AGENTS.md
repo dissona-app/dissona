@@ -1,0 +1,68 @@
+# AGENTS.md — Instruções para o agente de IA
+
+Este arquivo é **curto de propósito**. A especificação vive em [`docs/`](docs/) e é a fonte única; aqui ficam só o contexto do produto, os ponteiros e as proibições.
+
+---
+
+## Contexto do produto
+
+**Dissona** é uma plataforma web marketplace que conecta artistas musicais independentes a curadores profissionais para avaliação estruturada e paga de músicas. O artista submete uma música (link ou mp3), compra Claves (moeda interna), seleciona curadores e recebe feedback metódico com notas objetivas, nota subjetiva e texto escrito. A IA sintetiza os feedbacks em relatórios por música e por artista ao longo do tempo. O curador é remunerado por qualidade e pontualidade (classes Bronze/Prata/Ouro, com escalonamento de pagamento conforme prazo de 72h e itens opcionais preenchidos). O admin gerencia usuários, classes, finanças (rateio 50% plataforma/curador), moderação e payouts. A homepage pública exibe artistas compartilhados, destaques e ranking de curadores, com CTA para cadastro. O produto prioriza confiança bilateral: o artista recebe crítica confiável guiada por método; o curador recebe pagamento claro e reconhecimento (ranking, calibração, selo de classe).
+
+---
+
+## Onde está cada coisa
+
+| Preciso de… | Vá para |
+|---|---|
+| **Stack, pastas, camadas, convenções, deploy** | [`docs/architecture.md`](docs/architecture.md) |
+| **O quê** — 24 módulos, 5 releases, personas, fluxos | [`docs/PRD.md`](docs/PRD.md) + [`docs/prd/`](docs/prd/) |
+| **Escopo em execução** — checklist até a R2 | [`docs/BACKLOG.md`](docs/BACKLOG.md) |
+| **Em que ordem** — tasks e dependências | [`docs/implementation-plan.md`](docs/implementation-plan.md) |
+| **Schema físico, RLS, RPCs, ordem das migrations** | [`docs/data-model.md`](docs/data-model.md) |
+| **Critérios de aceite** (RF/RNF, Given/When/Then) | [`docs/requirements.md`](docs/requirements.md) |
+| **Tokens, componentes, acessibilidade** | [`docs/design-system.md`](docs/design-system.md) |
+| **Regras de negócio transversais** (Claves, classes, remuneração, SLA) | [`docs/prd/01-regras-de-negocio.md`](docs/prd/01-regras-de-negocio.md) |
+| **Matriz de notificações** — é o seed de `evento_notificacao` | [`docs/prd/06-matriz-notificacoes.md`](docs/prd/06-matriz-notificacoes.md) |
+| **O que ainda não foi decidido** — e o que trava qual release | [`docs/open-questions.md`](docs/open-questions.md) |
+
+**Precedência de fontes:** protótipo da R2 > board de discovery > derivação. Quando divergirem, siga o protótipo e registre a divergência em [`docs/prd/07-pendencias-e-divergencias.md`](docs/prd/07-pendencias-e-divergencias.md).
+
+---
+
+## Como rodar
+
+Pré-requisitos, scripts e o fluxo de banco estão no [`README.md`](README.md). Resumo: Node 24, pnpm 11, `pnpm install`, `pnpm dev`.
+
+---
+
+## Proibições
+
+Estas já estão implícitas na arquitetura, mas ficam explícitas porque são os erros mais fáceis de cometer:
+
+- **Sem Tailwind.** CSS Modules + custom properties. Os tokens do Design System foram extraídos dos protótipos como valores literais e não devem passar por uma camada de tradução.
+- **Sem backend separado.** Monolito modular em Next.js — Server Components e Server Actions. Não crie `apps/api`, Express ou Fastify.
+- **Sem monorepo.** Um único `src/`.
+- **Sem Prisma, Drizzle ou qualquer ORM.** Migrations em SQL versionado pelo Supabase CLI; tipos gerados em `lib/supabase/tipos-bd.ts`, **nunca escritos à mão**.
+- **Sem S3, sem Redis, sem broker.** Supabase Storage; `pg_cron` agenda e Edge Functions executam.
+- **Sem `any`.** TypeScript `strict`.
+- **Sem número de negócio hardcoded.** Thresholds, prazos, pisos e tetos vêm da tabela `configuracao`.
+- **Sem float para dinheiro.** `bigint` em centavos; só `lib/dinheiro.ts` formata.
+- **Sem `insert` direto** em `lancamento_clave`, `ganho_curador` ou `notificacao` — só por RPC `security definer` e por `registrar_notificacao()`.
+- **Sem DDL pelo MCP do Supabase.** O MCP é para inspeção (`list_tables`, `list_migrations`, `get_advisors`, leitura). Migration é só pelo CLI, senão `supabase_migrations` divirja dos arquivos.
+- **Sem criar tabela de release futura.** A numeração `0001`–`0010` está amarrada à release; nada de R3+ antecipado.
+- **Sem "Submissões"** na interface — o termo é **"Envios"**.
+
+## Convenções que importam
+
+- **Idioma:** domínio em **português** (`avaliacao`, `saldo_carteira`, `calcularRemuneracao`); termos de framework em inglês (`useState`, `middleware`). Banco em `snake_case` singular.
+- **Camadas:** `app/` → `modulos/*/acoes|consultas` → `servico` → `repositorio` → Supabase. Nenhuma camada pula a seguinte, e `servico` não importa nada de React.
+- **Erros:** códigos tipados em `lib/erros.ts`; a tradução para texto acontece **na View**, nunca no serviço.
+- **Autorização em três camadas, todas obrigatórias:** RLS no banco, guarda de rota no middleware, checagem no serviço.
+
+---
+
+## Definition of Done
+
+Uma task só está concluída quando **todos** os itens de [`architecture.md §10`](docs/architecture.md#10-definition-of-done) passam. Em resumo: `typecheck`, `lint`, `test` e `build` limpos; migration aplicada com policy de RLS testada; estados de loading, erro e vazio; acessibilidade AA; nenhum número de negócio hardcoded; evento de notificação gravado quando o módulo emite algum; e o cenário correspondente do Guia de Testes R2 coberto por E2E, quando houver.
+
+Não marque uma task como pronta sem rodar os comandos. Se algo falhar, diga o que falhou.

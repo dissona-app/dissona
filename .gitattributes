@@ -1,0 +1,19 @@
+# Normaliza para LF no repositório e no checkout — o CI roda em Ubuntu.
+* text=auto eol=lf
+
+# Binários
+*.docx binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
+*.mp3  binary
+*.wav  binary
+
+# Gerados — não contam como diff revisável
+pnpm-lock.yaml            linguist-generated=true -diff
+src/lib/supabase/tipos-bd.ts linguist-generated=true
+docs/R2/*.html            linguist-documentation=true -diff
