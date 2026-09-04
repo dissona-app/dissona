@@ -1,0 +1,95 @@
+/* Campo de texto - docs/design-system.md 2.2.1 */
+
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.rotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.obrigatorio {
+  color: var(--dsn-danger-fg);
+  margin-left: var(--dsn-space-1);
+}
+
+.caixa {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.entrada {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--dsn-text-base);
+  color: var(--dsn-ink);
+  background: var(--dsn-surface);
+  /* TODO(a11y): 1,26:1 sobre branco - reprova WCAG 1.4.11 (componente exige
+   * 3:1). Mantido por decisao de fidelidade ao prototipo; alternativa
+   * auditada e #8A8398 (3,63:1). Ver design-system.md 4.2. */
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 13px var(--dsn-space-7);
+  outline: none;
+  transition:
+    border-color var(--dsn-duration-base),
+    box-shadow var(--dsn-duration-base);
+}
+
+.entrada::placeholder {
+  color: var(--dsn-ink-500);
+}
+
+.entrada:focus {
+  border-color: var(--dsn-purple-500);
+  box-shadow: var(--dsn-shadow-focus);
+}
+
+.denso {
+  padding: clamp(9px, 1.25vh, 12px) var(--dsn-space-7);
+}
+
+.comAcao {
+  padding-right: var(--dsn-space-24);
+}
+
+.invalido {
+  border-color: var(--dsn-danger-fg);
+}
+
+.entrada:disabled {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink-500);
+  cursor: not-allowed;
+}
+
+.acao {
+  position: absolute;
+  right: var(--dsn-space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: none;
+  border-radius: var(--dsn-radius-lg);
+  color: var(--dsn-ink-500);
+}
+
+.erro {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-danger-fg);
+}
+
+.auxiliar {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}

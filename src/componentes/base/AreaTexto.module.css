@@ -1,0 +1,105 @@
+/* Textarea - docs/design-system.md 2.2.2 */
+
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.rotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.obrigatorio {
+  color: var(--dsn-danger-fg);
+  margin-left: var(--dsn-space-1);
+}
+
+.entrada {
+  width: 100%;
+  font-family: inherit;
+  color: var(--dsn-ink);
+  background: var(--dsn-surface);
+  border-radius: var(--dsn-radius-lg);
+  outline: none;
+  /* O prototipo nunca permite redimensionar textarea. */
+  resize: none;
+  transition:
+    border-color var(--dsn-duration-base),
+    box-shadow var(--dsn-duration-base);
+}
+
+.entrada:focus {
+  border-color: var(--dsn-purple-500);
+  box-shadow: var(--dsn-shadow-focus);
+}
+
+.entrada::placeholder {
+  color: var(--dsn-ink-500);
+}
+
+/* Variantes medidas no R2. */
+
+.bio {
+  font-size: var(--dsn-text-base);
+  line-height: var(--dsn-leading-normal);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  padding: 11px var(--dsn-space-7);
+}
+
+.contexto {
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-relaxed);
+  border: var(--dsn-border-width) solid var(--dsn-border-soft);
+  padding: var(--dsn-space-6) var(--dsn-space-7);
+}
+
+.bioCurador {
+  font-size: var(--dsn-text-base);
+  line-height: var(--dsn-leading-body);
+  border: var(--dsn-border-width) solid var(--dsn-border-soft);
+  padding: 13px var(--dsn-space-7);
+}
+
+.justificativa {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-body);
+  border: var(--dsn-border-width) solid var(--dsn-border-soft);
+  padding: 11px var(--dsn-space-6);
+}
+
+.invalido {
+  border-color: var(--dsn-danger-fg);
+}
+
+.entrada:disabled {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink-500);
+  cursor: not-allowed;
+}
+
+.rodape {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+}
+
+.erro {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-danger-fg);
+}
+
+.contador {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+.contadorExcedido {
+  color: var(--dsn-danger-fg);
+}

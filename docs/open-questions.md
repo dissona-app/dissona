@@ -268,6 +268,20 @@ Hoje **um único projeto Supabase** (`dissona`, `us-west-2`) serve tanto o Previ
 Antes de qualquer usuário real, provisionar `dissona-staging` e `dissona-producao` (US$ 10/mês cada) e separar as env vars da Vercel por escopo.
 **Gatilho:** antes do beta. **Decisão de:** técnico. **Impacto:** [arquitetura §2.2 e §9](architecture.md), env vars da Vercel, CI.
 
+### 26. Duas reprovações de contraste mantidas por fidelidade ao protótipo
+
+A auditoria do [Design System §4.2](design-system.md) reprova sete pares de contraste. Cinco foram corrigidos na implementação da R0 (botão em loading, botão desabilitado, dot de sucesso usado como texto, "senha média" e numeral de stepper). Dois foram **mantidos como estão no protótipo**, por decisão de fidelidade visual:
+
+| Par | Ratio | Exigência | Alternativa auditada |
+|---|---|---:|---|
+| Borda de campo em repouso `#E7E3EF` / branco | **1,26:1** | WCAG 1.4.11 pede 3:1 para componente | `#8A8398` (3,63:1), ou dar contraste pelo fundo do campo |
+| Botão primário, branco / `#E35336` | **3,78:1** | AA pede 4,5:1 para texto de 16px/600 | `#C4442A` (4,99:1), que o protótipo já usa no hover |
+
+Ambos estão marcados com `TODO(a11y)` em `src/estilos/tokens.css`, `Campo.module.css` e `Botao.module.css`.
+
+**Consequência:** o item "contraste AA" da [Definition of Done](architecture.md#10-definition-of-done) passa **com estas duas exceções registradas**, e não integralmente. Quem for revisar a R0 precisa saber disso.
+**Gatilho:** revisão de acessibilidade antes do beta. **Decisão de:** cliente + design.
+
 ---
 
 ## 4. Resolvidas

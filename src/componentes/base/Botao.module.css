@@ -1,0 +1,159 @@
+/* Botão — docs/design-system.md §2.3 */
+
+.base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsn-space-5);
+  border: none;
+  border-radius: var(--dsn-radius-lg);
+  font-family: inherit;
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  cursor: pointer;
+  transition:
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    border-color var(--dsn-duration-base) var(--dsn-ease-out),
+    color var(--dsn-duration-base) var(--dsn-ease-out),
+    box-shadow var(--dsn-duration-base);
+}
+
+.base:disabled {
+  cursor: not-allowed;
+}
+
+.blocoInteiro {
+  width: 100%;
+}
+
+/* ------------------------------------------------------------- primário */
+
+.primario {
+  /* TODO(a11y): 3,78:1 com label de 16px/600 — reprova AA. Mantido por
+   * decisão de fidelidade ao protótipo; alternativa auditada é
+   * --dsn-orange-600 (4,99:1). Ver design-system.md §4.2. */
+  background: var(--dsn-orange-500);
+  color: #ffffff;
+  font-size: var(--dsn-text-md);
+}
+
+.primario:hover:not(:disabled) {
+  background: var(--dsn-orange-600);
+  box-shadow: var(--dsn-shadow-cta);
+}
+
+.primario:active:not(:disabled) {
+  background: var(--dsn-orange-700);
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------ secundário */
+
+.secundario {
+  background: var(--dsn-surface);
+  color: var(--dsn-purple-600);
+  border: var(--dsn-border-width) solid var(--dsn-purple-600);
+  font-size: var(--dsn-text-md);
+}
+
+.secundario:hover:not(:disabled) {
+  background: var(--dsn-purple-050);
+}
+
+/* ----------------------------------------------------------------- ghost */
+
+.ghost {
+  background: none;
+  color: var(--dsn-purple-600);
+  font-size: var(--dsn-text-sm);
+  padding: 0;
+}
+
+.ghost:hover:not(:disabled) {
+  color: var(--dsn-purple-500);
+  text-decoration: underline;
+}
+
+.neutro {
+  background: none;
+  color: var(--dsn-ink-500);
+  font-size: var(--dsn-text-sm);
+  border-radius: var(--dsn-radius-lg);
+}
+
+.neutro:hover:not(:disabled) {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink);
+}
+
+.destrutivo {
+  background: none;
+  color: var(--dsn-danger-fg);
+  font-size: var(--dsn-text-sm);
+}
+
+.destrutivo:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* -------------------------------------------------------------- tamanhos */
+
+.md {
+  padding: 15px var(--dsn-space-11);
+}
+
+.denso {
+  padding: clamp(10px, 1.5vh, 13px) var(--dsn-space-11);
+}
+
+.sm {
+  padding: var(--dsn-space-4) var(--dsn-space-5);
+}
+
+.semPadding {
+  padding: 0;
+}
+
+/* ------------------------------------------------------------- disabled */
+
+/*
+ * A auditoria reprova #9B93A8 sobre #E7E3EF (2,33:1). Corrigido para
+ * --dsn-ink-500, que dá 4,40:1 sobre a mesma superfície (§4.2).
+ */
+.base:disabled:not(.ghost):not(.neutro):not(.destrutivo) {
+  background: var(--dsn-border);
+  color: var(--dsn-ink-500);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.base:disabled.ghost,
+.base:disabled.neutro,
+.base:disabled.destrutivo {
+  color: var(--dsn-ink-400);
+  background: none;
+  text-decoration: none;
+}
+
+/* -------------------------------------------------------------- spinner */
+
+/*
+ * O protótipo clareia o fundo para #EFB6A9 durante o loading, o que dá 1,76:1
+ * e torna o rótulo ilegível (§4.2). Aqui o fundo é mantido e o estado é
+ * comunicado por spinner + aria-busy, que é a correção sugerida na auditoria.
+ */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: var(--dsn-radius-circle);
+  animation: dsnSpin 700ms linear infinite;
+}
+
+.secundario .spinner,
+.ghost .spinner,
+.neutro .spinner {
+  border-color: var(--dsn-border);
+  border-top-color: var(--dsn-purple-600);
+}

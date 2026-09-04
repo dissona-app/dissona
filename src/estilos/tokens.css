@@ -1,0 +1,235 @@
+/*
+ * Tokens do Design System — extraídos dos protótipos da R2 como valores
+ * literais (docs/design-system.md §1).
+ *
+ * Os protótipos NÃO usam custom properties: os `--dsn-*` são nomes propostos
+ * pela documentação, e os valores são os medidos no HTML. Não invente token
+ * novo aqui sem que exista no §1.
+ */
+
+:root {
+  /* ---------------------------------------------- Roxo (marca / identidade) */
+  --dsn-purple-900: #1b0d2a;
+  --dsn-purple-850: #241239;
+  --dsn-purple-800: #2d1747;
+  --dsn-purple-600: #5b2e8f;
+  --dsn-purple-500: #7f47dd;
+  --dsn-purple-400: #8a4fe3;
+  --dsn-purple-300: #b79be4;
+  --dsn-purple-200: #d9c7f3;
+  --dsn-purple-200-alt: #d3c7e8;
+  --dsn-purple-100: #f1eafb;
+  --dsn-purple-050: #f6f3fb;
+  --dsn-purple-025: #fdfcff;
+
+  /* ------------------------------------------------- Laranja (ação / CTA) */
+  --dsn-orange-500: #e35336;
+  --dsn-orange-600: #c4442a;
+  --dsn-orange-650: #c0472f;
+  --dsn-orange-700: #a93a22;
+  --dsn-orange-800: #8c3a2c;
+  --dsn-orange-300: #efb6a9;
+  --dsn-orange-200: #ebd2cd;
+  --dsn-orange-100: #fbedea;
+  --dsn-orange-050: #fdf8f7;
+
+  /* ------------------------------------------------------------- Neutros */
+  --dsn-ink: #1b1226;
+  --dsn-ink-700: #4a4553;
+  --dsn-ink-500: #6b6675;
+  --dsn-ink-400: #9b93a8;
+  --dsn-ink-300: #b5afc0;
+  --dsn-ink-250: #c9c3d6;
+  --dsn-ink-200: #d9d3e6;
+  --dsn-border: #e7e3ef;
+  --dsn-border-soft: #e2ddec;
+  --dsn-border-faint: #f1eef7;
+  --dsn-track: #eeeaf5;
+  --dsn-surface: #ffffff;
+  --dsn-surface-alt: #fbfafe;
+
+  /* ------------------------------------------------ Sidebar (tema escuro) */
+  --dsn-nav-fg: #ffffff;
+  --dsn-nav-fg-idle: #c6bad9;
+  --dsn-nav-overline: #9b8cb5;
+  --dsn-nav-bg-active: #7f47dd;
+  --dsn-nav-bg-hover: rgba(255, 255, 255, 0.08);
+  --dsn-nav-divider: rgba(255, 255, 255, 0.08);
+  --dsn-nav-card-bg: rgba(255, 255, 255, 0.035);
+
+  /* -------------------------------------------------- Estados semânticos */
+  --dsn-success-fg: #1e7a4a;
+  --dsn-success-bg: #e6f5ed;
+  --dsn-success-bg-soft: #f2faf5;
+  --dsn-success-border: #bfe3ce;
+  /* Indicador gráfico apenas — 3,14:1. Nunca como cor de texto (§4.2). */
+  --dsn-success-dot: #2fa565;
+
+  --dsn-info-fg: #5b2e8f;
+  --dsn-info-bg: #f1eafb;
+
+  --dsn-warning-fg: #8a5a12;
+  --dsn-warning-bg: #fdf3e2;
+  --dsn-warning-bg-soft: #fff6e6;
+  --dsn-warning-border: #f0ddb6;
+
+  --dsn-danger-fg: #8c3a2c;
+  --dsn-danger-bg: #fbedea;
+  --dsn-danger-border: #ebd2cd;
+
+  --dsn-neutral-fg: #4a4553;
+  --dsn-neutral-bg: #f1eff5;
+
+  --dsn-dot-pendente: #e0a03a;
+  --dsn-dot-desativado: #b9b2c6;
+
+  /* ------------------------------------------------- Gradientes de marca */
+  --dsn-grad-sidebar: linear-gradient(180deg, #2d1747 0%, #241239 52%, #1b0d2a 100%);
+  --dsn-grad-auth-bg: linear-gradient(180deg, #fdfcff 0%, #f8f5fd 45%, #f1ecfa 100%);
+  --dsn-grad-brand-h: linear-gradient(90deg, #5b2e8f, #7f47dd 55%, #e35336);
+  --dsn-grad-brand-diag: linear-gradient(145deg, #8a4fe3 0%, #5b2e8f 46%, #e35336 100%);
+  --dsn-grad-brand-96: linear-gradient(96deg, #5b2e8f 0%, #7f47dd 46%, #e35336 100%);
+
+  /* ------------------------------------------------------------ Overlays */
+  --dsn-focus-ring: rgba(127, 71, 221, 0.16);
+  --dsn-focus-ring-slider: rgba(127, 71, 221, 0.14);
+  --dsn-backdrop: rgba(27, 18, 38, 0.42);
+  --dsn-topbar-bg: rgba(255, 255, 255, 0.9);
+  --dsn-selection: rgba(127, 71, 221, 0.18);
+
+  /* Anel de foco de botão, tab, item de nav e card clicável — o R2 não o
+   * define, só estiliza foco de input (§4.3). 5,46:1 sobre branco. */
+  --dsn-focus-outline-width: 2px;
+  --dsn-focus-outline-color: #7f47dd;
+  --dsn-focus-outline-color-dark: #ffffff;
+  --dsn-focus-offset: 2px;
+
+  /* ---------------------------------------------------------- Tipografia */
+  --dsn-font-sans:
+    Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --dsn-text-3xl: clamp(31px, 4.4vh, 42px);
+  --dsn-text-2xl: clamp(24px, 3.4vh, 30px);
+  --dsn-text-xl: clamp(22px, 3vh, 27px);
+  --dsn-text-lg: 24px;
+  --dsn-text-md: 16px;
+  --dsn-text-base: 15px;
+  --dsn-text-sm: 14px;
+  --dsn-text-xs: 13px;
+  --dsn-text-2xs: 12px;
+  --dsn-text-3xs: 11px;
+  --dsn-text-4xs: 10px;
+
+  --dsn-weight-regular: 400;
+  --dsn-weight-medium: 500;
+  /* Peso dominante: a UI é semibold por padrão, não regular (§1.2). */
+  --dsn-weight-semibold: 600;
+  --dsn-weight-bold: 700;
+  --dsn-weight-black: 800;
+
+  --dsn-tracking-tightest: -0.035em;
+  --dsn-tracking-tighter: -0.03em;
+  --dsn-tracking-tight: -0.025em;
+  --dsn-tracking-snug: -0.01em;
+  --dsn-tracking-label: 0.16em;
+  --dsn-tracking-overline: 0.18em;
+  --dsn-tracking-badge: 0.1em;
+
+  --dsn-leading-none: 1;
+  --dsn-leading-hero: 1.04;
+  --dsn-leading-title: 1.1;
+  --dsn-leading-snug: 1.4;
+  --dsn-leading-dense: 1.45;
+  --dsn-leading-normal: 1.5;
+  --dsn-leading-body: 1.55;
+  --dsn-leading-relaxed: 1.6;
+
+  /* --------------------------------------------------------- Espaçamento */
+  --dsn-space-1: 2px;
+  --dsn-space-2: 4px;
+  --dsn-space-3: 6px;
+  --dsn-space-4: 8px;
+  --dsn-space-5: 10px;
+  /* Unidade dominante (190 ocorrências). */
+  --dsn-space-6: 12px;
+  --dsn-space-7: 14px;
+  --dsn-space-8: 16px;
+  --dsn-space-9: 18px;
+  --dsn-space-10: 20px;
+  --dsn-space-11: 22px;
+  --dsn-space-12: 24px;
+  --dsn-space-14: 28px;
+  --dsn-space-16: 32px;
+  --dsn-space-20: 40px;
+  --dsn-space-24: 48px;
+
+  /* Fluidos — o R2 não tem nenhum `@media`; a escala vem de clamp() (§1.3). */
+  --dsn-pad-secao-y: clamp(20px, 2.4vh, 28px);
+  --dsn-pad-auth-x: clamp(20px, 4vw, 48px);
+  --dsn-gap-bloco: clamp(16px, 2.4vh, 22px);
+  --dsn-pad-card-auth: clamp(20px, 2.8vh, 30px);
+  --dsn-pad-card-kpi: clamp(12px, 2vh, 18px);
+  --dsn-pad-nav-item: clamp(7px, 1.2vh, 10px);
+
+  /* ------------------------------------------------------ Raio de borda */
+  --dsn-radius-sm: 5px;
+  --dsn-radius-md: 8px;
+  /* Raio padrão (300 ocorrências). */
+  --dsn-radius-lg: 10px;
+  --dsn-radius-xl: 12px;
+  --dsn-radius-2xl: 14px;
+  --dsn-radius-3xl: 16px;
+  --dsn-radius-full: 999px;
+  --dsn-radius-circle: 50%;
+
+  --dsn-border-width: 1px;
+
+  /* ----------------------------------------------------------- Elevação */
+  --dsn-shadow-xs: 0 1px 2px rgba(27, 18, 38, 0.04);
+  --dsn-shadow-card: 0 1px 2px rgba(27, 18, 38, 0.04), 0 18px 48px rgba(27, 18, 38, 0.1);
+  --dsn-shadow-menu: 0 2px 4px rgba(27, 18, 38, 0.05), 0 18px 40px rgba(27, 18, 38, 0.12);
+  --dsn-shadow-modal: 0 2px 4px rgba(27, 18, 38, 0.05), 0 18px 40px rgba(27, 18, 38, 0.18);
+  --dsn-shadow-toast: 0 2px 4px rgba(27, 18, 38, 0.05), 0 18px 40px rgba(27, 18, 38, 0.24);
+  --dsn-shadow-cta: 0 6px 18px rgba(227, 83, 54, 0.26);
+  --dsn-shadow-focus: 0 0 0 3px var(--dsn-focus-ring);
+  --dsn-shadow-focus-slider: 0 0 0 4px var(--dsn-focus-ring-slider);
+
+  /* ----------------------------------------------------------- Movimento */
+  --dsn-duration-fast: 180ms;
+  /* Duração padrão de toda transição de cor/borda/fundo. */
+  --dsn-duration-base: 200ms;
+  --dsn-duration-slow: 240ms;
+  --dsn-duration-enter: 240ms;
+  --dsn-duration-reveal: 320ms;
+  /* Easing único da UI (expo-out). */
+  --dsn-ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+
+  /* --------------------------------------------------------- Iconografia */
+  --dsn-icon-stroke: 1.7;
+  --dsn-icon-sm: 14px;
+  --dsn-icon-md: 15px;
+  --dsn-icon-lg: 17px;
+  --dsn-icon-xl: 18px;
+
+  /* ---------------------------------------------------------- Shell (§3) */
+  --dsn-viewport-referencia: 1280px;
+  --dsn-sidebar-largura: 260px;
+  --dsn-topbar-altura: 64px;
+}
+
+/*
+ * Exceções de acessibilidade — decididas com o cliente em favor da fidelidade
+ * ao protótipo da R2 (docs/design-system.md §4.2).
+ *
+ * TODO(a11y): `--dsn-border` em repouso dá 1,26:1 sobre branco e falha a WCAG
+ * 1.4.11 (componente exige 3:1). A alternativa auditada é `#8A8398` (3,63:1),
+ * ou dar contraste ao campo pelo fundo em vez da borda.
+ *
+ * TODO(a11y): `--dsn-orange-500` como fundo do botão primário dá 3,78:1 com
+ * label de 16px/600, e falha AA para texto normal. A alternativa auditada é
+ * `--dsn-orange-600` (#C4442A, 4,99:1).
+ *
+ * As duas ficam registradas como pendência aberta; o restante da auditoria
+ * (botão em loading, botão desabilitado, dot de sucesso, "senha média" e
+ * numeral de stepper) foi corrigido nos tokens semânticos acima.
+ */

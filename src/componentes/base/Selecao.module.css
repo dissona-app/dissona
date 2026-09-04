@@ -1,0 +1,75 @@
+/* Select — docs/design-system.md §2.2.3 */
+
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.rotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.entrada {
+  width: 100%;
+  appearance: none;
+  font-family: inherit;
+  color: var(--dsn-ink);
+  background-color: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  outline: none;
+  /* Seta desenhada por gradiente, como no protótipo — sem imagem externa. */
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--dsn-ink-500) 50%),
+    linear-gradient(135deg, var(--dsn-ink-500) 50%, transparent 50%);
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+  transition:
+    border-color var(--dsn-duration-base),
+    box-shadow var(--dsn-duration-base);
+}
+
+.entrada:focus {
+  border-color: var(--dsn-purple-500);
+  box-shadow: var(--dsn-shadow-focus);
+}
+
+.formulario {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-regular);
+  padding: var(--dsn-space-6) var(--dsn-space-20) var(--dsn-space-6) var(--dsn-space-7);
+  background-position:
+    right 18px center,
+    right 13px center;
+}
+
+.tabela {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-medium);
+  padding: 9px var(--dsn-space-16) 9px var(--dsn-space-6);
+  background-position:
+    right 15px center,
+    right 10px center;
+}
+
+.invalido {
+  border-color: var(--dsn-danger-fg);
+}
+
+.entrada:disabled {
+  background-color: var(--dsn-purple-050);
+  color: var(--dsn-ink-500);
+  cursor: not-allowed;
+}
+
+.erro {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-danger-fg);
+}

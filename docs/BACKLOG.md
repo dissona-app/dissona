@@ -63,8 +63,8 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [x] Criar `lib/configuracao` para leitura tipada da tabela `configuracao`
 
 ### Design System
-- [ ] Criar `src/estilos/tokens.css` a partir do [Design System](design-system.md)
-- [ ] Criar componentes base: `Botao`, `Campo`, `AreaTexto`, `Selecao`, `Grupo`
+- [x] Criar `src/estilos/tokens.css` a partir do [Design System](design-system.md)
+- [x] Criar componentes base: `Botao`, `Campo`, `AreaTexto`, `Selecao`, `Grupo`
 - [ ] Criar componentes base: `Cartao`, `Painel`, `Tabela`, `Etiqueta`, `SeloClasse`
 - [ ] Criar componentes base: `Modal`, `Gaveta`, `Aviso`, `BarraProgresso`, `EstadoVazio`, `Passos`
 - [ ] Criar componente `CampoNota` (0–5 com uma casa decimal)

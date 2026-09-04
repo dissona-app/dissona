@@ -1,0 +1,76 @@
+'use client';
+
+import type { SelectHTMLAttributes } from 'react';
+import { useId } from 'react';
+
+import estilos from './Selecao.module.css';
+
+export type OpcaoSelecao = {
+  readonly valor: string;
+  readonly rotulo: string;
+  readonly desabilitada?: boolean;
+};
+
+export type PropsSelecao = Omit<
+  SelectHTMLAttributes<HTMLSelectElement>,
+  'className' | 'id' | 'children'
+> & {
+  readonly rotulo: string;
+  readonly opcoes: readonly OpcaoSelecao[];
+  readonly erro?: string;
+  readonly variante?: 'formulario' | 'tabela';
+  /** Rótulo da opção vazia. Sem ele o select não tem estado "nada escolhido". */
+  readonly placeholder?: string;
+};
+
+export function Selecao({
+  rotulo,
+  opcoes,
+  erro,
+  variante = 'formulario',
+  placeholder,
+  required = false,
+  ...resto
+}: PropsSelecao) {
+  const id = useId();
+  const idErro = `${id}-erro`;
+
+  const classes = [
+    estilos.entrada,
+    variante === 'tabela' ? estilos.tabela : estilos.formulario,
+    erro !== undefined ? estilos.invalido : undefined,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <div className={estilos.envolvente}>
+      <label className={estilos.rotulo} htmlFor={id}>
+        {rotulo}
+      </label>
+
+      <select
+        {...resto}
+        id={id}
+        className={classes}
+        required={required}
+        aria-required={required || undefined}
+        aria-invalid={erro !== undefined || undefined}
+        aria-describedby={erro !== undefined ? idErro : undefined}
+      >
+        {placeholder !== undefined ? <option value="">{placeholder}</option> : null}
+        {opcoes.map((opcao) => (
+          <option key={opcao.valor} value={opcao.valor} disabled={opcao.desabilitada}>
+            {opcao.rotulo}
+          </option>
+        ))}
+      </select>
+
+      {erro !== undefined ? (
+        <span className={estilos.erro} id={idErro} role="alert">
+          {erro}
+        </span>
+      ) : null}
+    </div>
+  );
+}

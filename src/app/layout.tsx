@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 
 import { ProvedorDeConsulta } from '@/lib/consulta/provedor';
 
+import '@/estilos/global.css';
+
 export const metadata: Metadata = {
   title: 'Dissona',
   description:
