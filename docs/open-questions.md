@@ -325,3 +325,4 @@ Não são pendências — são riscos já identificados, com mitigação decidid
 | Empty states no lançamento | No beta tudo começa sem dados — tratar explicitamente | 2, 6, 16, 24, 26 |
 | Conta ou credencial falsa de curador | Credencial com link verificável + amostragem na aprovação | 12.3, 20.3 |
 | Avaliações em massa | Calibração penaliza compressão de notas | 16, 23 |
+| **Token pessoal do Supabase em texto puro** no `.mcp.json` local, com acesso de gestão a todos os projetos da organização | **Risco aceito** (decisão de 2026-09-04): não rotacionar. Mitigação em vigor: `.mcp.json` está no `.gitignore` e nunca entrou em commit — conferido com `git ls-files`. O arquivo existe apenas em disco local | — |

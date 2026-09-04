@@ -298,7 +298,11 @@ Sem Redis nem broker externo na V1. `pg_cron` agenda, Edge Functions executam.
 
 ## 9. Ambientes e deploy
 
-**Hospedagem: Vercel.** Um projeto, **Production Branch = `main`**. Região das funções **`pdx1`** (Portland, `us-west-2`), para ficar co-localizada com o Supabase — confirmar o código na lista de regiões do dashboard antes de aplicar.
+**Hospedagem: Vercel.** Um projeto, **Production Branch = `main`**. Produção em **`https://dissona.vercel.app`**.
+
+Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `pdx1` que a R0 havia sugerido. O efeito é uma troca: melhor tempo de resposta para o usuário brasileiro, e ~120 ms a mais em cada ida ao banco, que está em `us-west-2`. Como o `middleware.ts` faz um `getUser()` por requisição, essa ida acontece em toda navegação. Vale revisar junto da pendência [#25](open-questions.md), quando os projetos dedicados forem provisionados.
+
+⚠️ O **Site URL** do Supabase Auth precisa ser **`https://`**. Com `http://`, os links dos e-mails de verificação e recuperação saem inseguros, e a Vercel responde `308` para o `https` — o que pode fazer o redirect de OAuth não casar com a allow list.
 
 | Ambiente | App | Supabase | Gatilho |
 |---|---|---|---|
@@ -311,6 +315,10 @@ Sem Redis nem broker externo na V1. `pg_cron` agenda, Edge Functions executam.
 Hoje a suíte sobe o próprio servidor na **porta 3100**, e não na 3000: se outro projeto estiver servindo a porta padrão, reusar o que está lá faz a suíte testar o app errado. Quando a Vercel estiver conectada, definir `BASE_URL` com a URL do Preview do PR desliga o `webServer` do Playwright sozinho.
 
 Segredos por escopo da Vercel (Production e Preview): chaves Supabase, credenciais OAuth, chave e webhook do Asaas, provedor de e-mail, chaves Spotify e YouTube. Nada de segredo em arquivo versionado — `.env.local` e `.mcp.json` estão no `.gitignore`.
+
+⚠️ **`NEXT_PUBLIC_*` é embutida no build, não lida em tempo de execução.** Acrescentar a variável na Vercel **não** conserta um deploy já construído sem ela: é preciso **redeployar**. Foi exatamente o que derrubou o primeiro deploy da R0 com `MIDDLEWARE_INVOCATION_FAILED` em todas as rotas.
+
+O `middleware.ts` degrada em vez de cair quando não consegue renovar a sessão: rota pública continua servida, rota autenticada redireciona para o login, e o motivo vai para o log da função. Uma variável faltando não deve tirar `/termos` do ar.
 
 ⚠️ Enquanto Preview e Production compartilham o mesmo projeto Supabase, **um `supabase db reset --linked` apaga o banco dos dois**. Vale só nesta fase de desenvolvimento; some quando a pendência #25 for resolvida.
 

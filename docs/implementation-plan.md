@@ -65,7 +65,7 @@ Não consome horas do banco de 74h — é custo de setup.
 ### TASK-001 · Projeto Supabase e migrations
 Projeto `dissona` (desenvolvimento) · Supabase CLI como devDependency · `.env.local` apontando para o projeto certo · fluxo local de migration · geração de `lib/supabase/tipos-bd.ts`.
 **Depende de:** TASK-000
-**Pronto:** `supabase db reset` reconstrói o banco do zero a partir de `supabase/migrations/`; tipos gerados entram no typecheck.
+**Pronto:** os arquivos de `supabase/migrations/` reconstroem o banco do zero, e os tipos gerados entram no typecheck. Sem Docker na máquina, a verificação é reaplicar as migrations no projeto de desenvolvimento — `supabase db reset` local fica indisponível por decisão.
 
 ### TASK-002 · Route groups e guarda de sessão
 `(publico)`, `(auth)`, `(app)`, `(admin)` · `middleware.ts` renovando sessão e aplicando a guarda de papel · `lib/supabase/{cliente,servidor,middleware}.ts`.
