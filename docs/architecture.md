@@ -306,7 +306,9 @@ Sem Redis nem broker externo na V1. `pg_cron` agenda, Edge Functions executam.
 | Preview | Vercel Preview | projeto `dissona` | push em qualquer branch / PR |
 | Produção | Vercel Production | projeto `dissona` — **provisório** | merge em `main` |
 
-**CI obrigatório:** `typecheck` → `lint` → `test` → `build`, no GitHub Actions, em todo PR e em `main`. O **E2E roda contra o Preview do PR**.
+**CI obrigatório:** `typecheck` → `lint` → `test` → `build`, no GitHub Actions, em todo PR e em `main`. O **E2E** roda depois, num job próprio que só dispara se a qualidade passou.
+
+Hoje a suíte sobe o próprio servidor na **porta 3100**, e não na 3000: se outro projeto estiver servindo a porta padrão, reusar o que está lá faz a suíte testar o app errado. Quando a Vercel estiver conectada, definir `BASE_URL` com a URL do Preview do PR desliga o `webServer` do Playwright sozinho.
 
 Segredos por escopo da Vercel (Production e Preview): chaves Supabase, credenciais OAuth, chave e webhook do Asaas, provedor de e-mail, chaves Spotify e YouTube. Nada de segredo em arquivo versionado — `.env.local` e `.mcp.json` estão no `.gitignore`.
 

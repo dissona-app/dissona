@@ -1,0 +1,71 @@
+/* Pagina de documento legal - texto corrido, sem shell. */
+
+.pagina {
+  min-height: 100vh;
+  background: var(--dsn-grad-auth-bg);
+  padding: var(--dsn-pad-secao-y) var(--dsn-pad-auth-x);
+}
+
+.folha {
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-gap-bloco);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  box-shadow: var(--dsn-shadow-card);
+  padding: var(--dsn-pad-card-auth);
+}
+
+.voltar {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--dsn-text-2xl);
+  font-weight: var(--dsn-weight-black);
+  line-height: var(--dsn-leading-title);
+  letter-spacing: var(--dsn-tracking-tightest);
+  color: var(--dsn-ink);
+}
+
+.atualizacao {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink);
+}
+
+.corpo {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-700);
+}
+
+.lista {
+  margin: 0;
+  padding-left: var(--dsn-space-10);
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-700);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+}

@@ -79,7 +79,8 @@ pnpm db:tipos          # regenera lib/supabase/tipos-bd.ts
 | `pnpm format` | Prettier |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm test` | Vitest |
-| `pnpm e2e` | Playwright |
+| `pnpm e2e` | Playwright — sobe o app na porta 3100 |
+| `pnpm e2e:navegadores` | Instala o Chromium do Playwright (uma vez) |
 | `pnpm db:reset` | Reconstrói o banco local do zero |
 | `pnpm db:push` | Aplica as migrations pendentes no projeto linkado |
 | `pnpm db:tipos` | Regenera `lib/supabase/tipos-bd.ts` |

@@ -237,7 +237,7 @@ Playwright configurado · CI no GitHub Actions · deploy na Vercel com `main` = 
 | TASK-266 | Job `avisar_prazo_72h` | TASK-206, TASK-106 |
 | TASK-267 | Job `devolver_claves_sem_resposta` | TASK-206 |
 
-**Gate da R2:** os **16 cenários do Guia de Testes da Release 2** passam em E2E · compra de Claves credita uma única vez sob webhook duplicado · avaliação concluída gera ganho com o percentual correto por classe e prazo · devolução de 7 dias volta ao extrato e tira a faixa da fila · nenhum número de negócio fora de `configuracao`.
+**Gate da R2:** os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E · compra de Claves credita uma única vez sob webhook duplicado · avaliação concluída gera ganho com o percentual correto por classe e prazo · devolução de 7 dias volta ao extrato e tira a faixa da fila · nenhum número de negócio fora de `configuracao`.
 
 ---
 

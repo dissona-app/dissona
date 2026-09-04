@@ -73,11 +73,11 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 
 ### Entrega e conformidade
 - [x] Criar `.gitignore` **antes** do primeiro commit — `.env*.local` e `.mcp.json` carregam segredo
-- [ ] Configurar Playwright e estrutura de `e2e`
+- [x] Configurar Playwright e estrutura de `e2e` — 16 cenários do guia como `skip`, mais 9 testes da R0
 - [ ] Conectar o repositório à Vercel: Production Branch `main`, funções em `pdx1`, Node 24
 - [ ] Configurar as env vars da Vercel nos escopos Production e Preview
 - [ ] Cadastrar as Redirect URLs de Preview e produção no Supabase Auth
-- [ ] Criar páginas públicas de Termos de uso e Política de privacidade
+- [x] Criar páginas públicas de Termos de uso e Política de privacidade — estrutura pronta, **texto pendente do jurídico**
 
 ---
 
@@ -228,7 +228,7 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [ ] Estados do envio `Recebeu → Ouviu → Avaliando → Pronto` gravados para o Status de envio (3.3, R3)
 
 ### Gate da R2
-- [ ] Os **16 cenários do Guia de Testes da Release 2** passam em E2E
+- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — os arquivos existem em `e2e/`, hoje como `skip`
 - [ ] Compra de Claves credita uma única vez sob webhook duplicado
 - [ ] Avaliação concluída gera ganho com o percentual correto por classe e prazo
 - [ ] Devolução de 7 dias aparece no extrato e remove a faixa da fila
