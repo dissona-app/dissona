@@ -40,15 +40,32 @@ pnpm install
 # copie e preencha as variáveis de ambiente
 cp .env.example .env.local
 
-# stack Supabase local (precisa do Docker)
-pnpm supabase start
-pnpm db:reset          # reconstrói o banco a partir de supabase/migrations/
-pnpm db:tipos          # gera lib/supabase/tipos-bd.ts
-
 pnpm dev               # http://localhost:3000
 ```
 
-Sem Docker, dá para trabalhar direto contra o projeto Supabase remoto de desenvolvimento com `pnpm db:push`. Atenção: **`supabase db reset --linked` apaga o banco remoto**, que hoje é compartilhado entre Preview e Production ([#25](docs/open-questions.md#25-projetos-dedicados-de-staging-e-produção)).
+O app sobe sem banco local: as variáveis de `.env.local` apontam para o projeto Supabase de desenvolvimento.
+
+### Banco
+
+O caminho padrão é o **MCP do Supabase** — `apply_migration` para aplicar, `list_migrations` e `get_advisors` para conferir, `generate_typescript_types` para os tipos. Não exige Docker nem `supabase login`.
+
+O fluxo de uma migration é sempre:
+
+1. escrever o `.sql` em `supabase/migrations/` — o arquivo é a fonte;
+2. aplicar pelo MCP;
+3. ler a versão gravada e **renomear o arquivo com ela** (`<timestamp>_<NNNN>_<nome>.sql`).
+
+O passo 3 não é opcional: a CLI deriva a versão do nome do arquivo, e um prefixo fora de sincronia faz reaplicar o que já foi aplicado. Ver [arquitetura §2.4](docs/architecture.md).
+
+Para a stack local, com Docker rodando:
+
+```bash
+pnpm supabase start
+pnpm db:reset          # reconstrói o banco a partir de supabase/migrations/
+pnpm db:tipos          # regenera lib/supabase/tipos-bd.ts
+```
+
+⚠️ **`supabase db reset --linked` apaga o banco remoto**, que hoje é compartilhado entre Preview e Production ([#25](docs/open-questions.md#25-projetos-dedicados-de-staging-e-produção)).
 
 ---
 

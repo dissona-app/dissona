@@ -50,10 +50,10 @@ Setup; não consome horas do banco de 74h. Ver [plano · R0](implementation-plan
 ### Plataforma de dados
 Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcibjzmowcjkdrqyvi` / `us-west-2`. Staging e produção viram [#25](open-questions.md#25-projetos-dedicados-de-staging-e-produção).
 - [x] Apontar `.env.local` para o projeto `dissona` — hoje carrega as chaves do projeto `metrya`
-- [ ] Instalar o Supabase CLI como devDependency e linkar o projeto
+- [x] Instalar o Supabase CLI como devDependency
 - [ ] Configurar o fluxo local de migrations (`supabase db reset` reconstrói do zero)
-- [ ] Criar `lib/supabase` (cliente, servidor, middleware) e geração de `tipos-bd.ts`
-- [ ] Migration `0000_storage.sql` — buckets `faixas`, `capas`, `avatares`, `materiais`, `exportacoes` e policies
+- [x] Criar `lib/supabase` (cliente, servidor, middleware) e geração de `tipos-bd.ts`
+- [x] Migration `0000_storage` — buckets `faixas`, `capas`, `avatares`, `materiais`, `exportacoes` e policies
 
 ### Estrutura da aplicação
 - [x] Criar os route groups `(publico)`, `(auth)`, `(app)` e `(admin)`

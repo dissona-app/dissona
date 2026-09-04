@@ -48,7 +48,7 @@ Estas já estão implícitas na arquitetura, mas ficam explícitas porque são o
 - **Sem número de negócio hardcoded.** Thresholds, prazos, pisos e tetos vêm da tabela `configuracao`.
 - **Sem float para dinheiro.** `bigint` em centavos; só `lib/dinheiro.ts` formata.
 - **Sem `insert` direto** em `lancamento_clave`, `ganho_curador` ou `notificacao` — só por RPC `security definer` e por `registrar_notificacao()`.
-- **Sem DDL pelo MCP do Supabase.** O MCP é para inspeção (`list_tables`, `list_migrations`, `get_advisors`, leitura). Migration é só pelo CLI, senão `supabase_migrations` divirja dos arquivos.
+- **Sem DDL fora de migration versionada.** Escreva o `.sql` em `supabase/migrations/` **primeiro**, aplique pelo MCP (`apply_migration`) e renomeie o arquivo com a versão que `list_migrations` devolver. O que é aplicado tem de ser byte a byte o que está no arquivo, nomes de policy incluídos — ver [arquitetura §2.4](docs/architecture.md).
 - **Sem criar tabela de release futura.** A numeração `0001`–`0010` está amarrada à release; nada de R3+ antecipado.
 - **Sem "Submissões"** na interface — o termo é **"Envios"**.
 

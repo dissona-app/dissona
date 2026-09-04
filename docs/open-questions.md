@@ -304,7 +304,7 @@ Registradas aqui para que ninguém as reabra por engano.
 | **Hospedagem** | **Vercel** — um projeto, Production Branch `main`, funções em `pdx1` | decisão técnica — ver [arquitetura §9](architecture.md) |
 | **Projetos Supabase** | **Um só** (`dissona`, `us-west-2`) na fase de desenvolvimento; staging e produção viram [#25](#25-projetos-dedicados-de-staging-e-produção) | decisão técnica |
 | **Runtime** | **Node 24 LTS** — o Node 20 saiu de suporte em abr/2026 | decisão técnica |
-| **DDL** | Só pelo Supabase CLI; o MCP do Supabase é para inspeção, nunca para aplicar migration | decisão técnica |
+| **DDL** | **Pelo MCP do Supabase** (`apply_migration`); o `.sql` versionado é a fonte e o nome do arquivo carrega a versão que o MCP grava | decisão técnica — ver [arquitetura §2.2 e §2.4](architecture.md) |
 | **Escopo em execução** | Backlog vai só até a R2 | [PRD](PRD.md) |
 | **Treinar IA com documentos do cliente** | Descartado | discovery (R4) |
 | **Planos/Assinatura e Espaço de diálogo** | Adiados para a V2 (−8h), banco recarregado para 74h | discovery |

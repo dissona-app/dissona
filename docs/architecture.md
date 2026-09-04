@@ -69,7 +69,11 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 
 Nenhuma alteração de schema fora de migration versionada.
 
-**Quem escreve no banco:** as migrations são escritas e aplicadas pelo **Supabase CLI**. O **MCP do Supabase** serve para inspeção e diagnóstico — `list_tables`, `list_migrations`, `get_advisors`, `execute_sql` de leitura — e **nunca** para aplicar DDL, para que a tabela `supabase_migrations` não divirja dos arquivos em `supabase/migrations/`.
+**Quem aplica DDL: o MCP do Supabase.** `apply_migration` é o caminho padrão para o projeto remoto, e `list_tables`, `list_migrations`, `get_advisors`, `execute_sql` e `generate_typescript_types` cobrem inspeção, diagnóstico e geração de tipos. Não é preciso `supabase login` para nada disso.
+
+O **Supabase CLI** continua sendo o caminho da stack local (`supabase start`, `db reset`) e a alternativa quando não há MCP disponível.
+
+**O arquivo `.sql` versionado é a fonte, não o registro do banco.** Toda migration é escrita primeiro em `supabase/migrations/`, e só então aplicada. O que é aplicado tem de ser byte a byte o que está no arquivo — incluindo nomes de policy e de constraint, que são identificadores. Divergir faz `supabase db reset` reconstruir um banco diferente do que está em produção, e o teste local deixa de valer como evidência.
 
 ### 2.3 Integrações externas
 
@@ -87,7 +91,16 @@ Nenhuma alteração de schema fora de migration versionada.
 
 ### 2.4 Numeração de migrations
 
-`supabase migration new` gera nome com timestamp; este projeto adota `0001_`–`0010_`, amarrado à release. Os arquivos são criados **à mão** em `supabase/migrations/`. A ordenação lexicográfica preserva a sequência (`0000_` < `0001_` < `0010_`), e `supabase db push` e `db reset` respeitam essa ordem.
+Duas convenções precisam conviver, porque `apply_migration` do MCP grava a versão como **timestamp** (`20260904171821`), enquanto este projeto numera as migrations por release (`0001`–`0010`).
+
+O nome do arquivo carrega as duas: **`<timestamp>_<NNNN>_<nome>.sql`**.
+
+```
+supabase/migrations/20260904171821_0000_storage.sql
+                    └── versão ──┘ └─ release ─┘
+```
+
+A CLI deriva a versão do prefixo do arquivo. Se o prefixo não bater com o que está em `supabase_migrations`, a CLI reaplica uma migration que o MCP já aplicou. Por isso o fluxo é: escrever o `.sql`, aplicar pelo MCP, ler a versão gravada em `list_migrations` e **renomear o arquivo com essa versão**.
 
 A faixa `0001`–`0010` está reservada por release ([modelo de dados §11](data-model.md)). Infraestrutura que não é schema de produto — buckets de Storage, por exemplo — usa `0000_`.
 
@@ -250,7 +263,7 @@ Helpers SQL: `auth.uid()`, `tem_papel(papel)`, `e_admin()`, `tem_permissao(modul
 | `materiais` | Arquivos para matéria (Word, PDF, JPG, PNG) — R4 | privado — artista dono e curador destinatário |
 | `exportacoes` | `.zip` de exportação LGPD | privado — dono, com expiração |
 
-Os buckets e suas policies nascem em `supabase/migrations/0000_storage.sql`, fora da numeração `0001`–`0010` reservada por release. As policies que dependem de `envio` — curador com envio ativo daquela faixa — só podem ser escritas na R2, quando a tabela existir; até lá ficam como comentário no próprio arquivo.
+Os buckets e suas policies nascem em `supabase/migrations/20260904171821_0000_storage.sql`, fora da numeração `0001`–`0010` reservada por release. Todo objeto vive sob a pasta do dono (`<uid>/<resto>`), e as policies comparam `storage.foldername(name)[1]` com `auth.uid()` — isolamento por usuário sem depender de tabela do produto, que é o que permite existir já na R0. As policies que dependem de `envio` — curador com envio ativo daquela faixa — só podem ser escritas na R2, quando a tabela existir; até lá ficam como comentário no próprio arquivo.
 
 ⚠️ **Pendência:** armazenar o arquivo **sempre** ou **só quando a faixa não está no streaming**? Impacta o custo de storage e o campo `faixa.arquivo_caminho`.
 
