@@ -1,0 +1,91 @@
+/* Slider de nota - docs/design-system.md 2.2.7 */
+
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.linhaRotulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+}
+
+.rotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.valor {
+  font-size: var(--dsn-text-md);
+  font-weight: var(--dsn-weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink);
+}
+
+/* Nota ainda nao dada: a auditoria reprova #B5AFC0 como texto (2,13:1), por
+ * isso o placeholder usa --dsn-ink-500 (design-system 4.2). */
+.semNota {
+  color: var(--dsn-ink-500);
+  font-weight: var(--dsn-weight-medium);
+  font-size: var(--dsn-text-xs);
+}
+
+.trilha {
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: var(--dsn-radius-full);
+  background: var(--dsn-track);
+  outline: none;
+  cursor: pointer;
+}
+
+.trilha::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-surface);
+  border: 2px solid var(--dsn-purple-500);
+  box-shadow:
+    var(--dsn-shadow-focus-slider),
+    0 1px 3px rgba(27, 18, 38, 0.24);
+  cursor: pointer;
+}
+
+.trilha::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-surface);
+  border: 2px solid var(--dsn-purple-500);
+  box-shadow:
+    var(--dsn-shadow-focus-slider),
+    0 1px 3px rgba(27, 18, 38, 0.24);
+  cursor: pointer;
+}
+
+.trilha:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.extremos {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--dsn-text-4xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink-500);
+}
+
+.erro {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-danger-fg);
+}

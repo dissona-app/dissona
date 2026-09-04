@@ -1,0 +1,67 @@
+/* Stepper - docs/design-system.md 2.1 */
+
+.base {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.passo {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-4);
+  font-size: var(--dsn-text-2xs);
+}
+
+.numeral {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--dsn-radius-circle);
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-bold);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.concluido .numeral {
+  background: var(--dsn-purple-300);
+  color: var(--dsn-purple-900);
+}
+
+.atual .numeral {
+  background: var(--dsn-purple-500);
+  color: #ffffff;
+}
+
+/*
+ * A auditoria reprova #B5AFC0 para o numeral de passo futuro (2,13:1).
+ * Corrigido para --dsn-ink-500 sobre --dsn-track, que passa AA
+ * (design-system.md 4.2).
+ */
+.futuro .numeral {
+  background: var(--dsn-track);
+  color: var(--dsn-ink-500);
+}
+
+.rotulo {
+  color: var(--dsn-ink-500);
+}
+
+.atual .rotulo {
+  color: var(--dsn-ink);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.conector {
+  width: 20px;
+  height: 1px;
+  background: var(--dsn-border);
+  flex-shrink: 0;
+}

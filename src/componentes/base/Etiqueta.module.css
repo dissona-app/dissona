@@ -1,0 +1,67 @@
+/* Etiqueta - badge de status. docs/design-system.md 1.1 e 1.2 */
+
+.base {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dsn-space-3);
+  font-size: var(--dsn-text-4xs);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-badge);
+  text-transform: uppercase;
+  padding: var(--dsn-space-2) var(--dsn-space-5);
+  border-radius: var(--dsn-radius-full);
+  white-space: nowrap;
+}
+
+.neutro {
+  color: var(--dsn-neutral-fg);
+  background: var(--dsn-neutral-bg);
+}
+
+.info {
+  color: var(--dsn-info-fg);
+  background: var(--dsn-info-bg);
+}
+
+.sucesso {
+  color: var(--dsn-success-fg);
+  background: var(--dsn-success-bg);
+}
+
+.alerta {
+  color: var(--dsn-warning-fg);
+  background: var(--dsn-warning-bg);
+}
+
+.erro {
+  color: var(--dsn-danger-fg);
+  background: var(--dsn-danger-bg);
+}
+
+/*
+ * O dot e indicador grafico, para o qual 3:1 basta - nunca texto. A auditoria
+ * reprova #2FA565 como cor de texto (3,14:1). A cor do rotulo vem sempre do
+ * par semantico acima, que passa AA.
+ */
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--dsn-radius-circle);
+  flex-shrink: 0;
+}
+
+.dotSucesso {
+  background: var(--dsn-success-dot);
+}
+
+.dotPendente {
+  background: var(--dsn-dot-pendente);
+}
+
+.dotDesativado {
+  background: var(--dsn-dot-desativado);
+}
+
+.dotErro {
+  background: var(--dsn-danger-fg);
+}

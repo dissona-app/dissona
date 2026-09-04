@@ -1,0 +1,51 @@
+/*
+ * Selo de classe do curador - bronze, prata, ouro.
+ *
+ * Classe e ranking medem coisas diferentes, e a confusao entre os dois esta
+ * registrada como risco (open-questions 5). Este componente mostra classe.
+ */
+
+.base {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dsn-space-3);
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-badge);
+  text-transform: uppercase;
+  padding: var(--dsn-space-2) var(--dsn-space-5);
+  border-radius: var(--dsn-radius-full);
+  border: var(--dsn-border-width) solid transparent;
+  white-space: nowrap;
+}
+
+/*
+ * Os tres pares saem dos tokens semanticos, e nao de cores metalicas: o R2
+ * nao define paleta de bronze/prata/ouro, e metalico sobre branco nao chega
+ * a 4,5:1.
+ */
+.bronze {
+  color: var(--dsn-warning-fg);
+  background: var(--dsn-warning-bg);
+  border-color: var(--dsn-warning-border);
+}
+
+.prata {
+  color: var(--dsn-neutral-fg);
+  background: var(--dsn-neutral-bg);
+  border-color: var(--dsn-border);
+}
+
+.ouro {
+  color: var(--dsn-info-fg);
+  background: var(--dsn-info-bg);
+  border-color: var(--dsn-purple-200);
+}
+
+.marcador {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--dsn-radius-circle);
+  background: currentColor;
+  flex-shrink: 0;
+}

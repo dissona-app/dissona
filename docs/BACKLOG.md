@@ -65,11 +65,11 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 ### Design System
 - [x] Criar `src/estilos/tokens.css` a partir do [Design System](design-system.md)
 - [x] Criar componentes base: `Botao`, `Campo`, `AreaTexto`, `Selecao`, `Grupo`
-- [ ] Criar componentes base: `Cartao`, `Painel`, `Tabela`, `Etiqueta`, `SeloClasse`
-- [ ] Criar componentes base: `Modal`, `Gaveta`, `Aviso`, `BarraProgresso`, `EstadoVazio`, `Passos`
-- [ ] Criar componente `CampoNota` (0–5 com uma casa decimal)
-- [ ] Criar componente `Player` com medição de escuta confiável (inclusive seek e pausa)
-- [ ] Criar shell do ambiente autenticado com header, navegação e troca de papel
+- [x] Criar componentes base: `Cartao`, `Painel`, `Tabela`, `Etiqueta`, `SeloClasse`
+- [x] Criar componentes base: `Modal`, `Gaveta`, `Aviso`, `BarraProgresso`, `EstadoVazio`, `Passos`
+- [x] Criar componente `CampoNota` (0–5 com uma casa decimal)
+- [x] Criar componente `Player` com medição de escuta confiável (inclusive seek e pausa)
+- [x] Criar shell do ambiente autenticado com header, navegação e troca de papel
 
 ### Entrega e conformidade
 - [x] Criar `.gitignore` **antes** do primeiro commit — `.env*.local` e `.mcp.json` carregam segredo

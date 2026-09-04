@@ -1,0 +1,140 @@
+/* Sidebar - docs/design-system.md 1.1 (tema escuro) e 3.2 */
+
+.aside {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-10);
+  padding: var(--dsn-space-12) var(--dsn-space-6);
+  background: var(--dsn-grad-sidebar);
+  border-right: var(--dsn-border-width) solid var(--dsn-nav-divider);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  padding: 0 var(--dsn-space-3);
+  color: var(--dsn-nav-fg);
+  font-size: var(--dsn-text-md);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tight);
+  text-decoration: none;
+}
+
+.marca:hover {
+  color: var(--dsn-nav-fg);
+  text-decoration: none;
+}
+
+.icone {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--dsn-radius-md);
+  background: var(--dsn-grad-brand-diag);
+  flex-shrink: 0;
+}
+
+.grupos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-10);
+  flex: 1;
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+}
+
+.overline {
+  padding: 0 var(--dsn-space-6) var(--dsn-space-3);
+  font-size: var(--dsn-text-4xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-nav-overline);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+}
+
+.item {
+  display: block;
+  padding: var(--dsn-pad-nav-item) var(--dsn-space-6);
+  border-radius: var(--dsn-radius-lg);
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-medium);
+  color: var(--dsn-nav-fg-idle);
+  text-decoration: none;
+  transition:
+    background var(--dsn-duration-base),
+    color var(--dsn-duration-base);
+}
+
+.item:hover {
+  background: var(--dsn-nav-bg-hover);
+  color: var(--dsn-nav-fg);
+  text-decoration: none;
+}
+
+.ativo {
+  background: var(--dsn-nav-bg-active);
+  color: var(--dsn-nav-fg);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.ativo:hover {
+  background: var(--dsn-nav-bg-active);
+}
+
+/* Na sidebar escura o anel roxo nao tem contraste; o branco tem
+ * (design-system 4.3, item 1). */
+.item:focus-visible,
+.marca:focus-visible {
+  outline-color: var(--dsn-focus-outline-color-dark);
+}
+
+.rodape {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-10);
+  border-top: var(--dsn-border-width) solid var(--dsn-nav-divider);
+}
+
+.cartaoSaldo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-6);
+  border-radius: var(--dsn-radius-xl);
+  background: var(--dsn-nav-card-bg);
+  border: var(--dsn-border-width) solid var(--dsn-nav-divider);
+}
+
+.rotuloSaldo {
+  font-size: var(--dsn-text-4xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-nav-overline);
+}
+
+.valorSaldo {
+  font-size: var(--dsn-text-md);
+  font-weight: var(--dsn-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-nav-fg);
+}

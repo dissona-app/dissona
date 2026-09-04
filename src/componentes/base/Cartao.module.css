@@ -1,0 +1,56 @@
+/* Card - docs/design-system.md 2.4.1 */
+
+.base {
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  padding: var(--dsn-space-12);
+}
+
+.compacto {
+  padding: var(--dsn-space-9);
+}
+
+.kpi {
+  padding: var(--dsn-pad-card-kpi);
+  border-radius: var(--dsn-radius-2xl);
+}
+
+.autenticacao {
+  padding: var(--dsn-pad-card-auth);
+  box-shadow: var(--dsn-shadow-card);
+}
+
+.elevado {
+  box-shadow: var(--dsn-shadow-xs);
+}
+
+.selecionado {
+  background: var(--dsn-surface-alt);
+  border-color: var(--dsn-purple-600);
+}
+
+.comErro {
+  background: var(--dsn-orange-050);
+  border-color: var(--dsn-danger-border);
+}
+
+/*
+ * Card clicavel e <button>, nunca div com onClick: a ordem de foco segue o
+ * DOM e o teclado funciona sem tabindex (design-system.md 4.3).
+ */
+.clicavel {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--dsn-duration-base),
+    box-shadow var(--dsn-duration-base);
+}
+
+.clicavel:hover {
+  border-color: var(--dsn-purple-600);
+}

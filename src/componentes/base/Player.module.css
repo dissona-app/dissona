@@ -1,0 +1,94 @@
+/* Player - docs/design-system.md 2.3.4 (botao de play) */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-2xl);
+  padding: var(--dsn-space-9);
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-6);
+}
+
+.play {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--dsn-radius-circle);
+  /* Glifo de 13px/700, muito abaixo do limite de "texto grande" - mas e um
+   * icone, nao texto, e para icone o exigido e 3:1, que este par atende. */
+  background: var(--dsn-orange-500);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: var(--dsn-weight-bold);
+  cursor: pointer;
+  transition: background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.play:hover:not(:disabled) {
+  background: var(--dsn-orange-600);
+}
+
+.play:disabled {
+  background: var(--dsn-border);
+  color: var(--dsn-ink-500);
+  cursor: not-allowed;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.titulo {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artista {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.tempo {
+  font-size: var(--dsn-text-2xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink-500);
+  flex-shrink: 0;
+}
+
+.medicao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+}
+
+.aviso {
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-dense);
+  color: var(--dsn-ink-500);
+}
+
+.atingido {
+  color: var(--dsn-success-fg);
+  font-weight: var(--dsn-weight-semibold);
+}

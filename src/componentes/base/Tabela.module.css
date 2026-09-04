@@ -1,0 +1,76 @@
+/* Tabela - docs/design-system.md 2.4 */
+
+.rolagem {
+  /* Tabela larga rola dentro do proprio container; a pagina nunca rola na
+   * horizontal (design-system 4.8). */
+  overflow-x: auto;
+}
+
+.base {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--dsn-surface);
+}
+
+.cabecalho {
+  background: var(--dsn-surface-alt);
+}
+
+.colunaTitulo {
+  text-align: left;
+  font-size: var(--dsn-text-4xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+  padding: var(--dsn-space-5) var(--dsn-space-6);
+  border-bottom: var(--dsn-border-width) solid var(--dsn-border);
+  white-space: nowrap;
+}
+
+.numerica {
+  text-align: right;
+}
+
+.botaoOrdenar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dsn-space-3);
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.botaoOrdenar:hover {
+  color: var(--dsn-ink);
+}
+
+.seta {
+  font-size: 9px;
+  color: var(--dsn-purple-600);
+}
+
+.celula {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink);
+  padding: var(--dsn-space-6);
+  border-bottom: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+.linha:last-child .celula {
+  border-bottom: none;
+}
+
+.legenda {
+  caption-side: top;
+  text-align: left;
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  padding-bottom: var(--dsn-space-4);
+}

@@ -1,0 +1,40 @@
+/*
+ * Estado vazio.
+ *
+ * No beta tudo comeca sem dados, e isso esta registrado como risco
+ * (open-questions 5). Toda lista precisa deste componente, e o texto muda
+ * quando o vazio vem de um filtro - "nada aqui" e "nada com este filtro" sao
+ * problemas diferentes para quem le.
+ */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--dsn-space-5);
+  padding: var(--dsn-space-16);
+}
+
+.icone {
+  color: var(--dsn-ink-250);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink);
+}
+
+.descricao {
+  max-width: 42ch;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-dense);
+  color: var(--dsn-ink-500);
+}
+
+.acao {
+  margin-top: var(--dsn-space-3);
+}

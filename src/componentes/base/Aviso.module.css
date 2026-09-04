@@ -1,0 +1,55 @@
+/* Aviso - banner inline. docs/design-system.md 2.5 */
+
+.base {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dsn-space-5);
+  border: var(--dsn-border-width) solid transparent;
+  border-radius: var(--dsn-radius-lg);
+  padding: var(--dsn-space-6) var(--dsn-space-7);
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-dense);
+}
+
+.info {
+  color: var(--dsn-info-fg);
+  background: var(--dsn-info-bg);
+}
+
+.sucesso {
+  color: var(--dsn-success-fg);
+  background: var(--dsn-success-bg);
+  border-color: var(--dsn-success-border);
+}
+
+.alerta {
+  color: var(--dsn-warning-fg);
+  background: var(--dsn-warning-bg);
+  border-color: var(--dsn-warning-border);
+}
+
+.erro {
+  color: var(--dsn-danger-fg);
+  background: var(--dsn-danger-bg);
+  border-color: var(--dsn-danger-border);
+}
+
+.icone {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  flex: 1;
+}
+
+.titulo {
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.acao {
+  flex-shrink: 0;
+}

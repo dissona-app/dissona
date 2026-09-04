@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 
-// `(app)` — ambiente autenticado de artista e curador. O shell com header,
-// navegação e troca de papel entra aqui na TASK-006.
+// `(app)` — ambiente autenticado. O shell é montado por ambiente, em
+// `artista/layout.tsx` e `curador/layout.tsx`, porque cada um tem a sua
+// navegação e o seu papel ativo.
 export default function LayoutApp({ children }: { children: ReactNode }) {
-  return <main>{children}</main>;
+  return <>{children}</>;
 }

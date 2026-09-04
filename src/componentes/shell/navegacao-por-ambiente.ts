@@ -1,0 +1,118 @@
+import { ROTA } from '@/lib/guarda-rota';
+import type { Papel } from '@/lib/papeis';
+
+/**
+ * Mapa de navegação por ambiente.
+ *
+ * Os grupos e rótulos vêm dos protótipos da R2 ("MINHA MÚSICA", "CURADORIA",
+ * "CONTA" — design-system.md §1.1). Os caminhos usam a constante `ROTA`, e não
+ * literais, para que exista um só lugar onde uma URL é definida.
+ *
+ * `release` marca em qual release a tela existe de verdade. Item de release
+ * futura fica visível mas desabilitado: esconder faria a navegação mudar de
+ * forma a cada entrega, e o cliente perderia a noção do produto inteiro.
+ */
+
+export type ItemNavegacao = {
+  readonly rotulo: string;
+  readonly caminho: string;
+  readonly release: 1 | 2 | 3 | 4 | 5;
+};
+
+export type GrupoNavegacao = {
+  /** Overline do grupo. `null` para itens soltos no topo. */
+  readonly titulo: string | null;
+  readonly itens: readonly ItemNavegacao[];
+};
+
+const ARTISTA: readonly GrupoNavegacao[] = [
+  {
+    titulo: null,
+    itens: [{ rotulo: 'Início', caminho: ROTA.ARTISTA, release: 4 }],
+  },
+  {
+    titulo: 'Minha música',
+    itens: [
+      { rotulo: 'Enviar música', caminho: `${ROTA.ARTISTA}/enviar`, release: 2 },
+      { rotulo: 'Minhas músicas', caminho: `${ROTA.ARTISTA}/musicas`, release: 3 },
+      { rotulo: 'Catálogo', caminho: `${ROTA.ARTISTA}/catalogo`, release: 4 },
+    ],
+  },
+  {
+    titulo: 'Curadoria',
+    itens: [
+      { rotulo: 'Escolher curadores', caminho: `${ROTA.ARTISTA}/curadores`, release: 3 },
+      { rotulo: 'Relatórios', caminho: `${ROTA.ARTISTA}/relatorios`, release: 4 },
+    ],
+  },
+  {
+    titulo: 'Conta',
+    itens: [
+      { rotulo: 'Carteira', caminho: `${ROTA.ARTISTA}/carteira`, release: 2 },
+      { rotulo: 'Notificações', caminho: `${ROTA.ARTISTA}/notificacoes`, release: 5 },
+      { rotulo: 'Configurações', caminho: `${ROTA.ARTISTA}/conta`, release: 1 },
+    ],
+  },
+];
+
+const CURADOR: readonly GrupoNavegacao[] = [
+  {
+    titulo: null,
+    itens: [{ rotulo: 'Início', caminho: ROTA.CURADOR, release: 4 }],
+  },
+  {
+    titulo: 'Curadoria',
+    itens: [
+      { rotulo: 'Fila de avaliações', caminho: `${ROTA.CURADOR}/fila`, release: 2 },
+      { rotulo: 'Métricas', caminho: `${ROTA.CURADOR}/metricas`, release: 3 },
+    ],
+  },
+  {
+    titulo: 'Conta',
+    itens: [
+      { rotulo: 'Financeiro', caminho: `${ROTA.CURADOR}/financeiro`, release: 4 },
+      { rotulo: 'Notificações', caminho: `${ROTA.CURADOR}/notificacoes`, release: 5 },
+      { rotulo: 'Meu cadastro', caminho: ROTA.CURADOR_CADASTRO, release: 1 },
+      { rotulo: 'Configurações', caminho: `${ROTA.CURADOR}/conta`, release: 1 },
+    ],
+  },
+];
+
+const ADMIN: readonly GrupoNavegacao[] = [
+  {
+    titulo: null,
+    itens: [{ rotulo: 'Início', caminho: ROTA.ADMIN, release: 4 }],
+  },
+  {
+    titulo: 'Gestão',
+    itens: [
+      { rotulo: 'Curadores e artistas', caminho: `${ROTA.ADMIN}/usuarios`, release: 3 },
+      { rotulo: 'Aprovações', caminho: `${ROTA.ADMIN}/aprovacoes`, release: 3 },
+      { rotulo: 'Moderação', caminho: `${ROTA.ADMIN}/moderacao`, release: 3 },
+    ],
+  },
+  {
+    titulo: 'Financeiro',
+    itens: [
+      { rotulo: 'Pacotes de Claves', caminho: `${ROTA.ADMIN}/pacotes`, release: 2 },
+      { rotulo: 'Visão geral', caminho: `${ROTA.ADMIN}/financeiro`, release: 5 },
+    ],
+  },
+  {
+    titulo: 'Conta',
+    itens: [{ rotulo: 'Equipe', caminho: `${ROTA.ADMIN}/equipe`, release: 1 }],
+  },
+];
+
+export const NAVEGACAO: Record<Papel, readonly GrupoNavegacao[]> = {
+  artista: ARTISTA,
+  curador: CURADOR,
+  admin: ADMIN,
+};
+
+/** Título do ambiente, usado no header e no `aria-label` da navegação. */
+export const NOME_AMBIENTE: Record<Papel, string> = {
+  artista: 'Artista',
+  curador: 'Curador',
+  admin: 'Administração',
+};

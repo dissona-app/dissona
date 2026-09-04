@@ -1,0 +1,56 @@
+/* Painel - secao de pagina com titulo, acao e corpo. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-gap-bloco);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  padding: var(--dsn-pad-secao-y) var(--dsn-space-12);
+}
+
+.semMoldura {
+  border: none;
+  padding: 0;
+  background: none;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--dsn-space-12);
+  /* O R2 nao tem breakpoint; a quebra vem de flex-wrap (design-system 3.1). */
+  flex-wrap: wrap;
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink);
+}
+
+.sublegenda {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-dense);
+  color: var(--dsn-ink-500);
+}
+
+.acao {
+  flex-shrink: 0;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-10);
+}

@@ -1,0 +1,49 @@
+/* Barra de progresso - docs/design-system.md 1.4 e 2.5 */
+
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+}
+
+.linhaRotulo {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.valor {
+  font-variant-numeric: tabular-nums;
+}
+
+.trilha {
+  height: 6px;
+  background: var(--dsn-track);
+  border-radius: var(--dsn-radius-full);
+  overflow: hidden;
+}
+
+.preenchimento {
+  height: 100%;
+  border-radius: var(--dsn-radius-full);
+  transition: width var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.marca {
+  background: var(--dsn-grad-brand-h);
+}
+
+/* Prazo folgado x vencido, na fila do curador (design-system 1.1). */
+.folgado {
+  background: var(--dsn-purple-300);
+}
+
+.vencido {
+  background: var(--dsn-orange-650);
+}
+
+.sucesso {
+  background: var(--dsn-success-dot);
+}

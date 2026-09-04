@@ -1,0 +1,97 @@
+/* Shell do ambiente autenticado - docs/design-system.md 3.1 e 3.2 */
+
+.grade {
+  display: grid;
+  grid-template-columns: var(--dsn-sidebar-largura) 1fr;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  /* Sem isto, conteudo largo estica a coluna e quebra a grade. */
+  min-width: 0;
+  background: var(--dsn-surface);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-12);
+  padding: clamp(14px, 2.4vh, 20px) var(--dsn-space-20) clamp(10px, 1.6vh, 14px);
+  background: var(--dsn-topbar-bg);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--dsn-border-width) solid var(--dsn-border);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--dsn-text-lg);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-tight);
+  color: var(--dsn-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acoesHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  flex-shrink: 0;
+}
+
+.conteudo {
+  padding: clamp(18px, 2.8vh, 32px) var(--dsn-space-20) clamp(20px, 3vh, 40px);
+}
+
+.conteudoAdmin {
+  padding: clamp(14px, 2.2vh, 26px) var(--dsn-space-20) clamp(16px, 2.4vh, 32px);
+}
+
+/* Largura maxima por tipo de pagina (design-system 3.2). */
+.limiteConta {
+  max-width: 880px;
+}
+
+.limiteContaAdmin {
+  max-width: 1000px;
+}
+
+.limiteFormulario {
+  max-width: 720px;
+}
+
+.limitePasso {
+  max-width: 560px;
+}
+
+/*
+ * Atalho para o conteudo. Sem ele, quem navega por teclado passa pelos ~15
+ * itens da sidebar em toda troca de pagina (design-system 4.3).
+ */
+.atalho {
+  position: absolute;
+  left: var(--dsn-space-4);
+  top: var(--dsn-space-4);
+  z-index: 20;
+  padding: var(--dsn-space-4) var(--dsn-space-6);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-purple-600);
+  border-radius: var(--dsn-radius-lg);
+  color: var(--dsn-purple-600);
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  transform: translateY(-150%);
+  transition: transform var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.atalho:focus {
+  transform: translateY(0);
+}
