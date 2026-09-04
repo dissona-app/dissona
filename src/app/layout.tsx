@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+import { ProvedorDeConsulta } from '@/lib/consulta/provedor';
+
 export const metadata: Metadata = {
   title: 'Dissona',
   description:
@@ -13,7 +15,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <ProvedorDeConsulta>{children}</ProvedorDeConsulta>
+      </body>
     </html>
   );
 }

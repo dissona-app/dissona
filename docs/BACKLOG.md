@@ -56,11 +56,11 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [ ] Migration `0000_storage.sql` — buckets `faixas`, `capas`, `avatares`, `materiais`, `exportacoes` e policies
 
 ### Estrutura da aplicação
-- [ ] Criar os route groups `(publico)`, `(auth)`, `(app)` e `(admin)`
-- [ ] Implementar `middleware.ts` de sessão e guarda de papel por route group
-- [ ] Configurar TanStack Query com providers e política de cache
-- [ ] Criar `lib/dinheiro.ts`, `claves.ts`, `formato.ts`, `mascaras.ts` e `erros.ts`
-- [ ] Criar `lib/configuracao` para leitura tipada da tabela `configuracao`
+- [x] Criar os route groups `(publico)`, `(auth)`, `(app)` e `(admin)`
+- [x] Implementar `middleware.ts` de sessão e guarda de papel por route group
+- [x] Configurar TanStack Query com providers e política de cache
+- [x] Criar `lib/dinheiro.ts`, `claves.ts`, `formato.ts`, `mascaras.ts` e `erros.ts`
+- [x] Criar `lib/configuracao` para leitura tipada da tabela `configuracao`
 
 ### Design System
 - [ ] Criar `src/estilos/tokens.css` a partir do [Design System](design-system.md)

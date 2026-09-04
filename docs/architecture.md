@@ -157,6 +157,25 @@ src/modulos/avaliacao/
 
 **Regra de dependência:** `app/` → `modulos/*/acoes|consultas` → `servico` → `repositorio` → Supabase. Nenhuma camada pula a seguinte, e `servico` não importa nada de React.
 
+### 3.2 Mapa de URLs
+
+O sitemap do [PRD §6.1](PRD.md) nomeia telas, não caminhos. Os slugs abaixo foram definidos na R0 e estão centralizados na constante `ROTA` de `src/lib/guarda-rota.ts` — nenhum caminho literal espalhado pelo código.
+
+| Route group | Caminho | Módulo |
+|---|---|---|
+| `(publico)` | `/` | 26 (R5) |
+| `(publico)` | `/termos` · `/privacidade` | R0 |
+| `(auth)` | `/entrar` · `/cadastrar` | 1 · 1.1 |
+| `(auth)` | `/recuperar-senha` · `/redefinir-senha` · `/verificar-email` | 1.2 · 1.3 |
+| `(auth)` | `/selecao-de-perfil` | 1.4 |
+| `(app)` | `/artista` e subrotas | 2–10 |
+| `(app)` | `/curador` e subrotas | 13–18 |
+| `(app)` | `/curador/cadastro` | 12 |
+| `(admin)` | `/admin/entrar` · `/admin/recuperar-senha` · `/admin/redefinir-senha` | 19 · 19.1 · 19.2 |
+| `(admin)` | `/admin` e subrotas | 20–24 · 27 |
+
+O login do admin fica **dentro** de `(admin)` e não exige sessão — é login próprio, sem social e sem autocadastro.
+
 ---
 
 ## 4. Camadas e responsabilidades
