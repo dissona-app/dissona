@@ -97,6 +97,11 @@ end $$;
 -- UUIDs fixos e legíveis, para as asserções e as mensagens de erro serem
 -- reconhecíveis quando algo falha.
 create temporary table ator (papel text primary key, id uuid) on commit drop;
+
+-- Sem este grant, referenciar `ator` depois de `set local role authenticated`
+-- estoura com 42501: tabela temporária pertence a `postgres` e não concede
+-- nada aos outros papéis. É uma armadilha só do teste, não do produto.
+grant select on ator to authenticated, anon;
 insert into ator (papel, id) values
   ('artista',  '11111111-1111-1111-1111-111111111111'),
   ('vizinho',  '22222222-2222-2222-2222-222222222222'),

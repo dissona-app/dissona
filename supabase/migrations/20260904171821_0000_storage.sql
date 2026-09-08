@@ -91,27 +91,11 @@ create policy "faixas: dono gerencia a propria pasta"
   using (bucket_id = 'faixas' and (storage.foldername(name))[1] = auth.uid()::text)
   with check (bucket_id = 'faixas' and (storage.foldername(name))[1] = auth.uid()::text);
 
--- PENDENTE R2 — leitura pelo curador com `envio` ativo daquela faixa.
--- Não pode ser escrita agora: `envio` e `faixa` nascem na migration 0006.
--- Forma esperada:
---
--- create policy "faixas: curador com envio ativo lê"
---   on storage.objects for select
---   to authenticated
---   using (
---     bucket_id = 'faixas'
---     and exists (
---       select 1
---         from envio e
---         join faixa f on f.id = e.faixa_id
---        where f.arquivo_caminho = storage.objects.name
---          and e.curador_id = auth.uid()
---          and e.situacao in ('recebeu', 'ouviu', 'avaliando')
---     )
---   );
---
--- Depende também da pendência #7 (armazenar o mp3 sempre ou só fora do
--- streaming), que decide se `faixa.arquivo_caminho` é sempre preenchido.
+-- A policy "faixas: curador com envio ativo le" foi criada na migration
+-- `0006_faixa_envio`, quando `envio` e `faixa` passaram a existir. O rascunho
+-- que ficava aqui comparava `e.curador_id = auth.uid()` e não compilava: a
+-- coluna certa é `envio.perfil_curador_id`, que referencia `perfil_curador(id)`
+-- e exige o join até `perfil_curador.perfil_id`. Ver o comentário na 0006.
 
 -- ---------------------------------------------------------------------- capas
 

@@ -39,6 +39,130 @@ export type Database = {
   }
   public: {
     Tables: {
+      avaliacao: {
+        Row: {
+          atualizado_em: string
+          classe_no_momento:
+            | Database["public"]["Enums"]["classe_curador"]
+            | null
+          concluida_em: string | null
+          criado_em: string
+          envio_id: string
+          escuta_percentual: number
+          feedback: string | null
+          id: string
+          no_prazo: boolean | null
+          nota_subjetiva: number | null
+          passo_atual: number
+          perfil_curador_id: string
+          situacao: Database["public"]["Enums"]["situacao_avaliacao"]
+        }
+        Insert: {
+          atualizado_em?: string
+          classe_no_momento?:
+            | Database["public"]["Enums"]["classe_curador"]
+            | null
+          concluida_em?: string | null
+          criado_em?: string
+          envio_id: string
+          escuta_percentual?: number
+          feedback?: string | null
+          id?: string
+          no_prazo?: boolean | null
+          nota_subjetiva?: number | null
+          passo_atual?: number
+          perfil_curador_id: string
+          situacao?: Database["public"]["Enums"]["situacao_avaliacao"]
+        }
+        Update: {
+          atualizado_em?: string
+          classe_no_momento?:
+            | Database["public"]["Enums"]["classe_curador"]
+            | null
+          concluida_em?: string | null
+          criado_em?: string
+          envio_id?: string
+          escuta_percentual?: number
+          feedback?: string | null
+          id?: string
+          no_prazo?: boolean | null
+          nota_subjetiva?: number | null
+          passo_atual?: number
+          perfil_curador_id?: string
+          situacao?: Database["public"]["Enums"]["situacao_avaliacao"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacao_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: true
+            referencedRelation: "envio"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacao_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_curador"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compartilhamento: {
+        Row: {
+          avaliacao_id: string
+          criado_em: string
+          descricao: string | null
+          id: string
+          midia_curador_id: string | null
+          modalidade: Database["public"]["Enums"]["modalidade_compartilhamento"]
+          url: string | null
+          verificado_em: string | null
+        }
+        Insert: {
+          avaliacao_id: string
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          midia_curador_id?: string | null
+          modalidade: Database["public"]["Enums"]["modalidade_compartilhamento"]
+          url?: string | null
+          verificado_em?: string | null
+        }
+        Update: {
+          avaliacao_id?: string
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          midia_curador_id?: string | null
+          modalidade?: Database["public"]["Enums"]["modalidade_compartilhamento"]
+          url?: string | null
+          verificado_em?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compartilhamento_avaliacao_id_fkey"
+            columns: ["avaliacao_id"]
+            isOneToOne: true
+            referencedRelation: "avaliacao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compartilhamento_avaliacao_id_fkey"
+            columns: ["avaliacao_id"]
+            isOneToOne: true
+            referencedRelation: "nota_avaliacao"
+            referencedColumns: ["avaliacao_id"]
+          },
+          {
+            foreignKeyName: "compartilhamento_midia_curador_id_fkey"
+            columns: ["midia_curador_id"]
+            isOneToOne: false
+            referencedRelation: "midia_curador"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracao: {
         Row: {
           atualizado_em: string
@@ -150,6 +274,99 @@ export type Database = {
           },
         ]
       }
+      criterio: {
+        Row: {
+          ativo: boolean
+          chave: string
+          grupo: Database["public"]["Enums"]["grupo_criterio"]
+          obrigatorio: boolean
+          ordem: number
+          rotulo: string
+        }
+        Insert: {
+          ativo?: boolean
+          chave: string
+          grupo: Database["public"]["Enums"]["grupo_criterio"]
+          obrigatorio?: boolean
+          ordem: number
+          rotulo: string
+        }
+        Update: {
+          ativo?: boolean
+          chave?: string
+          grupo?: Database["public"]["Enums"]["grupo_criterio"]
+          obrigatorio?: boolean
+          ordem?: number
+          rotulo?: string
+        }
+        Relationships: []
+      }
+      envio: {
+        Row: {
+          atualizado_em: string
+          avisado_prazo_em: string | null
+          concluido_em: string | null
+          criado_em: string
+          devolucao_em: string
+          devolvido_em: string | null
+          faixa_id: string
+          id: string
+          iniciou_em: string | null
+          ouviu_em: string | null
+          perfil_curador_id: string
+          prazo_em: string
+          situacao: Database["public"]["Enums"]["situacao_envio"]
+          total_claves: number
+        }
+        Insert: {
+          atualizado_em?: string
+          avisado_prazo_em?: string | null
+          concluido_em?: string | null
+          criado_em?: string
+          devolucao_em: string
+          devolvido_em?: string | null
+          faixa_id: string
+          id?: string
+          iniciou_em?: string | null
+          ouviu_em?: string | null
+          perfil_curador_id: string
+          prazo_em: string
+          situacao?: Database["public"]["Enums"]["situacao_envio"]
+          total_claves: number
+        }
+        Update: {
+          atualizado_em?: string
+          avisado_prazo_em?: string | null
+          concluido_em?: string | null
+          criado_em?: string
+          devolucao_em?: string
+          devolvido_em?: string | null
+          faixa_id?: string
+          id?: string
+          iniciou_em?: string | null
+          ouviu_em?: string | null
+          perfil_curador_id?: string
+          prazo_em?: string
+          situacao?: Database["public"]["Enums"]["situacao_envio"]
+          total_claves?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "envio_faixa_id_fkey"
+            columns: ["faixa_id"]
+            isOneToOne: false
+            referencedRelation: "faixa"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "envio_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_curador"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evento_notificacao: {
         Row: {
           canais_padrao: Database["public"]["Enums"]["canal_notificacao"][]
@@ -179,6 +396,252 @@ export type Database = {
           titulo?: string
         }
         Relationships: []
+      }
+      evento_provedor: {
+        Row: {
+          carga: Json
+          id_evento_provedor: string
+          processado_em: string | null
+          provedor: string
+          recebido_em: string
+          tipo: string
+        }
+        Insert: {
+          carga: Json
+          id_evento_provedor: string
+          processado_em?: string | null
+          provedor: string
+          recebido_em?: string
+          tipo: string
+        }
+        Update: {
+          carga?: Json
+          id_evento_provedor?: string
+          processado_em?: string | null
+          provedor?: string
+          recebido_em?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
+      faixa: {
+        Row: {
+          arquivo_caminho: string | null
+          atualizado_em: string
+          capa_caminho: string | null
+          contexto_curador: string | null
+          criado_em: string
+          data_lancamento: string | null
+          duracao_segundos: number | null
+          estilo: string | null
+          genero: string | null
+          id: string
+          lancada: boolean | null
+          metadados_detectados: Json | null
+          origem: Database["public"]["Enums"]["origem_faixa"]
+          perfil_artista_id: string
+          situacao: Database["public"]["Enums"]["situacao_faixa"]
+          titulo: string
+          url_spotify: string | null
+          url_youtube: string | null
+        }
+        Insert: {
+          arquivo_caminho?: string | null
+          atualizado_em?: string
+          capa_caminho?: string | null
+          contexto_curador?: string | null
+          criado_em?: string
+          data_lancamento?: string | null
+          duracao_segundos?: number | null
+          estilo?: string | null
+          genero?: string | null
+          id?: string
+          lancada?: boolean | null
+          metadados_detectados?: Json | null
+          origem: Database["public"]["Enums"]["origem_faixa"]
+          perfil_artista_id: string
+          situacao?: Database["public"]["Enums"]["situacao_faixa"]
+          titulo: string
+          url_spotify?: string | null
+          url_youtube?: string | null
+        }
+        Update: {
+          arquivo_caminho?: string | null
+          atualizado_em?: string
+          capa_caminho?: string | null
+          contexto_curador?: string | null
+          criado_em?: string
+          data_lancamento?: string | null
+          duracao_segundos?: number | null
+          estilo?: string | null
+          genero?: string | null
+          id?: string
+          lancada?: boolean | null
+          metadados_detectados?: Json | null
+          origem?: Database["public"]["Enums"]["origem_faixa"]
+          perfil_artista_id?: string
+          situacao?: Database["public"]["Enums"]["situacao_faixa"]
+          titulo?: string
+          url_spotify?: string | null
+          url_youtube?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faixa_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_artista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faixa_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "saldo_carteira"
+            referencedColumns: ["perfil_artista_id"]
+          },
+        ]
+      }
+      ganho_curador: {
+        Row: {
+          acrescimos: Json
+          avaliacao_id: string
+          base_centavos: number
+          base_claves: number
+          classe: Database["public"]["Enums"]["classe_curador"]
+          comissao_centavos: number
+          criado_em: string
+          id: string
+          no_prazo: boolean
+          penalidade_prazo: boolean
+          percentual_aplicado: number
+          perfil_curador_id: string
+          piso_percentual: number
+          situacao: Database["public"]["Enums"]["situacao_ganho"]
+          teto_percentual: number
+          valor_centavos: number
+        }
+        Insert: {
+          acrescimos?: Json
+          avaliacao_id: string
+          base_centavos: number
+          base_claves: number
+          classe: Database["public"]["Enums"]["classe_curador"]
+          comissao_centavos: number
+          criado_em?: string
+          id?: string
+          no_prazo: boolean
+          penalidade_prazo?: boolean
+          percentual_aplicado: number
+          perfil_curador_id: string
+          piso_percentual: number
+          situacao?: Database["public"]["Enums"]["situacao_ganho"]
+          teto_percentual: number
+          valor_centavos: number
+        }
+        Update: {
+          acrescimos?: Json
+          avaliacao_id?: string
+          base_centavos?: number
+          base_claves?: number
+          classe?: Database["public"]["Enums"]["classe_curador"]
+          comissao_centavos?: number
+          criado_em?: string
+          id?: string
+          no_prazo?: boolean
+          penalidade_prazo?: boolean
+          percentual_aplicado?: number
+          perfil_curador_id?: string
+          piso_percentual?: number
+          situacao?: Database["public"]["Enums"]["situacao_ganho"]
+          teto_percentual?: number
+          valor_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ganho_curador_avaliacao_id_fkey"
+            columns: ["avaliacao_id"]
+            isOneToOne: true
+            referencedRelation: "avaliacao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ganho_curador_avaliacao_id_fkey"
+            columns: ["avaliacao_id"]
+            isOneToOne: true
+            referencedRelation: "nota_avaliacao"
+            referencedColumns: ["avaliacao_id"]
+          },
+          {
+            foreignKeyName: "ganho_curador_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_curador"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lancamento_clave: {
+        Row: {
+          criado_em: string
+          descricao: string
+          envio_id: string | null
+          id: number
+          pedido_clave_id: string | null
+          perfil_artista_id: string
+          quantidade: number
+          tipo: Database["public"]["Enums"]["tipo_lancamento_clave"]
+        }
+        Insert: {
+          criado_em?: string
+          descricao: string
+          envio_id?: string | null
+          id?: never
+          pedido_clave_id?: string | null
+          perfil_artista_id: string
+          quantidade: number
+          tipo: Database["public"]["Enums"]["tipo_lancamento_clave"]
+        }
+        Update: {
+          criado_em?: string
+          descricao?: string
+          envio_id?: string | null
+          id?: never
+          pedido_clave_id?: string | null
+          perfil_artista_id?: string
+          quantidade?: number
+          tipo?: Database["public"]["Enums"]["tipo_lancamento_clave"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lancamento_clave_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: false
+            referencedRelation: "envio"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamento_clave_pedido_clave_id_fkey"
+            columns: ["pedido_clave_id"]
+            isOneToOne: false
+            referencedRelation: "pedido_clave"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamento_clave_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_artista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamento_clave_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "saldo_carteira"
+            referencedColumns: ["perfil_artista_id"]
+          },
+        ]
       }
       log_auditoria: {
         Row: {
@@ -306,6 +769,52 @@ export type Database = {
           },
         ]
       }
+      nota_criterio: {
+        Row: {
+          avaliacao_id: string
+          criterio: string
+          id: string
+          justificativa: string | null
+          nota: number
+        }
+        Insert: {
+          avaliacao_id: string
+          criterio: string
+          id?: string
+          justificativa?: string | null
+          nota: number
+        }
+        Update: {
+          avaliacao_id?: string
+          criterio?: string
+          id?: string
+          justificativa?: string | null
+          nota?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nota_criterio_avaliacao_id_fkey"
+            columns: ["avaliacao_id"]
+            isOneToOne: false
+            referencedRelation: "avaliacao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nota_criterio_avaliacao_id_fkey"
+            columns: ["avaliacao_id"]
+            isOneToOne: false
+            referencedRelation: "nota_avaliacao"
+            referencedColumns: ["avaliacao_id"]
+          },
+          {
+            foreignKeyName: "nota_criterio_criterio_fkey"
+            columns: ["criterio"]
+            isOneToOne: false
+            referencedRelation: "criterio"
+            referencedColumns: ["chave"]
+          },
+        ]
+      }
       notificacao: {
         Row: {
           canais: Database["public"]["Enums"]["canal_notificacao"][]
@@ -363,6 +872,39 @@ export type Database = {
           },
         ]
       }
+      pacote_clave: {
+        Row: {
+          ativo: boolean
+          atualizado_em: string
+          criado_em: string
+          desconto_percentual: number
+          id: string
+          nome: string
+          quantidade_claves: number
+          valor_centavos: number
+        }
+        Insert: {
+          ativo?: boolean
+          atualizado_em?: string
+          criado_em?: string
+          desconto_percentual?: number
+          id?: string
+          nome: string
+          quantidade_claves: number
+          valor_centavos: number
+        }
+        Update: {
+          ativo?: boolean
+          atualizado_em?: string
+          criado_em?: string
+          desconto_percentual?: number
+          id?: string
+          nome?: string
+          quantidade_claves?: number
+          valor_centavos?: number
+        }
+        Relationships: []
+      }
       papel_usuario: {
         Row: {
           ativado_em: string
@@ -392,6 +934,85 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfil"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      pedido_clave: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          desconto_centavos: number
+          id: string
+          meio: Database["public"]["Enums"]["meio_pagamento"]
+          pacote_clave_id: string | null
+          pago_em: string | null
+          perfil_artista_id: string
+          pix_payload: string | null
+          pix_qr: string | null
+          provedor: string
+          provedor_cobranca_id: string | null
+          quantidade_claves: number
+          situacao: Database["public"]["Enums"]["situacao_pedido"]
+          valor_bruto_centavos: number
+          valor_total_centavos: number
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          desconto_centavos?: number
+          id?: string
+          meio: Database["public"]["Enums"]["meio_pagamento"]
+          pacote_clave_id?: string | null
+          pago_em?: string | null
+          perfil_artista_id: string
+          pix_payload?: string | null
+          pix_qr?: string | null
+          provedor?: string
+          provedor_cobranca_id?: string | null
+          quantidade_claves: number
+          situacao?: Database["public"]["Enums"]["situacao_pedido"]
+          valor_bruto_centavos: number
+          valor_total_centavos: number
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          desconto_centavos?: number
+          id?: string
+          meio?: Database["public"]["Enums"]["meio_pagamento"]
+          pacote_clave_id?: string | null
+          pago_em?: string | null
+          perfil_artista_id?: string
+          pix_payload?: string | null
+          pix_qr?: string | null
+          provedor?: string
+          provedor_cobranca_id?: string | null
+          quantidade_claves?: number
+          situacao?: Database["public"]["Enums"]["situacao_pedido"]
+          valor_bruto_centavos?: number
+          valor_total_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedido_clave_pacote_clave_id_fkey"
+            columns: ["pacote_clave_id"]
+            isOneToOne: false
+            referencedRelation: "pacote_clave"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedido_clave_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_artista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedido_clave_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "saldo_carteira"
+            referencedColumns: ["perfil_artista_id"]
           },
         ]
       }
@@ -686,13 +1307,176 @@ export type Database = {
           },
         ]
       }
+      servico_envio: {
+        Row: {
+          envio_id: string
+          id: string
+          preco_claves: number
+          servico_curador_id: string
+          tipo: Database["public"]["Enums"]["tipo_servico"]
+        }
+        Insert: {
+          envio_id: string
+          id?: string
+          preco_claves: number
+          servico_curador_id: string
+          tipo: Database["public"]["Enums"]["tipo_servico"]
+        }
+        Update: {
+          envio_id?: string
+          id?: string
+          preco_claves?: number
+          servico_curador_id?: string
+          tipo?: Database["public"]["Enums"]["tipo_servico"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "servico_envio_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: false
+            referencedRelation: "envio"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "servico_envio_servico_curador_id_fkey"
+            columns: ["servico_curador_id"]
+            isOneToOne: false
+            referencedRelation: "servico_curador"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      nota_artista: {
+        Row: {
+          avaliacoes: number | null
+          faixas_avaliadas: number | null
+          nf_media: number | null
+          perfil_artista_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faixa_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_artista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faixa_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "saldo_carteira"
+            referencedColumns: ["perfil_artista_id"]
+          },
+        ]
+      }
+      nota_avaliacao: {
+        Row: {
+          avaliacao_id: string | null
+          criterios_respondidos: number | null
+          envio_id: string | null
+          nf: number | null
+          no: number | null
+          ns: number | null
+          perfil_curador_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacao_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: true
+            referencedRelation: "envio"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacao_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_curador"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saldo_carteira: {
+        Row: {
+          comprometido: number | null
+          devolvido: number | null
+          disponivel: number | null
+          perfil_artista_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       aceitar_convite_admin: { Args: { p_token: string }; Returns: string }
+      avaliacao_em_rascunho_do_curador: {
+        Args: { p_avaliacao_id: string }
+        Returns: boolean
+      }
+      avisar_prazo_72h: {
+        Args: { p_janela?: string; p_limite?: number }
+        Returns: number
+      }
+      calcular_remuneracao: {
+        Args: {
+          p_base_claves: number
+          p_classe: Database["public"]["Enums"]["classe_curador"]
+          p_no_prazo: boolean
+          p_opcionais?: Json
+        }
+        Returns: {
+          acrescimos: Json
+          base_centavos: number
+          comissao_centavos: number
+          penalidade_prazo: boolean
+          percentual_aplicado: number
+          piso_percentual: number
+          teto_percentual: number
+          valor_centavos: number
+        }[]
+      }
+      confirmar_pedido_clave: { Args: { p_pedido_id: string }; Returns: number }
+      confirmar_selecao_curadores: {
+        Args: { p_faixa_id: string; p_selecao: Json }
+        Returns: string[]
+      }
+      criar_pedido_clave: {
+        Args: {
+          p_meio: Database["public"]["Enums"]["meio_pagamento"]
+          p_pacote_clave_id: string
+        }
+        Returns: string
+      }
+      curador_tem_envio_ativo_na_faixa: {
+        Args: { p_faixa_id: string }
+        Returns: boolean
+      }
+      curador_tem_envio_ativo_no_caminho: {
+        Args: { p_caminho: string }
+        Returns: boolean
+      }
+      devolver_claves_sem_resposta: {
+        Args: { p_limite?: number }
+        Returns: number
+      }
       e_admin: { Args: never; Returns: boolean }
+      enviar_avaliacao: {
+        Args: {
+          p_compartilhamento?: Json
+          p_envio_id: string
+          p_escuta_percentual: number
+          p_feedback: string
+          p_nota_subjetiva: number
+          p_notas: Json
+        }
+        Returns: string
+      }
+      expurgar_contas_excluidas: {
+        Args: { p_limite?: number }
+        Returns: number
+      }
       ler_contexto_sessao: {
         Args: never
         Returns: {
@@ -702,6 +1486,20 @@ export type Database = {
       }
       meu_perfil_artista_id: { Args: never; Returns: string }
       meu_perfil_curador_id: { Args: never; Returns: string }
+      posso_ver_avaliacao: {
+        Args: { p_avaliacao_id: string }
+        Returns: boolean
+      }
+      posso_ver_envio: { Args: { p_envio_id: string }; Returns: boolean }
+      registrar_evento_provedor: {
+        Args: {
+          p_carga: Json
+          p_id_evento: string
+          p_provedor: string
+          p_tipo: string
+        }
+        Returns: boolean
+      }
       registrar_notificacao: {
         Args: {
           p_contexto?: Json
@@ -712,6 +1510,8 @@ export type Database = {
         }
         Returns: string
       }
+      sou_dono_da_faixa: { Args: { p_faixa_id: string }; Returns: boolean }
+      sou_dono_do_envio: { Args: { p_envio_id: string }; Returns: boolean }
       tem_papel: {
         Args: { p: Database["public"]["Enums"]["papel"] }
         Returns: boolean

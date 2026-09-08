@@ -45,38 +45,82 @@ que filtrar. Com o helper errado, o teste passaria sem provar nada.
 
 ## Registro de execuções
 
-| Migration | Data | Resultado | Advisors |
-|---|---|---|---|
-| `0000b_extensoes` | 2026-09-08 | sem asserções (só extensões) | limpo |
-| `0001_identidade` | 2026-09-08 | `OK 0001_identidade` — 22 asserções | 3 findings, corrigidos na `0001b` |
-| `0001b_privilegios_de_funcao` | 2026-09-08 | coberta pela suíte da `0001` | 2 WARN aceitos, ver abaixo |
-| `0002_perfis` | 2026-09-08 | `OK 0002_perfis` — 27 asserções | 5 WARN aceitos (mesma classe) |
-| `0003_admin_auditoria` | 2026-09-08 | `OK 0003_admin_auditoria` — 22 asserções | idem |
-| `0004_configuracao` | 2026-09-08 | `OK 0004_configuracao` — 19 asserções | idem |
-| `0005_notificacoes` | 2026-09-08 | `OK 0005_notificacoes` — 24 asserções | idem |
+Todas em 2026-09-08, contra o projeto `fhqcibjzmowcjkdrqyvi`.
 
-### WARN aceitos
+| Migration | Resultado | Observação |
+|---|---|---|
+| `0000b_extensoes` | sem asserções | só extensões |
+| `0001_identidade` | `OK` — 22 asserções | 3 findings, corrigidos na `0001b` |
+| `0001b_privilegios_de_funcao` | coberta pela suíte da `0001` | — |
+| `0002_perfis` | `OK` — 27 asserções | — |
+| `0003_admin_auditoria` | `OK` — 22 asserções | passou de primeira |
+| `0004_configuracao` | `OK` — 19 asserções | duas asserções minhas de aritmética estavam erradas; ver abaixo |
+| `0005_notificacoes` | `OK` — 24 asserções | passou de primeira |
+| `0006_faixa_envio` | `OK` — 26 asserções | expôs a recursão de policy (`0006b`) e o trigger cego (`0006c`) |
+| `0007_claves` | `OK` — 34 asserções | cobre "credita uma única vez sob webhook duplicado" |
+| `0008_avaliacao` | coberta pela suíte da `0009` | seed dos 11 critérios conferido |
+| `0009_remuneracao` | `OK` — 31 asserções | cobertura obrigatória (data-model §10) |
+| `0010_rpcs_sla` | `OK` — 26 asserções | ciclo econômico completo; expôs o estado inválido corrigido na `0010b` |
+| `0011_jobs` | 3 `cron.job` agendados | conferido em `cron.job` |
 
-`get_advisors(security)` aponta 7 findings da classe
-`authenticated_security_definer_function_executable`. **Todos são intencionais**,
-e nenhum é acessível por `anon`:
+### O que os testes pegaram, e que a especificação não previa
 
-| Função | Por que `authenticated` precisa executá-la |
-|---|---|
-| `tem_papel(papel)` | helper de RLS, chamado de dentro das policies |
-| `e_admin()` | idem |
-| `tem_permissao(modulo, escrita)` | idem, e é a 3ª camada de autorização no serviço |
-| `meu_perfil_artista_id()` | idem — evita comparar `perfil_artista_id` com `auth.uid()` |
-| `meu_perfil_curador_id()` | idem |
-| `ler_contexto_sessao()` | o middleware a chama com a sessão do usuário, a cada navegação |
-| `aceitar_convite_admin(token)` | quem aceita o convite está autenticado, e é o único caminho para o papel `admin` |
+1. **Recursão mútua de policy** (`42P17`). A policy de `faixa` consultava
+   `envio`, e a de `envio` consultava `faixa`. RLS se aplica também às tabelas
+   referenciadas de dentro de uma policy, então a leitura mais simples do fluxo
+   da R2 — a fila do curador — abortava. Resolvido na `0006b` movendo o lado
+   cruzado para funções `security definer`. **Regra que ficou:** policy que
+   precisa de outra tabela protegida por RLS chama função `security definer`,
+   nunca `exists` direto.
 
-O que **não** está nessa lista, e foi deliberadamente revogado de
-`authenticated`: `registrar_notificacao`, `registrar_auditoria`,
-`criar_perfil_para_novo_usuario`, `atualizar_atualizado_em`,
-`proibir_remover_servico_feedback`, `proibir_autopromocao_de_classe` e
-`proibir_reescrever_notificacao`. Nenhuma delas tem razão para estar na
-superfície REST.
+2. **Trigger de guarda cego.** `proibir_editar_faixa_em_curadoria` nasceu
+   `security definer` **e** decidindo por `current_user <> 'authenticated'`. As
+   duas coisas se anulam: dentro de uma função `definer` o `current_user` já é
+   o dono, então a guarda nunca bloqueava — o artista reescrevia o título de
+   uma faixa em curadoria. Corrigido na `0006c` (`security invoker`).
+
+3. **Estado intermediário que o schema recusa.**
+   `confirmar_selecao_curadores` inseria o `envio` com `total_claves = 0` para
+   depois somar os serviços, e `check (total_claves > 0)` barrava. A correção
+   não foi relaxar o check: foi apurar o subtotal antes de inserir (`0010b`).
+
+4. **Aritmética da tabela de remuneração.** Duas asserções que eu havia escrito
+   estavam erradas, e o teste as pegou: o piso do Ouro é 45, não 50 — os 50%
+   são o **teto na avaliação**; e o vão uniforme de 12 pontos está entre
+   `teto_base` e `teto_max`, não entre piso e `teto_base` (esse varia: 8, 3, 5).
+
+5. **`teto_max` é inalcançável.** Com os acréscimos do catálogo, o máximo real é
+   46 / 51 / 58 contra tetos de 50 / 55 / 62 — sobram exatamente 4 pontos nas
+   três classes. Ou falta um acréscimo de 4 pontos, ou os tetos são
+   aspiracionais. **Pergunta aberta para o cliente**, e o teste fixa a folga
+   para ela não mudar em silêncio.
+
+### Advisors
+
+`get_advisors(security)` no estado final: **17 WARN e 1 INFO, todos
+intencionais**. Nenhum finding envolve `anon`.
+
+O INFO é `rls_enabled_no_policy` em `evento_provedor`, e é exatamente o
+desenho: RLS habilitada com zero policies nega a todo papel, e só a RPC
+`registrar_evento_provedor` escreve. É a expressão mais limpa da intenção.
+
+Os 17 WARN são da classe `authenticated_security_definer_function_executable`,
+e se dividem em dois grupos, ambos necessários:
+
+- **Helpers de RLS**, chamados de dentro das policies: `tem_papel`, `e_admin`,
+  `tem_permissao`, `meu_perfil_artista_id`, `meu_perfil_curador_id`,
+  `sou_dono_da_faixa`, `sou_dono_do_envio`, `posso_ver_envio`,
+  `posso_ver_avaliacao`, `avaliacao_em_rascunho_do_curador`,
+  `curador_tem_envio_ativo_na_faixa`, `curador_tem_envio_ativo_no_caminho`.
+- **RPCs que o cliente chama**: `ler_contexto_sessao` (middleware, a cada
+  navegação), `aceitar_convite_admin`, `criar_pedido_clave`,
+  `confirmar_selecao_curadores` e `enviar_avaliacao`.
+
+O que **não** está nessa lista, e foi deliberadamente revogado até de
+`authenticated`: `registrar_notificacao`, `registrar_evento_provedor`,
+`confirmar_pedido_clave`, `devolver_claves_sem_resposta`, `avisar_prazo_72h`,
+`expurgar_contas_excluidas`, `registrar_auditoria` e as sete funções de
+trigger. Nenhuma delas tem razão para estar na superfície REST.
 
 ## Pegadinha que vale para toda função
 

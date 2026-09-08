@@ -26,8 +26,12 @@ function lerSeedDaConfiguracao(): readonly string[] {
   const sql = readFileSync(join(MIGRATIONS, arquivo), 'utf8');
   const seed = sql.slice(sql.indexOf('insert into configuracao'));
 
-  // As chaves são o primeiro literal de cada tupla do `values`.
-  return [...seed.matchAll(/^ {2}\('([^']+)',/gm)].map((casado) => casado[1]);
+  // As chaves são o primeiro literal de cada tupla do `values`. O grupo 1
+  // sempre casa quando a regex casa, mas `noUncheckedIndexedAccess` não sabe
+  // disso — daí o filtro, em vez de um `!`.
+  return [...seed.matchAll(/^ {2}\('([^']+)',/gm)]
+    .map((casado) => casado[1])
+    .filter((chave): chave is string => chave !== undefined);
 }
 
 describe('registro de chaves de configuração', () => {

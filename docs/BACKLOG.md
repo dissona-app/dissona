@@ -160,12 +160,12 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 ## R2 — Núcleo do produto · 14,5h
 
 ### Banco — migrations `0006` a `0010`
-- [ ] Migration `0006` — `faixa`, `envio`, `servico_envio`
-- [ ] Migration `0007` — `pacote_clave`, `pedido_clave`, `evento_provedor`, `lancamento_clave`, view `saldo_carteira`
-- [ ] Migration `0008` — `criterio` (seed), `avaliacao`, `nota_criterio`, `compartilhamento`, view `nota_avaliacao` — *bloqueado por [#2](open-questions.md#2-11º-critério-de-avaliação) e [#3](open-questions.md#3-quais-5-dos-11-critérios-são-obrigatórios)*
-- [ ] Função `calcular_remuneracao` (piso, acréscimos, teto, penalidade de prazo, líquido e comissão) — *bloqueada por [#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe)*
-- [ ] Migration `0009` — `ganho_curador` e RPC `enviar_avaliacao`
-- [ ] Migration `0010` — RPC `confirmar_selecao_curadores`, `devolver_claves_sem_resposta` e índices da fila
+- [x] Migration `0006` — `faixa`, `envio`, `servico_envio`, mais a policy do bucket `faixas` que a R0 deixou pendente (corrigida: o rascunho comparava uma coluna que não existe). `0006b` quebra a recursão mútua de policy e `0006c` conserta um trigger de guarda que nascera cego
+- [x] Migration `0007` — `pacote_clave`, `pedido_clave`, `evento_provedor`, `lancamento_clave`, view `saldo_carteira` (com `security_invoker`), e as RPCs `criar_pedido_clave`, `registrar_evento_provedor` e `confirmar_pedido_clave`
+- [x] Migration `0008` — `criterio` (**seed com os 11 do protótipo**), `avaliacao`, `nota_criterio`, `compartilhamento`, views `nota_avaliacao` e `nota_artista`. Resolve [#2](open-questions.md#2-11º-critério-de-avaliação) e [#3](open-questions.md#3-quais-5-dos-11-critérios-são-obrigatórios)
+- [x] Função `calcular_remuneracao` — algoritmo do protótipo, 31 asserções. Resolve [#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe) (percentual sobre o **bruto**), mas com semântica diferente da tabela do board — ver o cabeçalho da `0009`
+- [x] Migration `0009` — `ganho_curador` (com `base_centavos`, para o `check` do rateio existir) e RPC `enviar_avaliacao`
+- [x] Migration `0010` — RPCs `confirmar_selecao_curadores`, `devolver_claves_sem_resposta` e `avisar_prazo_72h`; índices da fila na `0006`. `0010b` corrige um estado intermediário que o `check` recusava
 
 ### Envio de música (3)
 - [ ] Passo 1 — colar link com autodetecção de metadados (3)
@@ -224,28 +224,28 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [ ] Asaas — webhook de situação de KYC liberando o saque
 
 ### Jobs e SLA
-- [ ] Job `avisar_prazo_72h` — aviso antes de vencer, evento crítico
-- [ ] Job `devolver_claves_sem_resposta` — devolve a Clave, tira a faixa da fila, lança no extrato e notifica
-- [ ] Garantir que crédito devolvido **não** entra como ganho do curador
-- [ ] Estados do envio `Recebeu → Ouviu → Avaliando → Pronto` gravados para o Status de envio (3.3, R3)
+- [x] Job `avisar_prazo_72h` — aviso antes de vencer, evento crítico, uma vez por envio (`envio.avisado_prazo_em`)
+- [x] Job `devolver_claves_sem_resposta` — devolve a Clave, tira a faixa da fila, lança no extrato e notifica
+- [x] Garantir que crédito devolvido **não** entra como ganho do curador — asserção explícita na suíte da `0010`
+- [x] Estados do envio `Recebeu → Ouviu → Avaliando → Pronto` gravados. `Pronto` e `Devolvido` são reservados às RPCs por trigger
 
 ### Gate da R2
 - [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — os arquivos existem em `e2e/`, hoje como `skip`
 - [ ] Compra de Claves credita uma única vez sob webhook duplicado
 - [ ] Avaliação concluída gera ganho com o percentual correto por classe e prazo
 - [ ] Devolução de 7 dias aparece no extrato e remove a faixa da fila
-- [ ] `repasse + comissão = valor da transação` em toda transação
+- [x] `repasse + comissão = valor da transação` — garantido por `check` em `ganho_curador`, e não por convenção
 
 ---
 
 ## Transversais — qualidade e conformidade
 
 ### Testes
-- [ ] Testes unitários do cálculo de remuneração por classe (piso, acréscimos, teto, penalidade)
-- [ ] Testes unitários do saldo derivado de `lancamento_clave`
+- [x] Cálculo de remuneração por classe coberto na suíte SQL da `0009` (piso, acréscimos, teto, penalidade, arredondamento e invariante do rateio)
+- [x] Saldo derivado de `lancamento_clave` coberto nas suítes da `0007` e `0010`
 - [ ] Testes unitários dos schemas Zod
-- [ ] Testes de RLS tabela por tabela
-- [ ] Teste de idempotência do webhook de pagamento
+- [x] Testes de RLS tabela por tabela — 231 asserções em [`supabase/testes/`](../supabase/testes/)
+- [x] Teste de idempotência do webhook de pagamento — na suíte da `0007`
 - [ ] E2E dos 16 cenários do Guia de Testes da Release 2
 
 ### Interface
@@ -255,7 +255,7 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [ ] Suporte a pt-BR, es e en na interface
 
 ### Conformidade e governança
-- [ ] Job `expurgar_contas_excluidas` (LGPD, 30 dias)
+- [x] Job `expurgar_contas_excluidas` (LGPD, 30 dias) — **anonimiza** em vez de apagar, porque o ledger é append-only e há retenção fiscal. Decisão de jurídico a confirmar; ver o cabeçalho da `0011`
 - [ ] Auditoria de thresholds: nenhum número de negócio hardcoded — tudo vem de `configuracao`
 - [ ] Conferir que todo evento de R1 e R2 grava em `notificacao` (a central de leitura chega na R5)
 - [ ] Usar **"Envios"**, nunca "Submissões", na interface do admin
