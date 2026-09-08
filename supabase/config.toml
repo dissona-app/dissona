@@ -1,0 +1,7 @@
+# Configuração mínima do Supabase CLI.
+#
+# Existe para que `supabase gen types` funcione. A stack local
+# (`supabase start` / `db reset`) continua fora por decisão registrada no
+# BACKLOG — exige Docker. O caminho de DDL segue sendo o MCP (`apply_migration`),
+# conforme architecture.md §2.2.
+project_id = "fhqcibjzmowcjkdrqyvi"

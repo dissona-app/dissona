@@ -15,6 +15,11 @@ const eslintConfig = defineConfig([
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
+  {
+    // Scripts de linha de comando: a saída no console É a interface deles.
+    files: ['scripts/**/*.mjs'],
+    rules: { 'no-console': 'off' },
+  },
   globalIgnores([
     '.next/**',
     'out/**',

@@ -27,7 +27,7 @@ Detalhamento e perguntas objetivas em [open-questions](open-questions.md).
 
 - [ ] **Disponibilidade da API do SoundCloud** para OAuth — não é provider nativo do Supabase ([#9](open-questions.md#9-api-do-soundcloud-para-oauth))
 - [ ] **Provedor de e-mail transacional e domínio de envio** ([#10](open-questions.md#10-provedor-de-e-mail-transacional))
-- [ ] **Matriz de permissões por papel do admin** ([#11](open-questions.md#11-matriz-de-permissões-do-admin))
+- [x] **Matriz de permissões por papel do admin** ([#11](open-questions.md#11-matriz-de-permissões-do-admin)) — definida pelo protótipo do Admin da R2 e semeada na `0003`
 - [ ] **Ativar o 2º papel exige aprovação da curadoria?** ([#12](open-questions.md#12-ativação-do-2º-papel-exige-aprovação))
 - [ ] **Confirmar as horas da Release 1** — 16,75h declaradas × 14,75h somadas ([#13](open-questions.md#13-horas-da-release-1))
 
@@ -84,13 +84,15 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 ## R1 — Fundação do produto · 16,75h
 
 ### Banco — migrations `0001` a `0005`
-- [ ] Migration `0001` — enums base, `perfil`, `papel_usuario`, helpers de RLS (`tem_papel`, `e_admin`), trigger de `atualizado_em`
-- [ ] Migration `0002` — `perfil_artista`, `perfil_curador`, `credencial_curador`, `midia_curador`, `servico_curador`
-- [ ] Migration `0003` — `membro_admin`, `convite_admin`, `permissao_admin`, `log_auditoria`
-- [ ] Trigger genérico `registrar_auditoria` nas tabelas sensíveis
-- [ ] Migration `0004` — tabela `configuracao` e seed dos thresholds
-- [ ] Migration `0005` — `notificacao`, `evento_notificacao` (**seed completo, com eventos de todas as releases**), `preferencia_notificacao`
-- [ ] Função `registrar_notificacao`, usada por todos os módulos — nenhum `insert` direto em `notificacao`
+- [x] Migration `0000b` — extensões `citext`, `pg_cron` e `pg_net` (infra, fora da faixa por release)
+- [x] Migration `0001` — enums base, `perfil`, `papel_usuario`, helpers de RLS (`tem_papel`, `e_admin`), trigger de `atualizado_em`, trigger de criação de perfil em `auth.users` e RLS com 22 asserções em [`supabase/testes/`](../supabase/testes/)
+- [x] Migration `0001b` — revogação de `execute` por papel: `revoke from public` não basta no Supabase, ver [`supabase/testes/README.md`](../supabase/testes/README.md)
+- [x] Migration `0002` — `perfil_artista`, `perfil_curador`, `credencial_curador`, `midia_curador`, `servico_curador`, mais os helpers `meu_perfil_artista_id`/`meu_perfil_curador_id` e a RPC `ler_contexto_sessao`
+- [x] Migration `0003` — `membro_admin`, `convite_admin`, `permissao_admin`, `log_auditoria`, `tem_permissao` e `aceitar_convite_admin`
+- [x] Trigger genérico `registrar_auditoria` nas tabelas sensíveis — segredos removidos do rastro, e o `motivo` vindo de `current_setting`
+- [x] Migration `0004` — tabela `configuracao` e seed de **32** chaves, com o que o protótipo da R2 decidiu
+- [x] Migration `0005` — `notificacao`, `evento_notificacao` (**seed completo: 42 eventos das cinco releases**), `preferencia_notificacao`
+- [x] Função `registrar_notificacao`, usada por todos os módulos — nenhum `insert` direto. Revogada até de `authenticated`
 - [ ] `servicoNotificacao` no código, com canal in-app e e-mail
 
 ### Autenticação (1 / 11)

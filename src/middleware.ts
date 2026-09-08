@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 import type { LeituraDePapeis } from './lib/papeis';
 import { decidirAcesso } from './lib/guarda-rota';
-import { lerPapeis } from './lib/papeis';
+import { lerContextoSessao } from './lib/papeis';
 import type { SessaoDaRequisicao } from './lib/supabase/middleware';
 import { renovarSessao } from './lib/supabase/middleware';
 
@@ -42,21 +42,15 @@ export async function middleware(requisicao: NextRequest) {
   let leitura: LeituraDePapeis = SEM_SESSAO;
   if (sessao !== null) {
     try {
-      leitura = await lerPapeis(sessao.supabase, sessao.usuarioId);
+      leitura = await lerContextoSessao(sessao.supabase, sessao.usuarioId);
     } catch (erro) {
-      // Falha de leitura de papel não pode virar 500. Sem papel conhecido, a
-      // guarda trata como sessão ausente e manda para o login.
-      console.error('[middleware] não foi possível ler os papéis:', erro);
+      // Falha de leitura não pode virar 500. Sem contexto conhecido, a guarda
+      // trata como sessão ausente e manda para o login.
+      console.error('[middleware] não foi possível ler o contexto da sessão:', erro);
     }
   }
 
-  const decisao = decidirAcesso({
-    caminho: requisicao.nextUrl.pathname,
-    leitura,
-    // `perfil_curador.passo_cadastro` nasce na migration `0002` (R1). Até lá
-    // o estado do cadastro é indeterminado.
-    cadastroCuradorConcluido: null,
-  });
+  const decisao = decidirAcesso({ caminho: requisicao.nextUrl.pathname, leitura });
 
   if (decisao.tipo === 'seguir') return resposta;
 

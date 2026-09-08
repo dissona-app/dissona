@@ -57,11 +57,6 @@ export type Decisao =
 export type ContextoDeAcesso = {
   readonly caminho: string;
   readonly leitura: LeituraDePapeis;
-  /**
-   * Se o cadastro do módulo 12 está concluído. `null` significa
-   * indeterminado — é o caso da R0, em que `perfil_curador` ainda não existe.
-   */
-  readonly cadastroCuradorConcluido: boolean | null;
 };
 
 const seguir: Decisao = { tipo: 'seguir' };
@@ -80,11 +75,8 @@ function temSessao(leitura: LeituraDePapeis): boolean {
  * um ambiente que não é o dele.
  */
 export function inicioDoUsuario(leitura: LeituraDePapeis): string {
-  if (leitura.estado !== 'ok') {
-    // Sem o esquema de papéis (R0) não há como escolher ambiente; a home
-    // pública é o destino neutro.
-    return ROTA.HOME;
-  }
+  // Sem sessão não há ambiente a escolher; a home pública é o destino neutro.
+  if (leitura.estado !== 'ok') return ROTA.HOME;
   if (leitura.papeis.includes(Papel.ARTISTA)) return ROTA.ARTISTA;
   if (leitura.papeis.includes(Papel.CURADOR)) return ROTA.CURADOR;
   if (leitura.papeis.includes(Papel.ADMIN)) return ROTA.ADMIN;
@@ -98,15 +90,12 @@ function exigirSessao(contexto: ContextoDeAcesso, destinoDeLogin: string): Decis
 }
 
 /**
- * Exige um papel — mas **só quando o esquema de papéis existe**.
+ * Exige um papel.
  *
- * Enquanto `papel_usuario` não foi criada (R0), o recorte por papel é
- * inaplicável: não há dado para consultar. Nessa janela a exigência real é
- * sessão, e é isso que a função faz. Some sozinho quando a migration `0001`
- * entrar, porque `lerPapeis` deixa de devolver `sem_esquema`.
+ * Conta sem papel nenhum vai para a seleção de perfil (1.4), e não para o
+ * login: ela **está** autenticada, só não escolheu o ambiente ainda.
  */
 function exigirPapel(leitura: LeituraDePapeis, papel: Papel, destinoAlternativo: string): Decisao {
-  if (leitura.estado === 'sem_esquema') return seguir;
   if (leitura.estado === 'sem_sessao') return para(ROTA.ENTRAR);
   if (leitura.papeis.length === 0) return para(ROTA.SELECAO_DE_PERFIL);
   return leitura.papeis.includes(papel) ? seguir : para(destinoAlternativo);
@@ -165,7 +154,8 @@ export function decidirAcesso(contexto: ContextoDeAcesso): Decisao {
     // Curador com cadastro pendente vai para o wizard do módulo 12 — mas o
     // wizard em si tem de ser acessível, senão o redirecionamento cicla.
     if (
-      contexto.cadastroCuradorConcluido === false &&
+      leitura.estado === 'ok' &&
+      !leitura.cadastroCuradorConcluido &&
       !ehOuEstaSob(caminho, ROTA.CURADOR_CADASTRO)
     ) {
       return para(ROTA.CURADOR_CADASTRO);

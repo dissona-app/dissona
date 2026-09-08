@@ -1,16 +1,16 @@
 /**
- * Leitura dos papéis da conta.
+ * Leitura do contexto de sessão: papéis ativos e conclusão do cadastro do
+ * curador.
  *
- * A tabela `papel_usuario` nasce na migration `0001`, que é da **R1**
- * (data-model §11). Até ela existir, a leitura devolve `sem_esquema` — e a
- * guarda de rota trata esse estado explicitamente, em vez de assumir "sem
- * papel" e prender todo mundo na seleção de perfil.
- *
- * Não se aplica uma guarda de papel que ainda não existe. O que a R0 pode
- * exigir de verdade é sessão; o recorte por papel entra junto com a tabela.
+ * Uma consulta, não duas. O `middleware.ts` roda em `gru1` e o banco está em
+ * `us-west-2` — cada ida custa ~120 ms (architecture.md §9), e a guarda de
+ * `(app)/curador` precisa das duas informações em toda navegação. A RPC
+ * `ler_contexto_sessao()` (migration `0002`) devolve as duas de uma vez.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+
+import type { Database } from './supabase/tipos-bd';
 
 export const Papel = {
   ARTISTA: 'artista',
@@ -21,40 +21,36 @@ export const Papel = {
 export type Papel = (typeof Papel)[keyof typeof Papel];
 
 export type LeituraDePapeis =
-  | { readonly estado: 'sem_esquema' }
   | { readonly estado: 'sem_sessao' }
-  | { readonly estado: 'ok'; readonly papeis: readonly Papel[] };
+  | {
+      readonly estado: 'ok';
+      readonly papeis: readonly Papel[];
+      /** `perfil_curador.cadastro_concluido_em is not null` — guarda da rota do curador. */
+      readonly cadastroCuradorConcluido: boolean;
+    };
 
-/** Código do Postgres para "relação não existe". */
-const RELACAO_INEXISTENTE = '42P01';
+/** Aceita qualquer cliente tipado — o do servidor e o do middleware. */
+type Cliente = SupabaseClient<Database>;
 
-/**
- * O cliente é recebido como parâmetro (e tipado de forma frouxa) porque
- * `papel_usuario` ainda não está em `tipos-bd.ts`. Na R1, com os tipos
- * gerados, isto passa a usar `ClienteServidor` e some o `unknown`.
- */
-export async function lerPapeis(
-  supabase: SupabaseClient,
+export async function lerContextoSessao(
+  supabase: Cliente,
   usuarioId: string | null,
 ): Promise<LeituraDePapeis> {
   if (usuarioId === null) return { estado: 'sem_sessao' };
 
-  const { data, error } = await supabase
-    .from('papel_usuario')
-    .select('papel, ativo')
-    .eq('perfil_id', usuarioId)
-    .eq('ativo', true);
+  const { data, error } = await supabase.rpc('ler_contexto_sessao').single();
 
-  if (error !== null) {
-    if (error.code === RELACAO_INEXISTENTE) return { estado: 'sem_esquema' };
-    throw error;
-  }
+  if (error !== null) throw error;
 
-  const papeis = (data ?? [])
-    .map((linha) => (linha as { papel: string }).papel)
-    .filter((papel): papel is Papel => Object.values<string>(Papel).includes(papel));
+  const papeis = (data.papeis ?? []).filter((papel): papel is Papel =>
+    Object.values<string>(Papel).includes(papel),
+  );
 
-  return { estado: 'ok', papeis };
+  return {
+    estado: 'ok',
+    papeis,
+    cadastroCuradorConcluido: data.cadastro_curador_concluido ?? false,
+  };
 }
 
 export function temPapel(leitura: LeituraDePapeis, papel: Papel): boolean {

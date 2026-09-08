@@ -5,23 +5,33 @@ import type { LeituraDePapeis } from '../papeis';
 import { Papel } from '../papeis';
 
 const semSessao: LeituraDePapeis = { estado: 'sem_sessao' };
-/** Janela da R0: sessão real, mas `papel_usuario` ainda não existe. */
-const semEsquema: LeituraDePapeis = { estado: 'sem_esquema' };
-const comPapeis = (...papeis: readonly Papel[]): LeituraDePapeis => ({ estado: 'ok', papeis });
+
+/**
+ * Papéis com o cadastro do curador **concluído** — o caso comum. O cadastro
+ * pendente é o recorte específico, e tem o seu próprio helper.
+ */
+const comPapeis = (...papeis: readonly Papel[]): LeituraDePapeis => ({
+  estado: 'ok',
+  papeis,
+  cadastroCuradorConcluido: true,
+});
+
+const comCadastroPendente = (...papeis: readonly Papel[]): LeituraDePapeis => ({
+  estado: 'ok',
+  papeis,
+  cadastroCuradorConcluido: false,
+});
+
 const semPapel = comPapeis();
 
-function decidir(
-  caminho: string,
-  leitura: LeituraDePapeis,
-  cadastroCurador: boolean | null = null,
-) {
-  return decidirAcesso({ caminho, leitura, cadastroCuradorConcluido: cadastroCurador });
+function decidir(caminho: string, leitura: LeituraDePapeis) {
+  return decidirAcesso({ caminho, leitura });
 }
 
 describe('(publico)', () => {
   it('não exige nada', () => {
     for (const caminho of [ROTA.HOME, ROTA.TERMOS, ROTA.PRIVACIDADE]) {
-      for (const leitura of [semSessao, semEsquema, semPapel, comPapeis(Papel.ARTISTA)]) {
+      for (const leitura of [semSessao, semPapel, comPapeis(Papel.ARTISTA)]) {
         expect(decidir(caminho, leitura)).toEqual({ tipo: 'seguir' });
       }
     }
@@ -108,21 +118,21 @@ describe('(app)/artista', () => {
 
 describe('(app)/curador', () => {
   it('com o papel certo e cadastro concluído, segue', () => {
-    expect(decidir('/curador/fila', comPapeis(Papel.CURADOR), true)).toEqual({ tipo: 'seguir' });
+    expect(decidir('/curador/fila', comPapeis(Papel.CURADOR))).toEqual({ tipo: 'seguir' });
   });
 
   it('cadastro pendente vai para o wizard do módulo 12', () => {
-    expect(decidir('/curador/fila', comPapeis(Papel.CURADOR), false)).toEqual({
+    expect(decidir('/curador/fila', comCadastroPendente(Papel.CURADOR))).toEqual({
       tipo: 'redirecionar',
       para: ROTA.CURADOR_CADASTRO,
     });
   });
 
   it('o próprio wizard é acessível com cadastro pendente — senão o redirect cicla', () => {
-    expect(decidir(ROTA.CURADOR_CADASTRO, comPapeis(Papel.CURADOR), false)).toEqual({
+    expect(decidir(ROTA.CURADOR_CADASTRO, comCadastroPendente(Papel.CURADOR))).toEqual({
       tipo: 'seguir',
     });
-    expect(decidir('/curador/cadastro/passo-3', comPapeis(Papel.CURADOR), false)).toEqual({
+    expect(decidir('/curador/cadastro/passo-3', comCadastroPendente(Papel.CURADOR))).toEqual({
       tipo: 'seguir',
     });
   });
@@ -171,19 +181,14 @@ describe('(admin)', () => {
   });
 });
 
-describe('janela da R0 — sem o esquema de papéis', () => {
-  it('exige sessão, mas não aplica recorte de papel que ainda não existe', () => {
-    expect(decidir(ROTA.ARTISTA, semEsquema)).toEqual({ tipo: 'seguir' });
-    expect(decidir(ROTA.CURADOR, semEsquema)).toEqual({ tipo: 'seguir' });
-    expect(decidir(ROTA.ADMIN, semEsquema)).toEqual({ tipo: 'seguir' });
-  });
-
-  it('continua barrando quem não tem sessão', () => {
+describe('sem sessão', () => {
+  it('barra todo ambiente autenticado', () => {
     expect(decidir(ROTA.ARTISTA, semSessao).tipo).toBe('redirecionar');
+    expect(decidir(ROTA.CURADOR, semSessao).tipo).toBe('redirecionar');
     expect(decidir(ROTA.ADMIN, semSessao).tipo).toBe('redirecionar');
   });
 
   it('manda para a home pública quando não há como escolher ambiente', () => {
-    expect(inicioDoUsuario(semEsquema)).toBe(ROTA.HOME);
+    expect(inicioDoUsuario(semSessao)).toBe(ROTA.HOME);
   });
 });
