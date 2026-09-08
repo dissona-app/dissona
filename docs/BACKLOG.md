@@ -14,14 +14,16 @@ Detalhamento e perguntas objetivas em [open-questions](open-questions.md).
 
 ### Travam a R2
 
-- [ ] **Escuta mínima: 60% ou 100% da faixa** — protótipo do curador diz 60%, o do artista promete 100% ([#1](open-questions.md#1-escuta-mínima-60-ou-100-da-faixa)) · afeta 14 e a copy de 1
-- [ ] **11º critério de avaliação** — só 10 estão nomeados; falta o item do grupo Produção ([#2](open-questions.md#2-11º-critério-de-avaliação)) · trava o seed de `criterio`
-- [ ] **Quais 5 dos 11 critérios são obrigatórios** ([#3](open-questions.md#3-quais-5-dos-11-critérios-são-obrigatórios)) · trava a validação de `enviar_avaliacao`
-- [ ] **Tabela de pacotes de Claves** — quantidades, preços e descontos ([#4](open-questions.md#4-tabela-de-pacotes-de-claves)) · trava o seed e os testes de checkout
-- [ ] **Base de cálculo da remuneração por classe** — os percentuais incidem sobre o bruto ou sobre os 50%? Ouro no teto (62%) fura a margem declarada ([#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe)) · **maior risco de retrabalho**
+- [x] **Escuta mínima: 60%** — resolvido pelo protótipo do curador, a tela que aplica o gate. O que muda é a copy do artista, que promete 100%
+- [x] **11º critério** — o grupo Produção tem **dois** itens, Mixagem e Arranjo. O board perdeu dois, não um
+- [x] **Quais 5 são obrigatórios** — afinação, ritmo, melodia, personalidade, conexão. Não é um por grupo
+- [x] **Tabela de pacotes** — Ensaio, Repertório, Turnê e Catálogo (inativo), do protótipo do Admin
+- [ ] **Base de cálculo da remuneração** — respondida pelo protótipo (incide sobre o **bruto**), mas com **outra semântica**: os três números por classe são (piso, teto na avaliação, teto com compartilhamento). Um Bronze no prazo sem opcionais recebe **30%**, não 38% ([#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe)). Implementado e coberto por teste; **confirmar com o cliente antes da tela 14.4**
 - [ ] **Modelo de split com o Asaas**, junto do contador do cliente ([#6](open-questions.md#6-modelo-de-split-no-asaas))
-- [ ] **Armazenamento do mp3: sempre ou só fora do streaming** ([#7](open-questions.md#7-armazenamento-do-arquivo-de-áudio)) · se o player precisa medir escuta, pode forçar "sempre"
-- [ ] **Acréscimo de compartilhamento fica retido até verificação?** — board e protótipo divergem ([#8](open-questions.md#8-liberação-do-crédito-versus-compartilhamento))
+- [ ] **Armazenamento do mp3: sempre ou só fora do streaming** ([#7](open-questions.md#7-armazenamento-do-arquivo-de-áudio)) · default provisional `true` em `configuracao`, porque um iframe de streaming não expõe posição de reprodução e o gate de escuta ficaria inverificável
+- [ ] **Acréscimo de compartilhamento fica retido?** — o protótipo se contradiz internamente ([#8](open-questions.md#8-liberação-do-crédito-versus-compartilhamento)). Adotado o cálculo (libera na hora), com a decisão gravada no `jsonb` do ganho
+- [ ] **`teto_max` é inalcançável** — com os acréscimos do catálogo o máximo real é 46/51/58 contra tetos de 50/55/62; sobram 4 pontos nas três classes ([#5b](open-questions.md#5b-teto_max-é-inalcançável))
+- [ ] **LGPD × retenção fiscal no expurgo** — o job anonimiza em vez de apagar, porque o ledger é append-only. **Decisão de jurídico** ([#27](open-questions.md#27-lgpd-versus-retenção-fiscal-no-expurgo))
 
 ### Travam a R1
 

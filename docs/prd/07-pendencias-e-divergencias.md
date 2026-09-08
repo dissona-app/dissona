@@ -172,3 +172,36 @@ Registradas no discovery, fora do escopo da V1:
 
 - **Pacote Premium de classes** promete feedback em 48h — exigirá recalcular a remuneração por classe quando entrar.
 - **Validação automática de compartilhamento** após o feedback do curador (V2). Em primeiro momento, será manual.
+
+---
+
+## Divergências levantadas pela implementação do banco · 2026-09-08
+
+Registradas aqui porque a precedência do [AGENTS.md](../../AGENTS.md) —
+**protótipo da R2 > board > derivação** — as resolveu a favor do protótipo, e o
+banco já reflete isso. Cada uma tem o detalhe no cabeçalho da migration que a
+causou.
+
+| # | O que divergia | Decidido | Onde |
+|---|---|---|---|
+| 1 | O grupo Produção não tinha item nomeado | Tem **dois**: Mixagem e Arranjo. O board perdeu dois itens, não um | `0008` |
+| 2 | Quais cinco critérios são obrigatórios | afinação, ritmo, melodia, personalidade, conexão — **não** um por grupo | `0004` |
+| 3 | Escuta mínima 60% × 100% | **60%**; a copy do artista é que muda | `0004` |
+| 4 | Semântica de `remuneracao.*` | *(piso, teto na avaliação, teto com compartilhamento)*, e não *(atraso, prazo, teto)*. **RF-066 foi corrigido** | `0004`, `0009` |
+| 5 | Penalidade de atraso | −8 pontos no **piso**, mínimo 15. `teto_atraso_percentual` deixou de existir | `0004`, `0009` |
+| 6 | `evento_notificacao.destinatario` | `papel[]`, e não escalar: cinco eventos servem artista e curador | `0005` |
+| 7 | `log_auditoria.registro_id` | `text`, e não `uuid`: `lancamento_clave.id` é `bigint` | `0003` |
+| 8 | Faixa das migrations | `0011` são os jobs de R1+R2; a R3 começa em `0012` | `0011` |
+
+### E uma divergência interna do próprio protótipo
+
+Sobre o **acréscimo por compartilhamento** ([#8](../open-questions.md)), o
+protótipo se contradiz: a copy do passo diz *"a equipe confere o registro antes
+de liberar o acréscimo"*, mas o cálculo soma os 8 pontos na hora, e o cenário
+**C5** do Guia de Testes afirma que *"o crédito é liberado ao confirmar"*.
+
+Adotado o **cálculo**, que é o comportamento observável, com
+`configuracao.compartilhamento.acrescimo_retido = false`. O `ganho_curador`
+grava o item como `{"chave":"compartilhou","percentual":8,"retido":false}`, para
+o histórico continuar interpretável se a decisão virar.
+

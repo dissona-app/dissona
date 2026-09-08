@@ -294,7 +294,9 @@ Idênticos a RF-022, RF-023 e RF-024, com o catálogo de eventos do curador.
 
 ### RF-040 · Confirmação do envio
 
-- **Dado** que confirmo o envio, **quando** ele é gravado, **então** vejo *"Sua submissão chegou"* com as ações Acompanhar status, Voltar ao início e Enviar outra faixa.
+- **Dado** que confirmo o envio, **quando** ele é gravado, **então** vejo *"Seu envio chegou"* com as ações Acompanhar status, Voltar ao início e Enviar outra faixa.
+
+> O protótipo diz "Sua submissão chegou", mas a terminologia decidida é **"Envios"**, nunca "Submissões" ([PRD §9](PRD.md), [arquitetura §8](architecture.md)). É a única divergência em que o protótipo **não** vence, e o próprio [Guia de Testes](R2/guia-de-testes-r2.md) já registra a correção.
 
 ### RF-041 · Placeholder de seleção de curadores (R2)
 
@@ -452,7 +454,17 @@ Idênticos a RF-022, RF-023 e RF-024, com o catálogo de eventos do curador.
 ### RF-066 · Remuneração por classe
 
 - **Dado** que chego à etapa 5, **quando** ela carrega, **então** vejo classe atual, **piso** conforme o prazo, **acréscimos** item a item com rótulo e valor, **teto** da classe e **"Você recebe"**.
-- **Dado** que entreguei **dentro de 72h**, **quando** o cálculo roda, **então** o piso é 38% (Bronze), 43% (Prata) ou 50% (Ouro).
+- **Dado** que entreguei **dentro de 72h**, **quando** o cálculo roda, **então** o piso é **30%** (Bronze), **40%** (Prata) ou **45%** (Ouro).
+- **Dado** que respondi os onze critérios, justifiquei e escrevi o feedback longo, **quando** o cálculo roda, **então** chego ao teto na avaliação: 38% / 43% / 50%.
+- **Dado** que também compartilhei, **quando** o cálculo roda, **então** somo 8 pontos: 46% / 51% / 58%.
+- **Dado** que entreguei **fora das 72h**, **quando** o cálculo roda, **então** o piso cai 8 pontos, com mínimo de 15%.
+
+> ⚠️ **Este requisito foi corrigido.** A versão anterior afirmava que o piso
+> dentro de 72h era 38% / 43% / 50%. Esses são os **tetos na avaliação**: o
+> protótipo da R2 lê os três números por classe como *(piso, teto na avaliação,
+> teto com compartilhamento)*, e um Bronze que entrega no prazo sem nenhum
+> opcional recebe **30%**. Ver o aviso em [data-model §5](data-model.md) e o
+> cabeçalho da migration `0009`.
 - **Dado** que entreguei **após 72h**, **quando** o cálculo roda, **então** o piso é 30/40/45% e o **acumulado é limitado a 50%**.
 - **Dado** que cumpri opcionais, **quando** o cálculo roda, **então** os acréscimos somam **até o teto** da classe (50/55/62%).
 

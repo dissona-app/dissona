@@ -24,6 +24,9 @@ Este arquivo é **curto de propósito**. A especificação vive em [`docs/`](doc
 | **Regras de negócio transversais** (Claves, classes, remuneração, SLA) | [`docs/prd/01-regras-de-negocio.md`](docs/prd/01-regras-de-negocio.md) |
 | **Matriz de notificações** — é o seed de `evento_notificacao` | [`docs/prd/06-matriz-notificacoes.md`](docs/prd/06-matriz-notificacoes.md) |
 | **O que ainda não foi decidido** — e o que trava qual release | [`docs/open-questions.md`](docs/open-questions.md) |
+| **Perguntas prontas para enviar ao cliente** | [`docs/R2/perguntas-ao-cliente.md`](docs/R2/perguntas-ao-cliente.md) |
+| **Como ler o protótipo** — ele é markup, não imagem | `pnpm prototipo`, e [`scripts/extrair-prototipo.mjs`](scripts/extrair-prototipo.mjs) |
+| **Evidência de RLS por migration** | [`supabase/testes/README.md`](supabase/testes/README.md) |
 
 **Precedência de fontes:** protótipo da R2 > board de discovery > derivação. Quando divergirem, siga o protótipo e registre a divergência em [`docs/prd/07-pendencias-e-divergencias.md`](docs/prd/07-pendencias-e-divergencias.md).
 

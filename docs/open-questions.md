@@ -12,17 +12,18 @@ Tudo o que ainda **não foi decidido** e trava ou condiciona a implementação. 
 
 | # | Pergunta | Trava | Decisão de |
 |---|---|---|---|
-| [1](#1-escuta-mínima-60-ou-100-da-faixa) | Escuta mínima: 60% ou 100%? | **R2** | cliente |
-| [2](#2-11º-critério-de-avaliação) | Qual é o 11º critério de avaliação? | **R2** | cliente |
-| [3](#3-quais-5-dos-11-critérios-são-obrigatórios) | Quais 5 dos 11 critérios são obrigatórios? | **R2** | cliente |
-| [4](#4-tabela-de-pacotes-de-claves) | Tabela de pacotes de Claves | **R2** | cliente |
-| [5](#5-base-de-cálculo-da-remuneração-por-classe) | Base de cálculo da remuneração | **R2** | cliente + financeiro |
+| ~~1~~ | ~~Escuta mínima: 60% ou 100%?~~ | — | **resolvida pelo protótipo** → §4 |
+| ~~2~~ | ~~Qual é o 11º critério de avaliação?~~ | — | **resolvida pelo protótipo** → §4 |
+| ~~3~~ | ~~Quais 5 dos 11 critérios são obrigatórios?~~ | — | **resolvida pelo protótipo** → §4 |
+| ~~4~~ | ~~Tabela de pacotes de Claves~~ | — | **resolvida pelo protótipo** → §4 |
+| [5](#5-base-de-cálculo-da-remuneração-por-classe) | Base de cálculo: respondida, mas **com outra semântica** | R2 · tela 14.4 | cliente + financeiro |
+| [5b](#5b-teto_max-é-inalcançável) | `teto_max` é inalcançável — sobram 4 pontos | R2 · tela 14.4 | cliente |
 | [6](#6-modelo-de-split-no-asaas) | Modelo de split no Asaas | **R2** | cliente + contador |
 | [7](#7-armazenamento-do-arquivo-de-áudio) | Armazenar o mp3 sempre? | **R2** | cliente + dev |
 | [8](#8-liberação-do-crédito-versus-compartilhamento) | Crédito retido até verificar o compartilhamento? | **R2** | cliente |
 | [9](#9-api-do-soundcloud-para-oauth) | API do SoundCloud disponível? | **R1** | dev |
 | [10](#10-provedor-de-e-mail-transacional) | Provedor de e-mail e domínio de envio | **R1** | cliente + dev |
-| [11](#11-matriz-de-permissões-do-admin) | Matriz de permissões do admin | **R1** | cliente |
+| ~~11~~ | ~~Matriz de permissões do admin~~ | — | **resolvida pelo protótipo** → §4 |
 | [12](#12-ativação-do-2º-papel-exige-aprovação) | Ativar papel de curador exige aprovação? | **R1** | cliente |
 | [13](#13-horas-da-release-1) | R1 é 16,75h ou 14,75h? | **R1** | cliente |
 | [14](#14-pesos-do-ranking) | Pesos do ranking: tabela ou diagrama? | R3 | cliente |
@@ -36,85 +37,78 @@ Tudo o que ainda **não foi decidido** e trava ou condiciona a implementação. 
 | [22](#22-gestão-da-homepage--mídia-não-tem-módulo) | Gestão da Homepage & Mídia não tem módulo | R5 | cliente |
 | [23](#23-critérios-de-aceite-da-homepage) | Critérios de aceite da homepage | R5 | cliente |
 | [24](#24-breakpoints-e-layout-mobile) | Breakpoints e layout mobile | — | cliente + design |
+| [27](#27-lgpd-versus-retenção-fiscal-no-expurgo) | LGPD × retenção fiscal no expurgo | antes do beta | **jurídico** |
 
 ---
 
 ## 1. Bloqueiam a Release 2
 
-### 1. Escuta mínima: 60% ou 100% da faixa?
-
-**Aberto.** Duas telas da mesma release prometem coisas diferentes:
-
-| Fonte | O que diz |
-|---|---|
-| Protótipo **Curador**, avaliação | *"A escuta é medida. A avaliação só é aceita a partir de **60%** da faixa ouvidos."* |
-| Protótipo **Artista**, login | *"...100% da faixa ouvida"* |
-| Protótipo **Artista**, onboarding | *"O curador ouve do início ao fim antes de escrever qualquer coisa."* |
-| Board V4 | *"player mede tempo mínimo de escuta"* — sem número |
-
-**Impacto:** módulo 14 (gate de aceite da avaliação) e a copy do módulo 1. A promessa é **visível ao usuário final** — se o gate real for 60%, a home do artista promete algo que o sistema não exige.
-
-**Pergunta:** o gate é 60% ou 100%? E, se for 60%, a copy do artista muda?
-
-**Contorno técnico:** o valor vem de `configuracao.escuta_minima_percentual`; a implementação não trava, mas a copy do artista sim.
-
----
-
-### 2. 11º critério de avaliação
-
-**Aberto.** O método declara **11 itens em 5 grupos**, mas só **10 estão nomeados**:
-
-| Grupo | Itens nomeados |
-|---|---|
-| Execução técnica | afinação, ritmo |
-| Composição | melodia, letra |
-| Identidade | personalidade, expressividade, originalidade |
-| Impacto | conexão, memorabilidade |
-| **Produção** | **— nenhum** |
-
-**Impacto:** seed da tabela `criterio` (migration `0008`), tela 14, cálculo do acréscimo por "responder os onze".
-
-**Pergunta:** qual é o item do grupo Produção? É um só (mixagem? masterização? arranjo?) ou o grupo tem mais de um e outro grupo tem menos?
-
----
-
-### 3. Quais 5 dos 11 critérios são obrigatórios?
-
-**Aberto.** A regra diz *"cinco critérios são obrigatórios; responder os onze rende acréscimo"* — mas não diz **quais cinco**.
-
-**Impacto:** validação de conclusão da avaliação (RPC `enviar_avaliacao`), flag `criterio.obrigatorio`, cálculo do acréscimo.
-
-**Pergunta:** são cinco itens fixos (quais?), ou um por grupo, ou cinco quaisquer à escolha do curador?
-
----
-
-### 4. Tabela de pacotes de Claves
-
-**Aberto.** Não há definição de quantas Claves por pacote, preços finais em reais nem os percentuais do desconto progressivo.
-
-**Impacto:** módulos 5 (Carteira), 5.1 (Pacotes), 5.2 (Checkout) e 21 (Pacotes — admin). Sem a tabela não há o que semear nem o que testar no checkout.
-
-**Pergunta:** qual a tabela completa? (ex.: 10 Claves por R$ 95 · 50 Claves por R$ 450 · 100 Claves por R$ 850)
-
-**Contorno:** a tela do admin (21) permite cadastrar os pacotes; o bloqueio é para o seed de dev e para os cenários de teste da R2.
-
----
-
 ### 5. Base de cálculo da remuneração por classe
 
-**Aberto.** A tabela por classe (Bronze 30/38→50% · Prata 40/43→55% · Ouro 45/50→62%) não diz **sobre qual valor** esses percentuais incidem, nem como isso concilia com "1 Clave = R$ 10" e "margem da plataforma 50%".
+**Respondida pelo protótipo — mas a resposta traz uma mudança de semântica que
+precisa de confirmação.**
 
-**Impacto:** função `calcular_remuneracao`, módulos 14.4, 15 e 22. Sem a base não é possível calcular o crédito nem o split.
+O protótipo do curador calcula:
 
-**Perguntas:**
-- Os percentuais incidem sobre o **valor bruto** da Clave ou sobre os 50% que caberiam ao curador?
-- Exemplo numérico: artista paga 10 Claves (R$ 100); curador Bronze no prazo (38%) recebe quanto, e a plataforma fica com quanto?
-- Se o Ouro chega a 62%, a margem da plataforma cai abaixo de 50% — os 50% são teto, piso ou média?
-- Existe teto absoluto em reais por curadoria?
+```js
+valorArtista = soma(servicos.preco_claves) * 10   // Claves × R$ 10 = BRUTO
+valor        = valorArtista * pct / 100
+```
 
-> Este é o item de maior risco de retrabalho: ele contradiz aparentemente a regra dos 50% e atravessa três módulos.
+e a legenda da tela diz *"{pct}% de {valor} **pagos pelo artista**"*. Logo: os
+percentuais incidem sobre o **bruto**, e os 50% de margem passam a ser
+referência, não retenção fixa. Isso responde a pergunta original.
+
+**O que muda, e é maior que a pergunta.** Os mesmos nove números têm outra
+leitura. A tabela de [regras §3](prd/01-regras-de-negocio.md) os lê como
+*(piso em atraso, piso no prazo, teto)*; o protótipo os lê como *(piso dentro
+das 72h, teto na avaliação, teto com compartilhamento)*, com legendas que não
+deixam margem:
+
+> *"Piso da classe dentro das 72h"* — exibindo **30%** para Bronze
+> *"A faixa passou das 72h, então o piso da classe cai 8 pontos"*
+> *"Teto da classe Bronze: 38% na avaliação e 50% com compartilhamento"*
+
+| | Leitura do board | Leitura do protótipo |
+|---|---|---|
+| Bronze, no prazo, sem opcionais | 38% | **30%** |
+| Bronze, atrasado, sem opcionais | 30% | **22%** = max(15, 30−8) |
+| Penalidade de atraso | acumulado capado em 50% | **−8 pontos no piso**, mínimo 15 |
+
+**Pergunta objetiva ao cliente:** confirma que um curador Bronze que entrega
+dentro das 72h, sem responder os onze critérios nem compartilhar, recebe **30%**
+do valor pago pelo artista — e não 38%?
+
+**Estado da implementação.** O banco já segue o protótipo, com o algoritmo
+coberto por 31 asserções. `RF-066` foi corrigido, e `teto_atraso_percentual`
+saiu de `configuracao`. Se a resposta for "vale a leitura do board", o custo é
+um `update` em `configuracao` mais um ajuste em `calcular_remuneracao` — a
+chave `remuneracao.base` existe exatamente para isso. **Não bloqueia** as
+fatias de aplicação: quem depende disso é a tela 14.4 e o cenário C6.
 
 ---
+
+### 5b. `teto_max` é inalcançável
+
+**Aberto, e só aparece fazendo a aritmética.** Com o conjunto de acréscimos do
+protótipo — três de 3 pontos capados em `teto_base`, mais 8 pontos de
+compartilhamento — o máximo que um curador alcança é:
+
+| Classe | Máximo real | `teto_max` declarado | Folga |
+|---|---|---|---|
+| Bronze | 46% | 50% | **4** |
+| Prata | 51% | 55% | **4** |
+| Ouro | 58% | 62% | **4** |
+
+Sobram exatamente **4 pontos nas três classes**, o que é regular demais para ser
+acidente.
+
+**Pergunta:** falta um acréscimo de 4 pontos no catálogo (qual?), ou `teto_max`
+é um teto aspiracional que o conjunto atual de opcionais não atinge?
+
+**Impacto:** a tela 14.4 exibe o teto da classe. Se o teto nunca é atingível, o
+curador vê uma meta que não existe. A suíte de testes fixa a folga em 4 para
+que ela não mude sem alguém notar.
 
 ### 6. Modelo de split no Asaas
 
@@ -165,16 +159,6 @@ Tudo o que ainda **não foi decidido** e trava ou condiciona a implementação. 
 **Aberto.** Não há definição de provedor nem de domínio de envio. Toda a R1 depende de e-mail: verificação, recuperação, convite de admin, aviso de alteração de credencial.
 
 **Pergunta:** qual provedor, e qual domínio remetente? Quem configura SPF, DKIM e DMARC?
-
----
-
-### 11. Matriz de permissões do admin
-
-**Aberto.** O protótipo nomeou quatro papéis — **Administrador · Moderador · Financeiro · Suporte** — mas **não definiu quem acessa o quê**.
-
-**Impacto:** módulo 27.4 e o seed de `permissao_admin`. Sem a matriz, a tela existe mas não tem conteúdo, e as guardas de rota do `(admin)` ficam permissivas.
-
-**Pergunta:** para cada papel, quais módulos são de leitura, quais são de escrita e quais são invisíveis?
 
 ---
 
@@ -282,11 +266,61 @@ Ambos estão marcados com `TODO(a11y)` em `src/estilos/tokens.css`, `Campo.modul
 **Consequência:** o item "contraste AA" da [Definition of Done](architecture.md#10-definition-of-done) passa **com estas duas exceções registradas**, e não integralmente. Quem for revisar a R0 precisa saber disso.
 **Gatilho:** revisão de acessibilidade antes do beta. **Decisão de:** cliente + design.
 
+### 27. LGPD versus retenção fiscal no expurgo
+
+**Aberto, e é decisão de jurídico.** A política publicada em `/privacidade`
+promete apagar a conta em 30 dias. Mas `lancamento_clave` é append-only por
+desenho, e `pedido_clave` e `ganho_curador` têm retenção fiscal — apagar em
+cascata destruiria a conciliação financeira. E a devolutiva já paga
+**permanece com os curadores por obrigação contratual**
+([regras §10](prd/01-regras-de-negocio.md)), o que significa que a avaliação
+também não pode simplesmente desaparecer.
+
+**A leitura adotada, e implementada:** `expurgar_contas_excluidas`
+**anonimiza**. Zera nome, handle, foto, cidade, dados de cobrança e chave Pix;
+apaga credenciais, mídias e notificações; preserva as linhas financeiras e a
+avaliação, com o `perfil_id` intacto para a conciliação continuar possível.
+
+**Perguntas:** essa leitura atende à LGPD na avaliação do jurídico? Qual o prazo
+de retenção fiscal, para virar a chave `lgpd.retencao_fiscal_anos`? E o texto de
+`/privacidade` precisa ser reescrito para dizer o que de fato acontece — hoje
+ele promete mais do que o sistema pode cumprir.
+
+**Impacto:** job da `0011`, texto legal, e a exportação `.zip` da TASK-135.
+
+---
+
 ---
 
 ## 4. Resolvidas
 
 Registradas aqui para que ninguém as reabra por engano.
+
+### Resolvidas pelo protótipo da R2 · 2026-09-08
+
+Os três arquivos de [`docs/R2/`](R2/) não são imagens: cada um carrega o markup
+e o JavaScript da tela numa linha JSON, e `pnpm prototipo` os torna legíveis.
+Como o [AGENTS.md](../AGENTS.md) estabelece **protótipo da R2 > board de
+discovery > derivação**, o que está lá decide.
+
+| # | Pergunta | Resposta do protótipo | Onde está no código |
+|---|---|---|---|
+| **1** | Escuta mínima: 60% ou 100%? | **60%**, literal na copy da tela que aplica o gate: *"A escuta é medida. A avaliação só é aceita a partir de 60% da faixa ouvidos."* A promessa de 100% na copy do artista é o que precisa mudar | `configuracao.escuta_minima_percentual` |
+| **2** | Qual é o 11º critério? | **Não falta um, faltavam dois.** O grupo Produção tem **Mixagem** e **Arranjo**; com eles, 2+2+3+2+2 = 11 | seed de `criterio`, migration `0008` |
+| **3** | Quais 5 são obrigatórios? | `afinacao`, `ritmo`, `melodia`, `personalidade`, `conexao`. **Não** é um por grupo: Execução técnica tem dois e Produção nenhum | `configuracao.criterios_obrigatorios` |
+| **4** | Tabela de pacotes | Ensaio 10/R$ 100 · Repertório 30/R$ 285 · Turnê 60/R$ 540 · Catálogo 100/R$ 850 **inativo**. O inativo é o que torna demonstrável a regra "só os ativos aparecem na Carteira" | seed de dev |
+| **11** | Matriz de permissões do admin | `Moderador {gestao, moderacao}` · `Financeiro {financeiro}` · `Suporte {gestao}` · Administrador tudo, e *"só o Administrador gere equipe e papéis"* | seed de `permissao_admin`, migration `0003` |
+
+Duas ressalvas sobre estas respostas:
+
+- O protótipo tem **um** booleano por módulo, e `permissao_admin` tem
+  `pode_ler` **e** `pode_escrever`. A tradução foi por menor privilégio, e os
+  módulos `pacotes` e `configuracao` foram derivados (o primeiro vive no grupo
+  Financeiro da navegação; o segundo guarda os pisos de remuneração e ficou só
+  com o administrador). A granularidade fina segue à disposição do cliente.
+- A #5 também foi respondida pelo protótipo, mas com uma **mudança de
+  semântica** grande o bastante para continuar em aberto. Ver §1.
+
 
 | Item | Decisão | Fonte |
 |---|---|---|

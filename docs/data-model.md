@@ -210,10 +210,11 @@ Modalidades de compartilhamento (12.1 / 12.6).
 | `papel_admin` | `papel_admin` | sim | |
 | `modulo` | text | sim | Chave do módulo (`gestao`, `financeiro`, `moderacao`, `pacotes`, `equipe`…) |
 | `pode_ler` / `pode_escrever` | boolean | sim | |
+| `criado_em` / `atualizado_em` | timestamptz | sim | Faltavam nesta tabela, contra a convenção do §Convenções — ela é mutável pela tela 27.4 e é alvo do trigger de auditoria |
 
-**UK:** `(papel_admin, modulo)`
+**UK:** `(papel_admin, modulo)` · **Check:** escrever exige poder ler
 
-⚠️ O **conteúdo** desta tabela depende da matriz de permissões, ainda pendente. A estrutura existe desde a R1; o seed é provisório (Administrador = acesso total).
+O **conteúdo** vem do protótipo do Admin da R2, que define `perms` para Moderador, Financeiro e Suporte, mais a regra de tela "só o Administrador gere equipe e papéis". O protótipo tem **um** booleano por módulo; a tradução para `pode_ler`/`pode_escrever` foi por menor privilégio, e os módulos `pacotes` e `configuracao` foram derivados. Ver o bloco de seed da `0003`.
 
 ### `log_auditoria`
 
@@ -221,14 +222,20 @@ Modalidades de compartilhamento (12.1 / 12.6).
 |---|---|---|---|
 | `id` | bigint | sim | PK, identity |
 | `tabela` | text | sim | |
-| `registro_id` | uuid | não | |
+| `registro_id` | **text** | não | `text`, e não `uuid`: `lancamento_clave.id` é `bigint` e precisa caber aqui, senão o único ledger financeiro fica sem chave no rastro |
 | `acao` | text | sim | `insert`, `update`, `delete` ou ação de negócio |
 | `ator_id` | uuid | não | FK → `perfil(id)`; nulo quando é o sistema |
 | `motivo` | text | não | Obrigatório em bloqueio, exclusão e decisão de classe |
 | `antes` / `depois` | jsonb | não | |
 | `criado_em` | timestamptz | sim | |
 
-**Trigger genérico:** `registrar_auditoria()` aplicado a `perfil`, `papel_usuario`, `perfil_curador`, `membro_admin`, `permissao_admin`, `pacote_clave`, `lancamento_clave`, `ganho_curador`.
+**Trigger genérico:** `registrar_auditoria()` aplicado a `perfil`, `papel_usuario`, `perfil_curador`, `membro_admin`, `permissao_admin`, `configuracao`, `pacote_clave`, `lancamento_clave`, `ganho_curador`.
+
+A **função** nasce na `0003`, mas os `create trigger` se dividem: cinco na `0003`, `configuracao` na `0004`, `pacote_clave` e `lancamento_clave` na `0007`, e `ganho_curador` na `0009` — cada um na migration que cria a tabela.
+
+`configuracao` é a nona, e não estava nesta lista: mudar um piso de remuneração é a alteração mais sensível do sistema, e ficaria fora do rastro.
+
+`motivo` não pode ser um `check`, porque a mesma tabela recebe escritas que o exigem e escritas que não. O contrato é a Server Action fazer `set local dissona.motivo = '...'` antes da escrita; o trigger lê de `current_setting`.
 
 ---
 
@@ -254,15 +261,23 @@ Chave-valor tipada. **Nenhum número de negócio vive no código.**
 | `margem_plataforma_percentual` | `50` | retenção da plataforma |
 | `prazo_avaliacao_horas` | `72` | repasse cheio |
 | `prazo_devolucao_dias` | `7` | devolução automática |
-| `escuta_minima_percentual` | ⚠️ **pendente** (60 ou 100) | bloqueio da R2 |
+| `escuta_minima_percentual` | `60` | protótipo do curador: "a avaliação só é aceita a partir de 60%" |
+| `escuta_exigida_quando_link` | `true` | ⚠️ default provisional — [#7](open-questions.md) |
 | `feedback_min_caracteres` | `150` | acréscimo |
-| `justificativa_min_caracteres` | `250` | acréscimo de +3% |
+| `justificativa_min_caracteres` | `250` | acréscimo |
+| `criterios_obrigatorios` | `["afinacao","ritmo","melodia","personalidade","conexao"]` | flags do protótipo. **Não** é um por grupo |
+| `remuneracao.base` | `"bruto"` | protótipo: `pct` incide sobre o valor pago pelo artista |
+| `remuneracao.bronze` | `{"piso":30,"teto_base":38,"teto_max":50}` | **outra semântica** — ver o aviso abaixo |
+| `remuneracao.prata` | `{"piso":40,"teto_base":43,"teto_max":55}` | |
+| `remuneracao.ouro` | `{"piso":45,"teto_base":50,"teto_max":62}` | |
+| `penalidade_atraso_pontos` | `8` | o atraso derruba o **piso**, não capa o acumulado |
+| `piso_minimo_atraso_percentual` | `15` | piso absoluto depois da penalidade |
+| `acrescimo_onze_criterios_percentual` | `3` | |
 | `acrescimo_justificativa_percentual` | `3` | |
-| `criterios_obrigatorios` | ⚠️ **pendente** — 5 dos 11, quais? | |
-| `remuneracao.bronze` | `{"atraso":30,"prazo":38,"teto":50}` | |
-| `remuneracao.prata` | `{"atraso":40,"prazo":43,"teto":55}` | |
-| `remuneracao.ouro` | `{"atraso":45,"prazo":50,"teto":62}` | |
-| `teto_atraso_percentual` | `50` | acumulado máximo após 72h |
+| `acrescimo_justificativa_min_itens` | `1` | booleano, não 3% por item |
+| `acrescimo_feedback_150_percentual` | `3` | |
+| `acrescimo_compartilhamento_percentual` | `8` | o único que passa de `teto_base` |
+| `compartilhamento.acrescimo_retido` | `false` | ⚠️ default provisional — [#8](open-questions.md) |
 | `classe.prata_min_credenciais` | `2` | |
 | `classe.ouro_min_curadorias` | `60` | |
 | `classe.ouro_min_ciclos` | `2` | |
@@ -272,7 +287,37 @@ Chave-valor tipada. **Nenhum número de negócio vive no código.**
 | `ranking.pesos` | `{"notas":0.25,"prazo":0.33,"calibracao":0.27,"compartilhamento":0.15}` | ⚠️ tabela × diagrama divergem |
 | `upload.tamanho_max_mb` | `50` | |
 | `upload.formatos` | `["wav","mp3"]` | |
+| `upload.armazenar_sempre` | `true` | ⚠️ default provisional — [#7](open-questions.md) |
 | `lgpd.dias_expurgo` | `30` | |
+
+> ### ⚠️ `remuneracao.*` mudou de forma, e de significado
+>
+> A tabela de [regras §3](prd/01-regras-de-negocio.md) lê os três números por
+> classe como *(piso em atraso, piso no prazo, teto)*. O **protótipo da R2** —
+> que o [AGENTS.md](../AGENTS.md) põe acima do board — os lê como *(piso dentro
+> das 72h, teto na avaliação, teto com compartilhamento)*, e as legendas da
+> própria tela não deixam margem: *"Piso da classe dentro das 72h"* exibe **30%**
+> para Bronze, e *"Teto da classe Bronze: 38% na avaliação e 50% com
+> compartilhamento"*.
+>
+> Consequências, todas já refletidas no banco e cobertas por teste:
+>
+> - **Um Bronze que entrega no prazo sem nenhum opcional recebe 30%**, não 38%.
+>   `RF-066` de [requirements.md](requirements.md) está incorreto.
+> - `teto_atraso_percentual` **saiu**. O atraso derruba o piso em 8 pontos, com
+>   mínimo de 15; não existe teto de 50% sobre o acumulado.
+> - Com os acréscimos deste seed, `teto_max` **nunca é alcançado**: o máximo real
+>   é 46 / 51 / 58 contra tetos de 50 / 55 / 62. Sobram exatamente 4 pontos nas
+>   três classes — ou falta um acréscimo, ou os tetos são aspiracionais.
+>   **Pergunta aberta para o cliente.**
+>
+> `remuneracao.base` existe para a decisão ser reversível: com `"cota_curador"`
+> os percentuais passam a incidir sobre a margem, e `calcular_remuneracao` já
+> ramifica nos dois modos.
+
+O total é de **32 chaves**, e o registro Zod em
+`src/lib/configuracao/chaves.ts` tem de cobrir exatamente as mesmas — há teste
+de deriva que lê este `.sql` e compara.
 
 **RLS:** leitura para qualquer sessão autenticada; escrita apenas para `papel_admin = administrador`.
 
@@ -290,7 +335,7 @@ Catálogo estático dos eventos.
 |---|---|---|---|
 | `chave` | text | sim | PK — ex.: `feedback_concluido`, `claves_devolvidas` |
 | `titulo` | text | sim | |
-| `destinatario` | `papel` | sim | |
+| `destinatario` | `papel[]` | sim | **Array**, e não escalar: cinco eventos da matriz são idênticos para artista e curador (senha, verificação, alteração de credencial, bloqueio). Com escalar, ou se duplicam chaves — e a chave é PK referenciada por duas tabelas — ou a tela de preferências de um dos papéis perde o evento |
 | `canais_padrao` | `canal_notificacao[]` | sim | |
 | `critico` | boolean | sim | Quando `true`, **não é desativável** |
 | `rota_destino` | text | sim | Para onde a notificação leva |
@@ -303,14 +348,18 @@ Catálogo estático dos eventos.
 | `id` | uuid | sim | PK |
 | `perfil_id` | uuid | sim | FK → `perfil(id)` |
 | `evento` | text | sim | FK → `evento_notificacao(chave)` |
-| `titulo` / `corpo` | text | sim | |
-| `contexto` | jsonb | não | Faixa, curador, valor — dados do detalhe (10.1 / 18.1) |
+| `titulo` | text | sim | Vem do catálogo, não do chamador |
+| `corpo` | text | **não** | Nulável: o texto do detalhe é composto pela View a partir de `contexto`, que é para isso que `contexto` existe |
+| `contexto` | jsonb | sim | Faixa, curador, valor — dados do detalhe (10.1 / 18.1) |
 | `rota` | text | não | Sobrescreve `rota_destino` quando precisa de id |
+| `canais` | `canal_notificacao[]` | sim | Os canais **efetivos**, já resolvidos contra a preferência. Não está na especificação original — sem ela, um evento só de e-mail com in-app desligado ou não geraria linha (e ninguém enviaria o e-mail) ou apareceria na caixa de entrada contra a vontade do usuário |
 | `lida_em` | timestamptz | não | |
-| `enviada_email_em` | timestamptz | não | |
+| `enviada_email_em` | timestamptz | não | Nulo com `email` em `canais` = fila de envio |
 | `criado_em` | timestamptz | sim | |
 
-**Índice:** `(perfil_id, criado_em desc)`, parcial em `lida_em is null`
+**Índice:** `(perfil_id, criado_em desc)`, parcial em `lida_em is null`, e parcial em `enviada_email_em is null` para a fila de e-mail
+
+**Trigger:** em `notificacao` só `lida_em` muda. RLS filtra linha, não coluna, e sem o trigger o dono reescreveria o título da própria notificação.
 
 ### `preferencia_notificacao`
 
@@ -567,17 +616,22 @@ Catálogo estático dos itens de nota. Seed com os grupos do método.
 | `avaliacao_id` | uuid | sim | FK, **UK** |
 | `perfil_curador_id` | uuid | sim | FK |
 | `base_claves` | numeric(10,2) | sim | Total contratado no envio |
+| `base_centavos` | bigint | sim | **Não estava na especificação.** É o que torna a invariante verificável pelo banco: sem congelar a base em centavos, o `check` do rateio precisaria do valor da Clave, que vive em `configuracao` — e um `check` não pode ler tabela |
 | `classe` | `classe_curador` | sim | Congelada |
 | `no_prazo` | boolean | sim | |
 | `piso_percentual` | numeric(5,2) | sim | Por classe e prazo |
 | `acrescimos` | jsonb | sim | `[{"chave":"onze_criterios","percentual":…}, …]` |
 | `percentual_aplicado` | numeric(5,2) | sim | Piso + acréscimos, limitado ao teto |
 | `teto_percentual` | numeric(5,2) | sim | |
-| `penalidade_prazo` | boolean | sim | Quando `true`, o acumulado é limitado a 50% |
+| `penalidade_prazo` | boolean | sim | Entrega fora das 72h. **A descrição mudou:** sob o algoritmo do protótipo isso derruba o piso em 8 pontos (mínimo 15), e não limita o acumulado a 50% |
 | `valor_centavos` | bigint | sim | Líquido do curador |
-| `comissao_centavos` | bigint | sim | **Invariante:** `valor_centavos + comissao_centavos = base em centavos` |
+| `comissao_centavos` | bigint | sim | Obtido por **subtração** de `base_centavos`, nunca por um segundo arredondamento |
 | `situacao` | `situacao_ganho` | sim | padrão `liberado` |
 | `criado_em` | timestamptz | sim | |
+
+**Checks:** `valor_centavos + comissao_centavos = base_centavos` · `percentual_aplicado <= teto_percentual` · `piso_percentual <= percentual_aplicado` · valores não negativos
+
+A invariante do rateio (RNF-010) é **garantida pelo banco**, e não pela função: se `calcular_remuneracao` errar, a gravação é recusada.
 
 ### Função `calcular_remuneracao`
 
@@ -593,18 +647,39 @@ calcular_remuneracao(
   percentual_aplicado numeric,
   teto_percentual numeric,
   penalidade_prazo boolean,
+  base_centavos bigint,
   valor_centavos bigint,
   comissao_centavos bigint
 )
 ```
 
-Pura e determinística. Lê os percentuais de `configuracao`, aplica os acréscimos até o teto da classe e, quando fora do prazo, limita o acumulado ao `teto_atraso_percentual`. É a função com **cobertura de teste obrigatória**.
+Pura e determinística: nenhum `now()`, nenhum `auth.uid()` — o prazo e a classe entram **congelados** como parâmetro. `stable`, porque lê `configuracao`, numa única consulta que **falha** quando falta chave em vez de cair num default silencioso.
+
+O algoritmo é o do protótipo da R2:
+
+```
+piso     = no_prazo ? faixa.piso : max(piso_minimo_atraso, faixa.piso - penalidade_pontos)
+pct_base = min(piso + 3·onze + 3·just250 + 3·fb150, faixa.teto_base)
+pct      = min(pct_base + 8·compartilhou, faixa.teto_max)
+valor    = round(base_calculo * pct / 100)
+comissao = base_centavos - valor
+```
+
+Três coisas que valem registro:
+
+1. Os **três acréscimos de conteúdo** são capados em `teto_base`, e saturam-no em todas as classes (30+9 ≥ 38, 40+9 ≥ 43, 45+9 ≥ 50). Só o compartilhamento passa disso, e é por isso que vale 8 pontos, não 3.
+2. Os acréscimos entram em **ordem fixa declarada** no `jsonb` — a ordem não muda o total, mas torna o resultado byte a byte comparável em teste.
+3. A comissão sai por **subtração**, nunca por um segundo arredondamento: é o que faz o rateio fechar sem centavo perdido nem sobrando.
+
+`security invoker` e `grant` para `authenticated`: a etapa 5 da avaliação **prevê** o valor com esta mesma função. Uma para prever e outra para gravar é a origem clássica de "o valor mostrado não é o valor pago".
+
+É a função com **cobertura de teste obrigatória** — 31 asserções em `supabase/testes/0009_remuneracao.testes.sql`.
 
 ### RPC `enviar_avaliacao`
 
 Atômica. Em uma transação:
 
-1. Valida `escuta_percentual ≥ escuta_minima_percentual`.
+1. Valida `escuta_percentual ≥ escuta_minima_percentual` (DS001).
 2. Valida os critérios obrigatórios preenchidos e `feedback` não vazio.
 3. Marca `avaliacao.situacao = 'concluida'`, congela `no_prazo` e `classe_no_momento`.
 4. Grava o `compartilhamento` (inclusive `nao_compartilhou`).
@@ -622,17 +697,31 @@ Atômica. Valida saldo, insere `envio` e `servico_envio`, lança o `consumo` no 
 
 | # | Release | Conteúdo |
 |---|---|---|
-| `0001` | R1 | Enums base, `perfil`, `papel_usuario`, helpers de RLS, trigger de `atualizado_em` |
-| `0002` | R1 | `perfil_artista`, `perfil_curador`, `credencial_curador`, `midia_curador`, `servico_curador` |
-| `0003` | R1 | `membro_admin`, `convite_admin`, `permissao_admin`, `log_auditoria`, trigger `registrar_auditoria` |
-| `0004` | R1 | `configuracao` + seed dos thresholds |
-| `0005` | R1 | `notificacao`, `evento_notificacao` (seed completo), `preferencia_notificacao`, função `registrar_notificacao` |
-| `0006` | R2 | `faixa`, `envio`, `servico_envio` |
-| `0007` | R2 | `pacote_clave`, `pedido_clave`, `evento_provedor`, `lancamento_clave`, view `saldo_carteira` |
-| `0008` | R2 | `criterio` (seed), `avaliacao`, `nota_criterio`, `compartilhamento`, view `nota_avaliacao` |
+| `0000b` | infra | Extensões `citext`, `pg_cron` e `pg_net`. Fora da faixa por release, como os buckets: `citext` é pré-requisito de `perfil.handle` |
+| `0001` | R1 | Enums base, `perfil`, `papel_usuario`, helpers de RLS, trigger de `atualizado_em`, trigger de criação de perfil em `auth.users` |
+| `0001b` | R1 | Revogação de `execute` por papel — `revoke from public` não basta no Supabase |
+| `0002` | R1 | `perfil_artista`, `perfil_curador`, `credencial_curador`, `midia_curador`, `servico_curador`, helpers `meu_perfil_artista_id`/`meu_perfil_curador_id`, RPC `ler_contexto_sessao` |
+| `0003` | R1 | `membro_admin`, `convite_admin`, `permissao_admin`, `log_auditoria`, trigger `registrar_auditoria`, **`tem_permissao`** e **`aceitar_convite_admin`** |
+| `0004` | R1 | `configuracao` + seed de 32 chaves |
+| `0005` | R1 | `evento_notificacao` (seed completo), `notificacao`, `preferencia_notificacao`, função `registrar_notificacao` |
+| `0006` | R2 | `faixa`, `envio`, `servico_envio`, índices da fila, policy do bucket `faixas` |
+| `0006b` | R2 | Quebra a recursão mútua entre as policies de `faixa` e `envio` (`42P17`) |
+| `0006c` | R2 | `proibir_editar_faixa_em_curadoria` passa a `security invoker` |
+| `0007` | R2 | `pacote_clave`, `pedido_clave`, `evento_provedor`, `lancamento_clave`, view `saldo_carteira`, RPCs `criar_pedido_clave`, `registrar_evento_provedor` e `confirmar_pedido_clave` |
+| `0008` | R2 | `criterio` (seed), `avaliacao`, `nota_criterio`, `compartilhamento`, views `nota_avaliacao` e **`nota_artista`** |
 | `0009` | R2 | `ganho_curador`, `calcular_remuneracao`, RPC `enviar_avaliacao` |
-| `0010` | R2 | RPC `confirmar_selecao_curadores`, `devolver_claves_sem_resposta`, índices da fila |
-| `0011+` | R3+ | Ver §13 |
+| `0010` | R2 | RPCs `confirmar_selecao_curadores`, `devolver_claves_sem_resposta` e **`avisar_prazo_72h`** |
+| `0010b` | R2 | `confirmar_selecao_curadores` apura o subtotal antes de inserir o envio |
+| `0011` | R1+R2 | `expurgar_contas_excluidas` e os três `cron.schedule` |
+| `0012+` | R3+ | Ver §13 |
+
+> **A faixa mudou.** O documento reservava `0011+` para a R3; os jobs de R1 e R2
+> precisavam de um número depois de `0010` (o expurgo depende do grafo de FK
+> inteiro), então `0011` são os jobs e a R3 começa em `0012`.
+>
+> Os sufixos `b` e `c` são migrations corretivas, aplicadas depois de a
+> original já estar no banco compartilhado — não dava para reescrevê-las. Cada
+> uma explica no cabeçalho o que corrigiu.
 
 ---
 

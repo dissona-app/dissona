@@ -271,15 +271,37 @@ Os buckets e suas policies nascem em `supabase/migrations/20260904171821_0000_st
 
 ## 7. Processamento assíncrono
 
-Sem Redis nem broker externo na V1. `pg_cron` agenda, Edge Functions executam.
+Sem Redis nem broker externo na V1. `pg_cron` agenda.
 
-| Job | Frequência | O que faz | Release |
-|---|---|---|---|
-| `avisar_prazo_72h` | horária | Notifica curadores com prazo a vencer | R2 |
-| `devolver_claves_sem_resposta` | horária | Aplica a devolução automática de 7 dias | R2 |
-| `expurgar_contas_excluidas` | diária | Apaga contas desativadas há 30 dias (LGPD) | R1 |
-| `recalcular_metricas_curador` | diária | Ranking, calibração, % no prazo, % de compartilhamento | R3 |
-| `gerar_relatorio_ia` | sob demanda | Relatório da música e do artista | R4 |
+**Quem executa depende de onde o efeito está.** `pg_cron` chama SQL direto
+quando todo o efeito do job vive dentro do banco; `pg_net` → Edge Function
+apenas quando o job tem efeito **fora** dele. Os dois jobs de SLA são puramente
+SQL: levá-los para uma Edge Function moveria a fronteira de transação do ledger
+para fora do banco, que é exatamente o que a exigência de RPC atômica (§4.1)
+evita.
+
+| Job | Cron (UTC) | Executa | O que faz | Release |
+|---|---|---|---|---|
+| `avisar_prazo_72h` | `0 * * * *` | SQL direto | Notifica curadores com prazo a vencer, **uma vez por envio** (`envio.avisado_prazo_em`) | R2 |
+| `devolver_claves_sem_resposta` | `15 * * * *` | SQL direto | Aplica a devolução automática de 7 dias | R2 |
+| `expurgar_contas_excluidas` | `30 3 * * *` | **Edge Function** | Anonimiza a conta e apaga os objetos de Storage (LGPD) | R1 |
+| `recalcular_metricas_curador` | diária | a definir | Ranking, calibração, % no prazo, % de compartilhamento | R3 |
+| `gerar_relatorio_ia` | sob demanda | Edge Function | Relatório da música e do artista | R4 |
+
+Os três primeiros estão agendados na migration `0011`. O offset de 15 minutos
+entre os dois jobs de SLA existe porque ambos varrem o mesmo índice de `envio`.
+
+⚠️ **O expurgo anonimiza, não apaga.** `lancamento_clave` é append-only e
+`pedido_clave` e `ganho_curador` têm retenção fiscal — apagar em cascata
+destruiria a conciliação, e não apagar descumpre a política publicada em
+`/privacidade`. A devolutiva já paga também sobrevive, por obrigação contratual
+([regras §10](prd/01-regras-de-negocio.md)). É **decisão de jurídico**, e está
+registrada no cabeçalho da `0011`, não decidida lá.
+
+A parte que apaga objetos de Storage é a Edge Function `expurgar-contas`, que
+ainda não existe; enquanto isso o job cumpre a obrigação legal (a anonimização)
+e é o primeiro ponto do projeto que exige de fato a `SUPABASE_SERVICE_ROLE_KEY`.
+Segredo do `pg_net` vem do Vault, nunca inline — `cron.job.command` é legível.
 
 ---
 
