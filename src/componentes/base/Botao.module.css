@@ -157,3 +157,16 @@
   border-color: var(--dsn-border);
   border-top-color: var(--dsn-purple-600);
 }
+
+/*
+ * `BotaoLink` — a mesma aparência num `<a>`. Um link é `inline` por padrão e
+ * herda `text-decoration`, então as duas linhas abaixo são o que impede o
+ * botão de aparecer sublinhado e com altura de texto.
+ */
+.comoLink {
+  text-decoration: none;
+}
+
+.comoLink:hover {
+  text-decoration: none;
+}

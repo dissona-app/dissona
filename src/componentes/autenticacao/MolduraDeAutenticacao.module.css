@@ -1,0 +1,189 @@
+/*
+ * Moldura das telas de autenticação — protótipos 1 (artista/curador) e 19
+ * (admin), de `docs/R2/extraido/{Artista,Admin}.html`.
+ *
+ * Os `clamp()` são os do protótipo, copiados como estão. Eles são a única
+ * responsividade que o R2 tem — não existe um `@media` nos três arquivos
+ * (pendência #24) — e reescrevê-los em breakpoints inventados quebraria a
+ * fidelidade sem resolver o mobile, que ninguém desenhou ainda.
+ */
+
+.pagina {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--dsn-grad-auth-bg);
+}
+
+/*
+ * As ondas decorativas do protótipo, com o clarão radial por cima. São
+ * `aria-hidden` no TSX e `pointer-events: none` aqui: decoração que intercepta
+ * clique é a origem de "o botão não funciona em alguns lugares".
+ */
+.fundo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * `width: 200%` com o padrão repetindo a cada metade — é o que faz o deslize
+ * de −50% → 0 do `dsnWaveX` fechar sem costura visível.
+ */
+.ondas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  overflow: visible;
+  animation: dsnWaveX 46s linear infinite;
+}
+
+.clarao {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    90% 58% at 50% 50%,
+    rgb(255 255 255 / 90%) 0%,
+    rgb(255 255 255 / 55%) 44%,
+    rgb(255 255 255 / 0%) 76%
+  );
+}
+
+.miolo {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 1.8vh, 18px);
+  padding: clamp(20px, 2.4vh, 28px) var(--dsn-pad-auth-x);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  margin-bottom: clamp(6px, 1.2vh, 12px);
+  color: var(--dsn-ink);
+  font-size: var(--dsn-text-xl);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tighter);
+  text-decoration: none;
+  flex: none;
+}
+
+.marca:hover {
+  color: var(--dsn-ink);
+  text-decoration: none;
+}
+
+.marcaIcone {
+  width: clamp(28px, 3.6vh, 38px);
+  height: clamp(28px, 3.6vh, 38px);
+  border-radius: var(--dsn-radius-xl);
+  background: var(--dsn-grad-brand-diag);
+  flex: none;
+}
+
+/* Chamada acima do card — só a tela 1 tem. */
+.chamada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dsn-space-4);
+  max-width: 600px;
+  text-align: center;
+  flex: none;
+}
+
+.chamadaOverline {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-ink-500);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chamadaTitulo {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 38px);
+  line-height: var(--dsn-leading-hero);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+/*
+ * O card. 436px é o valor literal do protótipo, nos dois arquivos — e é
+ * estreito de propósito: um formulário de duas linhas mais largo que isto
+ * espalha rótulo e campo longe demais um do outro.
+ */
+.card {
+  width: 100%;
+  max-width: 436px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  padding: clamp(18px, 2.4vw, 26px);
+  box-shadow: var(--dsn-shadow-card);
+  flex: none;
+}
+
+/* Provas sociais do pé da tela 1. */
+.provas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsn-space-2) var(--dsn-space-6);
+  max-width: 520px;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+  text-align: center;
+}
+
+.separador {
+  color: var(--dsn-ink-250);
+}
+
+.rodape {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsn-space-4) var(--dsn-space-7);
+  padding: 0 var(--dsn-pad-auth-x) clamp(14px, 2vh, 22px);
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.rodapeLinha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsn-space-1) var(--dsn-space-5);
+}
+
+.rodape a {
+  color: var(--dsn-ink-500);
+  text-decoration: none;
+}
+
+.rodape a:hover {
+  color: var(--dsn-purple-600);
+}

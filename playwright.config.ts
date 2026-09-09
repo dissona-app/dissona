@@ -1,5 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { carregarEnvLocal } from './e2e/setup/ambiente';
+
+// `E2E_SENHA` mora em `.env.local` (gitignored). O Next carrega esse arquivo
+// para o servidor que ele sobe; o processo do Playwright é outro, e precisa da
+// variável para preencher o login. Não sobrescreve o que já vem do ambiente,
+// então o secret do job vence no CI.
+carregarEnvLocal();
+
 /**
  * Playwright — os 16 cenários do Guia de Testes da R2 (docs/R2/guia-de-testes-r2.md).
  *
@@ -29,6 +37,21 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+
+  /*
+   * 15 s, e nao os 5 s padrao.
+   *
+   * Toda asserção desta suíte espera um round trip que sai de `gru1`, vai a
+   * `us-west-2` e volta — e cada Server Action de pacote faz duas idas
+   * (`tem_permissao` e a escrita). Com `fullyParallel` e um worker por núcleo,
+   * quatro logins simultâneos passam folgadamente dos 5 s, e o sintoma é um
+   * botão parado em "Entrando…" quando o login está apenas lento.
+   *
+   * Aumentar o timeout **não** esconde bug: um seletor errado falha por
+   * "element not found" na mesma hora, e não por espera. O que 5 s escondia
+   * era latência normal disfarçada de falha.
+   */
+  expect: { timeout: 15_000 },
 
   fullyParallel: true,
   // No CI, `test.only` esquecido num commit silenciaria a suíte inteira.

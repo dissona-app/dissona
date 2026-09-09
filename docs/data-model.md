@@ -460,10 +460,35 @@ Uma linha por **faixa × curador**. É o item da fila (13) e a unidade de prazo,
 | `valor_centavos` | bigint | sim | `check > 0` |
 | `desconto_percentual` | numeric(5,2) | sim | `check between 0 and 100` |
 | `ativo` | boolean | sim | Só pacote ativo aparece na Carteira |
+| `excluido_em` | timestamptz | não | Exclusão lógica (`0007b`). `check (excluido_em is null or not ativo)` |
 | `criado_em` / `atualizado_em` | timestamptz | sim | |
 
 **Derivado (não persistido):** preço por Clave = `valor_centavos / quantidade_claves`.
 **Auditoria:** toda criação, alteração, ativação e exclusão grava em `log_auditoria`.
+
+**Desativar ≠ excluir.** A tela 21 tem as duas ações, com consequências
+diferentes, e a `0007` as havia colapsado numa só (`ativo = false`, sem policy
+de `delete`). O protótipo mostra que não fecha: o modal de exclusão diz *"Se a
+ideia for só tirar de circulação, desative"*, frase que não faz sentido se as
+duas ações forem a mesma. Daí `excluido_em`, na `0007b`:
+
+| Ação | Efeito | Onde o pacote aparece depois |
+|---|---|---|
+| **Desativar** | `ativo = false` | Lista do admin, com status *Inativo*. Fora da Carteira. |
+| **Excluir** | `ativo = false` **e** `excluido_em = now()` | Em lugar nenhum. A linha permanece, para o log de auditoria e para a FK de `pedido_clave`. |
+
+Duas garantias no schema, em vez de confiança na Server Action:
+
+- O `check` faz excluir implicar inativo, então a policy de leitura
+  (`ativo or tem_permissao('pacotes')`) já esconde o excluído do artista sem
+  emenda nenhuma.
+- O trigger `pacote_clave_exclusao_irreversivel` recusa zerar `excluido_em`
+  (`DS014`). Excluir é irreversível pela tela; um `update` que ressuscitasse o
+  pacote traria de volta um preço que já saiu de circulação.
+
+Continua **sem policy de `delete`**: `pedido_clave.pacote_clave_id` referencia
+esta linha, e apagá-la destruiria a conciliação de uma compra já feita — que é
+exatamente o que o modal promete preservar.
 
 ### `pedido_clave`
 
@@ -708,6 +733,8 @@ Atômica. Valida saldo, insere `envio` e `servico_envio`, lança o `consumo` no 
 | `0006b` | R2 | Quebra a recursão mútua entre as policies de `faixa` e `envio` (`42P17`) |
 | `0006c` | R2 | `proibir_editar_faixa_em_curadoria` passa a `security invoker` |
 | `0007` | R2 | `pacote_clave`, `pedido_clave`, `evento_provedor`, `lancamento_clave`, view `saldo_carteira`, RPCs `criar_pedido_clave`, `registrar_evento_provedor` e `confirmar_pedido_clave` |
+| `0007b` | R2 | `pacote_clave.excluido_em` — exclusão lógica, distinta de desativar |
+| `0007c` | R2 | Troca o `SQLSTATE` da guarda de exclusão: `DS030` já era "configuração ausente" |
 | `0008` | R2 | `criterio` (seed), `avaliacao`, `nota_criterio`, `compartilhamento`, views `nota_avaliacao` e **`nota_artista`** |
 | `0009` | R2 | `ganho_curador`, `calcular_remuneracao`, RPC `enviar_avaliacao` |
 | `0010` | R2 | RPCs `confirmar_selecao_curadores`, `devolver_claves_sem_resposta` e **`avisar_prazo_72h`** |

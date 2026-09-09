@@ -76,9 +76,10 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 ### Entrega e conformidade
 - [x] Criar `.gitignore` **antes** do primeiro commit — `.env*.local` e `.mcp.json` carregam segredo
 - [x] Configurar Playwright e estrutura de `e2e` — 16 cenários do guia como `skip`, mais 9 testes da R0
-- [ ] Conectar o repositório à Vercel: Production Branch `main`, funções em `pdx1`, Node 24
-- [ ] Configurar as env vars da Vercel nos escopos Production e Preview
-- [ ] Cadastrar as Redirect URLs de Preview e produção no Supabase Auth
+- [x] Repositório conectado à Vercel — há deploy em `https://dissona.vercel.app`
+- [ ] ⚠️ **Publicar `main`.** Em 2026-09-08 produção devolvia **500 em `/` e `/termos`**, e a causa não é código: o commit `5065f1a`, que fez o middleware degradar em vez de cair, **nunca foi publicado**. O branch local está à frente de `origin/main`, e o deploy roda um build anterior ao conserto. `NEXT_PUBLIC_*` é embutida no build, então acrescentar env var não conserta um deploy já feito — é preciso republicar
+- [ ] Configurar as env vars da Vercel nos escopos Production e Preview — conferir depois do push, porque o 500 mascara o diagnóstico
+- [ ] Cadastrar as Redirect URLs de Preview e produção no Supabase Auth — **necessário antes da verificação de e-mail** (fatia de autenticação): sem elas o link do e-mail sai quebrado
 - [x] Criar páginas públicas de Termos de uso e Política de privacidade — estrutura pronta, **texto pendente do jurídico**
 
 ---
@@ -98,7 +99,9 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [ ] `servicoNotificacao` no código, com canal in-app e e-mail
 
 ### Autenticação (1 / 11)
-- [ ] Tela de login com e-mail e senha (1)
+- [x] Tela de login com e-mail e senha (1) — fiel ao protótipo do artista, com os três provedores sociais visíveis e desabilitados
+- [x] Login administrativo próprio (19), **fora do shell do painel** — a divisão de `(admin)` em `(acesso)` e `(painel)` fecha o bug que a R0 deixou anotado
+- [x] Conta autenticada sem papel `admin` não entra na área administrativa: a sessão é desfeita e o banner é "Conta sem acesso administrativo"
 - [ ] Login social com Google
 - [ ] Login social com Facebook
 - [ ] Login social com SoundCloud (OAuth próprio) — *bloqueado por [#9](open-questions.md#9-api-do-soundcloud-para-oauth)*
@@ -164,6 +167,7 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 ### Banco — migrations `0006` a `0010`
 - [x] Migration `0006` — `faixa`, `envio`, `servico_envio`, mais a policy do bucket `faixas` que a R0 deixou pendente (corrigida: o rascunho comparava uma coluna que não existe). `0006b` quebra a recursão mútua de policy e `0006c` conserta um trigger de guarda que nascera cego
 - [x] Migration `0007` — `pacote_clave`, `pedido_clave`, `evento_provedor`, `lancamento_clave`, view `saldo_carteira` (com `security_invoker`), e as RPCs `criar_pedido_clave`, `registrar_evento_provedor` e `confirmar_pedido_clave`
+- [x] Migrations `0007b` e `0007c` — `pacote_clave.excluido_em`: portar a tela 21 mostrou que "desativar" e "excluir" são ações **diferentes** no protótipo, e a `0007` as havia colapsado numa só. A `0007c` corrige a colisão de `SQLSTATE` que a `0007b` introduziu (`DS030` já era "configuração ausente")
 - [x] Migration `0008` — `criterio` (**seed com os 11 do protótipo**), `avaliacao`, `nota_criterio`, `compartilhamento`, views `nota_avaliacao` e `nota_artista`. Resolve [#2](open-questions.md#2-11º-critério-de-avaliação) e [#3](open-questions.md#3-quais-5-dos-11-critérios-são-obrigatórios)
 - [x] Função `calcular_remuneracao` — algoritmo do protótipo, 31 asserções. Resolve [#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe) (percentual sobre o **bruto**), mas com semântica diferente da tabela do board — ver o cabeçalho da `0009`
 - [x] Migration `0009` — `ganho_curador` (com `base_centavos`, para o `check` do rateio existir) e RPC `enviar_avaliacao`
@@ -190,10 +194,10 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [ ] Bloqueio por saldo insuficiente com alerta e CTA de compra
 
 ### Pacotes de Claves — admin (21)
-- [ ] Lista de pacotes com preço por Clave e status (21)
-- [ ] Criar e editar pacote com recálculo valor ↔ desconto e economia do artista (21.1)
-- [ ] Ativar e desativar pacote, refletindo na Carteira do artista
-- [ ] Excluir pacote com confirmação, mantendo compras já feitas, com registro em log
+- [x] Lista de pacotes com preço por Clave e status (21) — **A1 verde**
+- [x] Criar e editar pacote com recálculo valor ↔ desconto e economia do artista (21.1) — **A2 verde**, com as validações que o protótipo não tem (ele coage em silêncio)
+- [x] Ativar e desativar pacote, refletindo na Carteira do artista — **A3 verde**
+- [x] Excluir pacote com confirmação, mantendo compras já feitas, com registro em log — exclusão **lógica** (`0007b`), que é o que preserva a FK de `pedido_clave`
 
 ### Fila de avaliações (13)
 - [ ] Fila com prazo de 72h, status e ordenação por urgência (13)
@@ -232,7 +236,7 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [x] Estados do envio `Recebeu → Ouviu → Avaliando → Pronto` gravados. `Pronto` e `Devolvido` são reservados às RPCs por trigger
 
 ### Gate da R2
-- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — os arquivos existem em `e2e/`, hoje como `skip`
+- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — **3 de 16 verdes** (A1, A2, A3, em 13 testes); os outros 13 seguem `skip`, e cada um sai do skip na fatia que o desbloqueia
 - [ ] Compra de Claves credita uma única vez sob webhook duplicado
 - [ ] Avaliação concluída gera ganho com o percentual correto por classe e prazo
 - [ ] Devolução de 7 dias aparece no extrato e remove a faixa da fila

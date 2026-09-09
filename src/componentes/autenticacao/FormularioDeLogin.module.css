@@ -1,0 +1,79 @@
+/* Formulário das telas 1 e 19 — `docs/R2/extraido/{Artista,Admin}.html`. */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(26px, 3.4vh, 32px);
+  line-height: 1.06;
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+/* Vai no `acessorioDoRotulo` do `Campo`, na linha do rótulo "Senha". */
+.esqueci {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-medium);
+  color: var(--dsn-purple-600);
+  white-space: nowrap;
+  flex: none;
+  text-decoration: none;
+}
+
+.esqueci:hover {
+  color: var(--dsn-purple-500);
+  text-decoration: underline;
+}
+
+/* Olho de mostrar/ocultar, dentro do campo. */
+.olho {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--dsn-radius-lg);
+  background: transparent;
+  color: var(--dsn-ink-500);
+  cursor: pointer;
+  transition:
+    background var(--dsn-duration-base),
+    color var(--dsn-duration-base);
+}
+
+.olho:hover {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink);
+}

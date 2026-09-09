@@ -13,6 +13,12 @@ export type PropsCampo = Omit<InputHTMLAttributes<HTMLInputElement>, 'className'
   readonly denso?: boolean;
   /** Botão à direita, dentro do campo: mostrar senha, limpar, colar. */
   readonly acao?: ReactNode;
+  /**
+   * Elemento à direita, na linha do rótulo — o "Esqueci minha senha" das
+   * telas 1 e 19. Fora do `<label>` de propósito: um link dentro do rótulo
+   * seria alcançado pelo clique que deveria focar o campo.
+   */
+  readonly acessorioDoRotulo?: ReactNode;
 };
 
 /**
@@ -26,6 +32,7 @@ export function Campo({
   auxiliar,
   denso = false,
   acao,
+  acessorioDoRotulo,
   required = false,
   ...resto
 }: PropsCampo) {
@@ -49,16 +56,27 @@ export function Campo({
     .filter(Boolean)
     .join(' ');
 
+  const marcacaoDoRotulo = (
+    <label
+      className={[estilos.rotulo, required ? estilos.rotuloObrigatorio : undefined]
+        .filter(Boolean)
+        .join(' ')}
+      htmlFor={id}
+    >
+      {rotulo}
+    </label>
+  );
+
   return (
     <div className={estilos.envolvente}>
-      <label className={estilos.rotulo} htmlFor={id}>
-        {rotulo}
-        {required ? (
-          <span className={estilos.obrigatorio} aria-hidden="true">
-            *
-          </span>
-        ) : null}
-      </label>
+      {acessorioDoRotulo === undefined ? (
+        marcacaoDoRotulo
+      ) : (
+        <div className={estilos.linhaDoRotulo}>
+          {marcacaoDoRotulo}
+          {acessorioDoRotulo}
+        </div>
+      )}
 
       <div className={estilos.caixa}>
         <input

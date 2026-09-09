@@ -51,8 +51,29 @@ O protótipo da R2 é posterior ao board e foi construído para validação com 
 | 5 | Fluxo de envio | 3 → 3.1/3.2 → 3.3 | **Wizard de 3 passos** + campo novo *"O que o curador precisa saber?"* | Protótipo |
 | 6 | Cadastro do curador | 6 telas (12 a 12.5) | **8 passos** | Protótipo |
 | 7 | Papéis do admin | "Administrador, Financeiro, Curadoria…" | **Administrador · Moderador · Financeiro · Suporte** | Protótipo |
+| 7b | Navegação do admin | — | **Início · Gestão** (Curadores e artistas, Pacotes de Claves) **· Operação** (Financeiro da plataforma, Moderação e antifraude) **· Conta** (Conta e equipe) | Protótipo — a R0 havia derivado outros grupos e dois itens que o protótipo não tem |
+| 7c | Granularidade da permissão | um booleano por módulo, em 4 módulos | `permissao_admin` tem `pode_ler` **e** `pode_escrever`, em 6 módulos (`pacotes` e `configuracao` separados de `financeiro`) | **Tabela**, com o booleano do protótipo semeado em `pode_escrever`. A granularidade maior fica disponível para quando o cliente a exercer |
 | 8 | Pacotes de Claves | criar / editar / excluir | acrescenta **status ativo/inativo**, preço por Clave calculado, **log de alteração** e a regra "só ativos aparecem na Carteira" | Protótipo |
 | 9 | Estados do saldo | saldo + extrato | acrescenta **"Comprometidas em análise"** e **"Devolvidas por falta de resposta"** | Protótipo |
+
+### Parte B.1 — Onde o protótipo **não** venceu, e por quê
+
+Registro das três vezes em que a implementação se afastou do protótipo de
+propósito. A precedência do [AGENTS.md](../../AGENTS.md) põe o protótipo acima
+de qualquer derivação, então cada uma destas precisa de razão explícita.
+
+| Tela | Protótipo | Implementado | Razão |
+|---|---|---|---|
+| 1 · login do artista | prova social *"100% da faixa ouvida"* | *"escuta medida e registrada"* | A tela de avaliação **do mesmo protótipo** diz "a avaliação só é aceita a partir de 60% da faixa ouvidos". Prometer 100% na porta de entrada é uma promessa que o produto não cumpre. Ver [perguntas ao cliente](../R2/perguntas-ao-cliente.md). |
+| 21.1 · criar pacote | `salvarPacote()` **coage em silêncio**: nome vazio vira `"Pacote 30 Claves"`, quantidade inválida vira `30`, desconto inválido vira `5`, e valor acima da base é capado | erro no campo, e não salva | Comportamento de mock. O cenário **A2** do guia de testes pede o contrário — *"Validações barram valores/percentuais inválidos"* — e o guia é o gate. Salvar um preço que não foi o digitado é pior que recusar. |
+| 21 · lista de pacotes | o `flash` de confirmação desaparece em 2,6 s | permanece até a próxima ação | Confirmação que se apaga sozinha é inútil para quem lê devagar. O `role="status"` já a anuncia ao leitor de tela sem interromper. |
+
+E uma divergência que o protótipo criou contra si mesmo, resolvida a favor da
+copy: a tela 21 tem **Desativar** e **Excluir** como ações distintas, com o
+modal dizendo *"Se a ideia for só tirar de circulação, desative"* — mas a
+`0007` havia colapsado as duas em `ativo = false`, o que tornaria a frase
+falsa. Resolvido com `pacote_clave.excluido_em` na `0007b`; ver
+[data-model §`pacote_clave`](../data-model.md).
 
 ### Nota sobre a divergência 3
 

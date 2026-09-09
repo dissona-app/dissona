@@ -67,7 +67,12 @@ select pg_temp.afirmar_bloqueado(
 -- ------------------------------------------------------- trigger de auditoria
 
 select pg_temp.afirmar(
-  (select count(*) from log_auditoria where tabela = 'membro_admin' and acao = 'insert') = 1,
+  -- Filtrado pelo ator do teste: o seed da suíte E2E também cria membros de
+  -- equipe, e o log é append-only e commitado.
+  (select count(*) from log_auditoria
+    where tabela = 'membro_admin' and acao = 'insert'
+      and registro_id in (select ma.id::text from membro_admin ma
+                           where ma.perfil_id in (select id from ator))) = 1,
   'o insert em membro_admin foi auditado'
 );
 

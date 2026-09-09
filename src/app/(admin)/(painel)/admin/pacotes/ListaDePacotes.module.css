@@ -1,0 +1,212 @@
+/* Tela 21 — lista de pacotes de Claves (`docs/R2/extraido/Admin.html`). */
+
+.tela {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 16px);
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-8);
+}
+
+.contexto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-4) var(--dsn-space-9);
+  min-width: 0;
+}
+
+.base {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.resumo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-700);
+}
+
+.pontoAtivo {
+  width: var(--dsn-space-3);
+  height: var(--dsn-space-3);
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-success-dot);
+  flex: none;
+}
+
+/*
+ * O card que envolve a tabela. O protótipo desenha a "tabela" com CSS Grid, e
+ * aqui ela é uma `<table>` de verdade, pelo componente `Tabela` do Design
+ * System: dado tabular precisa de `<th scope="col">` e de `<caption>` para ser
+ * navegável por leitor de tela, e uma grade de `<div>` não é.
+ */
+.moldura {
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rodapeDaTabela {
+  padding: clamp(11px, 1.8vh, 15px) clamp(16px, 2.4vh, 24px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-5) var(--dsn-space-8);
+  border-top: var(--dsn-border-width) solid var(--dsn-border);
+}
+
+.nota {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+/* Linha de pacote inativo, esmaecida — `opacity: 0.62` no protótipo. */
+.inativo {
+  opacity: 0.62;
+}
+
+.nomeCelula {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.nome {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Desconto zero fica cinza; com desconto, verde. */
+.semDesconto {
+  color: var(--dsn-ink-500);
+}
+
+.comDesconto {
+  color: var(--dsn-success-fg);
+}
+
+.porClave {
+  color: var(--dsn-ink-700);
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  margin-right: -6px;
+  min-width: 0;
+}
+
+.acao {
+  appearance: none;
+  font-family: inherit;
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  background: transparent;
+  border: none;
+  padding: 7px var(--dsn-space-3);
+  border-radius: var(--dsn-radius-lg);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background var(--dsn-duration-base);
+}
+
+.acao:hover {
+  background: var(--dsn-purple-050);
+  text-decoration: none;
+}
+
+.acao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* "Desativar" em laranja escuro; "Ativar" em roxo. */
+.acaoDesativar {
+  color: var(--dsn-orange-800);
+}
+
+.acaoExcluir {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+  color: var(--dsn-orange-800);
+  background: transparent;
+  border: none;
+  padding: 7px var(--dsn-space-3);
+  border-radius: var(--dsn-radius-lg);
+  cursor: pointer;
+  transition: background var(--dsn-duration-base);
+}
+
+.acaoExcluir:hover {
+  background: var(--dsn-danger-bg);
+}
+
+.acaoExcluir:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/*
+ * Confirmação de exclusão. O overline em laranja escuro é o do protótipo — e é
+ * a única pista de cor do diálogo, então o texto "Excluir pacote" carrega a
+ * informação sozinho (WCAG 1.4.1).
+ */
+.overlineModal {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-orange-800);
+  text-transform: uppercase;
+}
+
+.alvo {
+  font-size: 22px;
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-tight);
+}
+
+.textoModal {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-500);
+}
+
+.corpoModal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}

@@ -13,6 +13,15 @@ inteira numa chamada de `execute_sql` do MCP:
 cat supabase/testes/_ajuda.sql supabase/testes/0001_identidade.testes.sql
 ```
 
+Duas exceções, que **não** se concatenam a `_ajuda.sql` porque montam os
+próprios atores e abrem a própria transação: `0010_rpcs_sla.testes.sql` (precisa
+de dois curadores) e `0007b_pacote_exclusao.testes.sql`.
+
+E um arquivo que não é teste: [`dados-e2e.sql`](dados-e2e.sql) cria as contas e
+o catálogo da suíte Playwright. Ele **commita**, ao contrário de todos os
+outros — as contas têm de sobreviver para o navegador entrar com elas. Ver o
+cabeçalho do arquivo para a senha, que não é versionada.
+
 Saída esperada: uma única linha `OK <migration>`. Qualquer falha aborta a
 transação e nomeia a asserção — `FALHOU: <rótulo>`.
 
@@ -45,7 +54,10 @@ que filtrar. Com o helper errado, o teste passaria sem provar nada.
 
 ## Registro de execuções
 
-Todas em 2026-09-08, contra o projeto `fhqcibjzmowcjkdrqyvi`.
+Contra o projeto `fhqcibjzmowcjkdrqyvi`. A primeira rodada foi em 2026-09-08;
+a segunda em 2026-09-09, depois de `dados-e2e.sql` popular o banco — e a
+segunda encontrou coisas que a primeira não podia encontrar (ver
+"Isolamento", abaixo).
 
 | Migration | Resultado | Observação |
 |---|---|---|
@@ -58,6 +70,8 @@ Todas em 2026-09-08, contra o projeto `fhqcibjzmowcjkdrqyvi`.
 | `0005_notificacoes` | `OK` — 24 asserções | passou de primeira |
 | `0006_faixa_envio` | `OK` — 26 asserções | expôs a recursão de policy (`0006b`) e o trigger cego (`0006c`) |
 | `0007_claves` | `OK` — 34 asserções | cobre "credita uma única vez sob webhook duplicado" |
+| `0007b_pacote_exclusao` | `OK` — 12 asserções | desativar ≠ excluir; exclusão irreversível |
+| `0007c_codigo_de_erro_do_pacote` | coberta pela suíte da `0007b` | corrige a colisão de `DS030` |
 | `0008_avaliacao` | coberta pela suíte da `0009` | seed dos 11 critérios conferido |
 | `0009_remuneracao` | `OK` — 31 asserções | cobertura obrigatória (data-model §10) |
 | `0010_rpcs_sla` | `OK` — 26 asserções | ciclo econômico completo; expôs o estado inválido corrigido na `0010b` |
@@ -89,16 +103,60 @@ Todas em 2026-09-08, contra o projeto `fhqcibjzmowcjkdrqyvi`.
    são o **teto na avaliação**; e o vão uniforme de 12 pontos está entre
    `teto_base` e `teto_max`, não entre piso e `teto_base` (esse varia: 8, 3, 5).
 
-5. **`teto_max` é inalcançável.** Com os acréscimos do catálogo, o máximo real é
+5. **Colisão de `SQLSTATE`.** A `0007b` levantou `DS030` na guarda de exclusão
+   de pacote. `DS030` já era o código de "catálogo ou `configuracao`
+   ausente", usado por quatro funções. A colisão **não aparece em teste de
+   banco nenhum** — o `sqlstate` que sobe é o mesmo, e o teste da `0007b`
+   afirmava exatamente aquele código. Ela só apareceu ao escrever
+   `src/lib/supabase/erros.ts`, o mapa `SQLSTATE → CodigoErro`: um só mapa não
+   pode devolver `CONFIGURACAO_AUSENTE` e `PACOTE_EXCLUIDO` para a mesma
+   entrada, e o usuário veria "configuração ausente" ao tentar reativar um
+   pacote excluído. Corrigido na `0007c` (`DS014`). **Lição:** a tabela de
+   códigos precisa morar num arquivo só; espalhada por módulo, a colisão não
+   tem onde aparecer.
+
+6. **`teto_max` é inalcançável.** Com os acréscimos do catálogo, o máximo real é
    46 / 51 / 58 contra tetos de 50 / 55 / 62 — sobram exatamente 4 pontos nas
    três classes. Ou falta um acréscimo de 4 pontos, ou os tetos são
    aspiracionais. **Pergunta aberta para o cliente**, e o teste fixa a folga
    para ela não mudar em silêncio.
 
+### Isolamento: a suíte dependia de as tabelas estarem vazias
+
+Descoberto em 2026-09-09, ao rodar a suíte pela primeira vez **depois** de
+`dados-e2e.sql` popular o banco com o catálogo do protótipo e as três contas da
+E2E. Seis asserções e cinco fixtures quebraram de uma vez, e nenhuma delas
+estava errada sobre RLS — todas estavam erradas sobre o **escopo**:
+
+- `count(*) from perfil = 4` passou a ver 7 (3 contas novas).
+- `quantas('select 1 from pacote_clave') = 3` passou a ver 7 (4 pacotes novos).
+- `count(*) from log_auditoria where tabela = 'membro_admin'` passou a ver os
+  inserts do seed.
+- `count(*) from notificacao where evento = 'nova_compra_claves' = 1` passou a
+  ver 3, porque evento com destinatário `admin` **abre em leque** para toda a
+  equipe ativa — e o seed criou dois membros a mais.
+- Na `0010`, cinco `insert ... select ... from perfil_artista` **sem `where`**
+  passaram a produzir duas linhas em vez de uma, e `avisar_prazo_72h()`
+  devolveu 2 em lugar de 1 — uma falha cujo sintoma não aponta para a causa.
+
+Toda contagem agora é filtrada (pelo prefixo `T ` nos nomes de fixture, ou por
+`in (select id from ator)`), e todo `insert` de fixture é escopado ao ator do
+teste. O projeto Supabase é compartilhado entre Preview, Production e E2E
+([#25](../../docs/open-questions.md)); **"a tabela é minha" nunca foi verdade
+— só ainda não tinha sido violada.**
+
+Um teste de RLS que depende de a tabela estar vazia é um teste que funciona uma
+vez.
+
 ### Advisors
 
-`get_advisors(security)` no estado final: **17 WARN e 1 INFO, todos
-intencionais**. Nenhum finding envolve `anon`.
+Advisors de segurança no estado final (2026-09-09): **18 WARN e 1 INFO, todos
+intencionais**. Nenhum finding envolve `anon`, e a `0007b`/`0007c` não
+acrescentaram nenhum — `proibir_reviver_pacote` é `security invoker` de
+propósito, e por isso **não** aparece na lista de definer abaixo.
+
+O WARN a mais em relação à primeira rodada é `auth_leaked_password_protection`,
+que é configuração do Auth e não de schema.
 
 O INFO é `rls_enabled_no_policy` em `evento_provedor`, e é exatamente o
 desenho: RLS habilitada com zero policies nega a todo papel, e só a RPC

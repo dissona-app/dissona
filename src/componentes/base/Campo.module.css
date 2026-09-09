@@ -14,9 +14,40 @@
   color: var(--dsn-ink-500);
 }
 
-.obrigatorio {
-  color: var(--dsn-danger-fg);
+/*
+ * Linha do rótulo com acessório à direita — o "Esqueci minha senha" das telas
+ * 1 e 19 fica ali, na altura do rótulo "Senha", e não abaixo do campo. É onde
+ * o protótipo o põe, e é onde a pessoa olha no instante em que precisa dele.
+ *
+ * `align-items: baseline` alinha as duas linhas de texto pela base, e não pelo
+ * topo da caixa: os dois têm tamanhos diferentes (11px e 13px), e alinhar por
+ * baseline é o que faz parecerem uma linha só.
+ */
+.linhaDoRotulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-8);
+}
+
+/*
+ * Marcador de campo obrigatório, por `::after`.
+ *
+ * Antes era um `<span aria-hidden="true">*</span>` dentro do `<label>`. O
+ * `aria-hidden` já tirava o asterisco do **nome acessível**, então para leitor
+ * de tela estava correto — mas ele continuava no `textContent` do label, e o
+ * texto do rótulo passava a ser "E-mail*". Isso quebra qualquer busca por
+ * rótulo exato (`getByLabel('E-mail', { exact: true })` não casa) e faz uma
+ * busca não exata por "Senha" casar também com o botão "Mostrar senha".
+ *
+ * Conteúdo gerado por CSS não entra no `textContent` nem no nome acessível, e
+ * é o lugar certo para um marcador que é pura decoração: o que comunica a
+ * obrigatoriedade de verdade é o `required`/`aria-required` no input.
+ */
+.rotuloObrigatorio::after {
+  content: '*';
   margin-left: var(--dsn-space-1);
+  color: var(--dsn-danger-fg);
 }
 
 .caixa {

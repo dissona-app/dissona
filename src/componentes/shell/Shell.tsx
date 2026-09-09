@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import type { Papel } from '@/lib/papeis';
@@ -7,6 +8,7 @@ import type { Papel } from '@/lib/papeis';
 import { MenuAjuda } from './MenuAjuda';
 import { Navegacao } from './Navegacao';
 import estilos from './Shell.module.css';
+import { tituloDoCaminho } from './titulo-por-caminho';
 import { TrocaDePapel } from './TrocaDePapel';
 
 export type LimiteConteudo = 'total' | 'conta' | 'contaAdmin' | 'formulario' | 'passo';
@@ -15,7 +17,13 @@ export type PropsShell = {
   readonly papelAtivo: Papel;
   /** Todos os papéis ativos da conta — decide se a troca aparece. */
   readonly papeis: readonly Papel[];
-  readonly titulo: string;
+  /**
+   * Título do header. Quando omitido, sai de `tituloDoCaminho()` — que é como
+   * o protótipo faz: o título é propriedade da rota, não da tela.
+   */
+  readonly titulo?: string;
+  /** Sublegenda sob o título — o `appSub` do protótipo. */
+  readonly subtitulo?: string;
   /** Release em execução; item de release futura fica desabilitado na nav. */
   readonly releaseAtual?: number;
   readonly limite?: LimiteConteudo;
@@ -51,6 +59,7 @@ export function Shell({
   papelAtivo,
   papeis,
   titulo,
+  subtitulo,
   releaseAtual = 2,
   limite = 'total',
   acoes,
@@ -59,6 +68,10 @@ export function Shell({
   children,
 }: PropsShell) {
   const ehAdmin = papelAtivo === 'admin';
+  const caminho = usePathname();
+  const doCaminho = tituloDoCaminho(caminho, papelAtivo);
+  const tituloExibido = titulo ?? doCaminho.titulo;
+  const subtituloExibido = subtitulo ?? doCaminho.sublegenda;
 
   const itensDeAjuda =
     onReverOnboarding === undefined
@@ -75,7 +88,12 @@ export function Shell({
 
       <div className={estilos.coluna}>
         <header className={estilos.header}>
-          <h1 className={estilos.titulo}>{titulo}</h1>
+          <div className={estilos.textosHeader}>
+            <h1 className={estilos.titulo}>{tituloExibido}</h1>
+            {subtituloExibido !== undefined ? (
+              <span className={estilos.subtitulo}>{subtituloExibido}</span>
+            ) : null}
+          </div>
 
           <div className={estilos.acoesHeader}>
             <TrocaDePapel papelAtivo={papelAtivo} papeis={papeis} />

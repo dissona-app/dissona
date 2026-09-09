@@ -25,10 +25,10 @@ from perfil_curador pc join ator a on a.id = pc.perfil_id where a.papel = 'curad
 -- Os pacotes do protótipo da R2 (resolve open-questions #4). O "Catálogo"
 -- inativo é o que torna demonstrável a nota "só os ativos aparecem na Carteira".
 insert into pacote_clave (nome, quantidade_claves, valor_centavos, desconto_percentual, ativo) values
-  ('Ensaio',     10,  10000, 0,  true),
-  ('Repertorio', 30,  28500, 5,  true),
-  ('Turne',      60,  54000, 10, true),
-  ('Catalogo',  100,  85000, 15, false);
+  ('T Ensaio',     10,  10000, 0,  true),
+  ('T Repertorio', 30,  28500, 5,  true),
+  ('T Turne',      60,  54000, 10, true),
+  ('T Catalogo',  100,  85000, 15, false);
 
 -- ------------------------------------------------------------------- checks
 
@@ -45,7 +45,7 @@ select pg_temp.afirmar_bloqueado(
 
 -- O preço por Clave é derivado, não coluna: a conta bate com o que a tela mostra.
 select pg_temp.afirmar(
-  (select round(valor_centavos / quantidade_claves) from pacote_clave where nome = 'Repertorio') = 950,
+  (select round(valor_centavos / quantidade_claves) from pacote_clave where nome = 'T Repertorio') = 950,
   'o preco por Clave do Repertorio e R$ 9,50 — derivado, nao armazenado'
 );
 
@@ -119,12 +119,12 @@ set local role authenticated;
 
 -- Só os três pacotes ativos: o "Catálogo" inativo não aparece na Carteira.
 select pg_temp.afirmar(
-  pg_temp.quantas('select 1 from pacote_clave') = 3,
+  pg_temp.quantas('select 1 from pacote_clave where nome like ''T %''') = 3,
   'artista ve so os pacotes ativos'
 );
 
 select pg_temp.afirmar_invisivel(
-  'select 1 from pacote_clave where nome = ''Catalogo''',
+  'select 1 from pacote_clave where nome = ''T Catalogo''',
   'o pacote inativo e invisivel para o artista'
 );
 
@@ -142,7 +142,7 @@ declare
   v_pedido public.pedido_clave;
 begin
   v_pedido_id := criar_pedido_clave(
-    (select id from pacote_clave where nome = 'Repertorio'), 'pix');
+    (select id from pacote_clave where nome = 'T Repertorio'), 'pix');
 
   select * into v_pedido from pedido_clave where id = v_pedido_id;
 
@@ -171,7 +171,7 @@ do $$
 begin
   begin
     perform criar_pedido_clave(
-      (select id from pacote_clave where nome = 'Catalogo'), 'pix');
+      (select id from pacote_clave where nome = 'T Catalogo'), 'pix');
     raise exception 'FALHOU: comprou pacote inativo' using errcode = 'TS001';
   exception
     when sqlstate 'DS024' then null;
@@ -254,8 +254,14 @@ select pg_temp.afirmar(
   'o artista foi notificado da compra'
 );
 
+-- Filtrado pelo ator: `registrar_notificacao` de evento com destinatário
+-- `admin` **abre em leque** para toda a equipe ativa, e o seed da suíte E2E
+-- criou mais dois membros. A afirmação é "o admin deste teste recebeu", não
+-- "existe exatamente uma notificação no banco".
 select pg_temp.afirmar(
-  (select count(*) from notificacao where evento = 'nova_compra_claves') = 1,
+  (select count(*) from notificacao
+    where evento = 'nova_compra_claves'
+      and perfil_id in (select id from ator)) = 1,
   'o admin recebeu a conciliacao'
 );
 
@@ -353,7 +359,7 @@ select pg_temp.afirmar(
 );
 
 select pg_temp.afirmar(
-  pg_temp.quantas('select 1 from pacote_clave') = 4,
+  pg_temp.quantas('select 1 from pacote_clave where nome like ''T %''') = 4,
   'quem gere pacotes ve tambem os inativos'
 );
 
@@ -361,15 +367,15 @@ select pg_temp.afirmar_invisivel('select 1 from evento_provedor',
   'nem o financeiro le evento_provedor — a tabela nao tem policy nenhuma');
 
 -- Ativar e desativar pacote é dele.
-update pacote_clave set ativo = true where nome = 'Catalogo';
+update pacote_clave set ativo = true where nome = 'T Catalogo';
 
 select pg_temp.afirmar(
-  (select ativo from pacote_clave where nome = 'Catalogo'),
+  (select ativo from pacote_clave where nome = 'T Catalogo'),
   'quem gere pacotes ativa e desativa'
 );
 
 select pg_temp.afirmar_sem_efeito(
-  'delete from pacote_clave where nome = ''Catalogo''',
+  'delete from pacote_clave where nome = ''T Catalogo''',
   'pacote nao e apagado — "excluir" e desativar, e as compras feitas continuam'
 );
 

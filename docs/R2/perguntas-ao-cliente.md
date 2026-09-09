@@ -1,9 +1,12 @@
-# Perguntas ao cliente · 2026-09-08
+# Perguntas ao cliente · 2026-09-08, atualizado em 2026-09-09
 
-Três decisões que a implementação do banco expôs. Nenhuma bloqueia o
-desenvolvimento hoje — todas as três estão implementadas com um default
-explícito e reversível por `configuracao` — mas as duas primeiras precisam de
-resposta **antes da tela 14.4 (Remuneração por classe)** e do cenário C6.
+Quatro decisões que a implementação expôs. Nenhuma bloqueia o desenvolvimento
+hoje — todas estão implementadas com um default explícito e reversível — mas as
+duas primeiras precisam de resposta **antes da tela 14.4 (Remuneração por
+classe)** e do cenário C6.
+
+A quarta apareceu ao portar a tela de login e é a mais barata de resolver: é
+uma linha de texto.
 
 Contexto para as duas primeiras: o protótipo da R2 é a fonte de maior
 autoridade ([AGENTS.md](../../AGENTS.md)), e o cálculo de remuneração dele
@@ -83,3 +86,31 @@ para a conciliação continuar possível.
 aplicar? E o texto de `/privacidade` precisa ser reescrito para descrever o que
 de fato acontece — hoje ele promete mais do que o sistema pode cumprir sem
 descumprir outra obrigação.
+
+---
+
+## 4 · A home promete "100% da faixa ouvida". O gate é 60%.
+
+Os dois textos estão no **mesmo** conjunto de protótipos, e se contradizem:
+
+> Tela 1, prova social sob o card de login: *"7 dias para a devolutiva · até 11
+> critérios com nota · **100% da faixa ouvida**"*
+>
+> Tela 14, acima do player: *"A escuta é medida. A avaliação só é aceita a
+> partir de **60% da faixa** ouvidos."*
+
+A segunda é a regra implementada (`configuracao.escuta_minima_percentual = 60`)
+e a que o cenário C3 verifica. Então a primeira é uma promessa que o produto
+não cumpre — e ela está exatamente onde o artista decide se confia na
+plataforma.
+
+**Implementado por ora:** *"escuta medida e registrada"*, que é verdade nos
+dois casos e não promete um número.
+
+**Perguntas:** o gate deve subir para 100%, ou a copy da home desce? Se o gate
+subir, note que ele muda o cálculo de nada — é `configuracao`, um `update` — mas
+muda o produto: um curador que ouviu 95% de uma faixa de seis minutos passa a
+não poder entregar a avaliação que já escreveu.
+
+*Se preferirem um número na home, "60% da faixa ouvida, no mínimo" é
+verificável e ainda é um diferencial — quase nenhuma plataforma mede escuta.*

@@ -29,12 +29,28 @@
   border-bottom: var(--dsn-border-width) solid var(--dsn-border);
 }
 
+.textosHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  min-width: 0;
+}
+
 .titulo {
   margin: 0;
   font-size: var(--dsn-text-lg);
   font-weight: var(--dsn-weight-bold);
   letter-spacing: var(--dsn-tracking-tight);
   color: var(--dsn-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* `appSub` do protótipo — a linha sob o título do header. */
+.subtitulo {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -878,6 +878,7 @@ export type Database = {
           atualizado_em: string
           criado_em: string
           desconto_percentual: number
+          excluido_em: string | null
           id: string
           nome: string
           quantidade_claves: number
@@ -888,6 +889,7 @@ export type Database = {
           atualizado_em?: string
           criado_em?: string
           desconto_percentual?: number
+          excluido_em?: string | null
           id?: string
           nome: string
           quantidade_claves: number
@@ -898,6 +900,7 @@ export type Database = {
           atualizado_em?: string
           criado_em?: string
           desconto_percentual?: number
+          excluido_em?: string | null
           id?: string
           nome?: string
           quantidade_claves?: number

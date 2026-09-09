@@ -1,0 +1,28 @@
+/* Tela 19 — detalhes que só esta tela tem. */
+
+/*
+ * "Contas são criadas por convite." O 12,5px é o valor literal do protótipo, e
+ * é meio pixel abaixo da escala — fica entre `--dsn-text-2xs` (12px) e
+ * `--dsn-text-xs` (13px). Mantido como está: a nota é o único texto do card
+ * nesse tamanho, e arredondar para 13px a igualaria ao corpo, que é
+ * exatamente a hierarquia que ela não deve ter.
+ */
+.nota {
+  font-size: 12.5px;
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  border-top: var(--dsn-border-width) solid var(--dsn-border);
+  padding-top: 13px;
+}
+
+.contato {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.contato:hover {
+  text-decoration: underline;
+}

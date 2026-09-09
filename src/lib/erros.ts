@@ -31,11 +31,24 @@ export const CodigoErro = {
   // Avaliação
   ESCUTA_INSUFICIENTE: 'escuta_insuficiente',
   CRITERIO_OBRIGATORIO_AUSENTE: 'criterio_obrigatorio_ausente',
+  FEEDBACK_OBRIGATORIO: 'feedback_obrigatorio',
+  AVALIACAO_JA_CONCLUIDA: 'avaliacao_ja_concluida',
   PRAZO_EXPIRADO: 'prazo_expirado',
 
   // Envio
   ARQUIVO_MUITO_GRANDE: 'arquivo_muito_grande',
   FORMATO_NAO_SUPORTADO: 'formato_nao_suportado',
+  ENVIO_SITUACAO_INVALIDA: 'envio_situacao_invalida',
+  FAIXA_SITUACAO_INVALIDA: 'faixa_situacao_invalida',
+
+  // Seleção de curadores
+  CURADOR_INVALIDO: 'curador_invalido',
+  CURADOR_DUPLICADO: 'curador_duplicado',
+  SERVICO_FEEDBACK_OBRIGATORIO: 'servico_feedback_obrigatorio',
+
+  // Pacotes e equipe
+  PACOTE_EXCLUIDO: 'pacote_excluido',
+  CONVITE_INVALIDO: 'convite_invalido',
 } as const;
 
 export type CodigoErro = (typeof CodigoErro)[keyof typeof CodigoErro];

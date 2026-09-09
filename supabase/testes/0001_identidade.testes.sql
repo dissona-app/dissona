@@ -3,12 +3,22 @@
 --
 -- Roda concatenado a `_ajuda.sql`, que abre a transação e cria os atores.
 -- Ver o cabeçalho daquele arquivo.
+--
+-- NOTA SOBRE ISOLAMENTO (aprendida na prática)
+--
+-- Toda contagem aqui é **filtrada**, e todo nome de fixture leva o prefixo
+-- `T `. A primeira versão contava `count(*)` global e passava porque as
+-- tabelas estavam vazias; assim que `dados-e2e.sql` semeou o catálogo do
+-- protótipo e as contas da suíte E2E, quebrou. O projeto Supabase é
+-- compartilhado entre Preview, Production e E2E (open-questions #25), então
+-- "a tabela está vazia" nunca foi uma premissa válida — só ainda não tinha
+-- sido violada.
 -- ============================================================================
 
 -- ------------------------------------- o trigger de criação de perfil ------
 
 select pg_temp.afirmar(
-  (select count(*) from perfil) = 4,
+  (select count(*) from perfil where id in (select id from ator)) = 4,
   'o trigger em auth.users criou um perfil por conta'
 );
 
@@ -164,7 +174,7 @@ set local role authenticated;
 select pg_temp.afirmar(e_admin(), 'e_admin reconhece o admin');
 
 select pg_temp.afirmar(
-  pg_temp.quantas('select 1 from perfil') = 4,
+  pg_temp.quantas('select 1 from perfil where id in (select id from ator)') = 4,
   'admin le todos os perfis'
 );
 

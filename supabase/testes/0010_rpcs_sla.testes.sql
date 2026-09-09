@@ -18,6 +18,15 @@
 --     somava os serviços. Corrigido na `0010b`: o subtotal é apurado antes.
 --  2. `check (devolucao_em > prazo_em)` recusa forçar o vencimento mexendo só
 --     em `devolucao_em`. O teste move os dois marcos, preservando a ordem.
+--
+-- ISOLAMENTO: todo `insert ... select` de fixture é **filtrado pelo ator do
+-- teste**, e não varre a tabela inteira. A primeira versão fazia
+-- `select pa.id from perfil_artista pa` sem `where`, o que funcionava só
+-- enquanto o teste era o único dono de linhas. Quando `dados-e2e.sql` criou o
+-- artista da suíte E2E, cada `insert` daqueles passou a produzir **duas**
+-- linhas, e `avisar_prazo_72h()` devolveu 2 em vez de 1 — uma falha cujo
+-- sintoma não aponta para a causa. O projeto Supabase é compartilhado
+-- (open-questions #25); "a tabela é minha" nunca foi verdade.
 -- ============================================================================
 
 begin;
@@ -58,7 +67,8 @@ insert into perfil_curador (perfil_id, classe, situacao, cadastro_concluido_em, 
 select id, 'prata', 'prata_aprovado', now(), 8 from ator where papel like 'curador%';
 
 insert into servico_curador (perfil_curador_id, tipo, preco_claves)
-select pc.id, 'feedback', 2.00 from perfil_curador pc;
+select pc.id, 'feedback', 2.00 from perfil_curador pc
+ where pc.perfil_id in (select id from ator);
 
 -- Só um dos dois oferece playlist: é o que prova o subtotal por curador.
 insert into servico_curador (perfil_curador_id, tipo, preco_claves)
@@ -66,7 +76,8 @@ select pc.id, 'playlist', 1.50 from perfil_curador pc
  join ator a on a.id = pc.perfil_id where a.papel = 'curador';
 
 insert into lancamento_clave (perfil_artista_id, tipo, quantidade, descricao)
-select pa.id, 'ajuste', 10, 'Credito de teste' from perfil_artista pa;
+select pa.id, 'ajuste', 10, 'Credito de teste' from perfil_artista pa
+ where pa.perfil_id in (select id from ator);
 
 insert into faixa (perfil_artista_id, titulo, origem, arquivo_caminho, situacao)
 select pa.id, 'Faixa do ciclo', 'arquivo', a.id::text || '/f/1.mp3', 'aguardando_selecao'
@@ -143,8 +154,12 @@ select pg_temp.afirmar((select comprometido from saldo_carteira) = 5.50,
 
 reset role;
 insert into faixa (perfil_artista_id, titulo, origem, arquivo_caminho, situacao)
-select pa.id, 'Faixa caro', 'arquivo', '1/f/2.mp3', 'aguardando_selecao' from perfil_artista pa;
-update servico_curador set preco_claves = 99 where tipo = 'feedback';
+select pa.id, 'Faixa caro', 'arquivo', '1/f/2.mp3', 'aguardando_selecao' from perfil_artista pa
+ where pa.perfil_id in (select id from ator);
+update servico_curador set preco_claves = 99
+ where tipo = 'feedback'
+   and perfil_curador_id in (select pc.id from perfil_curador pc
+                              where pc.perfil_id in (select id from ator));
 
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
 set local role authenticated;
@@ -165,12 +180,18 @@ end $$;
 -- ============================ devolver_claves_sem_resposta ================
 
 reset role;
-update servico_curador set preco_claves = 2 where tipo = 'feedback';
+update servico_curador set preco_claves = 2
+ where tipo = 'feedback'
+   and perfil_curador_id in (select pc.id from perfil_curador pc
+                              where pc.perfil_id in (select id from ator));
 
 -- Move os **dois** marcos para o passado, preservando a ordem: o check
 -- `devolucao_em > prazo_em` recusa mexer só num deles — e está certo.
 update envio set prazo_em = now() - interval '8 days',
-                 devolucao_em = now() - interval '1 hour';
+                 devolucao_em = now() - interval '1 hour'
+ where faixa_id in (select f.id from faixa f
+                     join perfil_artista pa on pa.id = f.perfil_artista_id
+                    where pa.perfil_id in (select id from ator));
 
 select pg_temp.afirmar(devolver_claves_sem_resposta() = 2,
   'a devolucao alcancou os dois envios vencidos');
@@ -210,7 +231,7 @@ select pg_temp.afirmar((select devolvido from saldo_carteira) = 5.50,
 reset role;
 insert into faixa (perfil_artista_id, titulo, origem, arquivo_caminho, situacao)
 select pa.id, 'Faixa com prazo perto', 'arquivo', '1/f/3.mp3', 'em_curadoria'
-from perfil_artista pa;
+from perfil_artista pa where pa.perfil_id in (select id from ator);
 
 insert into envio (faixa_id, perfil_curador_id, total_claves, prazo_em, devolucao_em)
 select f.id, pc.id, 2, now() + interval '6 hours', now() + interval '5 days'

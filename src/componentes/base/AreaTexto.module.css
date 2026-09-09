@@ -14,9 +14,24 @@
   color: var(--dsn-ink-500);
 }
 
-.obrigatorio {
-  color: var(--dsn-danger-fg);
+/*
+ * Marcador de campo obrigatório, por `::after`.
+ *
+ * Antes era um `<span aria-hidden="true">*</span>` dentro do `<label>`. O
+ * `aria-hidden` já tirava o asterisco do **nome acessível**, então para leitor
+ * de tela estava correto — mas ele continuava no `textContent` do label, e o
+ * texto do rótulo passava a ser "E-mail*". Isso quebra qualquer busca por
+ * rótulo exato (`getByLabel('E-mail', { exact: true })` não casa) e faz uma
+ * busca não exata por "Senha" casar também com o botão "Mostrar senha".
+ *
+ * Conteúdo gerado por CSS não entra no `textContent` nem no nome acessível, e
+ * é o lugar certo para um marcador que é pura decoração: o que comunica a
+ * obrigatoriedade de verdade é o `required`/`aria-required` no input.
+ */
+.rotuloObrigatorio::after {
+  content: '*';
   margin-left: var(--dsn-space-1);
+  color: var(--dsn-danger-fg);
 }
 
 .entrada {

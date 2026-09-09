@@ -7,6 +7,8 @@ export { BarraProgresso } from './BarraProgresso';
 export type { PropsBarraProgresso, TomBarra } from './BarraProgresso';
 export { Botao } from './Botao';
 export type { PropsBotao, TamanhoBotao, VarianteBotao } from './Botao';
+export { BotaoLink } from './BotaoLink';
+export type { PropsBotaoLink } from './BotaoLink';
 export { Campo } from './Campo';
 export type { PropsCampo } from './Campo';
 export { CampoNota, NOTA_MAXIMA, NOTA_MINIMA, NOTA_PASSO } from './CampoNota';

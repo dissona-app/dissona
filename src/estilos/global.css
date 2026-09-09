@@ -110,6 +110,21 @@ a:hover {
 }
 
 /*
+ * Deslize horizontal das ondas do fundo das telas de autenticação. O SVG tem
+ * `width: 200%` e o padrão se repete a cada metade, então mover −50% → 0 é um
+ * ciclo sem costura. Valor literal do protótipo (`dsnWaveX 46s linear
+ * infinite`); a guarda de `prefers-reduced-motion` abaixo é que a desliga.
+ */
+@keyframes dsnWaveX {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/*
  * Guarda de reduced-motion.
  *
  * Nenhum dos três protótipos da R2 declara `prefers-reduced-motion`, e vários

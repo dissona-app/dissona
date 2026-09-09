@@ -1,0 +1,96 @@
+/* Tela 1 — o que só o login de artista/curador tem. */
+
+.alternativa {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsn-space-3);
+  font-size: var(--dsn-text-sm);
+  color: var(--dsn-ink-500);
+}
+
+.alternativaLink {
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.alternativaLink:hover {
+  color: var(--dsn-purple-500);
+  text-decoration: underline;
+}
+
+.social {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.provedores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dsn-space-4);
+}
+
+.provedor {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 11px var(--dsn-space-4);
+  cursor: pointer;
+  transition:
+    border-color var(--dsn-duration-base),
+    background var(--dsn-duration-base);
+}
+
+.provedor:hover:not(:disabled) {
+  border-color: var(--dsn-purple-600);
+  background: var(--dsn-purple-050);
+}
+
+/*
+ * Login social entra na fatia 3. Desabilitado e não escondido, pela mesma
+ * razão da navegação por release: a pessoa vê o produto inteiro, e a forma da
+ * tela não muda a cada entrega. O `title` diz o motivo.
+ */
+.provedor:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.provedorSigla {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-black);
+  line-height: var(--dsn-leading-none);
+}
+
+.divisor {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-6);
+}
+
+.divisorLinha {
+  flex: 1;
+  height: 1px;
+  background: var(--dsn-border);
+}
+
+.divisorTexto {
+  flex: none;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-ink-500);
+  text-transform: uppercase;
+}

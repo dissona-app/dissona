@@ -59,13 +59,13 @@ export function AreaTexto({
 
   return (
     <div className={estilos.envolvente}>
-      <label className={estilos.rotulo} htmlFor={id}>
+      <label
+        className={[estilos.rotulo, required ? estilos.rotuloObrigatorio : undefined]
+          .filter(Boolean)
+          .join(' ')}
+        htmlFor={id}
+      >
         {rotulo}
-        {required ? (
-          <span className={estilos.obrigatorio} aria-hidden="true">
-            *
-          </span>
-        ) : null}
       </label>
 
       <textarea

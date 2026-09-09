@@ -78,6 +78,19 @@ const CURADOR: readonly GrupoNavegacao[] = [
   },
 ];
 
+/*
+ * Grupos e rótulos **literais** da sidebar do protótipo do admin
+ * (`docs/R2/extraido/Admin.html`): Início solto no topo, depois Gestão,
+ * Operação e Conta.
+ *
+ * A R0 tinha derivado outra estrutura — grupos "Gestão", "Financeiro" e
+ * "Conta", com "Aprovações" e "Visão geral" que o protótipo não tem, e sem o
+ * grupo "Operação". Pela precedência do AGENTS.md (protótipo > board >
+ * derivação), o protótipo vence, e a navegação passa a ter os seis itens que
+ * ele tem, com os nomes que ele usa: "Financeiro da plataforma", e não
+ * "Financeiro"; "Moderação e antifraude", e não "Moderação"; "Conta e equipe",
+ * e não "Equipe".
+ */
 const ADMIN: readonly GrupoNavegacao[] = [
   {
     titulo: null,
@@ -87,20 +100,19 @@ const ADMIN: readonly GrupoNavegacao[] = [
     titulo: 'Gestão',
     itens: [
       { rotulo: 'Curadores e artistas', caminho: `${ROTA.ADMIN}/usuarios`, release: 3 },
-      { rotulo: 'Aprovações', caminho: `${ROTA.ADMIN}/aprovacoes`, release: 3 },
-      { rotulo: 'Moderação', caminho: `${ROTA.ADMIN}/moderacao`, release: 3 },
+      { rotulo: 'Pacotes de Claves', caminho: `${ROTA.ADMIN}/pacotes`, release: 2 },
     ],
   },
   {
-    titulo: 'Financeiro',
+    titulo: 'Operação',
     itens: [
-      { rotulo: 'Pacotes de Claves', caminho: `${ROTA.ADMIN}/pacotes`, release: 2 },
-      { rotulo: 'Visão geral', caminho: `${ROTA.ADMIN}/financeiro`, release: 5 },
+      { rotulo: 'Financeiro da plataforma', caminho: `${ROTA.ADMIN}/financeiro`, release: 5 },
+      { rotulo: 'Moderação e antifraude', caminho: `${ROTA.ADMIN}/moderacao`, release: 3 },
     ],
   },
   {
     titulo: 'Conta',
-    itens: [{ rotulo: 'Equipe', caminho: `${ROTA.ADMIN}/equipe`, release: 1 }],
+    itens: [{ rotulo: 'Conta e equipe', caminho: `${ROTA.ADMIN}/equipe`, release: 1 }],
   },
 ];
 

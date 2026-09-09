@@ -89,6 +89,40 @@ pnpm db:tipos          # regenera lib/supabase/tipos-bd.ts
 
 ---
 
+## Testes end-to-end
+
+Os 16 cenários do [Guia de Testes da R2](docs/R2/guia-de-testes-r2.md) são o
+gate da release. A suíte roda contra o projeto Supabase real — não há mock de
+banco — e por isso precisa de contas de teste que existam de verdade.
+
+**Uma vez, para preparar o banco:**
+
+1. Escolha uma senha e ponha em `.env.local` como `E2E_SENHA=...`. O arquivo
+   está no `.gitignore`; a senha **não** é versionada, porque seria a
+   credencial de uma conta com papel `admin` num projeto que também serve
+   produção.
+2. Rode [`supabase/testes/dados-e2e.sql`](supabase/testes/dados-e2e.sql) com a
+   mesma senha, como o cabeçalho do arquivo explica. Ele cria três contas no
+   namespace `@e2e.dissona.local` e o catálogo de pacotes do protótipo. É
+   idempotente: rodar de novo só troca as senhas.
+
+**Depois:** `pnpm e2e`, que faz o build e sobe o app na porta 3100. Para iterar
+sem rebuildar a cada vez, deixe um `pnpm start --port 3100` rodando e use
+`BASE_URL=http://localhost:3100 pnpm e2e`.
+
+O Playwright lê `E2E_SENHA` de `.env.local` por
+[`e2e/setup/ambiente.ts`](e2e/setup/ambiente.ts) — o Next carrega esse arquivo
+só para o servidor que ele sobe, e o processo do Playwright é outro. No CI a
+variável vem do secret do job, e o carregador nunca sobrescreve o que já está
+no ambiente.
+
+**Limpeza:** o que a suíte cria durante a execução leva o prefixo `e2e_` no
+nome; o rodapé de `dados-e2e.sql` traz o comando de varredura. Não use
+`db reset`: o projeto é compartilhado entre Preview, Production e a suíte
+([open-questions #25](docs/open-questions.md)).
+
+---
+
 ## Ambientes
 
 | Ambiente | App | Supabase | Gatilho |
