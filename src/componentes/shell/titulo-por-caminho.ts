@@ -57,6 +57,11 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
     titulo: 'Conta e equipe',
     sublegenda: 'Seus dados, equipe e permissões.',
   },
+
+  // Raiz dos outros dois ambientes. Sem entrada aqui elas cairiam no nome do
+  // ambiente ("Artista"), que como `<h1>` de uma tela não diz o que a tela é.
+  [ROTA.ARTISTA]: { titulo: 'Início', sublegenda: 'Sua música e sua carteira.' },
+  [ROTA.CURADOR]: { titulo: 'Fila de avaliações', sublegenda: 'O que está esperando você.' },
 };
 
 /**

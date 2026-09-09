@@ -69,3 +69,13 @@ Estas já estão implícitas na arquitetura, mas ficam explícitas porque são o
 Uma task só está concluída quando **todos** os itens de [`architecture.md §10`](docs/architecture.md#10-definition-of-done) passam. Em resumo: `typecheck`, `lint`, `test` e `build` limpos; migration aplicada com policy de RLS testada; estados de loading, erro e vazio; acessibilidade AA; nenhum número de negócio hardcoded; evento de notificação gravado quando o módulo emite algum; e o cenário correspondente do Guia de Testes R2 coberto por E2E, quando houver.
 
 Não marque uma task como pronta sem rodar os comandos. Se algo falhar, diga o que falhou.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
