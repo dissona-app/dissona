@@ -14,29 +14,19 @@
   border-right: var(--dsn-border-width) solid var(--dsn-nav-divider);
 }
 
+/*
+ * O logotipo branco do protótipo — design-system.md 2.1.1, `height:
+ * clamp(28px,3.8vh,34px)` e padding `6px 12px`. O `padding-bottom` do protótipo
+ * (`clamp(16px,3.2vh,28px)`) é o `gap` do `.aside`, e não se repete aqui.
+ *
+ * `align-self: flex-start` para o link ocupar só a largura do logotipo dentro
+ * da coluna de 260px.
+ */
 .marca {
-  display: flex;
-  align-items: center;
-  gap: var(--dsn-space-5);
-  padding: 0 var(--dsn-space-3);
-  color: var(--dsn-nav-fg);
-  font-size: var(--dsn-text-md);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tight);
-  text-decoration: none;
-}
-
-.marca:hover {
-  color: var(--dsn-nav-fg);
-  text-decoration: none;
-}
-
-.icone {
-  width: 26px;
-  height: 26px;
+  display: inline-flex;
+  align-self: flex-start;
+  padding: var(--dsn-space-3) var(--dsn-space-6);
   border-radius: var(--dsn-radius-md);
-  background: var(--dsn-grad-brand-diag);
-  flex-shrink: 0;
 }
 
 .grupos {

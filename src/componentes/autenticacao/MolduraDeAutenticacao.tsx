@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { Marca } from '@/componentes/base/Marca';
 import { ROTA } from '@/lib/guarda-rota';
 
 import estilos from './MolduraDeAutenticacao.module.css';
@@ -56,8 +57,7 @@ export function MolduraDeAutenticacao({
 
       <main className={estilos.miolo}>
         <Link className={estilos.marca} href={ROTA.HOME}>
-          <span className={estilos.marcaIcone} aria-hidden="true" />
-          Dissona
+          <Marca variante="colorida" altura="clamp(28px, 3vw, 36px)" />
         </Link>
 
         {chamada !== undefined ? (

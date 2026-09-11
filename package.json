@@ -21,6 +21,7 @@
     "test:watch": "vitest --passWithNoTests",
     "e2e": "playwright test",
     "prototipo": "node scripts/extrair-prototipo.mjs",
+    "prototipo:imagens": "node scripts/extrair-imagens-prototipo.mjs",
     "supabase": "supabase",
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",

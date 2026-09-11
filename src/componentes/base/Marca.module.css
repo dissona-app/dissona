@@ -1,0 +1,13 @@
+/*
+ * O logotipo. `height:…; width:auto; display:block; flex:none` — literalmente o
+ * `style` inline das `<img alt="Dissona">` do protótipo.
+ *
+ * A altura vem por `style` do componente; a largura tem de ser `auto` para
+ * sobrescrever o `width` que o `next/image` escreve no atributo a partir das
+ * dimensões do PNG. `!important` não: o atributo perde do CSS module.
+ */
+.marca {
+  width: auto;
+  display: block;
+  flex: none;
+}

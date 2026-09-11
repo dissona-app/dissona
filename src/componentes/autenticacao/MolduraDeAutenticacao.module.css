@@ -65,29 +65,18 @@
   padding: clamp(20px, 2.4vh, 28px) var(--dsn-pad-auth-x);
 }
 
+/*
+ * A marca é o logotipo do protótipo, e só ele — nada de texto ao lado. O
+ * `margin-bottom` é o do protótipo do admin; o do artista é `clamp(4px,1vh,10px)`,
+ * e vale aqui a mesma unificação que o comentário do TSX descreve.
+ *
+ * `inline-flex` para o link não esticar na largura do `.miolo` centrado, o que
+ * daria uma área clicável do tamanho da tela.
+ */
 .marca {
-  display: flex;
-  align-items: center;
-  gap: var(--dsn-space-5);
+  display: inline-flex;
   margin-bottom: clamp(6px, 1.2vh, 12px);
-  color: var(--dsn-ink);
-  font-size: var(--dsn-text-xl);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tighter);
-  text-decoration: none;
-  flex: none;
-}
-
-.marca:hover {
-  color: var(--dsn-ink);
-  text-decoration: none;
-}
-
-.marcaIcone {
-  width: clamp(28px, 3.6vh, 38px);
-  height: clamp(28px, 3.6vh, 38px);
-  border-radius: var(--dsn-radius-xl);
-  background: var(--dsn-grad-brand-diag);
+  border-radius: var(--dsn-radius-md);
   flex: none;
 }
 

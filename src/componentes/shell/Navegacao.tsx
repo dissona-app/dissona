@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
+import { Marca } from '@/componentes/base/Marca';
 import { ROTA } from '@/lib/guarda-rota';
 import type { Papel } from '@/lib/papeis';
 
@@ -25,8 +26,7 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
   return (
     <aside className={estilos.aside}>
       <Link className={estilos.marca} href={ROTA.HOME}>
-        <span className={estilos.icone} aria-hidden="true" />
-        Dissona
+        <Marca variante="branca" altura="clamp(28px, 3.8vh, 34px)" />
       </Link>
 
       <nav className={estilos.grupos} aria-label={`Navegação — ${NOME_AMBIENTE[papel]}`}>

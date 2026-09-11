@@ -26,6 +26,7 @@ Este arquivo é **curto de propósito**. A especificação vive em [`docs/`](doc
 | **O que ainda não foi decidido** — e o que trava qual release | [`docs/open-questions.md`](docs/open-questions.md) |
 | **Perguntas prontas para enviar ao cliente** | [`docs/R2/perguntas-ao-cliente.md`](docs/R2/perguntas-ao-cliente.md) |
 | **Como ler o protótipo** — ele é markup, não imagem | `pnpm prototipo`, e [`scripts/extrair-prototipo.mjs`](scripts/extrair-prototipo.mjs) |
+| **Imagens e ícones do protótipo** — logotipo e favicon, embutidos no manifest de assets | `pnpm prototipo:imagens`, e [`scripts/extrair-imagens-prototipo.mjs`](scripts/extrair-imagens-prototipo.mjs) |
 | **Evidência de RLS por migration** | [`supabase/testes/README.md`](supabase/testes/README.md) |
 
 **Precedência de fontes:** protótipo da R2 > board de discovery > derivação. Quando divergirem, siga o protótipo e registre a divergência em [`docs/prd/07-pendencias-e-divergencias.md`](docs/prd/07-pendencias-e-divergencias.md).
@@ -54,6 +55,7 @@ Estas já estão implícitas na arquitetura, mas ficam explícitas porque são o
 - **Sem DDL fora de migration versionada.** Escreva o `.sql` em `supabase/migrations/` **primeiro**, aplique pelo MCP (`apply_migration`) e renomeie o arquivo com a versão que `list_migrations` devolver. O que é aplicado tem de ser byte a byte o que está no arquivo, nomes de policy incluídos — ver [arquitetura §2.4](docs/architecture.md).
 - **Sem criar tabela de release futura.** A numeração `0001`–`0010` está amarrada à release; nada de R3+ antecipado.
 - **Sem "Submissões"** na interface — o termo é **"Envios"**.
+- **Sem recriar imagem ou ícone.** O protótipo embute os assets — logotipo, favicon — e traz os ícones como SVG inline no markup. Extraia (`pnpm prototipo:imagens`) ou copie o `<path>`; não redesenhe em CSS nem deduza a arte.
 
 ## Convenções que importam
 

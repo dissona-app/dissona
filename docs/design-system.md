@@ -92,6 +92,18 @@ Acentos pontuais: `#2FA565` (dot de "senha forte"/status ativo), `#A8761C` (senh
 
 Cores de terceiros (logos sociais, valor fixo, não tokenizar): `#4285F4` Google, `#1877F2` Facebook, `#FF5500` SoundCloud, `#C13584` Instagram.
 
+#### Logotipo
+
+O protótipo embute a marca como PNG no manifest de assets dos `.html` da R2 — ela **não** é desenhada em CSS, e nenhuma aproximação com gradiente a substitui. `pnpm prototipo:imagens` extrai os três arquivos; o componente é `componentes/base/Marca.tsx`.
+
+| Arquivo | Onde | Medida do protótipo |
+|---|---|---|
+| `public/marca/dissona-horizontal.png` | telas de autenticação, sobre fundo claro | `height:clamp(28px,3vw,36px)` (artista) · `36px` (curador) · `clamp(44px,5.6vh,60px)` (admin) |
+| `public/marca/dissona-horizontal-branco.png` | topo da sidebar, sobre `--dsn-grad-sidebar` | `height:clamp(28px,3.8vh,34px)` — §2.1.1 |
+| `public/marca/dissona-simbolo.png` | `<link rel="icon">`; duplicado em `src/app/icon.png` pela convenção do App Router | — |
+
+Em toda aparição o protótipo usa `width:auto; display:block; flex:none` e `alt="Dissona"` — o logotipo é a única aparição do nome na tela, então precisa ser lido. A altura de autenticação está unificada em `clamp(28px,3vw,36px)`, pelo mesmo motivo que o resto da moldura (§3.3).
+
 #### Gradientes de marca
 
 | Token | Valor |
@@ -99,7 +111,7 @@ Cores de terceiros (logos sociais, valor fixo, não tokenizar): `#4285F4` Google
 | `--dsn-grad-sidebar` | `linear-gradient(180deg,#2D1747 0%,#241239 52%,#1B0D2A 100%)` |
 | `--dsn-grad-auth-bg` | `linear-gradient(180deg,#FDFCFF 0%,#F8F5FD 45%,#F1ECFA 100%)` |
 | `--dsn-grad-brand-h` | `linear-gradient(90deg,#5B2E8F,#7F47DD 55%,#E35336)` — barra/accent de 26×3 px, preenchimento de slider |
-| `--dsn-grad-brand-diag` | `linear-gradient(145deg,#8A4FE3 0%,#5B2E8F 46%,#E35336 100%)` — capa de faixa sem imagem, ícone da marca |
+| `--dsn-grad-brand-diag` | `linear-gradient(145deg,#8A4FE3 0%,#5B2E8F 46%,#E35336 100%)` — capa de faixa sem imagem, avatar sem foto |
 | `--dsn-grad-brand-96` | `linear-gradient(96deg,#5B2E8F 0%,#7F47DD 46%,#E35336 100%)` — faixa de destaque do curador |
 
 #### Overlays
