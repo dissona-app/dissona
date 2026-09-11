@@ -27,6 +27,8 @@ Este arquivo é **curto de propósito**. A especificação vive em [`docs/`](doc
 | **Perguntas prontas para enviar ao cliente** | [`docs/R2/perguntas-ao-cliente.md`](docs/R2/perguntas-ao-cliente.md) |
 | **Como ler o protótipo** — ele é markup, não imagem | `pnpm prototipo`, e [`scripts/extrair-prototipo.mjs`](scripts/extrair-prototipo.mjs) |
 | **Imagens e ícones do protótipo** — logotipo e favicon, embutidos no manifest de assets | `pnpm prototipo:imagens`, e [`scripts/extrair-imagens-prototipo.mjs`](scripts/extrair-imagens-prototipo.mjs) |
+| **A fonte (Inter)** — os 7 woff2 e as regras `@font-face`, também embutidos | `pnpm prototipo:fontes`, e [`scripts/extrair-fontes-prototipo.mjs`](scripts/extrair-fontes-prototipo.mjs) |
+| **Paridade visual com o protótipo** — abre as duas telas e compara a tipografia | [`e2e/prototipo/`](e2e/prototipo/) e [`e2e/apoio/prototipo.ts`](e2e/apoio/prototipo.ts) |
 | **Evidência de RLS por migration** | [`supabase/testes/README.md`](supabase/testes/README.md) |
 
 **Precedência de fontes:** protótipo da R2 > board de discovery > derivação. Quando divergirem, siga o protótipo e registre a divergência em [`docs/prd/07-pendencias-e-divergencias.md`](docs/prd/07-pendencias-e-divergencias.md).

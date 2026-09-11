@@ -45,9 +45,9 @@ function ComoFunciona() {
   return (
     <>
       <div className={estilos.asideCabecalho}>
+        <span className={estilos.asideOverline}>{CADASTRAR.comoFunciona.overline}</span>
         {/* `<h2>`: o `<h1>` da página é o "Criar conta" do card. */}
         <h2 className={estilos.asideTitulo}>{CADASTRAR.comoFunciona.titulo}</h2>
-        <p className={estilos.asideSubtitulo}>{CADASTRAR.comoFunciona.subtitulo}</p>
       </div>
 
       <ol className={estilos.passos}>
@@ -90,6 +90,7 @@ function BlocoSocial() {
 
       <BotoesSociais
         acao={entrarComProvedor}
+        tamanho="md"
         rotulos={{
           google: CADASTRAR.google,
           facebook: CADASTRAR.facebook,

@@ -3,6 +3,12 @@
  * Os valores vêm dos protótipos da R2; nada de novo é inventado aqui.
  */
 
+/*
+ * A Inter vem antes dos tokens porque `--dsn-font-sans` a nomeia primeiro. Sem
+ * este `@import`, o navegador cai no fallback do sistema e os pesos 700/800
+ * dos títulos viram Segoe UI Black no Windows — ver `estilos/fontes.css`.
+ */
+@import './fontes.css';
 @import './tokens.css';
 
 * {

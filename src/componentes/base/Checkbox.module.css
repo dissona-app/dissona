@@ -65,10 +65,12 @@
   display: block;
 }
 
+/* 14 px e `ink-700`, os literais do aceite de LGPD no protótipo do cadastro —
+   a única tela do R2 que tem checkbox com rótulo longo. */
 .texto {
-  font-size: var(--dsn-text-xs);
-  line-height: 1.5;
-  color: var(--dsn-ink);
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-700);
 }
 
 .erro {

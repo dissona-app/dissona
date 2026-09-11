@@ -14,6 +14,15 @@ export type PropsBotoesSociais = {
   };
   /** "Entrar com" no login, "Criar conta com" no cadastro — vai no `title`. */
   readonly verbo: string;
+  /**
+   * Corpo do rótulo: `sm` (13 px) no login, `md` (14 px) no cadastro.
+   *
+   * Os dois são literais do protótipo, que compõe estes botões maiores na tela
+   * de cadastro. A diferença acompanha o papel deles em cada tela: no login o
+   * social é o atalho e fica compacto acima do formulário; no cadastro é a
+   * alternativa, e vem no corpo do resto da tela.
+   */
+  readonly tamanho?: 'sm' | 'md';
 };
 
 /**
@@ -33,7 +42,14 @@ export type PropsBotoesSociais = {
  * estado de cliente: o clique sai daqui direto para o domínio do provedor, e
  * não há nada a renderizar no meio. Funciona sem JavaScript.
  */
-export function BotoesSociais({ acao, proximo, rotulos, verbo }: PropsBotoesSociais) {
+export function BotoesSociais({
+  acao,
+  proximo,
+  rotulos,
+  verbo,
+  tamanho = 'sm',
+}: PropsBotoesSociais) {
+  const classeDoBotao = `${estilos.provedor} ${tamanho === 'md' ? estilos.provedorMd : ''}`;
   const provedores = [
     { chave: 'google', rotulo: rotulos.google, sigla: 'G', cor: '#4285F4', ligado: true },
     { chave: 'facebook', rotulo: rotulos.facebook, sigla: 'f', cor: '#1877F2', ligado: true },
@@ -52,14 +68,8 @@ export function BotoesSociais({ acao, proximo, rotulos, verbo }: PropsBotoesSoci
         provedor.ligado ? (
           <form key={provedor.chave} action={acao} className={estilos.formulario}>
             <input type="hidden" name="provedor" value={provedor.chave} />
-            {proximo === undefined ? null : (
-              <input type="hidden" name="proximo" value={proximo} />
-            )}
-            <button
-              type="submit"
-              className={estilos.provedor}
-              title={`${verbo} ${provedor.rotulo}`}
-            >
+            {proximo === undefined ? null : <input type="hidden" name="proximo" value={proximo} />}
+            <button type="submit" className={classeDoBotao} title={`${verbo} ${provedor.rotulo}`}>
               <span className={estilos.sigla} style={{ color: provedor.cor }}>
                 {provedor.sigla}
               </span>
@@ -70,7 +80,7 @@ export function BotoesSociais({ acao, proximo, rotulos, verbo }: PropsBotoesSoci
           <button
             key={provedor.chave}
             type="button"
-            className={estilos.provedor}
+            className={classeDoBotao}
             disabled
             title={`${provedor.rotulo} ainda não está disponível neste ambiente`}
           >

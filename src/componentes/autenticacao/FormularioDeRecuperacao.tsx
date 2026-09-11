@@ -108,7 +108,11 @@ export function FormularioDeRecuperacao({
         <span className={estilos.overline}>
           {enviado ? SENHA.enviadoOverline : SENHA.recuperarOverline}
         </span>
-        <h1 className={estilos.titulo}>{enviado ? SENHA.enviadoTitulo : SENHA.recuperarTitulo}</h1>
+        {/* O título da confirmação neutra é uma frase, e o protótipo o compõe
+            num degrau abaixo do nome de tela — ver `.tituloFrase` no CSS. */}
+        <h1 className={enviado ? estilos.tituloFrase : estilos.titulo}>
+          {enviado ? SENHA.enviadoTitulo : SENHA.recuperarTitulo}
+        </h1>
         <p className={estilos.texto}>{enviado ? SENHA.enviadoTexto : SENHA.recuperarTexto}</p>
         {enviado ? null : <p className={estilos.nota}>{SENHA.recuperarNota}</p>}
       </div>

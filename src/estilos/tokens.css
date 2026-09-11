@@ -154,7 +154,18 @@
 
   --dsn-leading-none: 1;
   --dsn-leading-hero: 1.04;
+  /* H1 de tela de marca do admin e da verificação de e-mail. */
+  --dsn-leading-display: 1.06;
   --dsn-leading-title: 1.1;
+  /*
+   * `1.14` e `1.16` são os dois `line-height` que o protótipo reserva para
+   * título que **quebra**: a frase inteira como título ("Se este e-mail
+   * estiver cadastrado…", "Este link expirou ou já foi usado") em `1.14`, e o
+   * título de painel de apoio em `1.16`. Mais folga que `1.1` porque em duas
+   * linhas o `1.1` cola as linhas uma na outra.
+   */
+  --dsn-leading-wrap: 1.14;
+  --dsn-leading-lead: 1.16;
   --dsn-leading-snug: 1.4;
   --dsn-leading-dense: 1.45;
   --dsn-leading-normal: 1.5;

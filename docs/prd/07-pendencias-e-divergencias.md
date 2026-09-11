@@ -317,3 +317,58 @@ O uso comercial também é discricionário: o que eles proíbem é *"in-app purc
 which allow access to content or features already available via the SoundCloud
 platform"*, e Claves compram curadoria, que não existe lá dentro — o argumento é
 bom, mas a decisão de revogar acesso é deles.
+
+---
+
+## Divergências de composição levantadas pela comparação visual · 2026-09-11
+
+A suíte `e2e/prototipo/telas-de-autenticacao.spec.ts` abre cada tela de
+autenticação no protótipo e na aplicação, no mesmo navegador, e compara a
+tipografia de todo texto que existe nos dois lados. O que ela achou e não foi
+corrigido está aqui; o resto virou correção de CSS no mesmo commit.
+
+### 1. A tela de verificação de e-mail é outra composição no protótipo
+
+| Fonte | O que faz |
+|---|---|
+| Protótipo **Artista**, verificação | bloco de **560 px alinhado à esquerda**, sobre **fundo branco**, com ícone de envelope, `<h1>` de **40 px**/`1.06`, texto de apoio de 16 px e **sem rodapé** de Termos/Privacidade. Os dois botões ficam lado a lado, com largura de conteúdo |
+| Aplicação, `/verificar-email` | cartão de 436 px **centralizado** sobre o gradiente de auth, `<h1>` de 24 px, botões em bloco inteiro, rodapé da moldura |
+
+A aplicação unificou a tela na `MolduraDeAutenticacao` das outras telas de auth
+— a mesma unificação que o protótipo pediu no `gap` do cartão (comentário em
+`MolduraDeAutenticacao.tsx`). O efeito colateral é visível: em 436 px o título
+quebra em *"Confirme seu e-/mail para continuar"*.
+
+**Não decidido por suposição:** ou o protótipo desenhou uma moldura larga que
+vale para mais telas (e a de confirmação neutra e a de senha redefinida também
+a querem), ou a unificação está certa e o protótipo é que tem uma tela fora do
+padrão. É decisão de design, não de implementação.
+
+**Enquanto não se decide:** a divergência está declarada como exceção no
+cenário de verificação do spec, com este parágrafo como motivo. O corpo do
+título continua o da moldura; o resto da tipografia da tela já bate.
+
+### 2. Onboarding (1.5) e seleção de perfil (1.4) fora da comparação
+
+As duas exigem sessão, e a suíte de paridade abre as telas sem autenticar —
+então ainda não há cenário para elas. A leitura manual do protótipo mostra pelo
+menos duas divergências a confirmar quando entrarem:
+
+- o `<h1>` do onboarding é o **hero** (`clamp(31px,4.4vh,42px)`/`1.04`), e a
+  aplicação usa `clamp(24px,3.2vh,30px)`;
+- o contador "Passo N de 4" é `ink-500` no protótipo e `purple-600` na
+  aplicação — o mesmo erro de cor que as outras telas de auth tinham.
+
+### 3. O protótipo se contradiz em dois detalhes de tipografia
+
+Nenhum dos dois é bug da aplicação; ficam registrados para não serem
+"corrigidos" de novo no futuro:
+
+- **`letter-spacing` de rótulo de botão.** A tela 1 usa `-0.01em`, e é o valor
+  que o Design System registra (§1.2). As telas de verificação e de link
+  inválido não põem `letter-spacing` nenhum. A aplicação segue o token nas
+  duas, e o spec declara a exceção.
+- **Corpo do botão social.** 13 px na tela 1 e 14 px na tela 1.1, no mesmo
+  componente. Aqui a aplicação **segue o protótipo tela por tela**, pelo prop
+  `tamanho` de `BotoesSociais` — a diferença acompanha o papel do social em
+  cada tela (atalho no login, alternativa no cadastro).

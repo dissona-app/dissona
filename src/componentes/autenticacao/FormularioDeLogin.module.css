@@ -21,7 +21,7 @@
 .titulo {
   margin: 0;
   font-size: clamp(26px, 3.4vh, 32px);
-  line-height: 1.06;
+  line-height: var(--dsn-leading-display);
   font-weight: var(--dsn-weight-black);
   letter-spacing: var(--dsn-tracking-tightest);
 }

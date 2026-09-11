@@ -11,25 +11,41 @@
   font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
-  color: var(--dsn-purple-600);
+  color: var(--dsn-ink-500);
   text-transform: uppercase;
 }
 
-/* Menor que o título das outras telas de auth: na confirmação neutra o título
-   É a frase inteira ("Se este e-mail estiver cadastrado…"), e no tamanho de
-   hero ela ocuparia o card todo. */
+/*
+ * Dois títulos, e não um menor para os dois — é o que o protótipo faz.
+ *
+ * `.titulo` é o nome da tela ("Esqueci minha senha"), no H1 de fluxo. Na
+ * confirmação neutra o título É a frase inteira ("Se este e-mail estiver
+ * cadastrado…"), e aí o protótipo desce um degrau na escala e abre o
+ * `line-height`, porque o texto quebra em duas ou três linhas. Encolher os dois
+ * para caber o segundo — que foi o que estava aqui — deixava o primeiro menor
+ * que o protótipo em toda visita à tela.
+ */
 .titulo {
   margin: 0;
-  font-size: clamp(20px, 2.6vh, 24px);
+  font-size: var(--dsn-text-2xl);
   line-height: var(--dsn-leading-title);
   font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tighter);
+  letter-spacing: var(--dsn-tracking-tightest);
   text-wrap: balance;
+}
+
+.tituloFrase {
+  margin: 0;
+  font-size: var(--dsn-text-xl);
+  line-height: var(--dsn-leading-wrap);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: pretty;
 }
 
 .texto {
   margin: 0;
-  font-size: var(--dsn-text-sm);
+  font-size: var(--dsn-text-base);
   line-height: var(--dsn-leading-body);
   color: var(--dsn-ink-500);
   text-wrap: pretty;
@@ -52,13 +68,15 @@
   display: contents;
 }
 
+/* 15 px, e não o 13 px de nota de rodapé: no protótipo esta linha é a saída da
+   tela ("Lembrou a senha? Voltar para o Login"), no mesmo corpo do texto. */
 .rodape {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--dsn-space-3);
+  gap: var(--dsn-space-4);
   margin: 0;
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-base);
   color: var(--dsn-ink-500);
 }
 

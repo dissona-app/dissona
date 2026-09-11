@@ -130,6 +130,10 @@ Em toda aparição o protótipo usa `width:auto; display:block; flex:none` e `al
 
 **Família:** `Inter, system-ui, sans-serif` — Inter carregada localmente via `@font-face` woff2 (7 arquivos, `font-display: swap`, subsets latin/latin-ext/cyrillic/greek/vietnamese). `-webkit-font-smoothing: antialiased` no `body`.
 
+**Na implementação:** os mesmos 7 woff2 são extraídos do manifest de assets dos protótipos por `pnpm prototipo:fontes` para `public/fontes/`, e as regras vão para `src/estilos/fontes.css` (arquivo gerado, importado por `global.css`). Os arquivos são **variáveis** no eixo `wght`, então uma regra por subset com `font-weight: 400 800` cobre as 35 declarações do protótipo.
+
+Nomear `Inter` em `--dsn-font-sans` **não basta** — sem `@font-face` o navegador vai para o fallback, e `font-weight: 800` resolve para Segoe UI Black no Windows, SF no macOS e o que houver no CI. A consequência é tipografia diferente por máquina, mais grossa que a do protótipo nos títulos. `e2e/prototipo/telas-de-autenticacao.spec.ts` trava isso comparando a fonte **renderizada** (via CDP), e não a declarada.
+
 **Pesos em uso:** 400, 500, 600, 700, 800. O peso dominante é **600** (437 ocorrências) — a UI é semibold por padrão, não regular.
 
 #### Escala
@@ -154,6 +158,8 @@ Em toda aparição o protótipo usa `width:auto; display:block; flex:none` e `al
 |---|---|
 | **Display / H1 hero** | `clamp(31px,4.4vh,42px)` · 800 · `line-height:1.04` · `letter-spacing:-0.035em` · `text-wrap:pretty` |
 | **H1 de fluxo** | `clamp(24px,3.4vh,30px)` · 800 · `1.1` · `-0.035em` |
+| **H1 de fluxo · título-frase** | `clamp(22px,3vh,27px)` · 800 · `1.14` · `-0.035em` · `text-wrap:pretty` — quando o título **é** a frase ("Se este e-mail estiver cadastrado…", "Este link expirou ou já foi usado") e quebra em duas linhas |
+| **Título de painel de apoio** | `clamp(17px,2.1vh,20px)` · 700 · `1.16` · `-0.025em` · `text-wrap:pretty` — o "Como funciona" do cadastro (1.1) |
 | **H1 de app (topbar)** | `24px` · 700 · `-0.025em` |
 | **H2 de seção** | `32px` · 700 · `-0.03em` |
 | **Título de card** | `15px` · 600 · `-0.01em` |

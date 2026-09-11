@@ -218,8 +218,14 @@ export const CADASTRAR = {
 
   /** Aside "Como funciona", ao lado do formulário. */
   comoFunciona: {
-    titulo: 'Como funciona',
-    subtitulo: 'Envie a faixa. Receba um parecer que você pode citar.',
+    /**
+     * "Como funciona" é o **overline** do painel, e não o título dele — é a
+     * frase seguinte que o protótipo compõe como `<h2>`. Trocar os dois de
+     * papel (o que estava aqui) dava um título de 16 px onde o protótipo tem
+     * um rótulo de 11 px, e um parágrafo de 13 px onde ele tem o título.
+     */
+    overline: 'Como funciona',
+    titulo: 'Envie a faixa. Receba um parecer que você pode citar.',
     passos: [
       {
         numero: '01',
@@ -242,8 +248,7 @@ export const CADASTRAR = {
         texto: 'Playlist, post ou matéria, a partir do parecer.',
       },
     ],
-    nota:
-      'Seus dados servem só para operar a curadoria. Nada de venda de base ou publicidade dirigida.',
+    nota: 'Seus dados servem só para operar a curadoria. Nada de venda de base ou publicidade dirigida.',
   },
 } as const;
 
@@ -264,7 +269,8 @@ export const VERIFICAR_EMAIL = {
    * artista vai direto a ele, curador chega nele depois do wizard.
    */
   textoAntes: 'Enviamos um link de verificação para ',
-  textoDepois: '. Ele vale por 24 horas. Depois de confirmar, um tour rápido mostra como a Dissona funciona.',
+  textoDepois:
+    '. Ele vale por 24 horas. Depois de confirmar, um tour rápido mostra como a Dissona funciona.',
   /** Quando não há e-mail na URL — o protótipo cai para o mesmo genérico. */
   emailDesconhecido: 'seu e-mail',
 
@@ -478,11 +484,11 @@ export const SELECAO_DE_PERFIL = {
   curadorTexto: 'Quero avaliar faixas com método e ser remunerado por isso.',
 
   /** A nota que o PRD 1.4 pede visível: a escolha não é definitiva. */
-  nota:
-    'Você pode ativar o outro papel depois, em Conta e configurações — sem criar outra conta.',
+  nota: 'Você pode ativar o outro papel depois, em Conta e configurações — sem criar outra conta.',
 
   /** O que o curador vê antes de escolher, porque o caminho dele é mais longo. */
-  notaCurador: 'O cadastro de curador tem oito perguntas curtas, e você pode retomar de onde parou.',
+  notaCurador:
+    'O cadastro de curador tem oito perguntas curtas, e você pode retomar de onde parou.',
 
   enviar: 'Continuar',
   enviando: 'Preparando…',

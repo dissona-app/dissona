@@ -15,14 +15,14 @@
   font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
-  color: var(--dsn-purple-600);
+  color: var(--dsn-ink-500);
   text-transform: uppercase;
 }
 
 .titulo {
   margin: 0;
   font-size: clamp(26px, 3.4vh, 32px);
-  line-height: 1.06;
+  line-height: var(--dsn-leading-display);
   font-weight: var(--dsn-weight-black);
   letter-spacing: var(--dsn-tracking-tightest);
 }
@@ -95,13 +95,19 @@
   text-decoration: underline;
 }
 
+/*
+ * Alinhada à esquerda e separada por um traço, e não centralizada como a do
+ * login: no protótipo esta linha fecha o card do cadastro depois do bloco
+ * social, e o traço é o que a separa dele.
+ */
 .alternativa {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--dsn-space-3);
+  gap: var(--dsn-space-4);
   margin: 0;
-  font-size: var(--dsn-text-xs);
+  padding-top: clamp(8px, 1.2vh, 14px);
+  border-top: var(--dsn-border-width) solid var(--dsn-border);
+  font-size: var(--dsn-text-sm);
   color: var(--dsn-ink-500);
 }
 

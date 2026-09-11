@@ -33,6 +33,11 @@
     background var(--dsn-duration-base);
 }
 
+/* Tela de cadastro — ver o `tamanho` em `BotoesSociais.tsx`. */
+.provedorMd {
+  font-size: var(--dsn-text-sm);
+}
+
 .provedor:hover:not(:disabled) {
   border-color: var(--dsn-purple-600);
   background: var(--dsn-purple-050);

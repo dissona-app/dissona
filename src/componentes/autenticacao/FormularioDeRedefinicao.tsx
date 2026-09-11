@@ -89,7 +89,7 @@ export function FormularioDeRedefinicao({
       <>
         <div className={estilos.cabecalho}>
           <span className={estilos.overlineAlerta}>{SENHA.invalidoOverline}</span>
-          <h1 className={estilos.titulo}>{SENHA.invalidoTitulo}</h1>
+          <h1 className={estilos.tituloFrase}>{SENHA.invalidoTitulo}</h1>
           <p className={estilos.texto}>{SENHA.invalidoTexto}</p>
         </div>
 
