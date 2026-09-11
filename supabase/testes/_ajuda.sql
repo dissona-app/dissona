@@ -30,17 +30,18 @@ begin
   end if;
 end $$;
 
--- A RLS nega de TRÊS formas diferentes, e cada uma precisa do seu helper —
--- um helper só daria falso positivo em dois terços dos casos:
+-- A negação chega de QUATRO formas diferentes, e cada uma precisa do seu
+-- helper — um helper só daria falso positivo em três quartos dos casos:
 --
 --   1. `select` numa linha excluída pelo `using`  -> zero linhas
 --   2. `update`/`delete` numa linha excluída pelo `using` -> zero linhas
 --      AFETADAS, e **nenhum erro**: a linha simplesmente não existe para o
 --      comando. É a forma mais fácil de confundir com sucesso.
 --   3. `insert`/`update` que viola o `with check`  -> 42501
+--   4. um `raise` de trigger ou de RPC nossa, na faixa privada `DSnnn`
 --
--- Por isso `afirmar_invisivel` (1), `afirmar_sem_efeito` (2) e
--- `afirmar_bloqueado` (3).
+-- Por isso `afirmar_invisivel` (1), `afirmar_sem_efeito` (2),
+-- `afirmar_bloqueado` (3) e `afirmar_sqlstate` (4, logo abaixo).
 create function pg_temp.afirmar_invisivel(p_sql text, p_rotulo text) returns void
 language plpgsql as $$
 declare
@@ -90,6 +91,26 @@ declare
 begin
   execute format('select count(*) from (%s) as _r', p_sql) into v_n;
   return v_n;
+end $$;
+
+-- Caso 4: a negação vem de um `raise` das nossas funções, na faixa privada
+-- `DSnnn`. `afirmar_bloqueado` não serve: ele lista as condições padrão do
+-- Postgres por nome, e um `sqlstate` customizado passa por ele e aborta a
+-- suíte. Este afirma o código exato, que é mais forte — prova **qual** guarda
+-- negou, e não apenas que algo negou.
+create function pg_temp.afirmar_sqlstate(p_sql text, p_sqlstate text, p_rotulo text)
+returns void
+language plpgsql as $$
+begin
+  execute p_sql;
+  raise exception 'FALHOU: % (passou, e devia ter negado com %)', p_rotulo, p_sqlstate
+    using errcode = 'TS001';
+exception
+  when sqlstate 'TS001' then raise;
+  when others then
+    if sqlstate = p_sqlstate then return; end if;
+    raise exception 'FALHOU: % (negou com % em vez de %)', p_rotulo, sqlstate, p_sqlstate
+      using errcode = 'TS001';
 end $$;
 
 -- ------------------------------------------------------------------- atores

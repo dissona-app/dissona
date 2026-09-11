@@ -23,6 +23,21 @@ export type FalhaDeAcao = {
   readonly codigo: CodigoErro;
   /** Nome do campo do formulário, quando o erro é de um campo. */
   readonly campo?: string;
+  /**
+   * Um código de motivo **por campo**, quando mais de um falhou de uma vez.
+   *
+   * Existe porque `campo` sozinho não serve a formulário grande. O cadastro
+   * tem cinco campos e o protótipo mostra os erros de todos juntos ao enviar;
+   * devolver só o primeiro faria a pessoa corrigir um, enviar, descobrir o
+   * segundo, e assim por diante.
+   *
+   * A alternativa seria validar no cliente, e ela é pior: passaria a haver
+   * dois lugares decidindo o que é uma senha válida, e a mensagem divergiria
+   * entre o caminho com JavaScript e o sem.
+   *
+   * Os valores são **códigos**, nunca texto: a tradução é da View.
+   */
+  readonly campos?: Readonly<Record<string, string>>;
   readonly detalhes?: DetalhesErro;
 };
 
@@ -43,6 +58,14 @@ export function falha(codigo: CodigoErro, campo?: string, detalhes?: DetalhesErr
     ...(campo === undefined ? {} : { campo }),
     ...(detalhes === undefined ? {} : { detalhes }),
   };
+}
+
+/** Falha de validação com um motivo por campo — formulários de vários campos. */
+export function falhaDeCampos(
+  codigo: CodigoErro,
+  campos: Readonly<Record<string, string>>,
+): FalhaDeAcao {
+  return { ok: false, codigo, campos };
 }
 
 /**

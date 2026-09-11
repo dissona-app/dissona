@@ -2,7 +2,24 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import estilos from './Botao.module.css';
 
-export type VarianteBotao = 'primario' | 'secundario' | 'ghost' | 'neutro' | 'destrutivo';
+export type VarianteBotao =
+  | 'primario'
+  | 'secundario'
+  | 'ghost'
+  | 'neutro'
+  /** Texto em vermelho, sem caixa — "Remover" numa linha de lista. */
+  | 'destrutivo'
+  /**
+   * Vermelho sólido. É o botão que **executa** a ação destrutiva dentro do
+   * diálogo de confirmação ("Excluir minha conta"), e o único vermelho cheio do
+   * protótipo — fora dele, vermelho é aviso, não convite.
+   */
+  | 'perigo'
+  /**
+   * Vermelho com contorno. É o que **abre** a confirmação ("Excluir conta"):
+   * diz que a consequência é grave sem ter o peso de um primário.
+   */
+  | 'perigoContorno';
 export type TamanhoBotao = 'md' | 'denso' | 'sm';
 
 export type PropsBotao = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & {
@@ -25,6 +42,8 @@ const CLASSE_VARIANTE: Record<VarianteBotao, string> = {
   ghost: estilos.ghost ?? '',
   neutro: estilos.neutro ?? '',
   destrutivo: estilos.destrutivo ?? '',
+  perigo: estilos.perigo ?? '',
+  perigoContorno: estilos.perigoContorno ?? '',
 };
 
 /** Variantes sem caixa não recebem padding de tamanho. */

@@ -1,0 +1,114 @@
+/* Curso de curadoria — tela 12.5, Bronze aprovado. */
+
+.curso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+  padding: var(--dsn-space-7);
+  background: var(--dsn-surface-alt);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-xl);
+}
+
+.cursoCabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--dsn-space-4) var(--dsn-space-6);
+}
+
+.cursoTitulo {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+.cursoResumo {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.cursoSelo {
+  margin-left: auto;
+  font-size: var(--dsn-text-4xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-badge);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+  background: var(--dsn-neutral-bg);
+  border-radius: var(--dsn-radius-full);
+  padding: 3px var(--dsn-space-5);
+}
+
+.modulos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.modulo {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--dsn-space-6);
+  align-items: baseline;
+}
+
+.moduloNumero {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-badge);
+  color: var(--dsn-purple-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.moduloTextos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.moduloTitulo {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+.moduloDescricao {
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.moduloDuracao {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+/* Desabilitado e não escondido: o curso existe no produto, e e o conteudo dele
+   que ainda nao. O `title` diz isso. */
+.cursoBotao {
+  appearance: none;
+  font-family: inherit;
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 12px var(--dsn-space-8);
+  opacity: 0.52;
+  cursor: not-allowed;
+}

@@ -27,7 +27,7 @@ Detalhamento e perguntas objetivas em [open-questions](open-questions.md).
 
 ### Travam a R1
 
-- [ ] **Disponibilidade da API do SoundCloud** para OAuth — não é provider nativo do Supabase ([#9](open-questions.md#9-api-do-soundcloud-para-oauth))
+- [ ] **SoundCloud: o Artist Pro pago e o e-mail que a API não dá** — a disponibilidade foi confirmada em 2026-09-10 (keys self-serve desde 18/05/2026, e o Supabase agora tem custom OAuth provider). O que trava é a assinatura e a decisão de onde colher o e-mail ([#9](open-questions.md#9-soundcloud-assinar-o-artist-pro-e-viver-sem-o-e-mail))
 - [ ] **Provedor de e-mail transacional e domínio de envio** ([#10](open-questions.md#10-provedor-de-e-mail-transacional))
 - [x] **Matriz de permissões por papel do admin** ([#11](open-questions.md#11-matriz-de-permissões-do-admin)) — definida pelo protótipo do Admin da R2 e semeada na `0003`
 - [ ] **Ativar o 2º papel exige aprovação da curadoria?** ([#12](open-questions.md#12-ativação-do-2º-papel-exige-aprovação))
@@ -78,8 +78,9 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [x] Configurar Playwright e estrutura de `e2e` — 16 cenários do guia como `skip`, mais 9 testes da R0
 - [x] Repositório conectado à Vercel — há deploy em `https://dissona.vercel.app`
 - [ ] ⚠️ **Publicar `main`.** Em 2026-09-08 produção devolvia **500 em `/` e `/termos`**, e a causa não é código: o commit `5065f1a`, que fez o middleware degradar em vez de cair, **nunca foi publicado**. O branch local está à frente de `origin/main`, e o deploy roda um build anterior ao conserto. `NEXT_PUBLIC_*` é embutida no build, então acrescentar env var não conserta um deploy já feito — é preciso republicar
-- [ ] Configurar as env vars da Vercel nos escopos Production e Preview — conferir depois do push, porque o 500 mascara o diagnóstico
+- [ ] Configurar as env vars da Vercel nos escopos Production e Preview — conferir depois do push, porque o 500 mascara o diagnóstico. Agora inclui `SUPABASE_SERVICE_ROLE_KEY`
 - [ ] Cadastrar as Redirect URLs de Preview e produção no Supabase Auth — **necessário antes da verificação de e-mail** (fatia de autenticação): sem elas o link do e-mail sai quebrado
+- [ ] **Configuração do Auth no dashboard**, que a fatia de autenticação depende e não é versionável: confirmação de e-mail ligada, templates reescritos para `{{ .TokenHash }}` apontando para `/api/auth/confirmar`, credenciais de Google e Facebook, e proteção contra senha vazada (o único achado acionável do `get_advisors`)
 - [x] Criar páginas públicas de Termos de uso e Política de privacidade — estrutura pronta, **texto pendente do jurídico**
 
 ---
@@ -96,69 +97,105 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [x] Migration `0004` — tabela `configuracao` e seed de **32** chaves, com o que o protótipo da R2 decidiu
 - [x] Migration `0005` — `notificacao`, `evento_notificacao` (**seed completo: 42 eventos das cinco releases**), `preferencia_notificacao`
 - [x] Função `registrar_notificacao`, usada por todos os módulos — nenhum `insert` direto. Revogada até de `authenticated`
-- [ ] `servicoNotificacao` no código, com canal in-app e e-mail
+- [x] Migration `0001c` — `perfil.onboarding_visto_em`, `ultimo_ambiente` e `senha_alterada_em`, mais o trigger que fecha um furo real: a policy de update liberava a **linha** do dono e RLS não filtra coluna, então uma conta `bloqueada` se reativava sozinha
+- [x] Migration `0002b` — `ler_contexto_sessao` passa a devolver `situacao`, `situacao_curador`, `onboarding_visto` e `ultimo_ambiente`, ainda numa ida só
+- [x] Migration `0002c` — os seis tipos de credencial do protótipo (a `0002` tinha quatro, e três caixas do wizard não tinham onde entrar), `anexo_caminho`, e a RPC `concluir_cadastro_curador`: sem ela a classificação de 12.4 era **impossível**, porque o trigger de autopromoção recusa a escrita do próprio curador e `security definer` não contorna
+- [x] Migrations `0003b` e `0003c` — `criar_convite_admin`, e `citext` comparado com `operator(extensions.=)`: com `search_path` vazio o `=` de `citext` fica invisível e o Postgres compara como `text`, em silêncio. Era bug latente em `aceitar_convite_admin` desde a `0003`
+- [x] `servicoNotificacao` no código, canal in-app — grava por `registrar_notificacao` pela service role, e **não lança**: um aviso interno não gravado não é razão para o cadastro de alguém falhar. O **envio** de e-mail depende do provedor ([#10](open-questions.md#10-provedor-de-e-mail-transacional)); a linha já nasce com `email` em `canais` e `enviada_email_em` nulo, esperando o consumidor
 
 ### Autenticação (1 / 11)
 - [x] Tela de login com e-mail e senha (1) — fiel ao protótipo do artista, com os três provedores sociais visíveis e desabilitados
 - [x] Login administrativo próprio (19), **fora do shell do painel** — a divisão de `(admin)` em `(acesso)` e `(painel)` fecha o bug que a R0 deixou anotado
 - [x] Conta autenticada sem papel `admin` não entra na área administrativa: a sessão é desfeita e o banner é "Conta sem acesso administrativo"
-- [ ] Login social com Google
-- [ ] Login social com Facebook
-- [ ] Login social com SoundCloud (OAuth próprio) — *bloqueado por [#9](open-questions.md#9-api-do-soundcloud-para-oauth)*
-- [ ] Tela de cadastro com aceite de Termos e LGPD (1.1)
-- [ ] Fluxo de verificação de e-mail com link de 24h
-- [ ] Tela de recuperação de senha com resposta neutra (1.2)
-- [ ] Tela de redefinição de senha com token de 60min e uso único (1.3)
-- [ ] Tela de seleção de perfil artista/curador (1.4)
-- [ ] Roteamento pós-login por papel e por primeiro acesso
-- [ ] Onboarding do artista em 4 passos (1.5)
-- [ ] Onboarding do curador em 4 passos (1.5)
-- [ ] Onboarding do admin em versão enxuta (1.5)
-- [ ] Reabrir o onboarding pelo menu de ajuda ("Rever onboarding")
+- [x] Login social com Google — provider nativo, `/api/auth/callback` e a confirmação de aceite
+- [x] Login social com Facebook — mesmo caminho
+- [x] Login social com SoundCloud — **custom OAuth provider** do Supabase, e não um fluxo OAuth2 escrito à mão. Três peças: a Edge Function `soundcloud-userinfo`, que traduz o `/me` porque o GoTrue **exige `sub`** e o `attribute_mapping` não alcança o `urn`; a migration `0002e`, sem a qual conta sem e-mail derruba o cadastro dentro do trigger; e o e-mail colhido em `/cadastrar/confirmar`, que a API deles não entrega. Falta só criar o provider no dashboard e ligar `SOUNDCLOUD_LIGADO`
+- [x] **O e-mail que o SoundCloud não dá** — a tela de confirmação ganhou um segundo modo: com Google e Facebook o endereço é conferido, com SoundCloud é pedido e gravado por `updateUser`. Fica pendente de confirmação, e a conta **navega assim mesmo** — a decisão está na [#9](open-questions.md#9-soundcloud-assinar-o-artist-pro-e-viver-sem-o-e-mail). O aviso é a própria `/verificar-email`, que deixou de expulsar quem tem sessão, mais a marca no menu da conta
+- [x] **O aceite de termos que o social não colhe** — um provider nativo não permite "confirmar antes de criar": a conta nasce no callback e ninguém aceitou nada. `/cadastrar/confirmar` colhe o aceite depois, e a `0002d` põe `aceite_termos` no contexto de sessão para que a guarda devolva a pessoa para lá enquanto ele faltar. Sem isso ficaria conta ativa sem o aceite que a LGPD exige (RF-010)
+- [x] **Conta bloqueada não navega** — o banner existia na copy desde a R0 e nada o disparava. Agora a ação de login desfaz a sessão, e o middleware ejeta quem foi bloqueado **durante** a navegação, com o motivo na URL
+- [x] **Conta desativada reativa ao entrar** — os 30 dias de reversão da LGPD só valem se o acesso reverter, e a guarda de rota deixa `desativada` navegar por isso
+- [x] Camada de serviço em `modulos/autenticacao` — a convenção `acoes → servico → repositorio` estava quebrada: as duas ações de login chamavam o repositório direto, com a regra duplicada
+- [x] Tela de cadastro com aceite de Termos e LGPD (1.1) — medidor de força (§2.2.9), `Checkbox` no Design System, e todos os erros de campo de uma vez
+- [x] Fluxo de verificação de e-mail com link de 24h — `/verificar-email` com reenvio e `/api/auth/confirmar` trocando `token_hash` por sessão
+- [x] Tela de recuperação de senha com resposta neutra (1.2) — a resposta é idêntica para e-mail cadastrado e não cadastrado, inclusive no estado da tela; só o estouro de limite se distingue, e ele fala do servidor, não da conta
+- [x] Tela de redefinição de senha com token de 60min e uso único (1.3) — três estados numa rota. A autorização é um **marcador de recuperação**, e não a sessão: o link cria sessão, e aceitar qualquer sessão faria desta tela um desvio da reautenticação que a troca em Conta exige
+- [x] Tela de seleção de perfil artista/curador (1.4) — **derivada**: não existe em protótipo nenhum, e a anotação do arquivo do Curador confirma. Card selecionável (§2.4.2) na moldura de autenticação
+- [x] Roteamento pós-login por papel e por primeiro acesso — inclusive o último ambiente usado (RF-008), que antes era prioridade fixa e mandava um curador-e-artista sempre para o lado errado
+- [x] Onboarding do artista em 4 passos (1.5) — conteúdo literal do protótipo, micro-notas incluídas
+- [x] Onboarding do curador em 4 passos (1.5) — **derivado**: o PRD dá só os quatro títulos, e os textos foram escritos a partir do que aquelas telas de fato fazem (72h, gate de 60%, escala por classe)
+- [x] Onboarding do admin em versão enxuta (1.5) — **derivado**, sobre a navegação real do painel
+- [x] Reabrir o onboarding — no **menu da conta**, e não no de ajuda: é onde o protótipo o põe, e "Sair" num menu de ajuda seria um alvo perigoso num lugar inesperado. O menu da conta entrou aqui porque `sair` existia desde a R0 sem nenhuma UI que o chamasse
 - [ ] Reautenticação para troca de e-mail e de senha
-- [ ] Encerramento das demais sessões ao trocar credencial
-- [ ] Notificação de novo cadastro concluído → admin
+- [x] Encerramento das demais sessões ao trocar credencial — **depois** da troca, e não antes: derrubar sessões e falhar na troca seria o pior dos dois mundos
+- [x] Notificação de novo cadastro concluído → admin — disparada quando a conta passa a **servir**, e não quando a linha nasce: com verificação exigida, avisar no `signUp` encheria a caixa do admin de contas que nunca confirmaram
+
+- [x] Migration `0003d` — `ler_equipe_admin` (o e-mail dos integrantes vive em `auth.users`, que o PostgREST não expõe, e a lista une duas tabelas), as três mutações da equipe como funções (é o único jeito de o `motivo` da auditoria existir), e `atualizar_meu_cargo`, que toca **uma** coluna porque a RLS não restringe coluna
+- [x] Migration `0003e` — `NULLIF` é gramática, não função: `pg_catalog.nullif(...)` não existe, e `atualizar_meu_cargo` falhava com `42883` para todo mundo. Encontrado pela suíte da `0003d`, na asserção que esperava `DS020` e recebeu outro código
 
 ### Cadastro do curador (12)
-- [ ] Wizard de cadastro com 8 passos, progresso e retomada por `passo_cadastro`
-- [ ] Identificação com herança de nome e e-mail da conta (12)
-- [ ] Modalidades de compartilhamento com validação de link (12.1)
-- [ ] Serviços e preços em Claves, com Feedback obrigatório (12.2)
-- [ ] Perfil profissional e credenciais (12.3)
-- [ ] Classificação automática Bronze / candidato a Prata, com thresholds vindos de `configuracao` (12.4)
-- [ ] Tela final Bronze aprovado, com curso de curadoria (12.5)
-- [ ] Tela final Prata em análise, com disparo ao admin (12.5)
-- [ ] Alteração de cadastro e gestão de mídias, sem alterar a classe (12.6)
+- [x] Wizard de cadastro com 8 passos, progresso e retomada por `passo_cadastro` — uma rota por passo, e não estado local: o progresso é persistido, o wizard é retomável dias depois e o "Editar" da revisão precisa de endereço. Fica em `(app)/(cadastro)`, fora do shell do curador, pela mesma razão que a R0 dividiu `(admin)`
+- [x] Identificação com herança de nome e e-mail da conta (12) — em leitura, e sem campo de senha: a variante do protótipo com senha é para quem chega sem sessão, e no produto o wizard exige o papel `curador`
+- [x] Modalidades de compartilhamento com validação de link (12.1) — linhas dinâmicas, com a regra de link do protótipo (aceita `site.com/x`, recusa espaço)
+- [x] Serviços e preços em Claves, com Feedback obrigatório (12.2) — o preço do opcional desmarcado é **preservado**, não apagado: `readOnly` em vez de `disabled`, porque campo desabilitado não vai no `FormData`
+- [x] Perfil profissional e credenciais (12.3) — as seis do protótipo, com anexo para formação e a dica de classe ao vivo
+- [x] Classificação automática Bronze / candidato a Prata, com thresholds vindos de `configuracao` (12.4) — pela RPC `concluir_cadastro_curador`, que é o **único** caminho possível: o trigger de autopromoção recusa a escrita do próprio curador
+- [x] Tela final Bronze aprovado, com curso de curadoria (12.5) — os três módulos do protótipo; "Começar o curso" fica desabilitado, porque o conteúdo é de outra release
+- [x] Tela final Prata em análise, com disparo ao admin (12.5) — o disparo sai de dentro da RPC, na mesma transação da classificação, e o "Entendi" sai da sessão de verdade: sem acesso ao painel, não há tela seguinte
+- [x] Alteração de cadastro e gestão de mídias, sem alterar a classe (12.6) — rota própria em `/curador/meu-cadastro`, e não `/curador/cadastro`: aquela é a **retomada** do wizard e manda quem já concluiu para a classificação, o que faria "Meu cadastro" na sidebar abrir a tela de parabéns do Bronze. A regra de que alterar mídia não altera a classe é sustentada em três camadas — o serviço não chama a RPC, o repositório não escreve as colunas, e o trigger recusaria se escrevesse
 
 ### Conta e configurações (7 / 17)
+As telas de Conta são **uma** (`TelaDeConta`) servindo os dois ambientes: o protótipo escreve os mesmos três cards de segurança, palavra por palavra, nos dois arquivos. Duplicá-las daria duas versões do fluxo mais sensível do produto — troca de senha e exclusão de conta — e a chance de corrigir uma e esquecer a outra. A aba viaja em `?aba=`, e não em estado local: é o que dá endereço à Segurança (a própria copy diz "gere outro em Configurações › Segurança"), faz a tela funcionar sem JavaScript e permite ler as sessões só para quem abriu aquela aba.
+
 - [ ] Perfil do artista com bio 280, até 3 gêneros e links validados (7.1)
-- [ ] Dados da conta do artista e dados de cobrança (7.2)
-- [ ] Troca de e-mail com confirmação no novo endereço (7.2)
-- [ ] Ativação do papel de curador pelo artista (7.2) — *bloqueado por [#12](open-questions.md#12-ativação-do-2º-papel-exige-aprovação)*
+- [x] Dados da conta do artista, com o bloco de cobrança declarado como pendente (7.2) — o card aparece com o aviso em vez de escondido: a forma da tela não muda a cada entrega
+- [x] Troca de e-mail com confirmação no novo endereço (7.2) — reautentica com a senha atual e **não** encerra sessões, ao contrário da troca de senha: aqui nada mudou ainda, e o e-mail só passa a valer quando o link chegar à caixa nova
+- [x] Ativação do papel de curador pelo artista (7.2) — leva ao wizard do módulo 12, com Bronze aprovado na hora; a frase "depende de aprovação da curadoria" é honrada pelo caminho Prata, e a divergência está registrada em [07-pendências](prd/07-pendencias-e-divergencias.md) — [#12](open-questions.md#12-ativação-do-2º-papel-exige-aprovação)
 - [ ] Preferências do artista: notificações e idioma, com eventos críticos não desativáveis (7.3)
-- [ ] Segurança do artista com painel de sessões ativas (7.4)
-- [ ] Fluxo de exclusão de conta em 2 passos, com exportação LGPD em `.zip` (7.4)
+- [x] Segurança do artista com painel de sessões ativas (7.4) — a sessão atual não tem "Encerrar": isso é "Sair", que já está no menu do header, e a RPC recusaria a própria sessão de qualquer forma. "há 3 dias" é formatado no cliente, porque depende do relógio de quem lê
+- [x] Fluxo de exclusão de conta em 2 passos, com exportação LGPD em `.zip` (7.4) — a exportação é **oferta**, não pedágio: "Continuar" está sempre ativo, porque obrigar a baixar os dados para poder sair seria cobrar pela saída
 - [ ] Perfil do curador com credenciais e classe somente leitura (17.1)
-- [ ] Dados de recebimento do curador com validação de chave Pix (17.2)
+- [x] Dados da conta do curador, com o bloco de recebimento declarado como pendente (17.2)
 - [ ] Preferências do curador (17.3)
-- [ ] Segurança do curador (17.4)
+- [x] Segurança do curador (17.4) — a mesma tela do artista; `/curador/conta` fica **fora** dos desvios do painel, senão uma conta só de curador em `prata_em_analise` não teria porta nenhuma para o direito de exclusão da LGPD
 
 ### Admin (19 / 27)
 - [ ] Login admin restrito, sem social e sem autocadastro (19)
-- [ ] Recuperação de senha admin com cooldown (19.1)
-- [ ] Redefinição de senha admin (19.2)
-- [ ] Dados pessoais do membro admin, com reautenticação (27.1)
-- [ ] Listagem da equipe com status e ações (27.2)
-- [ ] Convite de membro por e-mail com papel (27.3)
-- [ ] Aceite de convite e definição de senha
-- [ ] Papéis e permissões por módulo (27.4) — *bloqueado por [#11](open-questions.md#11-matriz-de-permissões-do-admin)*
+- [x] Recuperação de senha admin com cooldown (19.1) — o contador é um instante, não um decremento em efeito; o servidor já recusa com 429 e o cooldown só evita que a pessoa descubra clicando
+- [x] Redefinição de senha admin (19.2) — mesmo componente e mesma ação da 1.3, com os retornos apontando para o login administrativo
+A tela 27 é a única do produto onde **toda escrita passa por RPC**, e não por `update` do cliente. A razão é o `motivo` da auditoria: `registrar_auditoria` o lê de `current_setting('dissona.motivo')`, e `set local` só vale dentro de uma transação — pelo PostgREST cada `update` é a sua própria transação, sem onde marcá-la. Ver o cabeçalho da [`0003d`](../supabase/migrations/20260910175458_0003d_equipe_admin.sql).
+
+- [x] Dados pessoais do membro admin, com reautenticação (27.1) — o e-mail e a senha reusam o `ModalDeCredencial` e as ações de `modulos/conta`: o protótipo escreve os textos idênticos nos três ambientes, e um segundo caminho de troca de senha só para o admin seria um segundo lugar para esquecer o `signOut({ scope: 'others' })`. O cargo vai por RPC de uma coluna, porque a policy de `membro_admin` exige permissão de equipe e quem é `suporte` não a tem
+- [x] Listagem da equipe com status e ações (27.2) — a lista é a **união** de `membro_admin` com `convite_admin` pendente, feita em SQL: quem foi convidado e ainda não aceitou não tem linha de membro, e é ele que aparece como "Convite pendente". Ninguém altera o próprio papel nem desativa a própria conta — na tela é um controle ausente, no banco é `DS020`, porque o único administrador que se rebaixasse trancaria a organização fora da gestão
+- [x] Convite de membro por e-mail com papel (27.3) — o nosso convite é emitido **antes** da conta no Auth: se o e-mail falhar, existe uma linha pendente que o "Reenviar" resolve; na ordem inversa haveria conta criada sem convite nenhum. Reenviar **rotaciona** o token, porque o link antigo pode ter ido para a caixa errada
+- [x] Aceite de convite e definição de senha — `/admin/convite` é indiferente à sessão de propósito: `exigirSessao` monta o `?proximo=` a partir do *pathname*, e redirecionar traria a pessoa de volta **sem o token**. O aceite vem antes da senha — um token ruim, que é a falha comum, não deixa nada mudado
+- [x] Papéis e permissões por módulo (27.4) — a matriz inteira em uma transação, com `administrador` imutável e `equipe` exclusiva dele. A célula é um `<select>` de três níveis, e não a caixa do protótipo: uma caixa não expressa `pode_ler` **e** `pode_escrever`, e as duas saídas eram congelar a escrita no seed para sempre ou dar escrita a quem só tinha leitura. Ver §B.3 das [divergências](prd/07-pendencias-e-divergencias.md) — a matriz definitiva segue sendo [#11](open-questions.md#11-matriz-de-permissões-do-admin)
 
 ### Gate da R1
-- [ ] Conta criada por e-mail e por social, com papel escolhido e roteado
-- [ ] Curador Bronze liberado na hora; Prata em análise com admin notificado
-- [ ] Admin convida membro, que aceita e entra
-- [ ] Toda ação sensível grava em `log_auditoria`
-- [ ] Todo evento da R1 grava em `notificacao`
+Os cinco itens estão **implementados e provados no banco**; o que falta em cada
+um é a verificação de ponta a ponta pela interface. Ela depende de configuração
+que não é versionável — Redirect URLs, templates de e-mail e credenciais de
+Google e Facebook no dashboard do Supabase (ver "Pendências manuais" abaixo) —,
+então ficam marcados como pendentes até a passada manual.
+
+- [ ] Conta criada por e-mail e por social, com papel escolhido e roteado — código completo; falta a passada manual, que é a única forma de provar as Redirect URLs e os templates
+- [ ] Curador Bronze liberado na hora; Prata em análise com admin notificado — provado na suíte da `0002c`; falta ver pela tela
+- [ ] Admin convida membro, que aceita e entra — provado na suíte da `0003b` (ciclo emissão→aceite) e da `0003d`; falta o e-mail chegar de verdade
+- [x] Toda ação sensível grava em `log_auditoria` — **com o motivo**, que era o que faltava: o contrato antigo (`set local` na Server Action) é inexequível pelo PostgREST, e a `0003d` o substituiu por funções. Duas asserções provam que o motivo e o ator chegam
+- [x] Todo evento da R1 grava em `notificacao` — os 11 eventos de auth semeados na `0005`, com o teste de deriva em `modulos/notificacao/__testes__/eventos.test.ts` para código e seed não divergirem
+
+### Pendências manuais, no dashboard do Supabase
+Nada disto é versionável (`config.toml` só tem `project_id`), e nada disto o
+código pode contornar:
+
+- [ ] *Confirm email* ligado; Site URL e Redirect URLs de local, Preview e produção — inclui `/admin/convite`, que é onde o `inviteUserByEmail` devolve a pessoa
+- [ ] Templates de e-mail reescritos para `{{ .TokenHash }}` apontando para `/api/auth/confirmar` — sem isso o link do Supabase não fecha sessão no fluxo SSR/PKCE
+- [ ] Providers Google e Facebook com credenciais
+- [ ] **Custom provider `custom:soundcloud`** — Auth → Providers → New Provider → *Manual configuration*, com `client_id` `oXgbfsAkK3HZ96jVO0mXCbZ6spU3P93A`, o segredo da tela do SoundCloud, authorize `https://secure.soundcloud.com/authorize`, token `https://secure.soundcloud.com/oauth/token` e **userinfo apontando para a nossa Edge Function**, `https://fhqcibjzmowcjkdrqyvi.supabase.co/functions/v1/soundcloud-userinfo` — nunca para `api.soundcloud.com/me`, que não devolve `sub`. Se `email_optional` não estiver no formulário, fechar com um `PUT` parcial em `/auth/v1/admin/custom-providers/custom:soundcloud` mandando só `{"email_optional": true}`; sem ele o login falha com "Error getting user email from external provider"
+- [ ] `SOUNDCLOUD_LIGADO=true` no `.env.local` e nos escopos da Vercel — é o que habilita o botão
+- [ ] **Rotacionar o segredo do SoundCloud antes do lançamento** — ele apareceu num screenshot durante a implementação. Risco é abuso da nossa cota de API, não de conta: o `authorization_code` só volta para o redirect URI registrado
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` no `.env.local` e nos escopos da Vercel
+- [ ] *Leaked password protection* ligada — o advisor a aponta, e é uma chave no dashboard
+- [ ] Provedor de e-mail real ([#10](open-questions.md)) — enquanto for o SMTP embutido (~2 e-mails/hora), o convite da equipe mostra o link na tela para copiar, e esse paliativo sai junto
 
 ---
 

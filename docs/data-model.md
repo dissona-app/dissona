@@ -61,11 +61,32 @@ Extensão de `auth.users`. Uma linha por conta; o e-mail e a senha vivem no Supa
 | `situacao` | `situacao_conta` | sim | padrão `ativa` |
 | `aceite_termos_em` | timestamptz | não | Aceite de Termos + LGPD |
 | `desativada_em` | timestamptz | não | Início dos 30 dias de expurgo |
+| `onboarding_visto_em` | timestamptz | não | RF-007 — migration `0001c` |
+| `ultimo_ambiente` | `papel` | não | RF-008 — migration `0001c` |
+| `senha_alterada_em` | timestamptz | não | Exibida em 27.1 e 7.4 — migration `0001c` |
 | `criado_em` / `atualizado_em` | timestamptz | sim | |
 
 **UK:** `handle` · **Índice:** `situacao`, `desativada_em`
 
 **RLS:** o dono lê e escreve a própria linha; admin lê todas; leitura pública apenas dos campos de vitrine (via view `perfil_publico`, R5).
+
+> ### ⚠️ `situacao` é do admin, e a policy não bastava
+>
+> A policy de update libera a **linha** do dono, e RLS não filtra coluna — então
+> até a `0001c` uma conta `bloqueada` se reativava sozinha, e o bloqueio de
+> 20.2/23.2 valia nada. O trigger `proibir_autoalteracao_de_situacao` (`0001c`)
+> restringe o dono ao par `ativa ↔ desativada` (RF-024) e normaliza
+> `desativada_em`, que é o que o índice parcial do job de expurgo consulta.
+>
+> Contexto sem sessão (`auth.uid() is null`) passa: é como o `pg_cron` roda
+> `expurgar_contas_excluidas`, que leva `desativada` a `excluida`. Barrá-lo
+> faria a guarda derrubar o cumprimento da LGPD em silêncio.
+>
+> As três colunas novas de `0001c` existem porque três requisitos da R1 não
+> tinham onde guardar estado: o onboarding reabriria a cada login (RF-007), o
+> roteamento pós-login decidia por prioridade fixa em vez do último ambiente
+> (RF-008), e a tela 27.1 exibe a data da última troca de senha, que o Supabase
+> Auth não expõe.
 
 ### `papel_usuario`
 
@@ -135,11 +156,28 @@ Cada credencial declarada em 12.3. É a contagem destas linhas que classifica Br
 |---|---|---|---|
 | `id` | uuid | sim | PK |
 | `perfil_curador_id` | uuid | sim | FK |
-| `tipo` | text | sim | `veiculo`, `formacao`, `premio`, `participacao_disco` |
+| `tipo` | text | sim | `anos`, `playlist`, `canal`, `imprensa`, `disco`, `formacao` — migration `0002c` |
 | `descricao` | text | sim | |
-| `url` | text | não | Link verificável — obrigatório para contar como credencial |
-| `verificavel` | boolean | sim | `url is not null` |
+| `url` | text | não | Link verificável |
+| `anexo_caminho` | text | não | Caminho no bucket `materiais` — migration `0002c` |
+| `verificavel` | boolean | sim | Gerada: `url is not null or anexo_caminho is not null` |
 | `criado_em` | timestamptz | sim | |
+
+> **Os tipos são os seis do protótipo, e não os quatro da primeira versão.**
+> Portar o passo 6 do wizard mostrou que a `0002` aceitava
+> `veiculo | formacao | premio | participacao_disco`, e que três das seis
+> caixas da tela não tinham para onde ir. `veiculo` virou `imprensa` e
+> `participacao_disco` virou `disco` — o mesmo item com o nome que a tela usa.
+> `premio` **saiu**: o protótipo não tem essa caixa, e "Prêmios" já é
+> `perfil_curador.premios`, texto livre. Ele nunca foi uma credencial contável.
+>
+> `anexo_caminho` existe porque `formacao` se comprova por upload ("Anexar
+> comprovação"), não por link. Com `verificavel` derivada só de `url`, uma
+> formação anexada contava como não comprovada e o curador ficava Bronze com a
+> comprovação na mão.
+>
+> A leitura do anexo pelo admin (amostragem antifraude de 20.3) sai por URL
+> assinada gerada pela service role: a policy de `materiais` é do dono.
 
 ### `midia_curador`
 
@@ -171,6 +209,49 @@ Modalidades de compartilhamento (12.1 / 12.6).
 | `criado_em` / `atualizado_em` | timestamptz | sim | |
 
 **UK:** `(perfil_curador_id, tipo)` · **Regra:** `feedback` é obrigatório e sempre existe.
+
+### RPC `ler_contexto_sessao` — migrations `0002`, `0002b` e `0002d`
+
+`returns table (papeis papel[], cadastro_curador_concluido boolean, situacao situacao_conta, situacao_curador situacao_curador, onboarding_visto boolean, ultimo_ambiente papel, aceite_termos boolean)`
+
+Consumida pelo `middleware.ts` **a cada navegação**. Seis informações numa
+consulta porque o middleware roda em `gru1` e o banco em `us-west-2`: cada ida
+custa ~120 ms ([architecture §9](architecture.md)), e seis consultas seriam
+~720 ms por página.
+
+Devolve **exatamente uma linha** mesmo sem `perfil` — o `left join` sobre
+`(values (auth.uid()))` existe para isso, e não é detalhe: o chamador usa
+`.single()`, e zero linhas ali é um 500 em toda navegação.
+
+`aceite_termos` (`0002d`) fecha um caso que só o **login social** cria: com
+provider nativo a conta nasce no callback do OAuth e ninguém aceitou nada. Sem o
+campo aqui, quem fechasse a aba na tela de confirmação voltaria a entrar com
+sessão válida e nunca mais a veria — conta ativa sem o aceite que a LGPD exige
+(RF-010). Com ele, a guarda de rota trata o aceite como trata o papel: enquanto
+falta, todo caminho leva de volta à tela que o coleta.
+
+### RPC `concluir_cadastro_curador` — migration `0002c`
+
+`returns table (classe classe_curador, situacao situacao_curador, credenciais_verificaveis integer, minimo_para_prata integer)`
+
+Fim do wizard do módulo 12 (telas 12.4 e 12.5), numa transação: conta as
+credenciais `verificavel`, compara com `configuracao.classe.prata_min_credenciais`,
+grava `classe`/`situacao`/`classificado_em`/`cadastro_concluido_em` e chama
+`registrar_notificacao`. Exige o serviço `feedback` ativo (`DS012`) e recusa a
+segunda chamada (`DS015`).
+
+**É o único caminho.** `proibir_autopromocao_de_classe` recusa qualquer escrita
+do próprio curador em `classe`, `situacao` ou `classificado_em`, e
+`security definer` não contorna — ele troca o dono da execução, não a sessão,
+então `auth.uid()` continua sendo o curador e `e_admin()` continua falso. A RPC
+se identifica por `current_setting('dissona.classificacao')`, no mesmo padrão de
+`dissona.motivo`, e o trigger só cede para a transição exata da 12.4:
+`rascunho` → `bronze_aprovado` ou `prata_em_analise`, com `classe = 'bronze'`.
+
+**Candidato a Prata é Bronze na coluna `classe`.** A promoção é o ato do admin
+em 20.3, e `classe` é o que `calcular_remuneracao` lê. O que muda no candidato é
+`situacao`, e `prata_em_analise` o mantém fora da vitrine — a policy "aprovados
+são públicos" só reconhece `bronze_aprovado` e `prata_aprovado`.
 
 ---
 
@@ -235,7 +316,45 @@ A **função** nasce na `0003`, mas os `create trigger` se dividem: cinco na `00
 
 `configuracao` é a nona, e não estava nesta lista: mudar um piso de remuneração é a alteração mais sensível do sistema, e ficaria fora do rastro.
 
-`motivo` não pode ser um `check`, porque a mesma tabela recebe escritas que o exigem e escritas que não. O contrato é a Server Action fazer `set local dissona.motivo = '...'` antes da escrita; o trigger lê de `current_setting`.
+`motivo` não pode ser um `check`, porque a mesma tabela recebe escritas que o exigem e escritas que não. O trigger o lê de `current_setting('dissona.motivo')`.
+
+**Corrigido na `0003d`:** o contrato original dizia que a Server Action faria `set local dissona.motivo = '...'` antes da escrita, e isso **não é possível pelo cliente**. `set local` vale dentro de uma transação, e pelo PostgREST cada `update` é a sua própria — não há onde marcá-la. Então a regra passa a ser: **toda escrita que precisa de motivo é uma função**, que é uma transação, com o `set_config(..., is_local => true)` dentro. As três mutações da equipe (27.2 e 27.4) são as primeiras a segui-la; `concluir_cadastro_curador` (`0002c`) já seguia, com a mesma mecânica aplicada a `dissona.classificacao`.
+
+### RPCs do convite — migrations `0003`, `0003b` e `0003c`
+
+`criar_convite_admin(p_email text, p_papel_admin papel_admin, p_validade_horas integer default 168) returns table (convite_id uuid, token text, expira_em timestamptz)`
+
+`aceitar_convite_admin(p_token text) returns uuid`
+
+As duas metades de 27.3. A emissão gera 32 bytes aleatórios em hex, guarda só o
+`sha256` e devolve o token em claro **uma única vez** — a Server Action o põe no
+e-mail e não persiste. Reenviar (27.2) apaga o pendente e rotaciona o token, o
+que é o comportamento certo: o link antigo pode ter ido para a caixa errada.
+
+A emissão saiu do TypeScript para o hash viver num só lugar. Com o cálculo do
+lado do código e a conferência do lado do banco, uma divergência entre os dois
+não falha em teste — falha em produção, como "convite inválido" para todo mundo.
+
+Validade de 7 dias como constante da função, e não em `configuracao`: é a mesma
+categoria dos outros dois prazos de credencial do produto (token de senha de 60
+minutos, link de verificação de 24 horas), que vivem na configuração do Auth e
+não na tabela de thresholds de negócio.
+
+`aceitar_convite_admin` é o **único caminho** para o papel `admin` — a policy de
+`papel_usuario` recusa `papel = 'admin'` por escalonamento de privilégio.
+
+> ### ⚠️ `citext` dentro de função com `search_path` vazio
+>
+> As duas funções comparam e-mail com `operator(extensions.=)`, e não com `=`.
+> Com `set search_path = ''` o operador de `citext` fica invisível e o Postgres
+> **não falha**: promove os dois lados a `text` e compara com sensibilidade à
+> caixa. O índice único não disfarça, porque ele guarda a classe de operadores
+> de `citext` desde a criação — e o par "consulta case-sensitive contra índice
+> case-insensitive" produz um `delete` que não acha a linha seguido de um
+> `insert` que colide com ela.
+>
+> Corrigido na `0003c`, em `criar_convite_admin` e em `aceitar_convite_admin`,
+> onde era um bug latente desde a `0003`. **Vale para toda função nova.**
 
 ---
 
@@ -725,8 +844,18 @@ Atômica. Valida saldo, insere `envio` e `servico_envio`, lança o `consumo` no 
 | `0000b` | infra | Extensões `citext`, `pg_cron` e `pg_net`. Fora da faixa por release, como os buckets: `citext` é pré-requisito de `perfil.handle` |
 | `0001` | R1 | Enums base, `perfil`, `papel_usuario`, helpers de RLS, trigger de `atualizado_em`, trigger de criação de perfil em `auth.users` |
 | `0001b` | R1 | Revogação de `execute` por papel — `revoke from public` não basta no Supabase |
+| `0001c` | R1 | `perfil.onboarding_visto_em`, `ultimo_ambiente` e `senha_alterada_em`; trigger `proibir_autoalteracao_de_situacao` |
+| `0001d` | R1 | **`ler_sessoes_da_conta`** e **`encerrar_sessao_da_conta`** — `auth.sessions` está fora do alcance do PostgREST, e o painel de 7.4/17.4 não tem outro caminho |
 | `0002` | R1 | `perfil_artista`, `perfil_curador`, `credencial_curador`, `midia_curador`, `servico_curador`, helpers `meu_perfil_artista_id`/`meu_perfil_curador_id`, RPC `ler_contexto_sessao` |
+| `0002b` | R1 | `ler_contexto_sessao` passa a devolver `situacao`, `situacao_curador`, `onboarding_visto` e `ultimo_ambiente` |
+| `0002c` | R1 | Os seis tipos de credencial do protótipo, `credencial_curador.anexo_caminho`, e a RPC **`concluir_cadastro_curador`** (12.4) |
+| `0002d` | R1 | `ler_contexto_sessao` passa a devolver `aceite_termos` — a conta criada por login social nasce sem aceite, e sem isto ela navegaria sem ele |
+| `0002e` | R1 | O trigger de criação de perfil sobrevive a conta **sem e-mail** — o `coalesce` ganha `full_name`, `name` e `preferred_username` antes do endereço, e um literal no fim; sem isto o login por SoundCloud derruba o cadastro dentro do trigger |
 | `0003` | R1 | `membro_admin`, `convite_admin`, `permissao_admin`, `log_auditoria`, trigger `registrar_auditoria`, **`tem_permissao`** e **`aceitar_convite_admin`** |
+| `0003b` | R1 | RPC **`criar_convite_admin`** — a emissão que faltava ao lado do aceite |
+| `0003c` | R1 | `citext` comparado com `operator(extensions.=)` em `criar_convite_admin` e `aceitar_convite_admin` |
+| `0003d` | R1 | `situacao_membro_admin`, **`ler_equipe_admin`** (une `membro_admin` e convite pendente, com o e-mail de `auth.users`), as três mutações da equipe como funções — é o único jeito de o `motivo` da auditoria existir — e **`atualizar_meu_cargo`** |
+| `0003e` | R1 | `NULLIF` sem schema em `atualizar_meu_cargo`: `pg_catalog.nullif` não existe, e a função falhava com `42883` para todo chamador |
 | `0004` | R1 | `configuracao` + seed de 32 chaves |
 | `0005` | R1 | `evento_notificacao` (seed completo), `notificacao`, `preferencia_notificacao`, função `registrar_notificacao` |
 | `0006` | R2 | `faixa`, `envio`, `servico_envio`, índices da fila, policy do bucket `faixas` |
@@ -746,7 +875,7 @@ Atômica. Valida saldo, insere `envio` e `servico_envio`, lança o `consumo` no 
 > precisavam de um número depois de `0010` (o expurgo depende do grafo de FK
 > inteiro), então `0011` são os jobs e a R3 começa em `0012`.
 >
-> Os sufixos `b` e `c` são migrations corretivas, aplicadas depois de a
+> Os sufixos `b` a `e` são migrations corretivas ou de acréscimo, aplicadas depois de a
 > original já estar no banco compartilhado — não dava para reescrevê-las. Cada
 > uma explica no cabeçalho o que corrigiu.
 

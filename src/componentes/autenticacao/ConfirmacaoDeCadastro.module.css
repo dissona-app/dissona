@@ -1,0 +1,96 @@
+/* Confirmação do cadastro social — derivada, ver o bloco CONFIRMAR_SOCIAL. */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.overline {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(22px, 3vh, 27px);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+/* O e-mail é texto, e não `<input disabled>`: um campo desabilitado convida ao
+   clique e não vai no `FormData`. */
+.email {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-6) var(--dsn-space-7);
+  background: var(--dsn-purple-050);
+  border-radius: var(--dsn-radius-lg);
+}
+
+.emailRotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.emailValor {
+  font-size: var(--dsn-text-base);
+  color: var(--dsn-ink);
+  word-break: break-all;
+}
+
+.emailNota {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.aceiteLink {
+  color: var(--dsn-purple-600);
+  font-weight: var(--dsn-weight-semibold);
+  text-decoration: none;
+}
+
+.aceiteLink:hover {
+  text-decoration: underline;
+}
+
+.saida {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dsn-space-3);
+  padding-top: var(--dsn-space-6);
+  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+.notaSaida {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-align: center;
+  text-wrap: pretty;
+}

@@ -51,10 +51,13 @@ Requisitos funcionais (RF) e não funcionais (RNF) da plataforma. Cada RF traz c
 **Descrição:** autenticar via OAuth com Google, Facebook e SoundCloud.
 
 - **Dado** que escolho Google ou Facebook, **quando** autorizo no provedor, **então** sou autenticado e nome e e-mail vêm pré-preenchidos.
-- **Dado** que escolho SoundCloud, **quando** autorizo, **então** sou autenticado pelo fluxo OAuth2 próprio.
+- **Dado** que escolho SoundCloud, **quando** autorizo, **então** sou autenticado — e **só o nome** vem do provedor: a API dele não expõe e-mail, então o endereço é colhido na tela de confirmação do cadastro.
+- **Dado** que informei o endereço, **quando** concluo a confirmação, **então** recebo o link de verificação e sou levado à tela que o explica — e a conta **navega** enquanto ele não for confirmado, com a pendência marcada no menu da conta.
+- **Dado** que o endereço informado já pertence a outra conta, **quando** confirmo, **então** vejo o banner de e-mail em uso com o caminho para entrar pelo provedor de origem, e o aceite **não** é consumido.
 - **Dado** que o e-mail do provedor já existe na base, **quando** autorizo, **então** as contas são vinculadas em vez de duplicadas.
+- **Dado** que conectei minha conta do SoundCloud, **quando** quero desconectá-la, **então** encontro a ação em Conta e configurações, e os dados pessoais vindos do provedor são expurgados em até **7 dias** — exigência do ToS da API deles.
 
-⚠️ SoundCloud não é provider nativo do Supabase Auth — disponibilidade da API a validar.
+⚠️ SoundCloud não é provider nativo do Supabase Auth: entra como **custom OAuth provider** (OAuth 2.1 + PKCE, `email_optional`), e depende de assinatura **Artist Pro** na conta da plataforma ([#9](open-questions.md#9-soundcloud-assinar-o-artist-pro-e-viver-sem-o-e-mail)).
 
 **Rastreabilidade:** [02 · módulo 1](prd/02-ambiente-artista.md#1-autenticação) · [01 §9.1](prd/01-regras-de-negocio.md#91-login-e-papéis)
 

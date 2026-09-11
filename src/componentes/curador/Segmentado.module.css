@@ -1,0 +1,89 @@
+/* Segmented control com radio nativo — Design System §2.1.5 e §2.2.5. */
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.legenda {
+  padding: 0;
+  margin-bottom: var(--dsn-space-2);
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.trilha {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-2);
+  background: var(--dsn-purple-050);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-full);
+  align-self: flex-start;
+}
+
+.opcao {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+/* O radio existe e recebe o foco; ele só não é visto. As setas do teclado
+   funcionam nativamente por causa disso. */
+.entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.pastilha {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px var(--dsn-space-7);
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink-500);
+  border-radius: var(--dsn-radius-full);
+  transition:
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.opcao:hover .pastilha {
+  color: var(--dsn-ink);
+}
+
+.entrada:checked + .pastilha {
+  background: var(--dsn-surface);
+  color: var(--dsn-ink);
+  box-shadow: var(--dsn-shadow-xs);
+}
+
+.entrada:focus-visible + .pastilha {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.erro {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-danger-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pastilha {
+    transition: none;
+  }
+}

@@ -88,6 +88,48 @@ export function dentroDoPrazo(concluidoEm: Date, vencimento: Date): boolean {
   return concluidoEm.getTime() <= vencimento.getTime();
 }
 
+/**
+ * Tempo decorrido em linguagem natural — o "há 3 dias" do painel de sessões.
+ *
+ * `Intl.RelativeTimeFormat` com `numeric: 'auto'`, que é o que produz "ontem"
+ * e "agora" em vez de "há 1 dia" e "há 0 segundos". A maior unidade que couber
+ * vence: 90 minutos são "há 1 hora", e não "há 90 minutos".
+ *
+ * Datas no futuro são formatadas com o sinal correto ("em 2 dias"), embora o
+ * uso previsto seja passado — um relógio de servidor adiantado em relação ao do
+ * banco produziria futuro por alguns segundos, e "em 3 segundos" é menos errado
+ * que uma negativa formatada como passado.
+ */
+export function tempoRelativo(
+  data: Date,
+  locale: Locale = 'pt-BR',
+  agora: Date = new Date(),
+): string {
+  const formatador = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  const ms = data.getTime() - agora.getTime();
+  const absoluto = Math.abs(ms);
+
+  for (const [unidade, tamanho] of UNIDADES_RELATIVAS) {
+    if (absoluto >= tamanho || unidade === 'second') {
+      return formatador.format(Math.round(ms / tamanho), unidade);
+    }
+  }
+
+  // Inalcançável: `second` sempre casa. Existe para o `noUncheckedIndexedAccess`
+  // não exigir um `!` no fim do laço.
+  return formatador.format(0, 'second');
+}
+
+/** Da maior para a menor — a primeira que couber é a que aparece. */
+const UNIDADES_RELATIVAS: readonly (readonly [Intl.RelativeTimeFormatUnit, number])[] = [
+  ['year', 365 * MS_POR_DIA],
+  ['month', 30 * MS_POR_DIA],
+  ['day', MS_POR_DIA],
+  ['hour', MS_POR_HORA],
+  ['minute', MS_POR_MINUTO],
+  ['second', 1000],
+];
+
 /** Trunca texto preservando palavra, para as prévias de feedback nas listas. */
 export function truncar(texto: string, maximo: number): string {
   if (texto.length <= maximo) return texto;

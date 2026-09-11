@@ -1,0 +1,47 @@
+/* Modais de reautenticação — trocar senha e trocar e-mail. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+.blocoSenha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.acoes {
+  display: flex;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-3);
+}
+
+.olho {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--dsn-radius-lg);
+  background: transparent;
+  color: var(--dsn-ink-500);
+  cursor: pointer;
+  transition:
+    background var(--dsn-duration-base),
+    color var(--dsn-duration-base);
+}
+
+.olho:hover {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .olho {
+    transition: none;
+  }
+}

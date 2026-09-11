@@ -11,6 +11,7 @@ import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 
 import estilos from './FormularioDeLogin.module.css';
+import { IconeOlho } from './IconeOlho';
 
 export type Banner = { readonly titulo: string; readonly texto: string; readonly acao?: ReactNode };
 
@@ -36,6 +37,7 @@ export type TextosDeLogin = {
   readonly bannerCredenciais: Banner;
   /** Só a tela 19 tem — conta existente sem papel `admin`. */
   readonly bannerSemAcesso?: Banner;
+  readonly bannerBloqueada: Banner;
 };
 
 export type PropsFormulario = {
@@ -48,6 +50,15 @@ export type PropsFormulario = {
   readonly social?: ReactNode;
   /** Rodapé do card: a nota do admin, ou o "Criar conta" do artista. */
   readonly rodape?: ReactNode;
+  /**
+   * Banner já visível na primeira renderização, antes de qualquer tentativa.
+   *
+   * Vem de `?motivo=` na URL: o middleware não pode devolver um
+   * `ResultadoDeAcao` — ele redireciona —, então a razão de a pessoa ter sido
+   * ejetada viaja na query string. É o caso de alguém que estava navegando
+   * quando o admin bloqueou a conta.
+   */
+  readonly bannerInicial?: Banner;
 };
 
 const ESTADO_INICIAL: ResultadoDeAcao | null = null;
@@ -74,6 +85,7 @@ export function FormularioDeLogin({
   icone,
   social,
   rodape,
+  bannerInicial,
 }: PropsFormulario) {
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => acao(dados),
@@ -95,18 +107,24 @@ export function FormularioDeLogin({
   };
 
   /**
-   * Banner de topo. Três causas, três mensagens — é o que o protótipo faz, e a
-   * diferença importa: "senha errada" pede outra tentativa, "conta sem acesso
-   * administrativo" pede falar com alguém. Um banner genérico faria a segunda
-   * pessoa tentar a senha de novo, indefinidamente.
+   * Banner de topo. Uma mensagem por causa — é o que o protótipo faz, e a
+   * diferença importa: "senha errada" pede outra tentativa, "conta bloqueada"
+   * pede falar com o suporte, "conta sem acesso administrativo" pede falar com
+   * um administrador. Um banner genérico faria as duas últimas pessoas tentarem
+   * a senha de novo, indefinidamente.
+   *
+   * O `bannerInicial` só vale enquanto não houve tentativa: assim que a pessoa
+   * envia o formulário, o resultado da tentativa é o que ela precisa ler.
    */
   const banner: Banner | null = !falhou
-    ? null
+    ? (bannerInicial ?? null)
     : resultado.codigo === CodigoErro.PAPEL_AUSENTE && textos.bannerSemAcesso !== undefined
       ? textos.bannerSemAcesso
-      : resultado.codigo === CodigoErro.NAO_AUTENTICADO
-        ? textos.bannerCredenciais
-        : null;
+      : resultado.codigo === CodigoErro.CONTA_BLOQUEADA
+        ? textos.bannerBloqueada
+        : resultado.codigo === CodigoErro.NAO_AUTENTICADO
+          ? textos.bannerCredenciais
+          : null;
 
   const Titulo = textos.tituloComoH1 ? 'h1' : 'h2';
 
@@ -183,26 +201,5 @@ export function FormularioDeLogin({
 
       {rodape}
     </>
-  );
-}
-
-function IconeOlho({ riscado }: { readonly riscado: boolean }) {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M3 12s3.6-6 9-6 9 6 9 6-3.6 6-9 6-9-6-9-6z" />
-      <circle cx="12" cy="12" r="2.6" />
-      {riscado ? <path d="m4 20 16-16" /> : null}
-    </svg>
   );
 }

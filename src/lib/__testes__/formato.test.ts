@@ -8,6 +8,7 @@ import {
   prazoRestante,
   somarDias,
   somarHoras,
+  tempoRelativo,
   truncar,
 } from '../formato';
 
@@ -112,5 +113,30 @@ describe('truncar', () => {
 
   it('corta no meio quando não há espaço', () => {
     expect(truncar('palavraenormesemespaco', 8)).toBe('palavrae…');
+  });
+});
+
+describe('tempoRelativo', () => {
+  const agora = new Date('2026-09-10T12:00:00.000Z');
+
+  it('usa a maior unidade que couber', () => {
+    // 90 minutos são "há 1 hora": mostrar "há 90 minutos" seria correto e
+    // ilegível, e a lista de sessões é feita para bater o olho.
+    expect(tempoRelativo(new Date('2026-09-10T10:30:00.000Z'), 'pt-BR', agora)).toBe('há 1 hora');
+    expect(tempoRelativo(new Date('2026-09-07T12:00:00.000Z'), 'pt-BR', agora)).toBe('há 3 dias');
+  });
+
+  it("`numeric: 'auto'` dá as palavras, não os números", () => {
+    // É o que faz a diferença entre "ontem" e "há 1 dia" — e a sessão que
+    // aparece como "há 0 segundos" em vez de "agora" parece defeito.
+    expect(tempoRelativo(agora, 'pt-BR', agora)).toBe('agora');
+    expect(tempoRelativo(new Date('2026-09-09T12:00:00.000Z'), 'pt-BR', agora)).toBe('ontem');
+  });
+
+  it('mantém o sinal para data no futuro', () => {
+    // Não é o uso previsto, mas relógio de servidor adiantado em relação ao do
+    // banco produz futuro por alguns segundos, e formatá-lo como passado seria
+    // mentir sobre a ordem dos acessos.
+    expect(tempoRelativo(new Date('2026-09-15T12:00:00.000Z'), 'pt-BR', agora)).toBe('em 5 dias');
   });
 });

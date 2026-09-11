@@ -27,6 +27,9 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'src/lib/supabase/tipos-bd.ts',
     'docs/**',
+    // Entrypoint de Edge Function: runtime Deno, com `Deno.serve` e import por
+    // URL. O `userinfo.ts` ao lado continua sob o lint — é código nosso, puro.
+    'supabase/functions/**/index.ts',
   ]),
 ]);
 

@@ -47,6 +47,7 @@ export type ErroPostgres = {
  * | `DS012` | serviço de feedback ausente ou removido |
  * | `DS013` | faixa fora de `aguardando_selecao`, ou conteúdo em curadoria |
  * | `DS014` | pacote excluído não volta (`0007c`) |
+ * | `DS015` | cadastro de curador já concluído (`0002c`) |
  * | `DS020` | propriedade: "não é seu" / exige autenticação |
  * | `DS021` | convite inexistente, expirado ou já usado |
  * | `DS022` | em `notificacao`, só `lida_em` muda |
@@ -65,6 +66,7 @@ const POR_CODIGO_DISSONA: Readonly<Record<string, CodigoErro>> = {
   DS012: CodigoErro.SERVICO_FEEDBACK_OBRIGATORIO,
   DS013: CodigoErro.FAIXA_SITUACAO_INVALIDA,
   DS014: CodigoErro.PACOTE_EXCLUIDO,
+  DS015: CodigoErro.CADASTRO_CURADOR_JA_CONCLUIDO,
   DS020: CodigoErro.NAO_AUTORIZADO,
   DS021: CodigoErro.CONVITE_INVALIDO,
   DS022: CodigoErro.NAO_AUTORIZADO,

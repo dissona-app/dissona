@@ -122,7 +122,7 @@ Playwright configurado · CI no GitHub Actions · deploy na Vercel com `main` = 
 |---|---|---|
 | TASK-110 | Login e-mail/senha | TASK-101, TASK-002 |
 | TASK-111 | Login social Google e Facebook | TASK-110 |
-| TASK-112 | Login social SoundCloud (OAuth próprio) | TASK-110 · ⚠️ bloqueio |
+| TASK-112 | Login social SoundCloud — custom OAuth provider + Edge Function `soundcloud-userinfo` (traduz o `/me`, que não tem `sub`) + migration `0002e` + e-mail colhido na confirmação | TASK-110 · **feito**; falta criar o provider no dashboard |
 | TASK-113 | Cadastro com aceite de Termos e LGPD | TASK-110 |
 | TASK-114 | Verificação de e-mail (24h) | TASK-113, TASK-106 |
 | TASK-115 | Recuperação e redefinição de senha (60min, uso único) | TASK-113, TASK-106 |

@@ -187,3 +187,33 @@
 .rodape a:hover {
   color: var(--dsn-purple-600);
 }
+
+/*
+ * Variante split-screen — Design System §3.3. Usada pelo cadastro (1.1) e pelo
+ * wizard do curador (12).
+ *
+ * `auto-fit` com `minmax` em vez de `@media`: os protótipos da R2 não têm um
+ * único `@media` (pendência #24), e inventar breakpoint aqui seria fingir uma
+ * decisão de layout mobile que ninguém tomou. Com `auto-fit`, as duas colunas
+ * viram uma quando não cabem — sem número mágico de viewport, e sem quebrar a
+ * fidelidade do que foi desenhado.
+ */
+.split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(436px, 100%), 1fr));
+  gap: clamp(var(--dsn-space-6), 2vw, var(--dsn-space-9));
+  width: 100%;
+  max-width: 920px;
+  align-items: start;
+}
+
+/* `#FAF7FE` sobre `#F0EAF9`, valores literais do protótipo do curador. */
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+  background: var(--dsn-auth-painel-bg);
+  border: var(--dsn-border-width) solid var(--dsn-auth-painel-border);
+  border-radius: var(--dsn-radius-2xl);
+  padding: clamp(15px, 1.8vw, 20px);
+}

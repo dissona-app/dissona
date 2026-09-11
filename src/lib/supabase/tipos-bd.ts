@@ -238,6 +238,7 @@ export type Database = {
       }
       credencial_curador: {
         Row: {
+          anexo_caminho: string | null
           criado_em: string
           descricao: string
           id: string
@@ -247,6 +248,7 @@ export type Database = {
           verificavel: boolean | null
         }
         Insert: {
+          anexo_caminho?: string | null
           criado_em?: string
           descricao: string
           id?: string
@@ -256,6 +258,7 @@ export type Database = {
           verificavel?: boolean | null
         }
         Update: {
+          anexo_caminho?: string | null
           criado_em?: string
           descricao?: string
           id?: string
@@ -1032,7 +1035,10 @@ export type Database = {
           idioma: string
           nome_completo: string
           nome_exibicao: string | null
+          onboarding_visto_em: string | null
+          senha_alterada_em: string | null
           situacao: Database["public"]["Enums"]["situacao_conta"]
+          ultimo_ambiente: Database["public"]["Enums"]["papel"] | null
         }
         Insert: {
           aceite_termos_em?: string | null
@@ -1046,7 +1052,10 @@ export type Database = {
           idioma?: string
           nome_completo: string
           nome_exibicao?: string | null
+          onboarding_visto_em?: string | null
+          senha_alterada_em?: string | null
           situacao?: Database["public"]["Enums"]["situacao_conta"]
+          ultimo_ambiente?: Database["public"]["Enums"]["papel"] | null
         }
         Update: {
           aceite_termos_em?: string | null
@@ -1060,7 +1069,10 @@ export type Database = {
           idioma?: string
           nome_completo?: string
           nome_exibicao?: string | null
+          onboarding_visto_em?: string | null
+          senha_alterada_em?: string | null
           situacao?: Database["public"]["Enums"]["situacao_conta"]
+          ultimo_ambiente?: Database["public"]["Enums"]["papel"] | null
         }
         Relationships: []
       }
@@ -1414,6 +1426,19 @@ export type Database = {
     }
     Functions: {
       aceitar_convite_admin: { Args: { p_token: string }; Returns: string }
+      alterar_acesso_do_membro: {
+        Args: { p_ativo: boolean; p_membro_id: string; p_motivo: string }
+        Returns: undefined
+      }
+      alterar_papel_do_membro: {
+        Args: {
+          p_membro_id: string
+          p_motivo: string
+          p_papel: Database["public"]["Enums"]["papel_admin"]
+        }
+        Returns: undefined
+      }
+      atualizar_meu_cargo: { Args: { p_cargo: string }; Returns: undefined }
       avaliacao_em_rascunho_do_curador: {
         Args: { p_avaliacao_id: string }
         Returns: boolean
@@ -1440,10 +1465,31 @@ export type Database = {
           valor_centavos: number
         }[]
       }
+      concluir_cadastro_curador: {
+        Args: never
+        Returns: {
+          classe: Database["public"]["Enums"]["classe_curador"]
+          credenciais_verificaveis: number
+          minimo_para_prata: number
+          situacao: Database["public"]["Enums"]["situacao_curador"]
+        }[]
+      }
       confirmar_pedido_clave: { Args: { p_pedido_id: string }; Returns: number }
       confirmar_selecao_curadores: {
         Args: { p_faixa_id: string; p_selecao: Json }
         Returns: string[]
+      }
+      criar_convite_admin: {
+        Args: {
+          p_email: string
+          p_papel_admin: Database["public"]["Enums"]["papel_admin"]
+          p_validade_horas?: number
+        }
+        Returns: {
+          convite_id: string
+          expira_em: string
+          token: string
+        }[]
       }
       criar_pedido_clave: {
         Args: {
@@ -1460,11 +1506,19 @@ export type Database = {
         Args: { p_caminho: string }
         Returns: boolean
       }
+      definir_permissoes_admin: {
+        Args: { p_motivo: string; p_permissoes: Json }
+        Returns: number
+      }
       devolver_claves_sem_resposta: {
         Args: { p_limite?: number }
         Returns: number
       }
       e_admin: { Args: never; Returns: boolean }
+      encerrar_sessao_da_conta: {
+        Args: { p_sessao_id: string }
+        Returns: boolean
+      }
       enviar_avaliacao: {
         Args: {
           p_compartilhamento?: Json
@@ -1483,8 +1537,39 @@ export type Database = {
       ler_contexto_sessao: {
         Args: never
         Returns: {
+          aceite_termos: boolean
           cadastro_curador_concluido: boolean
+          onboarding_visto: boolean
           papeis: Database["public"]["Enums"]["papel"][]
+          situacao: Database["public"]["Enums"]["situacao_conta"]
+          situacao_curador: Database["public"]["Enums"]["situacao_curador"]
+          ultimo_ambiente: Database["public"]["Enums"]["papel"]
+        }[]
+      }
+      ler_equipe_admin: {
+        Args: never
+        Returns: {
+          cargo: string
+          convite_id: string
+          email: string
+          expira_em: string
+          membro_id: string
+          nome: string
+          papel_admin: Database["public"]["Enums"]["papel_admin"]
+          perfil_id: string
+          situacao: Database["public"]["Enums"]["situacao_membro_admin"]
+          sou_eu: boolean
+        }[]
+      }
+      ler_sessoes_da_conta: {
+        Args: never
+        Returns: {
+          agente: string
+          atual: boolean
+          criada_em: string
+          id: string
+          ip: string
+          visto_em: string
         }[]
       }
       meu_perfil_artista_id: { Args: never; Returns: string }
@@ -1564,6 +1649,7 @@ export type Database = {
         | "em_curadoria"
         | "concluida"
       situacao_ganho: "liberado" | "em_saque" | "pago" | "cancelado"
+      situacao_membro_admin: "ativo" | "inativo" | "pendente" | "expirado"
       situacao_pedido:
         | "criado"
         | "processando"
@@ -1761,6 +1847,7 @@ export const Constants = {
         "concluida",
       ],
       situacao_ganho: ["liberado", "em_saque", "pago", "cancelado"],
+      situacao_membro_admin: ["ativo", "inativo", "pendente", "expirado"],
       situacao_pedido: [
         "criado",
         "processando",

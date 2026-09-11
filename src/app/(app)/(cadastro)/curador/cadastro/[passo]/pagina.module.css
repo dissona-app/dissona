@@ -1,0 +1,18 @@
+/* Painel de marca do passo 1 do wizard. */
+
+.asideTitulo {
+  margin: 0;
+  font-size: var(--dsn-text-xl);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: balance;
+}
+
+.asideTexto {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}

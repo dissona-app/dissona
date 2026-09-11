@@ -17,6 +17,15 @@ export type PropsMoldura = {
   /** Provas sociais do pé — idem. */
   readonly provas?: readonly string[];
   readonly linksDeRodape: readonly LinkDeRodape[];
+  /**
+   * Painel ao lado do card — o "Como funciona" do cadastro (1.1) e o painel de
+   * marca do wizard do curador (12).
+   *
+   * Quando existe, a composição vira split-screen e a largura útil cresce;
+   * quando não, o card fica centralizado como nas telas 1 e 19. É a variante
+   * que o Design System §3.3 descreve.
+   */
+  readonly aside?: ReactNode;
   readonly children: ReactNode;
 };
 
@@ -34,7 +43,13 @@ const ANO = 2026;
  * O `gap` unificado é 16px (`--dsn-space-8`), o do admin — o card do artista
  * tem mais elementos e o espaço maior o organiza melhor.
  */
-export function MolduraDeAutenticacao({ chamada, provas, linksDeRodape, children }: PropsMoldura) {
+export function MolduraDeAutenticacao({
+  chamada,
+  provas,
+  linksDeRodape,
+  aside,
+  children,
+}: PropsMoldura) {
   return (
     <div className={estilos.pagina}>
       <OndasDeFundo />
@@ -57,7 +72,14 @@ export function MolduraDeAutenticacao({ chamada, provas, linksDeRodape, children
           </div>
         ) : null}
 
-        <div className={estilos.card}>{children}</div>
+        {aside === undefined ? (
+          <div className={estilos.card}>{children}</div>
+        ) : (
+          <div className={estilos.split}>
+            <div className={estilos.card}>{children}</div>
+            <aside className={estilos.painel}>{aside}</aside>
+          </div>
+        )}
 
         {provas !== undefined && provas.length > 0 ? (
           <p className={estilos.provas}>

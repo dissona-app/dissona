@@ -1,0 +1,86 @@
+/* Telas 1.3 e 19.2 — definir nova senha. Três estados na mesma rota. */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.overline,
+.overlineAlerta {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-purple-600);
+}
+
+/* "Link inválido" não é o mesmo tipo de aviso que "Redefinição · link válido",
+   e a cor é o que diz isso antes da leitura. */
+.overlineAlerta {
+  color: var(--dsn-danger-fg);
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(22px, 3vh, 27px);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: balance;
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+.blocoSenha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+.olho {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--dsn-radius-lg);
+  background: transparent;
+  color: var(--dsn-ink-500);
+  cursor: pointer;
+  transition:
+    background var(--dsn-duration-base),
+    color var(--dsn-duration-base);
+}
+
+.olho:hover {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .olho {
+    transition: none;
+  }
+}

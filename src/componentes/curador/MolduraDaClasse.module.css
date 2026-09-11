@@ -1,0 +1,90 @@
+/* Telas 12.4 e 12.5 — classificação, Bronze aprovado e cadastro em análise. */
+
+.pagina {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--dsn-grad-auth-bg);
+}
+
+.miolo {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dsn-pad-secao-y) var(--dsn-pad-auth-x);
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--dsn-space-7), 2.4vh, var(--dsn-space-12));
+  width: 100%;
+  max-width: 560px;
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  padding: var(--dsn-pad-card-auth);
+  box-shadow: var(--dsn-shadow-card);
+}
+
+.seloBronze,
+.seloPrata,
+.seloAnalise {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-badge);
+  text-transform: uppercase;
+  padding: 5px var(--dsn-space-6);
+  border-radius: var(--dsn-radius-full);
+}
+
+/* `--dsn-warning-*` para o Bronze: é o par de tokens que o protótipo usa no
+   `clSubFg` (#8A5A12), e pelo token ele acompanha a auditoria do §4.2. */
+.seloBronze {
+  color: var(--dsn-warning-fg);
+  background: var(--dsn-warning-bg);
+}
+
+.seloPrata {
+  color: var(--dsn-ink-700);
+  background: var(--dsn-neutral-bg);
+}
+
+.seloAnalise {
+  color: var(--dsn-info-fg);
+  background: var(--dsn-info-bg);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(26px, 3.4vh, 32px);
+  line-height: var(--dsn-leading-hero);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: balance;
+}
+
+.subtitulo {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink-500);
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-700);
+  text-wrap: pretty;
+}

@@ -58,7 +58,7 @@ O protótipo da R2 é posterior ao board e foi construído para validação com 
 
 ### Parte B.1 — Onde o protótipo **não** venceu, e por quê
 
-Registro das três vezes em que a implementação se afastou do protótipo de
+Registro das vezes em que a implementação se afastou do protótipo de
 propósito. A precedência do [AGENTS.md](../../AGENTS.md) põe o protótipo acima
 de qualquer derivação, então cada uma destas precisa de razão explícita.
 
@@ -74,6 +74,60 @@ modal dizendo *"Se a ideia for só tirar de circulação, desative"* — mas a
 `0007` havia colapsado as duas em `ativo = false`, o que tornaria a frase
 falsa. Resolvido com `pacote_clave.excluido_em` na `0007b`; ver
 [data-model §`pacote_clave`](../data-model.md).
+
+### Parte B.2 — Telas de Conta e a tela 12.6
+
+Três decisões da fatia de credenciais e segurança que merecem registro.
+
+| Tela | Protótipo | Implementado | Razão |
+|---|---|---|---|
+| 7.2 / 7.4 · 17.2 / 17.4 · abas | `<button>` com estado local; só o ambiente do artista tem `role="tablist"` (design-system §4.6) | links que trocam `?aba=` | A aba passa a ter endereço, e a própria copy o exige — *"gere outro em Configurações › Segurança"* é uma frase que precisa ser linkável. Além disso a tela funciona sem JavaScript, e o servidor lê as sessões só para quem abriu a aba de segurança. A aparência é idêntica; o que muda é o elemento, e para navegação de verdade o elemento certo é `<a>` com `aria-current`, não `role="tab"` — que promete um painel trocando no lugar. |
+| 7.4 / 17.4 · sessões ativas | *"Chrome · São Paulo"* | *"Chrome · Windows"*, com o IP na linha de apoio | `auth.sessions` guarda `ip` e `user_agent`, não cidade. Resolver o IP exigiria um serviço externo por linha, e um "São Paulo" errado num painel cuja função é reconhecer acesso indevido é pior que nenhum lugar. O sistema é a outra coisa que a pessoa reconhece de bater o olho, e essa é verdadeira. Ver o cabeçalho da migration `0001d`. |
+| 7.4 / 17.4 · exclusão, passo 1 | "Continuar" avança sem exigir a exportação | idem | Registrado por ser deliberado: exigir o download antes de sair seria cobrar pela saída, e o direito da LGPD é o de **levar** os dados, não o de recebê-los à força. |
+
+**12.6 não existe no protótipo.** A tela entrou na V3.1 do discovery, e a
+sidebar do curador aponta "Meu cadastro" para o wizard. O conteúdo vem do
+[PRD §12.6](03-ambiente-curador.md) — tabela de mídias com nome, tipo e link;
+inserir, editar e excluir com confirmação; editar serviços e preços — e a forma
+reaproveita os cards e a lista de serviços do módulo 12. Ela ganhou rota própria
+(`/curador/meu-cadastro`) porque `/curador/cadastro` é a **retomada** do wizard
+e manda quem já concluiu para a classificação: apontar "Meu cadastro" para lá
+faria o item da sidebar abrir a tela de parabéns do Bronze.
+
+### Parte B.3 — A matriz de permissões (27.4)
+
+O protótipo tem **uma** caixa por célula. A tabela `permissao_admin` tem
+`pode_ler` **e** `pode_escrever` — granularidade adotada na divergência 7c, com
+a nota de que "fica disponível para quando o cliente a exercer". A tela que a
+edita é a única que pode exercê-la, e uma caixa não expressa dois booleanos.
+
+As três saídas possíveis, e por que duas não servem:
+
+| Saída | Consequência |
+|---|---|
+| A caixa governa só `pode_ler` | `pode_escrever` fica **congelado no seed para sempre**: nenhum papel jamais ganha escrita em módulo nenhum, e o caminho de negação de escrita nunca é exercido de propósito |
+| A caixa governa as duas | Desligar e religar dá **escrita** a quem só tinha leitura, sem ninguém pedir. É escalonamento de privilégio por acidente de interface |
+| **Adotada:** a célula é um `<select>` de três níveis — Sem acesso · Ver · Ver e editar | O grid é o do protótipo (mesmas quatro linhas, mesmas quatro colunas, mesmas descrições); o controle é o que a tabela exige. Nada se perde e nada escala sozinho |
+
+Duas invariantes seguem travadas em três camadas — na tela sem controle, na RPC
+com `DS020`, na policy com `tem_permissao('equipe', true)`:
+
+- **`administrador` não é editável.** É o que o pé da tela promete: *"Administrador
+  mantém acesso total, inclusive a equipe e papéis."* Um administrador que se
+  cortasse de `equipe` trancaria a organização fora da própria gestão.
+- **`equipe` é exclusiva do administrador.** É a permissão que concede
+  permissões; dá-la a outro papel é dar o papel de administrador com outro nome.
+
+`pacotes` e `configuracao` existem na tabela e **não** nesta tela — o protótipo
+tem quatro módulos. Eles seguem governados pelo seed da `0003` em vez de serem
+zerados por omissão quando esta tela salva.
+
+**Duas outras decisões de 27.2**, menores e igualmente deliberadas: o `<select>`
+de papel salva por formulário com um botão "Aplicar", e não no `change` — custa
+um clique, faz a linha funcionar sem JavaScript e evita a troca acidental de
+quem rola a lista com o teclado sobre o select. E `/admin/convite` é indiferente
+à sessão, porque `exigirSessao` monta o `?proximo=` a partir do *pathname*:
+redirecionar quem chega sem sessão a traria de volta sem o token do convite.
 
 ### Nota sobre a divergência 3
 
@@ -226,3 +280,40 @@ Adotado o **cálculo**, que é o comportamento observável, com
 grava o item como `{"chave":"compartilhou","percentual":8,"retido":false}`, para
 o histórico continuar interpretável se a decisão virar.
 
+
+---
+
+## Divergência levantada pela pesquisa da API do SoundCloud · 2026-09-10
+
+O protótipo promete, no pé do cadastro: *"Google, Facebook ou SoundCloud
+preenchem seu nome e e-mail. Você confirma antes de criar."* Para o SoundCloud,
+a segunda metade é impossível — não por decisão nossa, mas porque a API não tem
+o campo.
+
+| Fonte | O que diz |
+|---|---|
+| Protótipo **Artista**, cadastro (1.1) | *"Google, Facebook ou SoundCloud preenchem seu nome e e-mail"* |
+| OpenAPI oficial do SoundCloud (`soundcloud/api`, `openapi/api.yaml`) | o schema `Me` tem `full_name`, `first_name`, `last_name`, `permalink_url`, `urn`, `plan` e `primary_email_confirmed` — **um booleano**, não o endereço. Campo `email` não existe, e não há scope que o libere |
+
+**Por que importa:** a frase é visível ao usuário final e promete menos atrito
+do que o provedor entrega. Pior, aqui o e-mail não é um campo de perfil: é o
+identificador da conta e o canal de verificação, recuperação e SLA.
+
+**Não decidido por suposição.** As duas saídas dependem do cliente
+([#9](../open-questions.md#9-soundcloud-assinar-o-artist-pro-e-viver-sem-o-e-mail)):
+pedir o endereço numa tela a mais — `/cadastrar/confirmar` já existe para o que
+o social não colhe — ou oferecer o SoundCloud só como **login** de quem já tem
+conta, corrigindo a copy nas duas telas.
+
+**Impacto:** módulo 1 (artista), copy das telas 1 e 1.1, RF-002.
+
+### E dois deveres que o ToS deles cria
+
+O [ToS da API](https://developers.soundcloud.com/docs/api/terms-of-use) exige um
+mecanismo **acessível** de desconectar a conta SoundCloud e o **expurgo dos
+dados pessoais em até 7 dias** a partir dela — *"without undue delay, but in any
+case within 7 days"*. Nenhum dos dois estava nos requisitos; entraram em RF-002.
+O uso comercial também é discricionário: o que eles proíbem é *"in-app purchases
+which allow access to content or features already available via the SoundCloud
+platform"*, e Claves compram curadoria, que não existe lá dentro — o argumento é
+bom, mas a decisão de revogar acesso é deles.

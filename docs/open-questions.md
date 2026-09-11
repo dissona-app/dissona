@@ -21,7 +21,7 @@ Tudo o que ainda **não foi decidido** e trava ou condiciona a implementação. 
 | [6](#6-modelo-de-split-no-asaas) | Modelo de split no Asaas | **R2** | cliente + contador |
 | [7](#7-armazenamento-do-arquivo-de-áudio) | Armazenar o mp3 sempre? | **R2** | cliente + dev |
 | [8](#8-liberação-do-crédito-versus-compartilhamento) | Crédito retido até verificar o compartilhamento? | **R2** | cliente |
-| [9](#9-api-do-soundcloud-para-oauth) | API do SoundCloud disponível? | **R1** | dev |
+| [9](#9-soundcloud-assinar-o-artist-pro-e-viver-sem-o-e-mail) | SoundCloud: assinar o Artist Pro e viver sem o e-mail? | **R1** | cliente + dev |
 | [10](#10-provedor-de-e-mail-transacional) | Provedor de e-mail e domínio de envio | **R1** | cliente + dev |
 | ~~11~~ | ~~Matriz de permissões do admin~~ | — | **resolvida pelo protótipo** → §4 |
 | [12](#12-ativação-do-2º-papel-exige-aprovação) | Ativar papel de curador exige aprovação? | **R1** | cliente |
@@ -144,13 +144,24 @@ que ela não mude sem alguém notar.
 
 ## 2. Bloqueiam a Release 1
 
-### 9. API do SoundCloud para OAuth
+### 9. SoundCloud: assinar o Artist Pro e viver sem o e-mail?
 
-**Aberto.** SoundCloud **não é provider nativo** do Supabase Auth; exige fluxo OAuth2 próprio. O cadastro de novas aplicações na API do SoundCloud tem histórico de restrição.
+**Pesquisado em 2026-09-10 em [developers.soundcloud.com](https://developers.soundcloud.com/).** A API existe e serve ao que o protótipo pede; o que restou é decisão, não disponibilidade. A pergunta antiga — *"conseguimos credenciais?"* — está respondida.
 
-**Impacto:** RF-002. Se a API estiver indisponível, o botão sai da tela — o que altera copy e layout do login e do cadastro.
+- **As credenciais destravaram.** Em 18/05/2026 o SoundCloud abriu **API keys self-serve**: registro instantâneo, sem formulário de análise e sem fila. O "histórico de restrição" que este item registrava não vale mais.
+- **Mas exigem assinatura.** *"You need a SoundCloud Artist Pro subscription to register API applications and receive credentials."* São ~US$ 8,25/mês (US$ 99/ano, com 30 dias de teste) numa conta da Dissona — custo recorrente da plataforma, não do usuário.
+- **O OAuth é padrão e casa com o nosso.** OAuth 2.1 `authorization_code` com **PKCE obrigatório** (`secure.soundcloud.com/authorize` → `/oauth/token`), `redirect_uri` pré-registrada com match exato, cliente tratado como confidencial (usa `client_secret` na troca) e botão oficial *"Connect with SoundCloud"* para sign-in.
+- **Não precisamos mais escrever o fluxo à mão.** O Supabase Auth passou a suportar **custom OAuth/OIDC providers**: OAuth2 puro com `authorization`, `token` e `userinfo` informados explicitamente, `pkce_enabled: true` por padrão e `email_optional: true`. O Free plan aceita 3 custom providers. É isto que derruba a premissa de "fluxo OAuth2 próprio" que estava na arquitetura.
+- **O furo é o e-mail: `/me` não devolve.** O OpenAPI oficial (`soundcloud/api`, `openapi/api.yaml`) traz no schema `Me` os campos `full_name`, `first_name`, `last_name`, `permalink_url`, `urn`, `plan` e **`primary_email_confirmed` — que é um booleano**. Campo `email` não existe, e não há scope que o libere (`scopes: {}` nos dois flows; o parâmetro `scope` é *"leave blank by default"*). O pedido de expor o endereço — issue #213 do repositório deles — foi fechado sem entrega.
+- **Dois deveres de ToS que não estavam nos requisitos:** um mecanismo acessível de **desconexão** da conta SoundCloud, e o **expurgo dos dados pessoais em até 7 dias** contados dela. Entraram em RF-002.
 
-**Pergunta (dev):** conseguimos credenciais de aplicação no SoundCloud? Se não, removemos o provedor ou adiamos?
+**Impacto:** RF-002 e a copy do cadastro. O protótipo promete *"Google, Facebook ou SoundCloud preenchem seu nome e e-mail"* — pelo SoundCloud vem o nome, e o e-mail não vem. A divergência está registrada em [07 · pesquisa da API do SoundCloud](prd/07-pendencias-e-divergencias.md#divergência-levantada-pela-pesquisa-da-api-do-soundcloud--2026-09-10).
+
+**O que ainda trava:**
+
+1. **(cliente)** A plataforma assina o **Artist Pro** para ter as credenciais? Sem isso o provedor sai da tela — e aí mudam a copy e o layout do login e do cadastro, como este item já previa.
+2. **(cliente + design)** Como o cadastro por SoundCloud colhe o e-mail que o provedor não dá: uma tela a mais — `/cadastrar/confirmar` já existe justamente para o que o social não colhe — ou o SoundCloud entra só como **login** de quem já tem conta?
+3. ~~**(dev)** O custom provider do Supabase digere o `/me` do SoundCloud?~~ **Respondido em 2026-09-11: não, e a saída é a prevista.** O GoTrue exige `sub` (`models.NewIdentity`) e o `attribute_mapping` não alcança o `urn`, porque roda depois do parse para a struct `Claims`. O tradutor existe: a Edge Function `soundcloud-userinfo`, que o `userinfo_url` do provider aponta no lugar de `api.soundcloud.com/me`. Implementada, testada e no ar.
 
 ---
 

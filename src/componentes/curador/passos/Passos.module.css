@@ -1,0 +1,477 @@
+/* Campos dos oito passos do wizard — módulo 12.
+ *
+ * Um arquivo para os oito porque eles compartilham quase tudo: cartão com
+ * caixa de seleção (passos 5 e 6), linha de lista (4), leitura (1) e o
+ * contador (2, 3, 7). Oito arquivos repetiriam o cartão seis vezes. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--dsn-space-7), 2vh, var(--dsn-space-10));
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.link {
+  color: var(--dsn-purple-600);
+  font-weight: var(--dsn-weight-semibold);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.contador {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.acessorio {
+  display: flex;
+}
+
+/* ------------------------------------------------------- passo 1 --------- */
+
+.foto {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-7);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-grad-brand-diag);
+  color: var(--dsn-surface);
+  font-size: var(--dsn-text-md);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-badge);
+}
+
+.fotoTextos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+  align-items: flex-start;
+}
+
+/* O `<label>` é o alvo de clique; o input de arquivo dentro dele fica
+   escondido. Sem `onClick` e sem `ref`. */
+.fotoBotao,
+.anexoBotao {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 9px var(--dsn-space-7);
+  cursor: pointer;
+  transition: border-color var(--dsn-duration-base);
+}
+
+.fotoBotao:hover,
+.anexoBotao:hover {
+  border-color: var(--dsn-purple-600);
+}
+
+.arquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.fotoBotao:focus-within,
+.anexoBotao:focus-within {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.fotoHint {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.leituras {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+/* Leitura, e não `<input disabled>`: campo desabilitado convida ao clique e
+   não vai no `FormData`. */
+.leitura {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-6) var(--dsn-space-7);
+  background: var(--dsn-purple-050);
+  border-radius: var(--dsn-radius-lg);
+}
+
+.leituraRotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.leituraValor {
+  font-size: var(--dsn-text-base);
+  color: var(--dsn-ink);
+  word-break: break-word;
+}
+
+/* ------------------------------------------------------- passo 4 --------- */
+
+.linhas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linha {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.6fr) minmax(140px, 1fr) minmax(160px, 1.2fr) auto;
+  gap: var(--dsn-space-5);
+  align-items: start;
+}
+
+.remover {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  /* Alinha com os campos, que têm rótulo acima. */
+  margin-top: 22px;
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-surface);
+  color: var(--dsn-ink-500);
+  font-size: var(--dsn-text-md);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color var(--dsn-duration-base),
+    color var(--dsn-duration-base);
+}
+
+.remover:hover {
+  border-color: var(--dsn-danger-fg);
+  color: var(--dsn-danger-fg);
+}
+
+/* --------------------------------------------------- passos 5 e 6 -------- */
+
+.cartoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao,
+.cartaoAtivo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+  padding: var(--dsn-space-7);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-xl);
+  transition:
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    border-color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.cartaoAtivo {
+  background: var(--dsn-surface-alt);
+  border-color: var(--dsn-purple-200-alt);
+}
+
+.cartaoRotulo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dsn-space-5);
+  cursor: pointer;
+}
+
+.caixaEscondida {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.caixa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: none;
+  border: var(--dsn-border-width) solid var(--dsn-ink-250);
+  border-radius: var(--dsn-radius-sm);
+  background: var(--dsn-surface);
+  color: transparent;
+  transition:
+    background var(--dsn-duration-base),
+    border-color var(--dsn-duration-base);
+}
+
+.caixaEscondida:checked + .caixa {
+  background: var(--dsn-purple-600);
+  border-color: var(--dsn-purple-600);
+  color: var(--dsn-surface);
+}
+
+.caixaEscondida:focus-visible + .caixa {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.cartaoTextos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+}
+
+.cartaoTitulo {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+.cartaoDescricao {
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.preco {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dsn-space-4);
+  align-self: flex-start;
+}
+
+.precoEntrada {
+  width: 72px;
+  font-family: inherit;
+  font-size: var(--dsn-text-base);
+  color: var(--dsn-ink);
+  text-align: right;
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 9px var(--dsn-space-5);
+  font-variant-numeric: tabular-nums;
+}
+
+/* `readOnly` e não `disabled`: campo desabilitado não vai no `FormData`, e o
+   servidor precisa do valor para preservá-lo quando o serviço religar. */
+.precoEntrada:read-only {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink-400);
+  cursor: not-allowed;
+}
+
+.precoEntrada:focus-visible {
+  border-color: var(--dsn-focus-outline-color);
+  box-shadow: var(--dsn-shadow-focus);
+  outline: none;
+}
+
+.precoUnidade {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.linkEntrada {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--dsn-text-sm);
+  color: var(--dsn-ink);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 11px var(--dsn-space-7);
+}
+
+.linkEntrada:focus-visible {
+  border-color: var(--dsn-focus-outline-color);
+  box-shadow: var(--dsn-shadow-focus);
+  outline: none;
+}
+
+.anexo {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  cursor: pointer;
+}
+
+.anexoNome {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  word-break: break-all;
+}
+
+.dica {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--dsn-space-2) var(--dsn-space-5);
+  margin: 0;
+  padding: var(--dsn-space-6) var(--dsn-space-7);
+  background: var(--dsn-purple-050);
+  border-radius: var(--dsn-radius-lg);
+  font-size: var(--dsn-text-xs);
+}
+
+.dicaPrata {
+  color: var(--dsn-ink-500);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+/* `--dsn-warning-fg`, e não o `#8A5A12` cru do protótipo: é o mesmo valor, e
+   pelo token ele acompanha a auditoria de contraste do §4.2. */
+.dicaBronze {
+  color: var(--dsn-warning-fg);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.dicaContagem {
+  color: var(--dsn-ink-500);
+}
+
+/* ------------------------------------------------------- passo 7 --------- */
+
+.blocoBio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+}
+
+/* ------------------------------------------------------- passo 8 --------- */
+
+.revisao {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-xl);
+  overflow: hidden;
+}
+
+.blocoRevisao {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--dsn-space-5) var(--dsn-space-7);
+  align-items: center;
+  padding: var(--dsn-space-6) var(--dsn-space-7);
+}
+
+.blocoRevisao + .blocoRevisao {
+  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+.blocoTextos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.blocoRotulo {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+.blocoResumo {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  overflow-wrap: anywhere;
+}
+
+.statusCompleto,
+.statusFaltaPouco,
+.statusOpcional {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-badge);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statusCompleto {
+  color: var(--dsn-success-fg);
+}
+
+.statusFaltaPouco {
+  color: var(--dsn-warning-fg);
+}
+
+.statusOpcional {
+  color: var(--dsn-ink-500);
+}
+
+.editar {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.editar:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao,
+  .cartaoAtivo,
+  .caixa,
+  .remover,
+  .fotoBotao,
+  .anexoBotao {
+    transition: none;
+  }
+}

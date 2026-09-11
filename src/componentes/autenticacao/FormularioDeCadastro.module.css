@@ -1,0 +1,122 @@
+/* Formulário da tela 1.1 — `docs/R2/extraido/Artista.html`.
+ *
+ * Espelha `FormularioDeLogin.module.css` no cabeçalho e nos campos. Não
+ * importa dele porque CSS Modules não compõe entre arquivos sem `composes`, e
+ * `composes` de outro módulo cria dependência de ordem de carregamento. */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.overline {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(26px, 3.4vh, 32px);
+  line-height: 1.06;
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+/* Denso: são cinco campos mais o medidor, e a tela do protótipo cabe numa
+   viewport de 800px de altura sem rolar. */
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--dsn-space-5), 1.6vh, var(--dsn-space-7));
+}
+
+/* O campo de senha e o medidor são uma unidade: o medidor descreve aquele
+   campo, e um `gap` cheio entre os dois os faria parecer independentes. */
+.blocoSenha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.olho {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--dsn-radius-lg);
+  background: transparent;
+  color: var(--dsn-ink-500);
+  cursor: pointer;
+  transition:
+    background var(--dsn-duration-base),
+    color var(--dsn-duration-base);
+}
+
+.olho:hover {
+  background: var(--dsn-purple-050);
+  color: var(--dsn-ink);
+}
+
+.aceiteLink {
+  color: var(--dsn-purple-600);
+  font-weight: var(--dsn-weight-semibold);
+  text-decoration: none;
+}
+
+.aceiteLink:hover {
+  text-decoration: underline;
+}
+
+.bannerLink {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.bannerLink:hover {
+  text-decoration: underline;
+}
+
+.alternativa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsn-space-3);
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.alternativaLink {
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.alternativaLink:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .olho {
+    transition: none;
+  }
+}

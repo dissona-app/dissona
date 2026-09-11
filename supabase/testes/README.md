@@ -13,9 +13,12 @@ inteira numa chamada de `execute_sql` do MCP:
 cat supabase/testes/_ajuda.sql supabase/testes/0001_identidade.testes.sql
 ```
 
-Duas exceções, que **não** se concatenam a `_ajuda.sql` porque montam os
+Três exceções, que **não** se concatenam a `_ajuda.sql` porque montam os
 próprios atores e abrem a própria transação: `0010_rpcs_sla.testes.sql` (precisa
-de dois curadores) e `0007b_pacote_exclusao.testes.sql`.
+de dois curadores), `0007b_pacote_exclusao.testes.sql` e
+`0002e_perfil_sem_email.testes.sql` — este último porque os atores de
+`_ajuda.sql` nascem **todos com e-mail**, e é a conta sem endereço que ele
+prova.
 
 E um arquivo que não é teste: [`dados-e2e.sql`](dados-e2e.sql) cria as contas e
 o catálogo da suíte Playwright. Ele **commita**, ao contrário de todos os
@@ -36,21 +39,28 @@ transação e nomeia a asserção — `FALHOU: <rótulo>`.
 - **Helpers em `pg_temp`.** São de sessão e morrem no fim. Um schema `testes`
   exigiria migration — código de teste em produção.
 
-## Os três modos de negação da RLS
+## Os quatro modos de negação
 
-A descoberta que moldou os helpers: a RLS nega de três formas, e confundi-las
-faz um teste passar por engano.
+A descoberta que moldou os helpers: a negação chega de quatro formas, e
+confundi-las faz um teste passar por engano.
 
 | Situação | O que acontece | Helper |
 |---|---|---|
 | `select` numa linha fora do `using` | zero linhas | `afirmar_invisivel` |
 | `update`/`delete` fora do `using`, **ou sem policy nenhuma** | zero linhas afetadas, **sem erro** | `afirmar_sem_efeito` |
 | `insert` sem policy, ou `insert`/`update` violando o `with check` | `42501` | `afirmar_bloqueado` |
+| `raise` de trigger ou de RPC nossa | `DSnnn` | `afirmar_sqlstate` |
 
 O segundo caso é o traiçoeiro, e vale também quando a tabela **não tem** policy
 de `update`/`delete`: o comando não estoura, apenas não alcança linha nenhuma.
 Um `insert` na mesma situação, por outro lado, estoura com `42501` — não há o
 que filtrar. Com o helper errado, o teste passaria sem provar nada.
+
+O quarto entrou com a `0001c`. `afirmar_bloqueado` lista as condições padrão do
+Postgres **por nome** (`insufficient_privilege`, `check_violation`…), e um
+`sqlstate` da nossa faixa privada passa por ele e aborta a suíte inteira.
+`afirmar_sqlstate` exige o código exato, o que é mais forte: prova **qual**
+guarda negou, e não apenas que algo negou.
 
 ## Registro de execuções
 
@@ -76,6 +86,26 @@ segunda encontrou coisas que a primeira não podia encontrar (ver
 | `0009_remuneracao` | `OK` — 31 asserções | cobertura obrigatória (data-model §10) |
 | `0010_rpcs_sla` | `OK` — 26 asserções | ciclo econômico completo; expôs o estado inválido corrigido na `0010b` |
 | `0011_jobs` | 3 `cron.job` agendados | conferido em `cron.job` |
+| `0001c_perfil_sessao` | `OK` — 12 asserções | fecha o furo da `situacao` auto-alterável; prova que o job de expurgo continua passando |
+| `0002b_contexto_de_sessao` | `OK` — 7 asserções | a garantia de "sempre uma linha", que é o que impede um 500 no middleware |
+| `0002c_credencial_e_classificacao` | `OK` — 17 asserções | a trava de autopromoção de três ângulos; Bronze e Prata pelo threshold de `configuracao` |
+| `0003b_criar_convite_admin` | `OK` — 17 asserções | ciclo emissão→aceite fechado; expôs o bug de `citext` corrigido na `0003c` |
+| `0003c_citext_com_operador_qualificado` | coberta pela suíte da `0003b` | as asserções de caixa do e-mail são a evidência |
+| `0003d_equipe_admin` | `OK` — 24 asserções | a lista de equipe fechada por permissão; a própria linha intocável; o **motivo** chegando em `log_auditoria`; expôs o `pg_catalog.nullif` corrigido na `0003e` |
+| `0003e_nullif_e_gramatica` | coberta pela suíte da `0003d` | a asserção de `atualizar_meu_cargo` é a evidência |
+| `0002e_perfil_sem_email` | `OK` — 10 asserções | conta sem e-mail cria perfil em vez de derrubar o cadastro; a ordem dos degraus do `coalesce` fica presa por asserção |
+
+A rodada de 2026-09-10 acrescentou a suíte da `0003d`, que descobriu duas
+coisas de uma vez: o `pg_catalog.nullif` inexistente (corrigido na `0003e`) e a
+contagem absoluta que o banco compartilhado invalida. As duas estão registradas
+abaixo.
+
+A rodada de 2026-09-09 (segunda metade do dia) reverificou também as suítes da
+`0001`, `0002` e `0003`, porque a `0001c` acrescentou trigger a `perfil` e a
+`0002c` mexeu no `check` de `credencial_curador`, na coluna gerada `verificavel`
+e no trigger `proibir_autopromocao_de_classe` — todos cobertos por elas. As três
+seguem `OK`. A suíte da `0002` precisou de uma correção de fixture: usava os
+tipos `veiculo` e `premio`, que a `0002c` substituiu pelos seis do protótipo.
 
 ### O que os testes pegaram, e que a especificação não previa
 
@@ -121,6 +151,52 @@ segunda encontrou coisas que a primeira não podia encontrar (ver
    aspiracionais. **Pergunta aberta para o cliente**, e o teste fixa a folga
    para ela não mudar em silêncio.
 
+7. **`citext` comparado como `text`.** A suíte da `0003b` reenviou um convite
+   para `NOVO@dissona.com.br` sobre um pendente de `novo@dissona.com.br` e
+   levou `23505`. Causa: dentro de função com `set search_path = ''`, o `=` de
+   `citext` (que vive em `extensions`) fica invisível, e o Postgres **não
+   falha** — promove os dois lados a `text` e compara com sensibilidade à
+   caixa. O índice único não disfarça, porque ele guarda a classe de operadores
+   de `citext` desde a criação: consulta case-sensitive contra índice
+   case-insensitive é exatamente o par que produz "o `delete` não acha, o
+   `insert` colide". O bug estava também em `aceitar_convite_admin` desde a
+   `0003`, latente porque nada exercitava a diferença de caixa. Corrigido na
+   `0003c`. **Regra que ficou:** comparação de `citext` dentro de função nossa
+   usa `operator(extensions.=)` / `operator(extensions.<>)`, sempre.
+
+8. **A `situacao` da conta era auto-alterável.** A policy "perfil: dono
+   atualiza a propria linha" existe desde a `0001`, e RLS filtra **linha**, não
+   coluna — então uma conta `bloqueada` se reativava com um `update` de uma
+   linha, e o bloqueio de 20.2/23.2 valia nada. Fechado por trigger na `0001c`,
+   com o cuidado que essa classe de guarda sempre exige: `auth.uid() is null`
+   passa, senão o job de expurgo (que leva `desativada` a `excluida` sem
+   sessão) pararia de cumprir a LGPD em silêncio. As duas coisas estão
+   afirmadas.
+
+9. **A classificação automática do curador era impossível.**
+   `proibir_autopromocao_de_classe` (`0002`) recusa qualquer escrita do próprio
+   curador em `classe`/`situacao`, e `security definer` não contorna: ele troca
+   o dono da execução, não a sessão, então `auth.uid()` continua sendo o curador
+   e `e_admin()` continua falso. A tela 12.4, que classifica ao fim do wizard,
+   não tinha caminho. Resolvido na `0002c` com uma janela nomeada
+   (`current_setting('dissona.classificacao')`, no padrão de `dissona.motivo`)
+   restrita à transição exata da 12.4 — `rascunho` → `bronze_aprovado` ou
+   `prata_em_analise`, com `classe = 'bronze'`. Ouro segue inalcançável, e há
+   três asserções provando isso.
+
+10. **O `motivo` da auditoria não tinha como chegar.** `registrar_auditoria`
+    (`0003`) o lê de `current_setting('dissona.motivo')`, e o contrato escrito
+    lá era *"a Server Action faz `set local dissona.motivo = '...'` antes da
+    escrita"*. Só que `set local` vale dentro de uma **transação**, e pelo
+    PostgREST cada `update` é a sua própria — não há onde marcá-la. O contrato
+    era inexequível pelo cliente, e toda decisão administrativa iria para
+    `log_auditoria` com `motivo` nulo: um rastro que registra *o quê* e nunca
+    *por quê*. A `0003d` resolve fazendo de cada mutação da equipe uma função,
+    que é uma transação, com o `set_config` dentro. As duas asserções que provam
+    isso são o motivo de a migration existir — sem elas, ela poderia ter sido
+    escrita como três `update` do cliente e ninguém notaria a diferença até
+    alguém precisar auditar.
+
 ### Isolamento: a suíte dependia de as tabelas estarem vazias
 
 Descoberto em 2026-09-09, ao rodar a suíte pela primeira vez **depois** de
@@ -148,21 +224,34 @@ teste. O projeto Supabase é compartilhado entre Preview, Production e E2E
 Um teste de RLS que depende de a tabela estar vazia é um teste que funciona uma
 vez.
 
+E voltou a acontecer em 2026-09-10: a primeira versão da suíte da `0003d`
+afirmava `count(*) = 4` na lista de equipe e viu 6, por causa dos dois membros
+do E2E. A regra é a de sempre — contagem filtrada pelo fixture
+(`where email in (...)`), nunca global.
+
 ### Advisors
 
-Advisors de segurança no estado final (2026-09-09): **18 WARN e 1 INFO, todos
-intencionais**. Nenhum finding envolve `anon`, e a `0007b`/`0007c` não
-acrescentaram nenhum — `proibir_reviver_pacote` é `security invoker` de
-propósito, e por isso **não** aparece na lista de definer abaixo.
+Advisors de segurança no estado final (2026-09-09, depois da `0003c`):
+**20 WARN e 1 INFO, todos intencionais**. Nenhum finding envolve `anon`, e a
+`0007b`/`0007c` não acrescentaram nenhum — `proibir_reviver_pacote` é
+`security invoker` de propósito, e por isso **não** aparece na lista de definer
+abaixo.
 
-O WARN a mais em relação à primeira rodada é `auth_leaked_password_protection`,
-que é configuração do Auth e não de schema.
+Os dois WARN a mais que a fatia de autenticação acrescentou são
+`concluir_cadastro_curador` e `criar_convite_admin`, ambos na classe de "RPC que
+o cliente chama" — e ambos com a checagem de autorização **dentro** da função,
+porque `security definer` desliga a policy que os protegeria.
+
+`auth_leaked_password_protection` continua desligado, e é o único achado
+acionável de todos: é configuração do Auth, não de schema, e liga a verificação
+contra o HaveIBeenPwned. Entra na lista de configuração manual da fatia de
+autenticação, junto com as Redirect URLs e os templates de e-mail.
 
 O INFO é `rls_enabled_no_policy` em `evento_provedor`, e é exatamente o
 desenho: RLS habilitada com zero policies nega a todo papel, e só a RPC
 `registrar_evento_provedor` escreve. É a expressão mais limpa da intenção.
 
-Os 17 WARN são da classe `authenticated_security_definer_function_executable`,
+Os 19 WARN são da classe `authenticated_security_definer_function_executable`,
 e se dividem em dois grupos, ambos necessários:
 
 - **Helpers de RLS**, chamados de dentro das policies: `tem_papel`, `e_admin`,
@@ -171,7 +260,8 @@ e se dividem em dois grupos, ambos necessários:
   `posso_ver_avaliacao`, `avaliacao_em_rascunho_do_curador`,
   `curador_tem_envio_ativo_na_faixa`, `curador_tem_envio_ativo_no_caminho`.
 - **RPCs que o cliente chama**: `ler_contexto_sessao` (middleware, a cada
-  navegação), `aceitar_convite_admin`, `criar_pedido_clave`,
+  navegação), `aceitar_convite_admin`, `criar_convite_admin`,
+  `concluir_cadastro_curador`, `criar_pedido_clave`,
   `confirmar_selecao_curadores` e `enviar_avaliacao`.
 
 O que **não** está nessa lista, e foi deliberadamente revogado até de
@@ -180,10 +270,34 @@ O que **não** está nessa lista, e foi deliberadamente revogado até de
 `expurgar_contas_excluidas`, `registrar_auditoria` e as sete funções de
 trigger. Nenhuma delas tem razão para estar na superfície REST.
 
-## Pegadinha que vale para toda função
+## Três pegadinhas que valem para toda função
 
-`revoke execute on function f() from public` **não basta** no Supabase: os
-*default privileges* concedem `execute` diretamente a `anon`, `authenticated` e
-`service_role`, e revogar de PUBLIC deixa esses grants intactos. Toda função
-nova precisa de `revoke ... from anon` (e de `authenticated`, quando não for
-para uso do cliente) por nome de papel. Foi o que a `0001b` corrigiu.
+**1 · `revoke ... from public` não basta.** Os *default privileges* do Supabase
+concedem `execute` diretamente a `anon`, `authenticated` e `service_role`, e
+revogar de PUBLIC deixa esses grants intactos. Toda função nova precisa de
+`revoke ... from anon` (e de `authenticated`, quando não for para uso do
+cliente) por nome de papel. Foi o que a `0001b` corrigiu.
+
+**2 · `set search_path = ''` também esconde operador.** A proteção contra
+sequestro de objeto tem um efeito colateral que não aparece em advisor nenhum:
+operadores de tipo de extensão (`citext`, e por extensão qualquer tipo fora de
+`pg_catalog`) deixam de ser encontrados, e o Postgres **cai silenciosamente**
+numa alternativa por coerção. Para `citext` isso significa comparar como `text`
+— sensível à caixa. Use `operator(extensions.=)`. Foi o que a `0003c` corrigiu,
+em duas funções.
+
+**3 · e `set search_path = ''` não se aplica ao que não é função.**
+`atualizar_meu_cargo` (0003d) chamava `pg_catalog.nullif(...)` e falhava com
+`42883` — *function pg_catalog.nullif(unknown, unknown) does not exist* — para
+**todo** chamador. `NULLIF` é gramática, como `CASE` e `COALESCE`: o parser a
+expande em `CASE WHEN a = b THEN NULL ELSE a END`, e nada disso está em
+`pg_proc`. O erro é o efeito colateral da disciplina do item 1 — sob search_path
+vazio toda chamada de função precisa de schema, e estender a regra a `nullif`
+parece consistente. **Não se qualificam:** `CASE`, `COALESCE`, `NULLIF`,
+`GREATEST`, `LEAST`, `CAST`, `EXTRACT`, `OVERLAY`, `POSITION`, `SUBSTRING`,
+`TRIM`. Corrigido na `0003e`.
+
+A suíte da `0003d` pegou porque afirma o **sqlstate exato** (`afirmar_sqlstate`,
+esperando `DS020`). Um `afirmar_bloqueado` genérico teria passado — "algo
+negou" — e a função iria para produção quebrada para todo mundo. É o argumento
+concreto a favor do quarto modo de negação.

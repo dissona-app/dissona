@@ -9,9 +9,27 @@ import estilos from './Modal.module.css';
 
 export type LarguraModal = 'estreita' | 'padrao' | 'larga';
 
+/**
+ * Cor do overline. É a única pista de cor do cabeçalho, e o protótipo a usa
+ * para dizer de que natureza é o diálogo: neutro para reautenticação, vermelho
+ * para o passo que apaga, laranja para a exclusão de pacote. O texto sempre
+ * carrega a informação sozinho — a cor só reforça (WCAG 1.4.1).
+ */
+export type TomDoOverline = 'neutro' | 'perigo' | 'marca';
+
 export type PropsModal = {
   readonly aberto: boolean;
   readonly onFechar: () => void;
+  /**
+   * Overline acima do título — "Reautenticação", "Passo 1 de 2 · LGPD".
+   *
+   * Vive no componente, e não no corpo de cada diálogo, porque no protótipo ele
+   * é a **primeira** linha do cabeçalho: escrito no corpo, ele apareceria depois
+   * da descrição, o que inverte a ordem de leitura ("por que estou vendo isto"
+   * vem antes do que é).
+   */
+  readonly overline?: string;
+  readonly tomDoOverline?: TomDoOverline;
   readonly titulo: string;
   readonly descricao?: string;
   readonly largura?: LarguraModal;
@@ -23,6 +41,12 @@ export type PropsModal = {
    */
   readonly persistente?: boolean;
   readonly children: ReactNode;
+};
+
+const CLASSE_TOM_OVERLINE: Record<TomDoOverline, string | undefined> = {
+  neutro: undefined,
+  perigo: estilos.overlinePerigo,
+  marca: estilos.overlineMarca,
 };
 
 const CLASSE_LARGURA: Record<LarguraModal, string | undefined> = {
@@ -40,6 +64,8 @@ const CLASSE_LARGURA: Record<LarguraModal, string | undefined> = {
 export function Modal({
   aberto,
   onFechar,
+  overline,
+  tomDoOverline = 'neutro',
   titulo,
   descricao,
   largura = 'padrao',
@@ -80,7 +106,16 @@ export function Modal({
         tabIndex={-1}
       >
         <div className={estilos.cabecalho}>
-          <div>
+          <div className={estilos.textos}>
+            {overline !== undefined ? (
+              <span
+                className={[estilos.overline, CLASSE_TOM_OVERLINE[tomDoOverline]]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                {overline}
+              </span>
+            ) : null}
             <h2 className={estilos.titulo} id={idTitulo}>
               {titulo}
             </h2>

@@ -75,13 +75,30 @@
 
   --dsn-danger-fg: #8c3a2c;
   --dsn-danger-bg: #fbedea;
+  /* Fundo do card em erro (§2.4.1) — mais claro que o do banner, porque
+   * envolve um bloco inteiro e não uma linha. */
+  --dsn-danger-bg-soft: #fdf8f7;
   --dsn-danger-border: #ebd2cd;
+  /* Borda do botão destrutivo com contorno ("Excluir conta"), mais forte que a
+   * do card, e o hover do botão destrutivo sólido ("Excluir minha conta"). */
+  --dsn-danger-border-strong: #c98a7c;
+  --dsn-danger-fg-hover: #75291c;
 
   --dsn-neutral-fg: #4a4553;
   --dsn-neutral-bg: #f1eff5;
 
   --dsn-dot-pendente: #e0a03a;
   --dsn-dot-desativado: #b9b2c6;
+
+  /* Painel do split-screen das telas de autenticação (§3.3) — valores
+   * literais do protótipo do curador. */
+  --dsn-auth-painel-bg: #faf7fe;
+  --dsn-auth-painel-border: #f0eaf9;
+
+  /* Medidor de força de senha (§2.2.9). O nível médio tem cor própria: o
+   * protótipo usa #a8761c, que é mais claro que --dsn-warning-fg (#8a5a12) e
+   * não serve como cor de texto sobre branco. Aqui ele é barra, não texto. */
+  --dsn-senha-media: #a8761c;
 
   /* ------------------------------------------------- Gradientes de marca */
   --dsn-grad-sidebar: linear-gradient(180deg, #2d1747 0%, #241239 52%, #1b0d2a 100%);

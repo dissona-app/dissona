@@ -1,0 +1,51 @@
+/* Menu do avatar — docs/design-system.md §2.1 e o dropdown do topbar do R2. */
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-grad-brand-diag);
+  color: var(--dsn-surface);
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-badge);
+}
+
+.nome {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+  white-space: nowrap;
+}
+
+.cabecalhoNome {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+/* `break-all`: e-mail longo em menu de 220px estoura, e um endereço cortado no
+   meio é pior que quebrado em duas linhas. */
+.cabecalhoEmail {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  word-break: break-all;
+}
+
+/* Pendência de confirmação: o mesmo tom de alerta do resto do sistema. */
+.pendencia {
+  display: block;
+  margin-top: var(--dsn-space-3);
+  font-size: var(--dsn-text-2xs);
+  font-weight: 600;
+  color: var(--dsn-warning-fg);
+  text-decoration: underline;
+}
+
+.pendencia:hover {
+  text-decoration: none;
+}

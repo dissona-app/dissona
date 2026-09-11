@@ -1,0 +1,92 @@
+/* Card com lista embutida — design-system.md §2.4.1. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+  padding: var(--dsn-space-12);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+}
+
+.overline {
+  font-size: var(--dsn-text-3xs);
+  font-weight: 600;
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.vazio {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-8);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--dsn-border);
+}
+
+/* Sem divisor depois da última: a borda do card já fecha a lista. */
+.linha:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.linha:first-child {
+  padding-top: 0;
+}
+
+.textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.dispositivo {
+  font-size: var(--dsn-text-base);
+  font-weight: 600;
+}
+
+.apoio {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.encerrar {
+  flex: none;
+  padding: var(--dsn-space-4) 10px;
+  border: none;
+  border-radius: var(--dsn-radius-lg);
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--dsn-text-sm);
+  font-weight: 600;
+  color: var(--dsn-purple-600);
+  cursor: pointer;
+  transition: background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.encerrar:hover:not(:disabled) {
+  background: var(--dsn-purple-050);
+}
+
+.encerrar:disabled {
+  color: var(--dsn-ink-400);
+  cursor: default;
+}

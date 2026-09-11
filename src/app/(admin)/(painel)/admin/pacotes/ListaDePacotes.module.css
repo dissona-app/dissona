@@ -179,19 +179,7 @@
   cursor: not-allowed;
 }
 
-/*
- * Confirmação de exclusão. O overline em laranja escuro é o do protótipo — e é
- * a única pista de cor do diálogo, então o texto "Excluir pacote" carrega a
- * informação sozinho (WCAG 1.4.1).
- */
-.overlineModal {
-  font-size: var(--dsn-text-3xs);
-  font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-label);
-  color: var(--dsn-orange-800);
-  text-transform: uppercase;
-}
-
+/* Confirmação de exclusão — o overline saiu para o `Modal`. */
 .alvo {
   font-size: 22px;
   font-weight: var(--dsn-weight-bold);

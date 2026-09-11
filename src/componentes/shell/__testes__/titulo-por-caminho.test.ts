@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { ROTA } from '@/lib/guarda-rota';
+import { CURADOR_MANUTENCAO } from '@/textos/curador';
 import { ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '@/textos/prototipo';
 
 import { NOME_AMBIENTE } from '../navegacao-por-ambiente';
@@ -47,6 +48,25 @@ describe('título do header por caminho', () => {
     expect(tituloDoCaminho(ROTA.ADMIN, 'admin').titulo).toBe('Painel administrativo');
   });
 
+  it('as duas telas de Conta têm títulos diferentes, como o protótipo', () => {
+    // Não é detalhe: o artista lê "Configurações" e o curador "Conta e
+    // configurações", com sublegendas distintas. Um título genérico servindo
+    // aos dois apagaria a diferença que o protótipo faz de propósito — a do
+    // curador anuncia os dados de recebimento.
+    const artista = tituloDoCaminho(ROTA.ARTISTA_CONTA, 'artista');
+    const curador = tituloDoCaminho(ROTA.CURADOR_CONTA, 'curador');
+
+    expect(artista.titulo).toBe('Configurações');
+    expect(curador.titulo).toBe('Conta e configurações');
+    expect(artista.sublegenda).not.toBe(curador.sublegenda);
+  });
+
+  it('"Meu cadastro" (12.6) usa o texto declarado na copy', () => {
+    const { titulo, sublegenda } = tituloDoCaminho(ROTA.CURADOR_MEU_CADASTRO, 'curador');
+    expect(titulo).toBe(CURADOR_MANUTENCAO.titulo);
+    expect(sublegenda).toBe(CURADOR_MANUTENCAO.subtitulo);
+  });
+
   it('rota sem entrada no mapa cai no nome do ambiente', () => {
     // É o que acontece com as telas que ainda não existem. Melhor um título
     // genérico que um `<h1>` vazio, que quebraria a estrutura de headings.
@@ -66,7 +86,7 @@ describe('título do header por caminho', () => {
       `${ROTA.ADMIN}/pacotes/novo`,
       `${ROTA.ADMIN}/financeiro`,
       `${ROTA.ADMIN}/moderacao`,
-      `${ROTA.ADMIN}/equipe`,
+      ROTA.ADMIN_EQUIPE,
     ]) {
       expect(tituloDoCaminho(caminho, 'admin').sublegenda, caminho).toBeDefined();
     }

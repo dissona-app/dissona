@@ -24,9 +24,31 @@ export const CodigoErro = {
   SALDO_INSUFICIENTE: 'saldo_insuficiente',
   PERCENTUAL_INVALIDO: 'percentual_invalido',
 
+  // Autenticação e credenciais
+  //
+  // `NAO_AUTENTICADO` continua sendo o erro genérico de credencial, e é ele que
+  // a tela de login mostra: distinguir "e-mail não existe" de "senha errada"
+  // entrega ao atacante um oráculo de contas existentes (regras §9). Os códigos
+  // abaixo são para os estados que **precisam** de uma resposta diferente —
+  // conta bloqueada pede falar com o suporte, e-mail não verificado pede abrir
+  // o link. Um banner genérico faria a pessoa tentar a senha de novo, para
+  // sempre.
+  EMAIL_JA_CADASTRADO: 'email_ja_cadastrado',
+  EMAIL_NAO_VERIFICADO: 'email_nao_verificado',
+  CONTA_BLOQUEADA: 'conta_bloqueada',
+  TOKEN_INVALIDO: 'token_invalido',
+  TOKEN_EXPIRADO: 'token_expirado',
+  SENHA_FRACA: 'senha_fraca',
+  SENHAS_DIFERENTES: 'senhas_diferentes',
+  ACEITE_OBRIGATORIO: 'aceite_obrigatorio',
+  REAUTENTICACAO_INVALIDA: 'reautenticacao_invalida',
+  /** Rate limit do provedor de e-mail, ou cooldown nosso de reenvio. */
+  LIMITE_DE_ENVIO: 'limite_de_envio',
+
   // Papéis e cadastro
   PAPEL_AUSENTE: 'papel_ausente',
   CADASTRO_CURADOR_INCOMPLETO: 'cadastro_curador_incompleto',
+  CADASTRO_CURADOR_JA_CONCLUIDO: 'cadastro_curador_ja_concluido',
 
   // Avaliação
   ESCUTA_INSUFICIENTE: 'escuta_insuficiente',

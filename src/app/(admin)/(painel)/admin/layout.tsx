@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 
 import { Shell } from '@/componentes/shell/Shell';
-import { lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
+import { sairDoAdmin } from '@/modulos/autenticacao/acoes';
+import { lerIdentidadeDaSessao, lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
 
 /**
  * Shell do painel administrativo.
@@ -15,12 +16,26 @@ import { lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
  * visível: `TrocaDePapel` só aparece para quem tem mais de um papel, e com o
  * valor fixo ela nunca aparecia — nem para o admin que também é artista, que é
  * exatamente o caso que a troca existe para servir.
+ *
+ * `sairDoAdmin`, e não `sair`: quem sai do painel volta para o login
+ * administrativo, não para a home pública. E **sem** `registrarAmbiente`: o
+ * admin tem porta própria e não entra no "último ambiente usado" (RF-008) —
+ * gravá-lo mandaria um admin-e-artista para o painel no login pelo `/entrar`.
  */
 export default async function LayoutPainelAdmin({ children }: { children: ReactNode }) {
-  const papeis = await lerPapeisDaSessao();
+  const [papeis, identidade] = await Promise.all([
+    lerPapeisDaSessao(),
+    lerIdentidadeDaSessao(),
+  ]);
 
   return (
-    <Shell papelAtivo="admin" papeis={papeis} limite="total">
+    <Shell
+      papelAtivo="admin"
+      papeis={papeis}
+      limite="total"
+      identidade={identidade ?? undefined}
+      acaoDeSair={sairDoAdmin}
+    >
       {children}
     </Shell>
   );

@@ -50,7 +50,7 @@ const ARTISTA: readonly GrupoNavegacao[] = [
     itens: [
       { rotulo: 'Carteira', caminho: `${ROTA.ARTISTA}/carteira`, release: 2 },
       { rotulo: 'Notificações', caminho: `${ROTA.ARTISTA}/notificacoes`, release: 5 },
-      { rotulo: 'Configurações', caminho: `${ROTA.ARTISTA}/conta`, release: 1 },
+      { rotulo: 'Configurações', caminho: ROTA.ARTISTA_CONTA, release: 1 },
     ],
   },
 ];
@@ -72,8 +72,8 @@ const CURADOR: readonly GrupoNavegacao[] = [
     itens: [
       { rotulo: 'Financeiro', caminho: `${ROTA.CURADOR}/financeiro`, release: 4 },
       { rotulo: 'Notificações', caminho: `${ROTA.CURADOR}/notificacoes`, release: 5 },
-      { rotulo: 'Meu cadastro', caminho: ROTA.CURADOR_CADASTRO, release: 1 },
-      { rotulo: 'Configurações', caminho: `${ROTA.CURADOR}/conta`, release: 1 },
+      { rotulo: 'Meu cadastro', caminho: ROTA.CURADOR_MEU_CADASTRO, release: 1 },
+      { rotulo: 'Configurações', caminho: ROTA.CURADOR_CONTA, release: 1 },
     ],
   },
 ];
@@ -112,7 +112,7 @@ const ADMIN: readonly GrupoNavegacao[] = [
   },
   {
     titulo: 'Conta',
-    itens: [{ rotulo: 'Conta e equipe', caminho: `${ROTA.ADMIN}/equipe`, release: 1 }],
+    itens: [{ rotulo: 'Conta e equipe', caminho: ROTA.ADMIN_EQUIPE, release: 1 }],
   },
 ];
 

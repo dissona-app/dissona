@@ -1,23 +1,42 @@
 import type { ReactNode } from 'react';
 
 import { Shell } from '@/componentes/shell/Shell';
-import { lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
+import { Papel } from '@/lib/papeis';
+import { registrarAmbiente, sair } from '@/modulos/autenticacao/acoes';
+import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
 
 /**
- * Shell do ambiente do curador.
+ * Shell do ambiente do curador — o **painel**.
  *
- * `papeis` vem da sessão. Até a `0001` existir, a R0 passava `['curador']`
- * fixo, com a consequência declarada de esconder a troca de ambiente — não
- * havia como saber se a conta acumulava os dois papéis. Agora há, e
- * `TrocaDePapel` aparece para quem de fato tem os dois.
+ * Fica em `(app)/(painel)` e não em `(app)/curador` porque o wizard do módulo
+ * 12 mora em `(app)/(cadastro)/curador/cadastro` e **não** pode herdar este
+ * shell: no protótipo ele é tela cheia, sem sidebar, e no primeiro acesso não
+ * há o que navegar nela. É a mesma divisão que a R0 fez em `(admin)`, pelo
+ * mesmo motivo — e lá o comentário do `layout.tsx` registra que a ausência
+ * dela era um bug.
+ *
+ * Mesma composição do ambiente do artista — ver o comentário de lá sobre
+ * `papeis` e sobre por que `registrarAmbiente` é condicional.
  *
  * **Sem `titulo`**: o `Shell` o deriva do caminho, como o protótipo faz.
  */
-export default async function LayoutCurador({ children }: { children: ReactNode }) {
-  const papeis = await lerPapeisDaSessao();
+export default async function LayoutPainelCurador({ children }: { children: ReactNode }) {
+  const [contexto, identidade] = await Promise.all([
+    lerContextoDaSessao(),
+    lerIdentidadeDaSessao(),
+  ]);
+
+  const papeis = contexto.estado === 'ok' ? contexto.papeis : [];
+  const precisaRegistrar = contexto.estado === 'ok' && contexto.ultimoAmbiente !== Papel.CURADOR;
 
   return (
-    <Shell papelAtivo="curador" papeis={papeis}>
+    <Shell
+      papelAtivo="curador"
+      papeis={papeis}
+      identidade={identidade ?? undefined}
+      acaoDeSair={sair}
+      registrarAmbiente={precisaRegistrar ? registrarAmbiente : undefined}
+    >
       {children}
     </Shell>
   );

@@ -370,6 +370,8 @@ Itens: `14px`/500 · `#1B1226` · padding `10px 12px` · `border-radius:10px` ·
 
 O único `role="tablist"` do R2 está no ambiente Artista — os demais grupos de aba são `<button>` sem semântica ARIA (ver 4.6).
 
+**Implementado como links** (`Abas`), com a mesma aparência: a aba viaja em `?aba=`, o que lhe dá endereço (a copy de Conta diz *"gere outro em Configurações › Segurança"*), faz a tela funcionar sem JavaScript e permite ao servidor renderizar só a aba aberta. Sendo navegação de verdade, o padrão acessível é `<a>` com `aria-current="page"`, e não `role="tab"` — que promete ao leitor de tela um painel trocando sem sair da página. Ver [07-pendências §B.2](prd/07-pendencias-e-divergencias.md).
+
 #### 2.1.5 Segmented control (filtro pill)
 
 **Uso real:** filtros de status na Fila do curador, filtros do Extrato de Claves, escolha de meio de pagamento.
@@ -531,6 +533,17 @@ Variante "provedor social" (`border:1px solid #E7E3EF`, `color:#1B1226`, `13–1
 Variante neutra (ex.: "Pular" no onboarding): `14px`/600 · `color:#6B6675` · `padding:8px 10px` · `border-radius:10px` · hover `background:#F6F3FB; color:#1B1226`.
 
 Variante destrutiva: `color:#8C3A2C`, fundo transparente.
+
+#### 2.3.3b Botão destrutivo com caixa
+
+O R2 usa **dois** vermelhos com caixa, e a diferença entre eles é semântica: um abre a confirmação, o outro executa.
+
+| Variante | Especificação | Uso real |
+|---|---|---|
+| **Contorno** (`perigoContorno`) | `color:#8C3A2C` · `background:#FFFFFF` · `border:1px solid #C98A7C` · `14px`/600 · `border-radius:10px` · `padding:11px 20px` · hover `background:#FBEDEA; border-color:#8C3A2C` | "Excluir conta" no card de encerramento (7.4 / 17.4) — **abre** o diálogo |
+| **Sólido** (`perigo`) | `color:#FFFFFF` · `background:#8C3A2C` · `border:none` · `15px`/600 · `border-radius:10px` · `padding:12px 22px` · hover `background:#75291C` | "Excluir minha conta" e "Excluir mídia", dentro do diálogo — **executa** |
+
+Fora do diálogo, vermelho cheio não aparece: no R2 ele é a última tecla, não um convite. O passo 1 da exclusão ("Continuar") usa o primário laranja justamente porque nada foi apagado ainda.
 
 #### 2.3.4 Icon button
 

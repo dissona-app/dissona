@@ -1,0 +1,109 @@
+/* Medidor de força de senha — docs/design-system.md §2.2.9 */
+
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+
+  /* A cor do nível entra por variável, e as classes de nível abaixo só a
+     trocam. Sem isso, cada elemento precisaria de uma classe por nível. */
+  --medidor-barra: var(--dsn-border);
+  --medidor-texto: var(--dsn-ink-500);
+}
+
+.vazio {
+  --medidor-barra: var(--dsn-border);
+  --medidor-texto: var(--dsn-ink-500);
+}
+
+.fraca {
+  --medidor-barra: var(--dsn-danger-fg);
+  --medidor-texto: var(--dsn-danger-fg);
+}
+
+.media {
+  --medidor-barra: var(--dsn-senha-media);
+  /* Barra e texto divergem de propósito: #a8761c não passa AA como texto.
+     Ver o comentário do componente. */
+  --medidor-texto: var(--dsn-warning-fg);
+}
+
+.forte {
+  --medidor-barra: var(--dsn-success-dot);
+  --medidor-texto: var(--dsn-success-fg);
+}
+
+.medidor {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-4);
+}
+
+.barras {
+  display: flex;
+  flex: 1;
+  gap: var(--dsn-space-2);
+}
+
+.barra,
+.barraAtiva {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--dsn-radius-full);
+  background: var(--dsn-border);
+  transition: background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.barraAtiva {
+  background: var(--medidor-barra);
+}
+
+.rotulo {
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--medidor-texto);
+  white-space: nowrap;
+}
+
+.requisitos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-2) var(--dsn-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.requisito,
+.requisitoAtendido {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-3);
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.requisitoAtendido {
+  color: var(--dsn-ink);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--dsn-radius-full);
+  background: var(--dsn-ink-200);
+  flex: none;
+  transition: background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.requisitoAtendido .dot {
+  background: var(--dsn-success-dot);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra,
+  .barraAtiva,
+  .dot {
+    transition: none;
+  }
+}

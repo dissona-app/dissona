@@ -1,0 +1,48 @@
+/* Convidar membro (27.3). */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+.acoes {
+  display: flex;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-3);
+}
+
+/* Bloco do link do convite — temporário, enquanto o SMTP é o embutido. */
+.blocoDoLink {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+  padding: var(--dsn-space-8);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-purple-050);
+}
+
+.linkTitulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.link {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-md);
+  background: var(--dsn-surface);
+  font-family: inherit;
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-700);
+}
+
+.linkNota {
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}

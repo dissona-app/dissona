@@ -1,0 +1,134 @@
+/* Tabela de mídias — tela 12.6. Linha é grid, não `<tr>` (design-system §2.4.3). */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+  padding: var(--dsn-space-12);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-8);
+}
+
+.overline {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.vazio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-10);
+  border-radius: var(--dsn-radius-xl);
+  background: var(--dsn-purple-050);
+}
+
+.vazioTitulo {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.vazioNota {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+/* A lista rola sozinha em tela estreita — o `<main>` nunca rola na horizontal. */
+.lista {
+  overflow-x: auto;
+}
+
+.linhaDeTitulo,
+.linha {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.2fr) 110px minmax(180px, 1.6fr) auto;
+  align-items: center;
+  gap: var(--dsn-space-6);
+  min-width: 620px;
+}
+
+.linhaDeTitulo {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--dsn-border);
+  font-size: var(--dsn-text-4xs);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-badge);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.linhas {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linha {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--dsn-border-faint);
+}
+
+.linha:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.nome {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.tipo {
+  justify-self: start;
+}
+
+.link {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-purple-600);
+  /* O link pode ser longo e não tem espaço onde quebrar; uma linha só, com
+     reticências, mantém a altura da linha previsível. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acoesDaLinha {
+  display: flex;
+  gap: var(--dsn-space-8);
+  justify-self: end;
+}
+
+.formularioDeExclusao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+.textoDeExclusao {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-700);
+}
+
+.acoesDoModal {
+  display: flex;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-3);
+}

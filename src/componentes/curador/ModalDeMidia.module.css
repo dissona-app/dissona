@@ -1,0 +1,13 @@
+/* Inserir e editar mídia — tela 12.6. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+.acoes {
+  display: flex;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-3);
+}

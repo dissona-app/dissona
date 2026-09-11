@@ -1,0 +1,30 @@
+/* Serviços e preços na manutenção — tela 12.6. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+  padding: var(--dsn-space-12);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+}
+
+.overline {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.acoes {
+  display: flex;
+}

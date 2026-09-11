@@ -1,0 +1,122 @@
+/* Tela 1.5 — tour de 4 passos. Conteúdo do artista literal do protótipo;
+   curador e admin derivados do PRD 1.5. */
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-5);
+}
+
+.contador {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+.pular {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink-500);
+  cursor: pointer;
+}
+
+.pular:hover:not(:disabled) {
+  color: var(--dsn-ink);
+  text-decoration: underline;
+}
+
+.pular:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(24px, 3.2vh, 30px);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: balance;
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--dsn-text-base);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-700);
+  text-wrap: pretty;
+}
+
+/* A micro-nota é o dado concreto do passo — "aceita WAV e MP3 até 50 MB",
+   "prazo de sete dias". Separada por uma régua porque ela responde a outra
+   pergunta que o parágrafo acima. */
+.micro {
+  margin: 0;
+  padding-top: var(--dsn-space-5);
+  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--dsn-radius-full);
+  background: var(--dsn-border);
+  transition: background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.dotAtivo {
+  background: var(--dsn-purple-600);
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+}
+
+/* O `<form>` do "Finalizar" precisa ocupar a mesma largura que o botão de
+   "Avançar" ocuparia — senão o rodapé salta no último passo. */
+.formularioFinal {
+  display: flex;
+  flex: 1;
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    transition: none;
+  }
+}

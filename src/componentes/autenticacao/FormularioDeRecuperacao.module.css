@@ -1,0 +1,77 @@
+/* Telas 1.2 e 19.1 — recuperação de senha. Copy idêntica nos dois ambientes. */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.overline {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+/* Menor que o título das outras telas de auth: na confirmação neutra o título
+   É a frase inteira ("Se este e-mail estiver cadastrado…"), e no tamanho de
+   hero ela ocuparia o card todo. */
+.titulo {
+  margin: 0;
+  font-size: clamp(20px, 2.6vh, 24px);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tighter);
+  text-wrap: balance;
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+.campo {
+  display: contents;
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsn-space-3);
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.rodapePergunta {
+  color: var(--dsn-ink-500);
+}
+
+.rodapeLink {
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.rodapeLink:hover {
+  text-decoration: underline;
+}

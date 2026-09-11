@@ -68,3 +68,46 @@
   margin: var(--dsn-space-3) 0;
   background: var(--dsn-border-faint);
 }
+
+/* Disparador sem caixa fixa — o do menu da conta, que carrega iniciais e nome
+   e por isso não cabe nos 38×38 do "?". */
+.disparadorLivre {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  background: var(--dsn-surface);
+  border-radius: var(--dsn-radius-full);
+  padding: var(--dsn-space-2) var(--dsn-space-5) var(--dsn-space-2) var(--dsn-space-2);
+  color: var(--dsn-ink);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--dsn-duration-base);
+}
+
+.disparadorLivre:hover {
+  border-color: var(--dsn-purple-600);
+}
+
+/* Nome e e-mail no topo do menu da conta. Não é item: não se clica nele. */
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  padding: var(--dsn-space-5) var(--dsn-space-6) var(--dsn-space-6);
+  margin-bottom: var(--dsn-space-3);
+  border-bottom: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disparador,
+  .disparadorLivre,
+  .item {
+    transition: none;
+  }
+
+  .menu {
+    animation: none;
+  }
+}

@@ -89,13 +89,14 @@ select pg_temp.afirmar_bloqueado(
   'preco de servico tem de ser positivo'
 );
 
--- `verificavel` é coluna gerada: acompanha `url` e não aceita valor.
+-- `verificavel` é coluna gerada: acompanha `url`/`anexo_caminho` (0002c) e não
+-- aceita valor. Os tipos são os seis do passo 6 do wizard, alinhados na `0002c`.
 insert into credencial_curador (perfil_curador_id, tipo, descricao, url)
-select pc.id, 'veiculo', 'Coluna semanal na Revista X', 'https://exemplo.test/coluna'
+select pc.id, 'imprensa', 'Coluna semanal na Revista X', 'https://exemplo.test/coluna'
 from perfil_curador pc join ator a on a.id = pc.perfil_id where a.papel = 'curador';
 
 insert into credencial_curador (perfil_curador_id, tipo, descricao)
-select pc.id, 'premio', 'Mencao honrosa sem link'
+select pc.id, 'anos', 'Atuacao declarada sem comprovacao'
 from perfil_curador pc join ator a on a.id = pc.perfil_id where a.papel = 'curador';
 
 select pg_temp.afirmar(
@@ -252,7 +253,7 @@ select pg_temp.afirmar(
 
 select pg_temp.afirmar_bloqueado(
   format('insert into credencial_curador (perfil_curador_id, tipo, descricao)
-          values (%L, ''premio'', ''forjada'')',
+          values (%L, ''anos'', ''forjada'')',
          (select pc.id from perfil_curador pc
            where pc.perfil_id = '55555555-5555-5555-5555-555555555555')),
   'curador nao cria credencial para outro curador'

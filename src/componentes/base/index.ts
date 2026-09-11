@@ -1,4 +1,6 @@
 // Componentes base do Design System (docs/design-system.md §2).
+export { Abas } from './Abas';
+export type { Aba, PropsAbas } from './Abas';
 export { AreaTexto } from './AreaTexto';
 export type { PropsAreaTexto, VarianteAreaTexto } from './AreaTexto';
 export { Aviso } from './Aviso';
@@ -15,6 +17,8 @@ export { CampoNota, NOTA_MAXIMA, NOTA_MINIMA, NOTA_PASSO } from './CampoNota';
 export type { PropsCampoNota } from './CampoNota';
 export { Cartao, CartaoClicavel } from './Cartao';
 export type { PropsCartao, PropsCartaoClicavel, VarianteCartao } from './Cartao';
+export { Checkbox } from './Checkbox';
+export type { PropsCheckbox } from './Checkbox';
 export { EstadoVazio } from './EstadoVazio';
 export type { PropsEstadoVazio } from './EstadoVazio';
 export { Etiqueta } from './Etiqueta';
@@ -23,6 +27,8 @@ export { Gaveta } from './Gaveta';
 export type { PropsGaveta } from './Gaveta';
 export { Grupo } from './Grupo';
 export type { OpcaoGrupo, PropsGrupo } from './Grupo';
+export { MedidorDeSenha } from './MedidorDeSenha';
+export type { PropsMedidorDeSenha } from './MedidorDeSenha';
 export { Modal } from './Modal';
 export type { LarguraModal, PropsModal } from './Modal';
 export { Painel } from './Painel';

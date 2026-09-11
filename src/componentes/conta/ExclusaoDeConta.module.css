@@ -1,0 +1,59 @@
+/* Exclusão de conta em dois passos — telas 7.4 / 17.4. */
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+/* Linha do arquivo de exportação — o bloco em lilás do protótipo. */
+.arquivo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: var(--dsn-space-8);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-purple-050);
+}
+
+.arquivoTextos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.arquivoNome {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.arquivoNota {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.baixar {
+  flex: none;
+  padding: 10px 18px;
+  border: var(--dsn-border-width) solid var(--dsn-purple-600);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-surface);
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+  transition: background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.baixar:hover {
+  background: var(--dsn-purple-050);
+}
+
+.acoes {
+  display: flex;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-3);
+}

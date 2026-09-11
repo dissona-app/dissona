@@ -1,0 +1,83 @@
+/* Caixa de seleção — docs/design-system.md §2.2.4 */
+
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+}
+
+.rotulo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dsn-space-4);
+  cursor: pointer;
+}
+
+/* O input existe e recebe o foco; ele só não é visto. `appearance: none` não
+   basta — o foco tem de continuar alcançável pelo teclado, então nada de
+   `display: none` nem `visibility: hidden`. */
+.entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.caixa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: none;
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-sm);
+  background: var(--dsn-surface);
+  color: transparent;
+  transition:
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    border-color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.invalida {
+  border-color: var(--dsn-danger-fg);
+}
+
+.entrada:checked + .caixa {
+  background: var(--dsn-purple-500);
+  border-color: var(--dsn-purple-500);
+  color: var(--dsn-surface);
+}
+
+/* O anel de foco pertence à caixa pintada, e não ao input escondido. */
+.entrada:focus-visible + .caixa {
+  border-color: var(--dsn-focus-outline-color);
+  box-shadow: var(--dsn-shadow-focus);
+}
+
+.marca {
+  display: block;
+}
+
+.texto {
+  font-size: var(--dsn-text-xs);
+  line-height: 1.5;
+  color: var(--dsn-ink);
+}
+
+.erro {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-danger-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caixa {
+    transition: none;
+  }
+}

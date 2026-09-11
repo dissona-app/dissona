@@ -1,0 +1,57 @@
+/* Botões de provedor — telas 1 e 1.1. */
+
+.provedores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dsn-space-4);
+}
+
+/* O `<form>` precisa esticar, senão o botão dentro dele não acompanha a coluna
+   do grid. */
+.formulario {
+  display: flex;
+}
+
+.provedor {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 11px var(--dsn-space-4);
+  cursor: pointer;
+  transition:
+    border-color var(--dsn-duration-base),
+    background var(--dsn-duration-base);
+}
+
+.provedor:hover:not(:disabled) {
+  border-color: var(--dsn-purple-600);
+  background: var(--dsn-purple-050);
+}
+
+/* SoundCloud: na tela, desabilitado, com o motivo no `title`. */
+.provedor:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.sigla {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-black);
+  line-height: var(--dsn-leading-none);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .provedor {
+    transition: none;
+  }
+}

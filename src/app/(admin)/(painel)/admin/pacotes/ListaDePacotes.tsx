@@ -254,6 +254,8 @@ export function ListaDePacotes({
       <Modal
         aberto={aExcluir !== null}
         onFechar={() => setAExcluir(null)}
+        overline={ADMIN_PACOTE_EXCLUIR.overline}
+        tomDoOverline="marca"
         titulo={aExcluir === null ? '' : ADMIN_PACOTE_EXCLUIR.alvo(aExcluir.nome, aExcluir.claves)}
         largura="estreita"
         // Confirmação destrutiva: fechar sem querer, por ESC ou clique fora,
@@ -283,7 +285,6 @@ export function ListaDePacotes({
         }
       >
         <div className={estilos.corpoModal}>
-          <span className={estilos.overlineModal}>{ADMIN_PACOTE_EXCLUIR.overline}</span>
           <p className={estilos.textoModal}>{ADMIN_PACOTE_EXCLUIR.texto}</p>
         </div>
       </Modal>

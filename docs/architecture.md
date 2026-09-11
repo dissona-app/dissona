@@ -62,7 +62,7 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 | **Supabase Postgres** | Banco relacional, RLS, funções e RPC |
 | **Supabase Auth** | Sessão, e-mail/senha, OAuth Google e Facebook |
 | **Supabase Storage** | Faixas, capas, avatares, materiais de matéria, exportações LGPD |
-| **Supabase Edge Functions** | Webhooks do gateway e jobs agendados (`pg_cron` dispara, Edge executa) |
+| **Supabase Edge Functions** | Webhooks do gateway, jobs agendados (`pg_cron` dispara, Edge executa) e **um caminho de requisição**: o `userinfo` do provider do SoundCloud, que não podia viver no Next — ver §2.3 |
 | **Supabase CLI** | Migrations versionadas em `supabase/migrations/`, geração de tipos |
 
 **Um projeto Supabase, em desenvolvimento.** `dissona` · ref `fhqcibjzmowcjkdrqyvi` · região `us-west-2` · Postgres 17. Ele serve o Preview e a Production da Vercel enquanto o produto não tem usuário real. Projetos dedicados de staging e produção entram antes do beta — ver [open-questions #25](open-questions.md#25-projetos-dedicados-de-staging-e-produção).
@@ -81,7 +81,7 @@ O **Supabase CLI** continua sendo o caminho da stack local (`supabase start`, `d
 |---|---|---|---|
 | Google OAuth | Login social | R1 | provider nativo do Supabase Auth |
 | Facebook OAuth | Login social | R1 | provider nativo do Supabase Auth |
-| **SoundCloud OAuth** | Login social | R1 | ⚠️ **não é provider nativo** — exige fluxo OAuth2 próprio. Validar disponibilidade da API |
+| **SoundCloud OAuth** | Login social | R1 | **Custom OAuth provider** `custom:soundcloud` (`pkce_enabled`, `email_optional`). O `userinfo_url` aponta para a Edge Function **`soundcloud-userinfo`**, e não para `api.soundcloud.com/me`: o GoTrue exige `sub` e o `/me` deles não tem. Exige Artist Pro pago, e não devolve e-mail — colhido na confirmação do cadastro ([#9](open-questions.md#9-soundcloud-assinar-o-artist-pro-e-viver-sem-o-e-mail)) |
 | E-mail transacional | Verificação, recuperação, avisos | R1 | ⚠️ provedor e domínio de envio a definir |
 | **Asaas** | Cobrança Pix e cartão, split, subcontas, payouts | R2 | ⚠️ modelo de split a definir com o contador do cliente |
 | Spotify Web API | Metadados de faixa por link | R2 | oEmbed / Web API |

@@ -94,3 +94,17 @@
   color: var(--dsn-ink-500);
   text-transform: uppercase;
 }
+
+/* Contato do banner de conta bloqueada — o único estado em que tentar de novo
+   não resolve. Mesmos tokens do contato da tela 19. */
+.contato {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.contato:hover {
+  text-decoration: underline;
+}

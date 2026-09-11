@@ -1,0 +1,81 @@
+/* Painel de credenciais reconhecidas — tela 12.4. */
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+  padding: var(--dsn-space-7);
+  background: var(--dsn-surface-alt);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-xl);
+}
+
+.painelCabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+}
+
+.painelTitulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.contagemOk {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-success-fg);
+}
+
+.contagemFalta {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-warning-fg);
+}
+
+.credenciais {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.credencial,
+.credencialOk {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.credencialOk {
+  color: var(--dsn-ink);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: var(--dsn-radius-full);
+  background: var(--dsn-ink-250);
+}
+
+.credencialOk .dot {
+  background: var(--dsn-success-dot);
+}
+
+.notaOuro {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}

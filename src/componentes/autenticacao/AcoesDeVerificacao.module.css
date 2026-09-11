@@ -1,0 +1,70 @@
+/* Verificação de e-mail — tela acrescentada pelo protótipo da R2. */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.overline {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(22px, 3vh, 27px);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: balance;
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+/* `word-break` porque endereço longo em card de 436px estoura a largura, e um
+   e-mail cortado no meio é pior que quebrado. */
+.endereco {
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+  word-break: break-all;
+}
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+.formulario {
+  display: flex;
+}
+
+.rodape {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.rodapeLink {
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.rodapeLink:hover {
+  text-decoration: underline;
+}

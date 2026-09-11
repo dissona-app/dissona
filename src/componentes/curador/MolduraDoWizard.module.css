@@ -1,0 +1,116 @@
+/* Wizard do módulo 12 — Design System §3.3 (split-screen) e §3.4. */
+
+.pagina {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--dsn-grad-auth-bg);
+}
+
+/* `<progress>` nativo, restilizado. O valor é anunciado sem ARIA escrito à
+   mão, e o `appearance: none` é o que permite pintá-lo com o gradiente da
+   marca. */
+.progresso {
+  position: relative;
+  z-index: 2;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border: none;
+  background: var(--dsn-border);
+  flex: none;
+}
+
+.progresso::-webkit-progress-bar {
+  background: var(--dsn-border);
+}
+
+.progresso::-webkit-progress-value {
+  background: var(--dsn-grad-brand-h);
+  transition: width var(--dsn-duration-slow) var(--dsn-ease-out);
+}
+
+.progresso::-moz-progress-bar {
+  background: var(--dsn-grad-brand-h);
+}
+
+.miolo,
+.mioloDividido {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(var(--dsn-space-8), 3vw, var(--dsn-space-24));
+  padding: var(--dsn-pad-secao-y) var(--dsn-pad-auth-x);
+}
+
+/* `auto-fit` em vez de `@media`: os protótipos da R2 não têm nenhum breakpoint
+   (pendência #24), e inventar um aqui fingiria uma decisão de mobile que
+   ninguém tomou. Assim as duas colunas viram uma quando não cabem. */
+.mioloDividido {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(404px, 100%), 1fr));
+  align-items: start;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+  background: var(--dsn-auth-painel-bg);
+  border: var(--dsn-border-width) solid var(--dsn-auth-painel-border);
+  border-radius: var(--dsn-radius-2xl);
+  padding: clamp(15px, 1.8vw, 20px);
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--dsn-space-8), 2.4vh, var(--dsn-space-12));
+  width: 100%;
+  /* A largura por passo, medida no protótipo. */
+  max-width: var(--wizard-largura, 660px);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.contador {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(24px, 3.2vh, 30px);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: balance;
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progresso::-webkit-progress-value {
+    transition: none;
+  }
+}

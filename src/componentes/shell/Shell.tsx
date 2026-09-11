@@ -5,8 +5,10 @@ import type { ReactNode } from 'react';
 
 import type { Papel } from '@/lib/papeis';
 
-import { MenuAjuda } from './MenuAjuda';
+import { MenuDaConta } from './MenuDaConta';
+import type { IdentidadeExibida } from './MenuDaConta';
 import { Navegacao } from './Navegacao';
+import { RegistrarAmbiente } from './RegistrarAmbiente';
 import estilos from './Shell.module.css';
 import { tituloDoCaminho } from './titulo-por-caminho';
 import { TrocaDePapel } from './TrocaDePapel';
@@ -31,7 +33,18 @@ export type PropsShell = {
   readonly acoes?: ReactNode;
   /** Card de saldo no pé da sidebar. */
   readonly rodapeNavegacao?: ReactNode;
-  readonly onReverOnboarding?: () => void;
+  /**
+   * Identidade da conta — alimenta o menu do avatar, onde ficam "Rever
+   * onboarding" e "Sair".
+   *
+   * Opcional para que o `Shell` continue montável sem sessão em teste. Sem ela,
+   * o menu não aparece — e é melhor não aparecer do que aparecer vazio.
+   */
+  readonly identidade?: IdentidadeExibida;
+  /** `sair` ou `sairDoAdmin`, conforme o ambiente. */
+  readonly acaoDeSair?: () => Promise<void>;
+  /** Registra o ambiente em uso (RF-008). Só é montado quando o valor mudou. */
+  readonly registrarAmbiente?: (papel: Papel) => Promise<void>;
   readonly children: ReactNode;
 };
 
@@ -64,7 +77,9 @@ export function Shell({
   limite = 'total',
   acoes,
   rodapeNavegacao,
-  onReverOnboarding,
+  identidade,
+  acaoDeSair,
+  registrarAmbiente,
   children,
 }: PropsShell) {
   const ehAdmin = papelAtivo === 'admin';
@@ -73,13 +88,12 @@ export function Shell({
   const tituloExibido = titulo ?? doCaminho.titulo;
   const subtituloExibido = subtitulo ?? doCaminho.sublegenda;
 
-  const itensDeAjuda =
-    onReverOnboarding === undefined
-      ? []
-      : [{ rotulo: 'Rever onboarding', onAcionar: onReverOnboarding }];
-
   return (
     <div className={estilos.grade}>
+      {registrarAmbiente === undefined ? null : (
+        <RegistrarAmbiente papel={papelAtivo} acao={registrarAmbiente} />
+      )}
+
       <a className={estilos.atalho} href={`#${ID_CONTEUDO}`}>
         Ir para o conteúdo
       </a>
@@ -98,7 +112,16 @@ export function Shell({
           <div className={estilos.acoesHeader}>
             <TrocaDePapel papelAtivo={papelAtivo} papeis={papeis} />
             {acoes}
-            {itensDeAjuda.length > 0 ? <MenuAjuda itens={itensDeAjuda} /> : null}
+            {identidade !== undefined && acaoDeSair !== undefined ? (
+              <MenuDaConta
+                identidade={identidade}
+                acaoDeSair={acaoDeSair}
+                // O onboarding do admin é a versão enxuta e não vale um item
+                // permanente no menu — e "Rever onboarding" apontando para o
+                // tour do artista seria pior que não ter o item.
+                ofereceOnboarding={!ehAdmin}
+              />
+            ) : null}
           </div>
         </header>
 

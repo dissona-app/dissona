@@ -1,0 +1,105 @@
+/* Dados pessoais do integrante (27.1). */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+  overflow: hidden;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 22px);
+  padding: clamp(16px, 2.4vh, 24px);
+}
+
+.identidade {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-8);
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: clamp(56px, 7vh, 66px);
+  height: clamp(56px, 7vh, 66px);
+  border: 1px solid var(--dsn-purple-200);
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-purple-100);
+  font-size: var(--dsn-text-lg);
+  font-weight: var(--dsn-weight-bold);
+  color: var(--dsn-purple-600);
+}
+
+.foto {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fotoNota {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.par {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(12px, 1.8vh, 18px);
+}
+
+.linhaDoEmail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.blocoDaSenha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-8);
+  padding: clamp(12px, 1.8vh, 16px) var(--dsn-space-8);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-purple-050);
+}
+
+.textosDaSenha {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  max-width: 520px;
+}
+
+.senhaTitulo {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.senhaNota {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-6);
+  margin: 0 calc(-1 * clamp(16px, 2.4vh, 24px)) calc(-1 * clamp(16px, 2.4vh, 24px));
+  padding: clamp(12px, 1.8vh, 16px) clamp(16px, 2.4vh, 24px);
+  border-top: 1px solid var(--dsn-border);
+  background: var(--dsn-surface-alt);
+}

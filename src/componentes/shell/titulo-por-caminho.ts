@@ -1,5 +1,6 @@
 import { ROTA } from '@/lib/guarda-rota';
 import type { Papel } from '@/lib/papeis';
+import { CURADOR_MANUTENCAO } from '@/textos/curador';
 
 import { NOME_AMBIENTE } from './navegacao-por-ambiente';
 
@@ -53,9 +54,29 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
     titulo: 'Moderação e antifraude',
     sublegenda: 'Denúncias, logs e bloqueios.',
   },
-  [`${ROTA.ADMIN}/equipe`]: {
+  [ROTA.ADMIN_EQUIPE]: {
     titulo: 'Conta e equipe',
     sublegenda: 'Seus dados, equipe e permissões.',
+  },
+
+  // Conta e configurações (7.2/7.4 e 17.2/17.4). Título e sublegenda literais:
+  // o artista lê "Configurações", e o curador "Conta e configurações" com a
+  // sublegenda do recebimento — são dois blocos diferentes no protótipo, e não
+  // um texto genérico servindo aos dois.
+  [ROTA.ARTISTA_CONTA]: {
+    titulo: 'Configurações',
+    sublegenda: 'Conta, preferências e segurança.',
+  },
+  [ROTA.CURADOR_CONTA]: {
+    titulo: 'Conta e configurações',
+    sublegenda: 'Dados de recebimento, preferências e segurança.',
+  },
+
+  // 12.6 — derivada: o protótipo tem "Meu cadastro" na sidebar e o aponta para
+  // o wizard. Título e sublegenda vêm do PRD §12.6.
+  [ROTA.CURADOR_MEU_CADASTRO]: {
+    titulo: CURADOR_MANUTENCAO.titulo,
+    sublegenda: CURADOR_MANUTENCAO.subtitulo,
   },
 
   // Raiz dos outros dois ambientes. Sem entrada aqui elas cairiam no nome do

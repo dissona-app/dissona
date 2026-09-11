@@ -18,26 +18,12 @@ import 'server-only';
 import { estourarSeErro } from '@/lib/supabase/erros';
 import { criarClienteServidor } from '@/lib/supabase/servidor';
 
-/**
- * Módulos de `permissao_admin`, como a `0003` os semeia.
- *
- * A tela 27.4 do protótipo tem quatro chaves (`gestao`, `moderacao`,
- * `financeiro`, `equipe`); a tabela tem seis, com `pacotes` e `configuracao`
- * separados de `financeiro`. A divergência está registrada em
- * `docs/prd/07-pendencias-e-divergencias.md`: a granularidade maior fica, e a
- * tela do protótipo mapeia `pacotes` junto de `financeiro` até o cliente
- * decidir.
- */
-export const ModuloAdmin = {
-  GESTAO: 'gestao',
-  MODERACAO: 'moderacao',
-  FINANCEIRO: 'financeiro',
-  PACOTES: 'pacotes',
-  EQUIPE: 'equipe',
-  CONFIGURACAO: 'configuracao',
-} as const;
+import type { ModuloAdmin } from './modulos';
 
-export type ModuloAdmin = (typeof ModuloAdmin)[keyof typeof ModuloAdmin];
+// Os nomes dos módulos vivem em `modulos.ts`, que **não** é `server-only`: a
+// matriz de 27.4 é uma tela de cliente e precisa deles. Reexportados aqui
+// (valor e tipo) para quem já os importava deste arquivo.
+export { ModuloAdmin } from './modulos';
 
 export type Permissao = {
   readonly podeLer: boolean;

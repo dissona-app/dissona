@@ -61,6 +61,7 @@ export default async function Pagina({
           erroEmailInvalido: ADMIN_ENTRAR.erroEmailInvalido,
           erroSenhaVazia: ADMIN_ENTRAR.erroSenhaVazia,
           bannerCredenciais: ADMIN_ENTRAR.bannerCredenciais,
+          bannerBloqueada: ADMIN_ENTRAR.bannerBloqueada,
           bannerSemAcesso: {
             titulo: ADMIN_ENTRAR.bannerSemAcesso.titulo,
             texto: ADMIN_ENTRAR.bannerSemAcesso.texto,

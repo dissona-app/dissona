@@ -1,0 +1,33 @@
+/* Abas sublinhadas — design-system.md §2.1.4. */
+
+.base {
+  display: flex;
+  gap: var(--dsn-space-14);
+  align-items: flex-end;
+  border-bottom: 1px solid var(--dsn-border);
+  /* A aba ativa monta o sublinhado com `inset 0 -2px 0` sobre esta linha, e
+     precisa do `margin-bottom:-1px` para cobri-la. */
+  overflow-x: auto;
+}
+
+.aba {
+  padding: 0 2px clamp(9px, 1.5vh, 13px);
+  margin-bottom: -1px;
+  font-size: var(--dsn-text-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--dsn-ink-500);
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: inset 0 -2px 0 transparent;
+  transition: color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.aba:hover {
+  color: var(--dsn-ink);
+}
+
+.ativa {
+  color: var(--dsn-ink);
+  box-shadow: inset 0 -2px 0 var(--dsn-purple-600);
+}

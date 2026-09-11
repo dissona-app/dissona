@@ -96,6 +96,32 @@
   text-decoration: underline;
 }
 
+/* --------------------------------------------------------------- perigo */
+
+/* Vermelho sólido — o botão que executa a exclusão, dentro do diálogo. */
+.perigo {
+  background: var(--dsn-danger-fg);
+  color: #ffffff;
+  font-size: var(--dsn-text-base);
+}
+
+.perigo:hover:not(:disabled) {
+  background: var(--dsn-danger-fg-hover);
+}
+
+/* Vermelho com contorno — o botão que abre o diálogo. */
+.perigoContorno {
+  background: var(--dsn-surface);
+  color: var(--dsn-danger-fg);
+  border: var(--dsn-border-width) solid var(--dsn-danger-border-strong);
+  font-size: var(--dsn-text-sm);
+}
+
+.perigoContorno:hover:not(:disabled) {
+  background: var(--dsn-danger-bg);
+  border-color: var(--dsn-danger-fg);
+}
+
 /* -------------------------------------------------------------- tamanhos */
 
 .md {

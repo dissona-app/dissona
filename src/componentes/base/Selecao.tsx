@@ -21,6 +21,16 @@ export type PropsSelecao = Omit<
   readonly variante?: 'formulario' | 'tabela';
   /** Rótulo da opção vazia. Sem ele o select não tem estado "nada escolhido". */
   readonly placeholder?: string;
+  /**
+   * Esconde o rótulo visualmente, mantendo-o para leitor de tela.
+   *
+   * Para o `<select>` dentro de linha de tabela, onde o cabeçalho da coluna já
+   * diz "Papel" e repetir o rótulo em cada uma das quatro linhas é ruído. É o
+   * que o protótipo faz com `aria-label="Papel"` — a diferença é que aqui o
+   * texto continua sendo um `<label>` de verdade, associado por `htmlFor`, que
+   * é mais robusto que um `aria-label` (design-system §4.4).
+   */
+  readonly rotuloOculto?: boolean;
 };
 
 export function Selecao({
@@ -29,6 +39,7 @@ export function Selecao({
   erro,
   variante = 'formulario',
   placeholder,
+  rotuloOculto = false,
   required = false,
   ...resto
 }: PropsSelecao) {
@@ -45,7 +56,10 @@ export function Selecao({
 
   return (
     <div className={estilos.envolvente}>
-      <label className={estilos.rotulo} htmlFor={id}>
+      <label
+        className={rotuloOculto ? 'dsn-apenas-leitor' : estilos.rotulo}
+        htmlFor={id}
+      >
         {rotulo}
       </label>
 

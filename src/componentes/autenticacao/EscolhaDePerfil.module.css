@@ -1,0 +1,113 @@
+/* Tela 1.4 — seleção de perfil. Derivada: card selecionável (§2.4.2) na
+   moldura de autenticação (§3.3). */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.overline {
+  align-self: flex-start;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-purple-600);
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(22px, 3vh, 27px);
+  line-height: var(--dsn-leading-title);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-tightest);
+  text-wrap: balance;
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.opcoes {
+  display: grid;
+  gap: var(--dsn-space-5);
+}
+
+.cartao {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--dsn-space-3);
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-xl);
+  padding: var(--dsn-space-8);
+  cursor: pointer;
+  transition:
+    border-color var(--dsn-duration-base) var(--dsn-ease-out),
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    box-shadow var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.cartao:hover:not(:disabled) {
+  border-color: var(--dsn-purple-500);
+  background: var(--dsn-purple-050);
+}
+
+.cartao:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.cartaoTitulo {
+  font-size: var(--dsn-text-md);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-tight);
+  color: var(--dsn-ink);
+}
+
+.cartaoTexto {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.cartaoNota {
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+/* `aria-hidden` no TSX: é a afordância visual do card, e o botão já se anuncia
+   pelo título. Repetir "Continuar" no leitor de tela só duplicaria. */
+.cartaoAcao {
+  margin-top: var(--dsn-space-2);
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao {
+    transition: none;
+  }
+}

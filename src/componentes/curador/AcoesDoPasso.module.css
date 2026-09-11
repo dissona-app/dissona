@@ -1,0 +1,19 @@
+/* Rodapé dos passos do wizard. */
+
+.rodape {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-6);
+  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+/* `margin-left: auto` em vez de `justify-content: space-between` no pai: o
+   "Pular" pode não existir, e com `space-between` os dois botões restantes
+   ficariam nas pontas opostas da tela. */
+.direita {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-5);
+  margin-left: auto;
+}

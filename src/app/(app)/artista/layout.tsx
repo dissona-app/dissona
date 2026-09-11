@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 
 import { Shell } from '@/componentes/shell/Shell';
-import { lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
+import { Papel } from '@/lib/papeis';
+import { registrarAmbiente, sair } from '@/modulos/autenticacao/acoes';
+import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
 
 /**
  * Shell do ambiente do artista.
@@ -11,13 +13,30 @@ import { lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
  * havia como saber se a conta acumulava os dois papéis. Agora há, e
  * `TrocaDePapel` aparece para quem de fato tem os dois.
  *
+ * O `registrarAmbiente` só é passado quando o valor gravado **difere** deste
+ * ambiente (RF-008). Passá-lo sempre seria uma escrita no banco por navegação;
+ * a informação muda quando a pessoa troca de ambiente, não quando abre outra
+ * página do mesmo.
+ *
  * **Sem `titulo`**: o `Shell` o deriva do caminho, como o protótipo faz.
  */
 export default async function LayoutArtista({ children }: { children: ReactNode }) {
-  const papeis = await lerPapeisDaSessao();
+  const [contexto, identidade] = await Promise.all([
+    lerContextoDaSessao(),
+    lerIdentidadeDaSessao(),
+  ]);
+
+  const papeis = contexto.estado === 'ok' ? contexto.papeis : [];
+  const precisaRegistrar = contexto.estado === 'ok' && contexto.ultimoAmbiente !== Papel.ARTISTA;
 
   return (
-    <Shell papelAtivo="artista" papeis={papeis}>
+    <Shell
+      papelAtivo="artista"
+      papeis={papeis}
+      identidade={identidade ?? undefined}
+      acaoDeSair={sair}
+      registrarAmbiente={precisaRegistrar ? registrarAmbiente : undefined}
+    >
       {children}
     </Shell>
   );

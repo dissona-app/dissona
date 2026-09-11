@@ -1,0 +1,108 @@
+/* Matriz de papéis e permissões (27.4). Grid do protótipo, com o cabeçalho e
+   as quatro colunas de papel. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+  overflow: hidden;
+}
+
+.cabecalho,
+.linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(4, 132px);
+  gap: var(--dsn-space-6);
+  padding: 0 clamp(16px, 2.4vh, 24px);
+  min-width: 760px;
+}
+
+.cabecalho {
+  align-items: end;
+  padding-top: clamp(13px, 2vh, 19px);
+  padding-bottom: clamp(13px, 2vh, 19px);
+  border-bottom: 1px solid var(--dsn-border);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.overline {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.descricao {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.nomeDoPapel {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  text-align: center;
+}
+
+.linha {
+  align-items: center;
+  padding-top: clamp(10px, 1.6vh, 14px);
+  padding-bottom: clamp(10px, 1.6vh, 14px);
+  border-bottom: 1px solid var(--dsn-border-faint);
+}
+
+.permissao {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.permissaoRotulo {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+}
+
+.permissaoDescricao {
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-snug);
+  color: var(--dsn-ink-500);
+}
+
+.celula {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Célula travada: texto, sem controle. É o que a RPC recusaria. */
+.celulaFixa {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+  text-align: center;
+}
+
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-6);
+  padding: clamp(12px, 1.8vh, 16px) clamp(16px, 2.4vh, 24px);
+  background: var(--dsn-surface-alt);
+}
+
+.nota {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

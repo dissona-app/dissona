@@ -1,9 +1,10 @@
-# Perguntas ao cliente · 2026-09-08, atualizado em 2026-09-09
+# Perguntas ao cliente · 2026-09-08, atualizado em 2026-09-10
 
-Quatro decisões que a implementação expôs. Nenhuma bloqueia o desenvolvimento
-hoje — todas estão implementadas com um default explícito e reversível — mas as
-duas primeiras precisam de resposta **antes da tela 14.4 (Remuneração por
-classe)** e do cenário C6.
+Cinco decisões que a implementação expôs. As quatro primeiras não bloqueiam o
+desenvolvimento hoje — estão implementadas com um default explícito e
+reversível — mas as duas iniciais precisam de resposta **antes da tela 14.4
+(Remuneração por classe)** e do cenário C6. **A quinta bloqueia**: sem ela, o
+login por SoundCloud não sai do lugar.
 
 A quarta apareceu ao portar a tela de login e é a mais barata de resolver: é
 uma linha de texto.
@@ -114,3 +115,47 @@ não poder entregar a avaliação que já escreveu.
 
 *Se preferirem um número na home, "60% da faixa ouvida, no mínimo" é
 verificável e ainda é um diferencial — quase nenhuma plataforma mede escuta.*
+
+---
+
+## 5 · O SoundCloud custa uma assinatura, e não entrega o e-mail
+
+Pesquisamos a API deles em 2026-09-10. Duas notícias.
+
+**A boa:** desde 18/05/2026 as credenciais são self-serve — nada de formulário
+de análise nem de fila, que era o risco registrado desde o discovery. O OAuth
+deles é padrão, e o Supabase passou a aceitar provedores customizados: o login
+por SoundCloud deixou de ser um fluxo que teríamos de escrever e manter por
+conta própria.
+
+**As duas ruins:**
+
+1. **Registrar a aplicação exige assinatura Artist Pro** — ~US$ 8,25/mês, ou
+   US$ 99 no ano, numa conta da Dissona. É custo fixo da plataforma, e sem ele
+   não existem credenciais.
+2. **A API não devolve o e-mail do usuário.** O perfil que ela entrega tem
+   nome, foto e link — e um campo que apenas diz *se* o e-mail foi confirmado,
+   não qual é. Não há permissão que libere o endereço; o pedido foi aberto na
+   comunidade deles em 2022 e fechado sem entrega.
+
+O item 2 contradiz uma promessa que está no protótipo, no pé do cadastro:
+*"Google, Facebook ou SoundCloud preenchem seu nome e e-mail. Você confirma
+antes de criar."* Pelo Google e pelo Facebook, sim. Pelo SoundCloud, o nome vem
+e o e-mail não — e aqui o e-mail não é enfeite de perfil: é o identificador da
+conta e o canal de verificação, de recuperação de senha e de aviso de prazo.
+
+**Perguntas:**
+
+1. A plataforma assina o Artist Pro? Se não, o provedor sai das telas de login
+   e de cadastro, e a copy muda com ele.
+2. Se sim, como pedimos o e-mail que o SoundCloud não dá? Já existe uma tela de
+   confirmação depois do login social — colher o endereço ali é o caminho mais
+   curto. A alternativa é o SoundCloud servir só para **entrar**, para quem já
+   criou a conta por outro caminho.
+
+*Enquanto não houver resposta, o botão continua na tela, desabilitado e com o
+motivo visível — a mesma decisão que vale para o resto do que ainda não entrou.*
+
+**Custo de implementar, depois do "sim":** pequeno. O provedor é configuração no
+Supabase, e o único ponto técnico a provar é se o perfil deles precisa de uma
+tradução nossa no meio.

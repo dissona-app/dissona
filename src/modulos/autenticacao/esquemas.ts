@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { senhaAtendePolitica } from '@/lib/senha';
+
 /**
  * Credenciais das telas 1 e 19.
  *
@@ -35,6 +37,78 @@ export const esquemaCredenciais = z.object({
 export type Credenciais = z.infer<typeof esquemaCredenciais>;
 
 /**
+ * Cadastro — tela 1.1.
+ *
+ * Aqui a política de senha **vale**, ao contrário do login: é o momento em que
+ * ela é escolhida. A regra vem de `lib/senha.ts`, o mesmo módulo que alimenta o
+ * medidor de força da tela — se fossem duas implementações, o formulário
+ * mostraria "Senha forte" e recusaria o envio.
+ *
+ * O aceite é `z.literal('on')` porque é o que um checkbox HTML manda quando
+ * marcado; desmarcado, ele simplesmente não vai no `FormData`, e o `literal`
+ * falha com o código certo. Validar o aceite no servidor não é formalidade: ele
+ * é obrigação de LGPD (RF-010), e o `perfil.aceite_termos_em` só é gravado
+ * porque este campo passou.
+ */
+export const esquemaCadastro = z
+  .object({
+    nome: z.string().trim().min(1, { message: 'nome_vazio' }),
+    email,
+    senha: z.string().refine(senhaAtendePolitica, { message: 'senha_fraca' }),
+    confirmar: z.string().min(1, { message: 'confirmar_vazio' }),
+    aceite: z.literal('on', { message: 'aceite_obrigatorio' }).transform(() => true),
+  })
+  // O `path` põe o erro no campo de confirmação, e não no de senha: quem digita
+  // diferente errou a repetição, não a senha.
+  .refine((dados) => dados.senha === dados.confirmar, {
+    message: 'senhas_diferentes',
+    path: ['confirmar'],
+  });
+
+export type Cadastro = z.infer<typeof esquemaCadastro>;
+
+/** Só o e-mail — recuperação de senha (1.2) e reenvio da verificação. */
+export const esquemaEmail = z.object({ email });
+
+/**
+ * Nova senha e confirmação — redefinição (1.3 / 19.2) e troca em Conta.
+ *
+ * Não tem `senhaAtual`: quem chega pelo link do e-mail já provou a posse da
+ * caixa, e exigir a senha atual de quem esqueceu a senha é o que o fluxo existe
+ * para evitar. A troca em Conta acrescenta a reautenticação por cima deste
+ * schema.
+ */
+export const esquemaNovaSenha = z
+  .object({
+    senha: z.string().refine(senhaAtendePolitica, { message: 'senha_fraca' }),
+    confirmar: z.string().min(1, { message: 'confirmar_vazio' }),
+  })
+  .refine((dados) => dados.senha === dados.confirmar, {
+    message: 'senhas_diferentes',
+    path: ['confirmar'],
+  });
+
+/**
+ * Colhe **todos** os erros de campo de um `safeParse`, e não só o primeiro.
+ *
+ * `issues` pode trazer mais de um problema para o mesmo campo; o primeiro por
+ * campo é o que a tela mostra, e é o mais específico porque o Zod avalia na
+ * ordem em que o schema declara.
+ */
+export function motivosPorCampo(issues: readonly z.core.$ZodIssue[]): Record<string, string> {
+  const motivos: Record<string, string> = {};
+
+  for (const issue of issues) {
+    const campo = issue.path[0];
+    if (typeof campo !== 'string') continue;
+    if (campo in motivos) continue;
+    motivos[campo] = issue.message;
+  }
+
+  return motivos;
+}
+
+/**
  * Destino pós-login, validado.
  *
  * Só caminho relativo começando com uma barra, e **nunca** `//`. Sem isto,
@@ -48,3 +122,50 @@ export function destinoSeguro(proximo: string | undefined, padrao: string): stri
   if (proximo.startsWith('//')) return padrao;
   return proximo;
 }
+
+/**
+ * O papel escolhido em 1.4.
+ *
+ * `enum` e não `string`: o `FormData` vem do cliente, e `admin` num campo
+ * escondido forjado chegaria ao banco. A policy o recusaria — é o que a `0001`
+ * garante —, mas com `42501` no lugar de uma mensagem, e um erro de
+ * autorização onde devia haver uma validação de entrada.
+ */
+export const esquemaPapelEscolhivel = z.object({
+  papel: z.enum(['artista', 'curador'], { message: 'papel_invalido' }),
+});
+
+/** Os três provedores. O SoundCloud só chega aqui com a flag ligada. */
+export const esquemaProvedorSocial = z.object({
+  provedor: z.enum(['google', 'facebook', 'soundcloud'], { message: 'provedor_invalido' }),
+  proximo: z.string().optional(),
+});
+
+/**
+ * Confirmação do cadastro social — nome, aceite e, às vezes, o e-mail.
+ *
+ * A tela tem dois modos, e o schema serve aos dois. Com Google e Facebook o
+ * endereço vem do provedor e é **exibido**, não editado: torná-lo editável
+ * abriria a porta para confirmar a conta com um endereço que a pessoa não
+ * provou possuir. Com SoundCloud não vem endereço nenhum — a API deles não
+ * expõe e-mail — e aí o campo existe e é obrigatório.
+ *
+ * Obrigatório **no serviço**, não aqui: quem sabe se a sessão já tem e-mail é
+ * quem tem a sessão na mão. Um schema que exigisse o campo sempre quebraria o
+ * caminho do Google; um que nunca o exigisse deixaria passar conta sem
+ * endereço. Por isso ele é opcional na forma e exigido no lugar que pode
+ * decidir.
+ */
+const emailOpcional = z
+  .string()
+  .trim()
+  .optional()
+  // Campo em branco e campo ausente são a mesma coisa aqui: "não informou".
+  .transform((valor) => (valor === undefined || valor === '' ? undefined : valor.toLowerCase()))
+  .pipe(z.email({ message: 'email_invalido' }).optional());
+
+export const esquemaConfirmacaoSocial = z.object({
+  nome: z.string().trim().min(1, { message: 'nome_vazio' }),
+  aceite: z.literal('on', { message: 'aceite_obrigatorio' }).transform(() => true),
+  email: emailOpcional,
+});

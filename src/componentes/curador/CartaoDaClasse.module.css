@@ -1,0 +1,42 @@
+/* Classe atual, somente leitura — tela 12.6. */
+
+.base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-10);
+  padding: var(--dsn-space-12);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-purple-050);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+  max-width: 520px;
+  min-width: 0;
+}
+
+.overline {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-purple-600);
+}
+
+.selos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-5);
+}
+
+.nota {
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-700);
+}

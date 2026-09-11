@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { BotoesSociais } from '@/componentes/autenticacao/BotoesSociais';
 import { FormularioDeLogin } from '@/componentes/autenticacao/FormularioDeLogin';
+import type { Banner } from '@/componentes/autenticacao/FormularioDeLogin';
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
-import { entrar } from '@/modulos/autenticacao/acoes';
+import { MOTIVO_LOGIN, ROTA } from '@/lib/guarda-rota';
+import { entrar, entrarComProvedor } from '@/modulos/autenticacao/acoes';
 import { ENTRAR } from '@/textos/prototipo';
 
 import estilos from './pagina.module.css';
@@ -17,19 +19,30 @@ export const metadata: Metadata = {
 /**
  * Tela 1 — login de artista e curador.
  *
- * Os três botões sociais estão na tela, desabilitados, com o motivo no
- * `title`. Mostrá-los desabilitados em vez de escondê-los é a mesma decisão da
- * navegação por release (`navegacao-por-ambiente.ts`): a pessoa entende o que
- * o produto oferece, e não descobre um caminho novo a cada deploy. O Google e
- * o Facebook entram na fatia 3 (TASK-111); o SoundCloud depende da
- * open-question #9 e fica atrás de flag.
+ * Os três botões sociais estão na tela. O Google e o Facebook estão ligados
+ * (TASK-111); o do SoundCloud fica desabilitado, com o motivo no `title` —
+ * depende da open-question #9, que hoje é a assinatura Artist Pro paga e o
+ * e-mail que a API deles não devolve. Mostrá-lo desabilitado em vez de
+ * escondê-lo é a mesma decisão da navegação por release
+ * (`navegacao-por-ambiente.ts`): a pessoa entende o que o produto oferece, e
+ * não descobre um caminho novo a cada deploy.
  */
 export default async function Pagina({
   searchParams,
 }: {
-  readonly searchParams: Promise<{ readonly proximo?: string }>;
+  readonly searchParams: Promise<{ readonly proximo?: string; readonly motivo?: string }>;
 }) {
-  const { proximo } = await searchParams;
+  const { proximo, motivo } = await searchParams;
+
+  // O middleware ejeta quem foi bloqueado durante a navegação e traz o motivo
+  // na URL — é o único canal que ele tem, porque redireciona em vez de devolver
+  // um resultado. Sem isto, a pessoa cai aqui sem explicação nenhuma.
+  const bannerInicial: Banner | undefined =
+    motivo === MOTIVO_LOGIN.BLOQUEADA
+      ? bannerBloqueado()
+      : motivo === MOTIVO_LOGIN.FALHA_SOCIAL
+        ? ENTRAR.bannerSocial
+        : undefined;
 
   return (
     <MolduraDeAutenticacao
@@ -43,7 +56,26 @@ export default async function Pagina({
       <FormularioDeLogin
         acao={entrar}
         proximo={proximo}
-        social={<BlocoSocial />}
+        bannerInicial={bannerInicial}
+        social={
+          <div className={estilos.social}>
+            <BotoesSociais
+              acao={entrarComProvedor}
+              proximo={proximo}
+              rotulos={{
+                google: ENTRAR.google,
+                facebook: ENTRAR.facebook,
+                soundcloud: ENTRAR.soundcloud,
+              }}
+              verbo="Entrar com"
+            />
+            <div className={estilos.divisor}>
+              <span className={estilos.divisorLinha} aria-hidden="true" />
+              <span className={estilos.divisorTexto}>{ENTRAR.ou}</span>
+              <span className={estilos.divisorLinha} aria-hidden="true" />
+            </div>
+          </div>
+        }
         textos={{
           titulo: ENTRAR.titulo,
           // A moldura já renderizou o `<h1>` na chamada. Repetir o nível aqui
@@ -64,6 +96,7 @@ export default async function Pagina({
           erroEmailInvalido: ENTRAR.erroEmailInvalido,
           erroSenhaVazia: ENTRAR.erroSenhaVazia,
           bannerCredenciais: ENTRAR.bannerCredenciais,
+          bannerBloqueada: bannerBloqueado(),
         }}
         rodape={
           <p className={estilos.alternativa}>
@@ -78,37 +111,21 @@ export default async function Pagina({
   );
 }
 
-const PROVEDORES = [
-  { rotulo: ENTRAR.google, sigla: 'G', cor: '#4285F4', release: 3 },
-  { rotulo: ENTRAR.facebook, sigla: 'f', cor: '#1877F2', release: 3 },
-  { rotulo: ENTRAR.soundcloud, sigla: '≈', cor: '#FF5500', release: 3 },
-] as const;
-
-function BlocoSocial() {
-  return (
-    <div className={estilos.social}>
-      <div className={estilos.provedores}>
-        {PROVEDORES.map((provedor) => (
-          <button
-            key={provedor.rotulo}
-            type="button"
-            className={estilos.provedor}
-            disabled
-            title={`Entrar com ${provedor.rotulo} entra na Release ${provedor.release}`}
-          >
-            <span className={estilos.provedorSigla} style={{ color: provedor.cor }}>
-              {provedor.sigla}
-            </span>
-            {provedor.rotulo}
-          </button>
-        ))}
-      </div>
-
-      <div className={estilos.divisor}>
-        <span className={estilos.divisorLinha} aria-hidden="true" />
-        <span className={estilos.divisorTexto}>{ENTRAR.ou}</span>
-        <span className={estilos.divisorLinha} aria-hidden="true" />
-      </div>
-    </div>
-  );
+/**
+ * O banner de conta bloqueada, com o contato.
+ *
+ * O protótipo só renderiza o link "Falar com o suporte" no estado `blocked`, e
+ * está certo: é o único estado em que tentar de novo não resolve nada.
+ */
+function bannerBloqueado(): Banner {
+  return {
+    titulo: ENTRAR.bannerBloqueada.titulo,
+    texto: ENTRAR.bannerBloqueada.texto,
+    acao: (
+      <a className={estilos.contato} href="mailto:suporte@dissona.com.br">
+        {ENTRAR.suporte}
+      </a>
+    ),
+  };
 }
+

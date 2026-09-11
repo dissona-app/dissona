@@ -1,0 +1,72 @@
+/* Card de seção das telas de Conta — design-system.md §2.4.1. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+  padding: var(--dsn-space-12);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+}
+
+.linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-10);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 520px;
+  min-width: 0;
+}
+
+.overline {
+  font-size: var(--dsn-text-3xs);
+  font-weight: 600;
+  letter-spacing: var(--dsn-tracking-overline);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.titulo {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: var(--dsn-tracking-snug);
+  /* O e-mail da conta pode ser longo e não tem espaços onde quebrar. */
+  overflow-wrap: anywhere;
+}
+
+.nota {
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-body);
+  color: var(--dsn-ink-700);
+}
+
+.acao {
+  flex: none;
+}
+
+/* Card de destaque — o de papéis da conta. */
+.destaque {
+  background: var(--dsn-purple-050);
+}
+
+.destaque .overline {
+  color: var(--dsn-purple-600);
+}
+
+/* Card de erro — o de encerrar conta. */
+.perigo {
+  border-color: var(--dsn-danger-border);
+  background: var(--dsn-danger-bg-soft);
+}
+
+.perigo .overline {
+  color: var(--dsn-danger-fg);
+}
