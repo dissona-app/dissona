@@ -42,16 +42,23 @@ export const ambiente = {
 /**
  * O login por SoundCloud está ligado?
  *
- * Não há credencial nossa a ler: o `client_id` e o segredo vivem no provider do
- * Supabase, e o app só pede a URL de autorização. Esta flag existe porque o
- * provider pode não estar configurado — e aí o botão precisa continuar na tela,
- * desabilitado e com o motivo, em vez de levar a pessoa a um erro do GoTrue.
+ * **Ligado por padrão**, e desligado só por `SOUNDCLOUD_LIGADO=false`. A
+ * inversão é deliberada: não há credencial nossa a ler — o `client_id` e o
+ * segredo vivem no provider `custom:soundcloud`, que é do **projeto** Supabase,
+ * e Preview e Production compartilham o mesmo projeto. Ou seja, onde o app
+ * roda, o provider existe.
  *
- * Sem prefixo `NEXT_PUBLIC_`: quem decide é o servidor, e os dois lugares que
- * leem isto são Server Components.
+ * Como opt-in, um deploy sem a variável mostraria o botão desabilitado sem
+ * nenhum motivo real, e quem fosse investigar procuraria o defeito no lugar
+ * errado. O que sobra para a flag é o papel de chave de emergência: se a API
+ * deles cair ou a assinatura expirar, `false` tira o botão do caminho sem
+ * exigir deploy de código.
+ *
+ * Sem prefixo `NEXT_PUBLIC_`: quem decide é o servidor, e quem lê é Server
+ * Component.
  */
 export function soundcloudLigado(): boolean {
-  return process.env.SOUNDCLOUD_LIGADO === 'true';
+  return process.env.SOUNDCLOUD_LIGADO !== 'false';
 }
 
 /**

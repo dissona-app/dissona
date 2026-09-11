@@ -191,7 +191,7 @@ código pode contornar:
 - [ ] Templates de e-mail reescritos para `{{ .TokenHash }}` apontando para `/api/auth/confirmar` — sem isso o link do Supabase não fecha sessão no fluxo SSR/PKCE
 - [ ] Providers Google e Facebook com credenciais
 - [ ] **Custom provider `custom:soundcloud`** — Auth → Providers → New Provider → *Manual configuration*, com `client_id` `oXgbfsAkK3HZ96jVO0mXCbZ6spU3P93A`, o segredo da tela do SoundCloud, authorize `https://secure.soundcloud.com/authorize`, token `https://secure.soundcloud.com/oauth/token` e **userinfo apontando para a nossa Edge Function**, `https://fhqcibjzmowcjkdrqyvi.supabase.co/functions/v1/soundcloud-userinfo` — nunca para `api.soundcloud.com/me`, que não devolve `sub`. Se `email_optional` não estiver no formulário, fechar com um `PUT` parcial em `/auth/v1/admin/custom-providers/custom:soundcloud` mandando só `{"email_optional": true}`; sem ele o login falha com "Error getting user email from external provider"
-- [ ] `SOUNDCLOUD_LIGADO=true` no `.env.local` e nos escopos da Vercel — é o que habilita o botão
+- [x] ~~`SOUNDCLOUD_LIGADO` na Vercel~~ — não é preciso: o botão vem ligado, e a variável virou chave de emergência (`=false` desliga). O provider é do projeto Supabase, que Preview e Production compartilham
 - [ ] **Rotacionar o segredo do SoundCloud antes do lançamento** — ele apareceu num screenshot durante a implementação. Risco é abuso da nossa cota de API, não de conta: o `authorization_code` só volta para o redirect URI registrado
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` no `.env.local` e nos escopos da Vercel
 - [ ] *Leaked password protection* ligada — o advisor a aponta, e é uma chave no dashboard
