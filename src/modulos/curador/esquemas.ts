@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { esquemaLink } from '@/lib/link';
 import { CURADOR_CADASTRO } from '@/textos/curador';
 
 import { TEMPO_DE_ATUACAO, TIPOS_DE_CREDENCIAL } from './tipos';
@@ -21,37 +22,11 @@ import { TEMPO_DE_ATUACAO, TIPOS_DE_CREDENCIAL } from './tipos';
  */
 
 /**
- * Link de canal, na regra do protótipo (`validLink`).
- *
- * Aceita sem esquema — "site.com/seu-canal" é o placeholder da tela —, e é por
- * isso que não usa `z.url()`: aquele exigiria `https://` e recusaria justamente
- * o formato que a tela pede. A normalização para URL absoluta é de
- * `normalizarLink`, abaixo, e acontece na gravação.
+ * A regra de link mora em `lib/link.ts` desde que o perfil do artista (7.1)
+ * passou a precisar dela. Reexportada aqui para os pontos de uso do módulo 12
+ * continuarem importando de um lugar só.
  */
-const PADRAO_DE_LINK = /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/[^\s]*)?$/i;
-
-export const esquemaLink = z
-  .string()
-  .trim()
-  .min(1, { message: 'link_vazio' })
-  .refine((valor) => !/\s/.test(valor), { message: 'link_com_espaco' })
-  .refine((valor) => PADRAO_DE_LINK.test(valor), { message: 'link_invalido' });
-
-/**
- * Prefixa `https://` no link que veio sem esquema.
- *
- * `esquemaLink` aceita `open.spotify.com/playlist/…` porque é o que a pessoa
- * digita — e o protótipo aceita também. O que não pode é isso chegar ao banco
- * cru: renderizado como `href`, um link sem esquema é **relativo**, e
- * `/curador/meu-cadastro/open.spotify.com/...` é para onde ele levaria.
- *
- * `https`, e não `http`: é 2026, e um link que a pessoa colou de um serviço de
- * streaming é servido por TLS.
- */
-export function normalizarLink(link: string): string {
-  const limpo = link.trim();
-  return /^https?:\/\//i.test(limpo) ? limpo : `https://${limpo}`;
-}
+export { esquemaLink, normalizarLink } from '@/lib/link';
 
 /** Passo 2 — gêneros. Sem teto: o protótipo diz "Escolha quantos quiser". */
 export const esquemaGeneros = z.object({

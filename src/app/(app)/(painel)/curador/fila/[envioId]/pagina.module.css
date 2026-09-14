@@ -1,0 +1,91 @@
+/* 13.1 · Detalhe do item da fila. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--dsn-space-6);
+  max-width: 52rem;
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--dsn-space-6);
+  margin: 0;
+  width: 100%;
+}
+
+.rotulo {
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.valor {
+  margin: var(--dsn-space-2) 0 0;
+  color: var(--dsn-ink);
+}
+
+.contexto {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--dsn-ink);
+}
+
+.vazio {
+  margin: 0;
+  font-style: italic;
+  color: var(--dsn-ink-400);
+}
+
+.prazo {
+  margin: 0;
+  font-size: var(--dsn-text-xl);
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.prazoAtrasado {
+  composes: prazo;
+  color: var(--dsn-danger-fg);
+}
+
+.servicos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+  margin: 0 0 var(--dsn-space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.servico {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-3);
+  color: var(--dsn-ink);
+}
+
+.preco {
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink-500);
+}
+
+.total {
+  margin: 0 0 var(--dsn-space-6);
+  padding-top: var(--dsn-space-4);
+  border-top: 1px solid var(--dsn-border-faint);
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.nota {
+  margin: var(--dsn-space-3) 0 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

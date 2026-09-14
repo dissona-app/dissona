@@ -137,12 +137,7 @@ export function DadosDoMembro({
               (`form=""` faria o mesmo e é HTML inválido: o atributo tem de
               apontar para um `id` que existe.) */}
           <Campo type="email" rotulo={TEXTOS.rotuloEmail} value={email} readOnly />
-          <Botao
-            type="button"
-            variante="secundario"
-            tamanho="denso"
-            onClick={() => setModal('email')}
-          >
+          <Botao type="button" variante="secundario" tamanho="sm" onClick={() => setModal('email')}>
             {CONTA.alterarEmail}
           </Botao>
         </div>
@@ -152,12 +147,7 @@ export function DadosDoMembro({
             <span className={estilos.senhaTitulo}>{TEXTOS.senhaTitulo}</span>
             <span className={estilos.senhaNota}>{notaDaSenha}</span>
           </div>
-          <Botao
-            type="button"
-            variante="secundario"
-            tamanho="denso"
-            onClick={() => setModal('senha')}
-          >
+          <Botao type="button" variante="secundario" tamanho="sm" onClick={() => setModal('senha')}>
             {CONTA.alterarSenha}
           </Botao>
         </div>
@@ -165,7 +155,7 @@ export function DadosDoMembro({
         {avisoDeCredencial === null ? null : <Aviso tom="sucesso">{avisoDeCredencial}</Aviso>}
 
         <div className={estilos.rodape}>
-          <Botao type="submit" carregando={pendente}>
+          <Botao type="submit" tamanho="denso" carregando={pendente}>
             {pendente ? TEXTOS.salvando : TEXTOS.salvar}
           </Botao>
           {resultado !== null && resultado.ok ? <Aviso tom="sucesso">{TEXTOS.salvo}</Aviso> : null}

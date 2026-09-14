@@ -8,11 +8,12 @@
   gap: var(--dsn-space-5);
 }
 
+/* `ink-500`, como todo overline de tela de fluxo no protótipo. */
 .contador {
   font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
-  color: var(--dsn-purple-600);
+  color: var(--dsn-ink-500);
   text-transform: uppercase;
 }
 
@@ -22,7 +23,7 @@
   background: transparent;
   padding: 0;
   font-family: inherit;
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-sm);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-ink-500);
   cursor: pointer;
@@ -44,13 +45,15 @@
   gap: var(--dsn-space-5);
 }
 
+/* Hero, e não H1 de fluxo: o tour tem uma frase por tela e o protótipo lhe dá
+   o corpo de tela de marca. */
 .titulo {
   margin: 0;
-  font-size: clamp(24px, 3.2vh, 30px);
-  line-height: var(--dsn-leading-title);
+  font-size: var(--dsn-text-3xl);
+  line-height: var(--dsn-leading-hero);
   font-weight: var(--dsn-weight-black);
   letter-spacing: var(--dsn-tracking-tightest);
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
 .texto {
@@ -110,7 +113,8 @@
 
 .nota {
   margin: 0;
-  font-size: var(--dsn-text-2xs);
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
   color: var(--dsn-ink-500);
   text-align: center;
 }

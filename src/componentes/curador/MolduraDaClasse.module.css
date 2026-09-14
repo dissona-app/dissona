@@ -55,9 +55,12 @@
   background: var(--dsn-neutral-bg);
 }
 
+/* Alerta, e não informativo: no protótipo "Em análise" usa o mesmo par do
+   Bronze (#8A5A12 sobre #FDF3E2). Faz sentido — análise é espera, e espera é
+   alerta; o roxo informativo diria "pronto". */
 .seloAnalise {
-  color: var(--dsn-info-fg);
-  background: var(--dsn-info-bg);
+  color: var(--dsn-warning-fg);
+  background: var(--dsn-warning-bg);
 }
 
 .cabecalho {
@@ -66,25 +69,41 @@
   gap: var(--dsn-space-4);
 }
 
+/*
+ * Três telas, dois títulos — e nenhum deles é o hero de 3.4vh que estava aqui.
+ *
+ * O protótipo compõe a classificação e a análise em `clamp(21px,2.8vh,26px)`, e
+ * o Bronze um degrau acima, em `clamp(22px,3vh,28px)`: ali há um selo de
+ * aprovação para celebrar, aqui há um resultado a ler. `.tituloBronze` é essa
+ * exceção; o resto compartilha `.titulo`.
+ */
 .titulo {
   margin: 0;
-  font-size: clamp(26px, 3.4vh, 32px);
-  line-height: var(--dsn-leading-hero);
+  font-size: clamp(21px, 2.8vh, 26px);
+  line-height: var(--dsn-leading-title);
   font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tightest);
+  letter-spacing: var(--dsn-tracking-tighter);
   text-wrap: balance;
 }
 
+.tituloBronze {
+  font-size: clamp(22px, 3vh, 28px);
+  line-height: 1.08;
+  letter-spacing: var(--dsn-tracking-tightest);
+}
+
+/* "Classe de entrada" — 12 px e o mesmo âmbar do selo, no protótipo: é a
+   legenda do resultado, e pertence a ele. */
 .subtitulo {
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-2xs);
   font-weight: var(--dsn-weight-semibold);
-  color: var(--dsn-ink-500);
+  color: var(--dsn-warning-fg);
 }
 
 .texto {
   margin: 0;
   font-size: var(--dsn-text-sm);
-  line-height: var(--dsn-leading-body);
+  line-height: var(--dsn-leading-relaxed);
   color: var(--dsn-ink-700);
   text-wrap: pretty;
 }

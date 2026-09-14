@@ -1,0 +1,130 @@
+/* 5 · Carteira. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.saldo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--dsn-space-6);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+}
+
+.rotulo {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.numero {
+  margin: var(--dsn-space-2) 0 0;
+  font-size: var(--dsn-text-3xl);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--dsn-purple-600);
+}
+
+.unidade {
+  font-size: var(--dsn-text-base);
+  font-weight: 400;
+  color: var(--dsn-ink-500);
+}
+
+.numeroMedio {
+  margin: var(--dsn-space-2) 0 var(--dsn-space-2);
+  font-size: var(--dsn-text-xl);
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+/* As duas cores que o protótipo dá aos cards de resumo. "Usadas" fica na
+   tinta padrão, e por isso não tem classe. */
+.adquiridas {
+  color: var(--dsn-purple-600);
+}
+
+.devolvidas {
+  color: var(--dsn-success-fg);
+}
+
+.nota {
+  margin: var(--dsn-space-2) 0 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+/* "Comprometidas" e "Devolvidas" lado a lado sob o saldo. `dl` porque são
+   pares rótulo/valor de verdade. */
+.paralelos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--dsn-space-4);
+  margin: var(--dsn-space-6) 0 0;
+  padding: var(--dsn-space-6) 0 0;
+  border-top: 1px solid var(--dsn-border-faint);
+}
+
+.paralelo {
+  margin: var(--dsn-space-2) 0 0;
+  font-size: var(--dsn-text-lg);
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--dsn-space-4);
+  margin: 0;
+}
+
+.movimentacoes {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.movimentacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+  padding: var(--dsn-space-4) 0;
+  border-bottom: 1px solid var(--dsn-border-faint);
+}
+
+.movimentacao:last-child {
+  border-bottom: none;
+}
+
+.origem {
+  margin: 0;
+  color: var(--dsn-ink);
+}
+
+/* Tabular para os valores alinharem na vertical numa lista. */
+.quantidade {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.entrada {
+  color: var(--dsn-success-fg);
+}

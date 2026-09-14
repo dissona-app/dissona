@@ -68,8 +68,12 @@ export function MolduraDoWizard({ passo, total, aside, children }: PropsMolduraD
         <div className={estilos.coluna}>
           <div className={estilos.cabecalho}>
             <span className={estilos.contador}>{CURADOR_CADASTRO.passoDe(passo, total)}</span>
-            <h1 className={estilos.titulo}>{titulo}</h1>
-            <p className={estilos.subtitulo}>{subtitulo}</p>
+            {/* Passo 1 divide a tela com o painel de marca, e ali o título é um
+                degrau menor — ver `.tituloEstreito` no CSS. */}
+            <h1 className={aside === undefined ? estilos.titulo : tituloEstreito}>{titulo}</h1>
+            <p className={aside === undefined ? estilos.subtitulo : subtituloEstreito}>
+              {subtitulo}
+            </p>
           </div>
 
           {children}
@@ -90,3 +94,6 @@ const LARGURA_POR_PASSO = [
   '560px',
   '660px',
 ] as const;
+
+const tituloEstreito = `${estilos.titulo ?? ''} ${estilos.tituloEstreito ?? ''}`;
+const subtituloEstreito = `${estilos.subtitulo ?? ''} ${estilos.subtituloEstreito ?? ''}`;

@@ -71,7 +71,10 @@ describe('título do header por caminho', () => {
     // É o que acontece com as telas que ainda não existem. Melhor um título
     // genérico que um `<h1>` vazio, que quebraria a estrutura de headings.
     expect(tituloDoCaminho(`${ROTA.ADMIN}/inexistente`, 'admin').titulo).toBe(NOME_AMBIENTE.admin);
-    expect(tituloDoCaminho(`${ROTA.ARTISTA}/carteira`, 'artista').titulo).toBe(
+    // `/artista/musicas` é da R3 e ainda não tem entrada. Era `/artista/carteira`
+    // até a Carteira (5) ser entregue e ganhar título próprio — o exemplo troca,
+    // a regra não.
+    expect(tituloDoCaminho(`${ROTA.ARTISTA}/musicas`, 'artista').titulo).toBe(
       NOME_AMBIENTE.artista,
     );
   });

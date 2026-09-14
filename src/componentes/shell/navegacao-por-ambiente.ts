@@ -33,7 +33,7 @@ const ARTISTA: readonly GrupoNavegacao[] = [
   {
     titulo: 'Minha música',
     itens: [
-      { rotulo: 'Enviar música', caminho: `${ROTA.ARTISTA}/enviar`, release: 2 },
+      { rotulo: 'Enviar música', caminho: ROTA.ARTISTA_ENVIAR, release: 2 },
       { rotulo: 'Minhas músicas', caminho: `${ROTA.ARTISTA}/musicas`, release: 3 },
       { rotulo: 'Catálogo', caminho: `${ROTA.ARTISTA}/catalogo`, release: 4 },
     ],
@@ -48,7 +48,8 @@ const ARTISTA: readonly GrupoNavegacao[] = [
   {
     titulo: 'Conta',
     itens: [
-      { rotulo: 'Carteira', caminho: `${ROTA.ARTISTA}/carteira`, release: 2 },
+      { rotulo: 'Perfil', caminho: ROTA.ARTISTA_PERFIL, release: 1 },
+      { rotulo: 'Carteira', caminho: ROTA.ARTISTA_CARTEIRA, release: 2 },
       { rotulo: 'Notificações', caminho: `${ROTA.ARTISTA}/notificacoes`, release: 5 },
       { rotulo: 'Configurações', caminho: ROTA.ARTISTA_CONTA, release: 1 },
     ],
@@ -63,7 +64,7 @@ const CURADOR: readonly GrupoNavegacao[] = [
   {
     titulo: 'Curadoria',
     itens: [
-      { rotulo: 'Fila de avaliações', caminho: `${ROTA.CURADOR}/fila`, release: 2 },
+      { rotulo: 'Fila de avaliações', caminho: ROTA.CURADOR_FILA, release: 2 },
       { rotulo: 'Métricas', caminho: `${ROTA.CURADOR}/metricas`, release: 3 },
     ],
   },

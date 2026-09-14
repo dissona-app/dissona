@@ -1,0 +1,42 @@
+/* 14 · Notas objetivas. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+}
+
+.grupos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+}
+
+/* `fieldset` de verdade: sem ele o leitor de tela anuncia "Mixagem" sem dizer
+   que é de Produção, e os onze critérios viram uma lista plana de rótulos
+   curtos e ambíguos. */
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.legenda {
+  padding: 0;
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.notaRodape {
+  margin: var(--dsn-space-6) 0 0;
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}

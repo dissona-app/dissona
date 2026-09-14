@@ -1,0 +1,125 @@
+/* 14.2 · Compartilhamento.
+ *
+ * Mesmo padrão de `Chips`: o `<input>` existe, recebe foco e viaja no
+ * `FormData`; o `<span>` é só a pintura, e o estado marcado é CSS. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-relaxed);
+  color: var(--dsn-ink-700);
+  text-wrap: pretty;
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.legenda {
+  padding: 0;
+  font-size: var(--dsn-text-4xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--dsn-space-5);
+}
+
+.cartao,
+.recusa {
+  display: block;
+  cursor: pointer;
+}
+
+/* Nada de `display: none`: tiraria a caixa da ordem de tabulação. */
+.entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.pintura {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  height: 100%;
+  padding: var(--dsn-space-6);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-surface);
+  transition:
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    border-color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.pinturaRecusa {
+  composes: pintura;
+  flex-direction: column;
+}
+
+.cartao:hover .pintura,
+.recusa:hover .pinturaRecusa {
+  border-color: var(--dsn-purple-300);
+}
+
+.entrada:checked + .pintura,
+.entrada:checked + .pinturaRecusa {
+  border-color: var(--dsn-purple-500);
+  background: var(--dsn-purple-025);
+}
+
+.entrada:focus-visible + .pintura,
+.entrada:focus-visible + .pinturaRecusa {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.rotulo {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+.apoio {
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+/* "Selecionado" / "Marcar" — o texto é a informação; a borda só reforça. */
+.estado {
+  margin-top: auto;
+  padding-top: var(--dsn-space-3);
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-400);
+}
+
+.entrada:checked + .pintura .estado {
+  color: var(--dsn-purple-600);
+}

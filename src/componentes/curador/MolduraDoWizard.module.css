@@ -1,6 +1,8 @@
 /* Wizard do módulo 12 — Design System §3.3 (split-screen) e §3.4. */
 
 .pagina {
+  /* Rótulo de campo do wizard: 10 px, o menor degrau — ver `Campo.module.css`. */
+  --dsn-rotulo-corpo: var(--dsn-text-4xs);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -58,6 +60,8 @@
   margin: 0 auto;
 }
 
+/* O painel de marca do passo 1 — o "Sua escuta vira crédito e remuneração." é
+   um hero de 38 px no protótipo, e não um título de card. */
 .painel {
   display: flex;
   flex-direction: column;
@@ -83,30 +87,50 @@
   gap: 7px;
 }
 
+/* 10 px e `ink-500`: no protótipo o contador do wizard é o menor rótulo da
+   tela, e cinza — ele situa, não chama. */
 .contador {
   align-self: flex-start;
-  font-size: var(--dsn-text-3xs);
+  font-size: var(--dsn-text-4xs);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
-  color: var(--dsn-purple-600);
+  color: var(--dsn-ink-500);
   text-transform: uppercase;
 }
 
+/*
+ * `clamp(25px,3.6vh,34px)` nos passos 2 a 8, e um degrau menor no passo 1.
+ *
+ * A diferença é do protótipo e tem razão: o passo 1 divide a tela com o painel
+ * de marca, e a coluna do formulário é mais estreita ali. Nos outros sete a
+ * coluna ocupa a tela e o título cresce com ela.
+ */
 .titulo {
   margin: 0;
+  font-size: clamp(25px, 3.6vh, 34px);
+  line-height: var(--dsn-leading-heading);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-hero);
+  text-wrap: balance;
+}
+
+.tituloEstreito {
   font-size: clamp(24px, 3.2vh, 30px);
   line-height: var(--dsn-leading-title);
-  font-weight: var(--dsn-weight-black);
   letter-spacing: var(--dsn-tracking-tightest);
-  text-wrap: balance;
 }
 
 .subtitulo {
   margin: 0;
-  font-size: var(--dsn-text-sm);
-  line-height: var(--dsn-leading-normal);
+  font-size: var(--dsn-text-base);
+  line-height: var(--dsn-leading-body);
   color: var(--dsn-ink-500);
   text-wrap: pretty;
+}
+
+/* Acompanha `.tituloEstreito`: no passo 1 a coluna é mais estreita. */
+.subtituloEstreito {
+  font-size: var(--dsn-text-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {

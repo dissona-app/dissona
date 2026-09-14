@@ -19,6 +19,19 @@ export type PropsPainel = {
  * O nivel do heading e parametro porque a hierarquia de headings tem de ser
  * continua na pagina (design-system 4.6): um painel dentro de outro nao pode
  * repetir o mesmo nivel.
+ *
+ * ## Por que o `aria-label`
+ *
+ * `<section>` só é exposta como **landmark `region`** quando tem nome
+ * acessível; sem ele, o elemento é genérico e some da lista de regiões do
+ * leitor de tela — numa tela com três ou quatro painéis, é a diferença entre
+ * navegar por seções e varrer tudo de cima a baixo.
+ *
+ * `aria-label` e não `aria-labelledby`: apontar para o heading exigiria um id
+ * único, e `useId` é hook — este componente é Server Component de propósito,
+ * já que não tem estado nenhum. O texto é o mesmo do título, então o custo é
+ * uma duplicação que o leitor de tela anuncia como "região, <título>", que é
+ * exatamente o esperado.
  */
 export function Painel({
   titulo,
@@ -32,6 +45,7 @@ export function Painel({
 
   return (
     <section
+      aria-label={titulo}
       className={[estilos.base, semMoldura ? estilos.semMoldura : undefined]
         .filter(Boolean)
         .join(' ')}

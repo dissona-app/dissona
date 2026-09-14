@@ -98,10 +98,7 @@ export function Passo6Credenciais({
           const porAnexo = credencial.valor === CREDENCIAL_POR_ANEXO;
 
           return (
-            <li
-              key={credencial.valor}
-              className={marcada ? estilos.cartaoAtivo : estilos.cartao}
-            >
+            <li key={credencial.valor} className={marcada ? estilos.cartaoAtivo : estilos.cartao}>
               <label className={estilos.cartaoRotulo}>
                 <input
                   type="checkbox"
@@ -130,7 +127,7 @@ export function Passo6Credenciais({
                     <path d="m5 13 4.5 4.5L19 7" />
                   </svg>
                 </span>
-                <span className={estilos.cartaoTitulo}>{credencial.rotulo}</span>
+                <span className={estilos.credencialRotulo}>{credencial.rotulo}</span>
               </label>
 
               {/* A prova só aparece quando a caixa está marcada — é o que o
@@ -138,17 +135,13 @@ export function Passo6Credenciais({
               {marcada ? (
                 porAnexo ? (
                   <label className={estilos.anexo}>
-                    <span className={estilos.anexoBotao}>
-                      {CURADOR_CADASTRO.anexarComprovacao}
-                    </span>
+                    <span className={estilos.anexoBotao}>{CURADOR_CADASTRO.anexarComprovacao}</span>
                     <input
                       type="file"
                       name="anexo_formacao"
                       accept="application/pdf,image/jpeg,image/png"
                       className={estilos.arquivo}
-                      onChange={(evento) =>
-                        setAnexoNovo(evento.target.files?.[0]?.name ?? null)
-                      }
+                      onChange={(evento) => setAnexoNovo(evento.target.files?.[0]?.name ?? null)}
                     />
                     <span className={estilos.anexoNome}>
                       {anexoNovo ??

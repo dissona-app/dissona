@@ -1,0 +1,99 @@
+/* Passo 1 do envio (3). */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.par {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--dsn-space-4);
+}
+
+/* A dropzone é um `<label>` com o input escondido: arrastar e clicar
+   funcionam, `Tab` alcança e o leitor de tela anuncia o campo de arquivo —
+   sem `role` nem `aria-*` escritos à mão. */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-8) var(--dsn-space-6);
+  border: 1px dashed var(--dsn-ink-250);
+  border-radius: var(--dsn-radius-md);
+  background: var(--dsn-purple-025);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--dsn-duration-base) var(--dsn-ease-out),
+    background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.dropzone:hover {
+  border-color: var(--dsn-purple-300);
+  background: var(--dsn-purple-050);
+}
+
+/* `sr-only` à mão em vez de `display:none`: escondido de verdade tiraria o
+   campo da ordem de tabulação e do leitor de tela. */
+.entradaDeArquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.entradaDeArquivo:focus-visible + .dropzoneTitulo {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.dropzoneTitulo {
+  font-weight: 500;
+  color: var(--dsn-ink);
+}
+
+.dropzoneApoio {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+}
+
+/* Botão de capa — mesmo truque do input escondido da dropzone. */
+.capa {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-3) var(--dsn-space-5);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-md);
+  background: var(--dsn-surface);
+  cursor: pointer;
+}
+
+.capa:hover {
+  border-color: var(--dsn-purple-300);
+}
+
+.entradaDeArquivo:focus-visible + .capaTitulo {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.capaTitulo {
+  font-size: var(--dsn-text-sm, var(--dsn-text-base));
+  color: var(--dsn-ink);
+}

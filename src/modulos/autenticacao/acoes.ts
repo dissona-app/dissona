@@ -144,6 +144,11 @@ export async function cadastrar(dadosDoFormulario: FormData): Promise<ResultadoD
   if (resultado.estado === 'email_ja_cadastrado') {
     return falha(CodigoErro.EMAIL_JA_CADASTRADO, undefined, { email });
   }
+  if (resultado.estado === 'email_invalido') {
+    // Mesma lógica da senha fraca: a política do Auth é mais rigorosa que a
+    // nossa, e quando ele recusa o endereço o erro é do campo.
+    return falha(CodigoErro.EMAIL_INVALIDO, 'email');
+  }
   if (resultado.estado === 'senha_fraca') {
     // O Auth tem política própria e pode ser mais rigoroso que a nossa; quando
     // ele recusa, o erro é do campo da senha e não do formulário.

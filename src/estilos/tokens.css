@@ -144,6 +144,9 @@
   --dsn-weight-bold: 700;
   --dsn-weight-black: 800;
 
+  /* Títulos de marca e de passo — a chamada da tela 1, o painel do wizard e os
+     títulos dos passos 2 a 8. É o tracking mais fechado do R2. */
+  --dsn-tracking-hero: -0.04em;
   --dsn-tracking-tightest: -0.035em;
   --dsn-tracking-tighter: -0.03em;
   --dsn-tracking-tight: -0.025em;
@@ -156,6 +159,8 @@
   --dsn-leading-hero: 1.04;
   /* H1 de tela de marca do admin e da verificação de e-mail. */
   --dsn-leading-display: 1.06;
+  /* Entre `display` e `title`: título de passo do wizard. */
+  --dsn-leading-heading: 1.08;
   --dsn-leading-title: 1.1;
   /*
    * `1.14` e `1.16` são os dois `line-height` que o protótipo reserva para

@@ -1,0 +1,19 @@
+/* Passo 2 do envio (3). */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.contador {
+  margin: var(--dsn-space-2) 0 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+}

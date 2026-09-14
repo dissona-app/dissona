@@ -1,0 +1,22 @@
+/* Bloco de escuta da etapa 14. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+/* Atingido o mínimo, a mesma frase muda de cor — o texto continua sendo a
+   informação, e a cor só reforça (WCAG 1.4.1). */
+.notaAtingida {
+  composes: nota;
+  color: var(--dsn-success-fg);
+}

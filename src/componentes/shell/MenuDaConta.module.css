@@ -1,22 +1,27 @@
 /* Menu do avatar — docs/design-system.md §2.1 e o dropdown do topbar do R2. */
 
+/*
+ * O R2 tem **dois** avatares sem foto, e este é o do topbar: 28 px, superfície
+ * roxa e iniciais em `purple-600` (§1.1, "avatar do topbar"). O gradiente de
+ * marca com iniciais brancas — que estava aqui — é o outro: o de capa de faixa
+ * e de avatar em lista.
+ */
 .avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   flex: none;
   border-radius: var(--dsn-radius-circle);
-  background: var(--dsn-grad-brand-diag);
-  color: var(--dsn-surface);
+  background: var(--dsn-purple-050);
+  color: var(--dsn-purple-600);
   font-size: var(--dsn-text-3xs);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-badge);
+  font-weight: var(--dsn-weight-bold);
 }
 
 .nome {
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-sm);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-ink);
   white-space: nowrap;

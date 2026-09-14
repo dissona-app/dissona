@@ -18,22 +18,24 @@
   gap: var(--dsn-space-4);
 }
 
+/* 10 px e roxo: no protótipo este rótulo é o título do painel de credenciais,
+   não uma legenda neutra — ele aponta o que foi reconhecido. */
 .painelTitulo {
-  font-size: var(--dsn-text-3xs);
+  font-size: var(--dsn-text-4xs);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;
-  color: var(--dsn-ink-500);
+  color: var(--dsn-purple-600);
 }
 
 .contagemOk {
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-success-fg);
 }
 
 .contagemFalta {
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-warning-fg);
 }

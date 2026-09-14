@@ -135,6 +135,8 @@ export type ResultadoDeCadastro =
   /** Confirmação desligada no projeto — a sessão já nasceu com o `signUp`. */
   | { readonly estado: 'ok'; readonly destino: string }
   | { readonly estado: 'email_ja_cadastrado' }
+  /** O Auth recusou o endereço — regra dele, mais rigorosa que a nossa. */
+  | { readonly estado: 'email_invalido' }
   | { readonly estado: 'senha_fraca' }
   | { readonly estado: 'limite_de_envio' };
 

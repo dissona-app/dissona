@@ -1,0 +1,32 @@
+/* 7.1 · Perfil do artista.
+
+   O protótipo ("Editar cadastro") põe os campos em dois painéis empilhados e
+   os pares curtos lado a lado, quebrando para uma coluna quando não cabem. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+/* `auto-fit` com `minmax` em vez de duas colunas fixas: os quatro links viram
+   duas linhas de dois em telas largas e uma coluna nas estreitas, sem
+   `@media` — a pendência #24 (breakpoints) segue aberta, e uma grade que se
+   resolve sozinha não a antecipa. */
+.par {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--dsn-space-4);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-4);
+}
+
+.nota {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

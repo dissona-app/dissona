@@ -1,0 +1,56 @@
+/* 5.3 · Extrato. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+/* A tabela é a única coisa da tela que pode passar da largura em telas
+   estreitas. O contêiner rola só ela, e não o corpo da página. */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+  padding: var(--dsn-space-3) var(--dsn-space-2);
+  border-bottom: 1px solid var(--dsn-border-faint);
+  text-align: left;
+  font-weight: 400;
+  color: var(--dsn-ink);
+}
+
+.tabela thead th {
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.tabela tbody tr:last-child th,
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.origem {
+  font-weight: 500;
+}
+
+/* Tabular e à direita: são colunas de número que se lêem na vertical. */
+.numerica {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.entrada {
+  color: var(--dsn-success-fg);
+}
+
+.nota {
+  margin: var(--dsn-space-6) 0 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

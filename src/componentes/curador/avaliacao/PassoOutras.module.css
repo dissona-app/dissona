@@ -1,0 +1,44 @@
+/* 14.3 · Outras formas de divulgação. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-7);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-relaxed);
+  color: var(--dsn-ink-700);
+  text-wrap: pretty;
+}
+
+/* Preenchem o campo acima; não são opções fechadas. Por isso são `<button>` de
+   ação, e não uma segunda lista de escolha. */
+.sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-4);
+  margin-top: calc(-1 * var(--dsn-space-3));
+}
+
+.sugestao {
+  padding: var(--dsn-space-2) var(--dsn-space-5);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-full);
+  background: var(--dsn-surface);
+  font-family: inherit;
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-medium);
+  color: var(--dsn-ink-700);
+  cursor: pointer;
+  transition:
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    border-color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.sugestao:hover {
+  border-color: var(--dsn-purple-300);
+  background: var(--dsn-purple-025);
+}

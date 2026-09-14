@@ -1,0 +1,104 @@
+/* 14.1 · Nota subjetiva e feedback. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+}
+
+.media {
+  display: flex;
+  align-items: baseline;
+  gap: var(--dsn-space-4);
+  margin: 0 0 var(--dsn-space-6);
+}
+
+.mediaValor {
+  font-size: var(--dsn-text-2xl);
+  font-weight: var(--dsn-weight-semibold);
+  line-height: var(--dsn-leading-none);
+  letter-spacing: var(--dsn-tracking-tight);
+  color: var(--dsn-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.mediaApoio {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.grupos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grupo {
+  margin: 0;
+}
+
+.campoFeedback {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+  margin-top: var(--dsn-space-8);
+}
+
+.rotulo {
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-medium);
+  color: var(--dsn-ink-700);
+}
+
+.feedback {
+  width: 100%;
+  min-height: 11rem;
+  padding: var(--dsn-space-5);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-md);
+  background: var(--dsn-surface);
+  font-family: inherit;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-relaxed);
+  color: var(--dsn-ink);
+  resize: vertical;
+}
+
+.feedback:focus-visible {
+  outline: none;
+  border-color: var(--dsn-purple-400);
+  box-shadow: var(--dsn-shadow-focus);
+}
+
+.rodapeDoCampo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+}
+
+.dica {
+  font-size: var(--dsn-text-3xs);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.dicaAtingida {
+  composes: dica;
+  color: var(--dsn-success-fg);
+}
+
+.contador {
+  font-size: var(--dsn-text-3xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink-500);
+}
+
+.contadorAtingido {
+  composes: contador;
+  color: var(--dsn-success-fg);
+  font-weight: var(--dsn-weight-semibold);
+}

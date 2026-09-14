@@ -1,0 +1,18 @@
+/* Confirmação do envio (3). */
+
+.base {
+  max-width: 46rem;
+}
+
+.faixa {
+  margin: 0 0 var(--dsn-space-6);
+  font-size: var(--dsn-text-lg);
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+}

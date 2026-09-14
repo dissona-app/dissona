@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 
 import { PERSONA, senhaDeTeste } from './personas';
 import type { Persona } from './personas';
-import { ADMIN_ENTRAR } from './textos';
+import { ADMIN_ENTRAR, ENTRAR } from './textos';
 
 /**
  * Login pela tela real, e não por injeção de cookie.
@@ -49,4 +49,20 @@ export async function abrirPacotes(page: Page, persona: Persona = PERSONA.ADMIN)
   await entrarComoAdmin(page, persona);
   await page.goto('/admin/pacotes');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Pacotes de Claves');
+}
+
+/**
+ * Login pela tela de artista/curador (`/entrar`), para uma persona qualquer.
+ *
+ * Não espera por um destino fixo: o roteamento pós-login depende do estado da
+ * conta — seleção de perfil para quem não tem papel, onboarding para quem tem o
+ * tour pendente, wizard para o curador em rascunho (RF-008 e `inicioDoUsuario`).
+ * O que se espera é apenas **sair** do login; para onde, é o cenário que sabe.
+ */
+export async function entrarComo(page: Page, persona: Persona) {
+  await page.goto('/entrar');
+  await page.getByLabel(ENTRAR.rotuloEmail, { exact: true }).fill(persona.email);
+  await page.getByLabel(ENTRAR.rotuloSenha, { exact: true }).fill(senhaDeTeste());
+  await page.getByRole('button', { name: ENTRAR.enviar, exact: true }).click();
+  await page.waitForURL((url) => !url.pathname.endsWith('/entrar'));
 }

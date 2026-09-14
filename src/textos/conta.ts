@@ -13,6 +13,14 @@
 
 export const CONTA = {
   abas: {
+    /**
+     * 17.1, e **só no curador**. No artista o perfil é rota própria
+     * (`/artista/perfil`), porque é assim que o protótipo do artista o põe —
+     * com item na sidebar e tela "Editar cadastro". O protótipo do curador não
+     * tem item de perfil na sidebar nenhum, e o PRD lista 17.1 como uma das
+     * quatro telas de Conta. Cada lado segue o seu protótipo.
+     */
+    perfil: 'Perfil',
     dados: 'Dados da conta',
     preferencias: 'Preferências',
     seguranca: 'Segurança',
@@ -191,10 +199,80 @@ export const CONTA = {
    * muda a cada entrega, e o cliente entende o que o produto vai oferecer.
    */
   pendenteNestaRelease: 'Esta parte da tela chega em uma próxima entrega.',
+} as const;
 
-  preferenciasPendente: {
-    titulo: 'Preferências de notificação e idioma',
-    texto:
-      'Os avisos que você recebe e o idioma da interface. A tabela de eventos já existe no banco; a tela chega na fatia de preferências (7.3 / 17.3).',
+// ---------------------------------------------------------------------------
+// 7.3 / 17.3 · Preferências
+// ---------------------------------------------------------------------------
+
+export const PREFERENCIAS = {
+  notificacoesTitulo: 'Notificações',
+  /** O protótipo escreve isto no lugar de um botão Salvar — e não há um. */
+  salvoAutomaticamente: 'Salvo automaticamente',
+
+  colunaEvento: 'Aviso',
+  colunaInApp: 'No app',
+  colunaEmail: 'E-mail',
+
+  /**
+   * A etiqueta do evento que não se desliga. A regra é da matriz de
+   * notificações e é aplicada no envio por `registrar_notificacao`, que ignora
+   * a preferência quando `critico` — a tela só conta a verdade.
+   */
+  critico: 'Sempre ativo',
+  criticoNota: 'Avisos essenciais da conta e de prazo não podem ser desligados.',
+
+  idiomaTitulo: 'Idioma da interface',
+  /** Nota literal do protótipo — a do artista. A do curador é a outra. */
+  idiomaNotaArtista: 'A devolutiva chega no idioma em que o curador escreveu.',
+  idiomaNotaCurador: 'Vale para a interface. A faixa e o contexto chegam no idioma do artista.',
+
+  idiomas: {
+    'pt-BR': 'Português (Brasil)',
+    es: 'Español',
+    en: 'English',
   },
+
+  erroSalvar: 'Não conseguimos salvar agora. Tente de novo em alguns instantes.',
+  erroCritico: 'Este aviso é essencial e não pode ser desligado.',
+} as const;
+
+// ---------------------------------------------------------------------------
+// 17.1 · Perfil do curador — leitura
+// ---------------------------------------------------------------------------
+
+/**
+ * Textos da aba Perfil do curador.
+ *
+ * A aba é **de leitura**, e a edição fica em "Meu cadastro" (12.6). O PRD
+ * descreve 17.1 com foto, bio e gêneros editáveis, mas 12.6 já os edita — e
+ * duplicar a edição repetiria, para bio e gêneros, exatamente o problema que
+ * esta tela evita para senha e exclusão: dois caminhos para o mesmo dado, e a
+ * chance de corrigir um e esquecer o outro. A divergência está registrada em
+ * docs/prd/07-pendencias-e-divergencias.md.
+ */
+export const CURADOR_PERFIL = {
+  titulo: 'Seu perfil',
+  subtitulo: 'O que o artista vê quando escolhe quem vai ouvir a faixa.',
+
+  classeTitulo: 'Classe',
+  classeNota: 'A classe é definida pela curadoria. Você não a altera por aqui.',
+
+  bioTitulo: 'Bio',
+  bioVazia: 'Você ainda não escreveu sua bio.',
+
+  generosTitulo: 'Gêneros',
+  generosVazios: 'Nenhum gênero escolhido.',
+
+  especialidadeTitulo: 'Especialidade',
+  especialidadeVazia: 'Nenhuma especialidade descrita.',
+
+  credenciaisTitulo: 'Credenciais',
+  credenciaisNota: 'Enviadas no cadastro e conferidas pela curadoria. Somente leitura.',
+  credenciaisVazias: 'Nenhuma credencial enviada.',
+  /** As que contam para a classe — as mesmas que `credenciaisComprovadas()` conta. */
+  credencialComprovada: 'Comprovada',
+
+  editar: 'Editar em Meu cadastro',
+  editarNota: 'Bio, gêneros, mídias e serviços se alteram lá — e alterá-los não muda sua classe.',
 } as const;

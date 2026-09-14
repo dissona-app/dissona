@@ -19,6 +19,8 @@ export { Cartao, CartaoClicavel } from './Cartao';
 export type { PropsCartao, PropsCartaoClicavel, VarianteCartao } from './Cartao';
 export { Checkbox } from './Checkbox';
 export type { PropsCheckbox } from './Checkbox';
+export { Chips } from './Chips';
+export type { PropsChips } from './Chips';
 export { EstadoVazio } from './EstadoVazio';
 export type { PropsEstadoVazio } from './EstadoVazio';
 export { Etiqueta } from './Etiqueta';

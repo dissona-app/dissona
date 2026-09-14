@@ -1,0 +1,78 @@
+/* 17.1 · Perfil do curador, em leitura. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+}
+
+.classe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+}
+
+.rotulo {
+  margin: 0 0 var(--dsn-space-2);
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.texto {
+  margin: 0;
+  color: var(--dsn-ink);
+}
+
+/* Estado vazio de campo, não de lista: é uma frase no lugar do conteúdo, e
+   não o `EstadoVazio` do Design System, que é para lista sem linha nenhuma. */
+.vazio {
+  margin: 0;
+  color: var(--dsn-ink-400);
+  font-style: italic;
+}
+
+.etiquetas,
+.credenciais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.credenciais {
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+}
+
+.credencial {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-3);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-4);
+}
+
+.nota {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

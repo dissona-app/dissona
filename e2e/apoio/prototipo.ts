@@ -50,11 +50,46 @@ export type Prototipo = (typeof PROTOTIPO)[keyof typeof PROTOTIPO];
  * atributo de props do `<script type="text/x-dc">` de cada `.html`.
  */
 export type PropsDoPrototipo = {
-  readonly telaInicial?: 'Login' | 'Cadastro' | 'Recuperação' | 'Redefinição' | 'Onboarding';
-  readonly estadoInicial?: 'Normal' | 'Loading' | 'Erro' | 'Bloqueada' | 'Autenticado';
+  /**
+   * A união é a soma dos três painéis: os quatro primeiros valores existem nos
+   * três ambientes, e o resto pertence a um só. Passar um nome ao ambiente
+   * errado não é erro — o `routeMap` do protótipo cai no login, e a guarda de
+   * "poucos textos pareados" do spec acusa.
+   */
+  readonly telaInicial?:
+    | 'Login'
+    | 'Cadastro'
+    | 'Recuperação'
+    | 'Redefinição'
+    // Artista
+    | 'Onboarding'
+    | 'Perfil'
+    | 'Configurações'
+    | 'Carteira'
+    | 'Enviar'
+    // Curador
+    | 'Classificação'
+    | 'Boas-vindas Bronze'
+    | 'Cadastro em análise'
+    | 'Conta e configurações'
+    | 'Painel'
+    | 'Fila'
+    | 'Avaliação'
+    // Admin
+    | 'Pacotes de Claves'
+    | 'Conta e equipe';
+  readonly estadoInicial?:
+    'Normal' | 'Loading' | 'Erro' | 'Bloqueada' | 'Autenticado' | 'Sem permissão';
   readonly estadoCadastro?: 'Normal' | 'Loading' | 'Erro' | 'Sucesso';
   readonly estadoToken?: 'Válido' | 'Expirado';
   readonly passoOnboarding?: 1 | 2 | 3 | 4;
+  /** Passo do wizard do curador — 1 a 8 (ambiente Curador). */
+  readonly passoInicial?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  /** `true` quando o wizard é aberto por quem já tem sessão (ambiente Curador). */
+  readonly curadorLogado?: boolean;
+  readonly classeCurador?: 'Bronze' | 'Prata' | 'Ouro';
+  readonly classeForcada?: 'Calculada' | 'Bronze' | 'Candidato a Prata';
+  readonly credenciaisMinimas?: 1 | 2 | 3 | 4;
   readonly mostrarSocial?: boolean;
   readonly mostrarProvas?: boolean;
 };

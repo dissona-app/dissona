@@ -1,0 +1,49 @@
+/* 3.3 · Status do envio — versão mínima. */
+
+.base {
+  max-width: 52rem;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+  padding: var(--dsn-space-4) var(--dsn-space-2);
+  border-bottom: 1px solid var(--dsn-border-faint);
+  text-align: left;
+  font-weight: 400;
+  color: var(--dsn-ink);
+  vertical-align: middle;
+}
+
+.tabela thead th {
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.tabela tbody tr:last-child th,
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.curador {
+  font-weight: 500;
+}
+
+/* A barra ocupa a coluna inteira; o rótulo é oculto porque a coluna "Etapa"
+   ao lado já diz em palavras o que ela mostra em forma. */
+.andamento {
+  min-width: 10rem;
+}
+
+.nota {
+  margin: var(--dsn-space-6) 0 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

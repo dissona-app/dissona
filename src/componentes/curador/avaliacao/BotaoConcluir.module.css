@@ -1,0 +1,15 @@
+/* Conclusão da avaliação (14.4). */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-3xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}

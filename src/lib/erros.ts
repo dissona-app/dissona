@@ -34,6 +34,8 @@ export const CodigoErro = {
   // o link. Um banner genérico faria a pessoa tentar a senha de novo, para
   // sempre.
   EMAIL_JA_CADASTRADO: 'email_ja_cadastrado',
+  /** O Auth recusou o endereço: a regra dele é mais rigorosa que a nossa. */
+  EMAIL_INVALIDO: 'email_invalido',
   EMAIL_NAO_VERIFICADO: 'email_nao_verificado',
   CONTA_BLOQUEADA: 'conta_bloqueada',
   TOKEN_INVALIDO: 'token_invalido',

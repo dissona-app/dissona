@@ -27,10 +27,29 @@ export const ROTA = {
   SELECAO_DE_PERFIL: '/selecao-de-perfil',
   ONBOARDING: '/onboarding',
   ARTISTA: '/artista',
+  /** "Perfil" na sidebar (7.1) — o que o curador vê antes de ouvir. */
+  ARTISTA_PERFIL: '/artista/perfil',
+  /** Carteira (5) e extrato (5.3). O extrato é rota própria porque o protótipo lhe dá endereço ("Ver extrato", "Ver tudo"). */
+  ARTISTA_CARTEIRA: '/artista/carteira',
+  ARTISTA_EXTRATO: '/artista/carteira/extrato',
+  /**
+   * Envio de música (3) — wizard de 3 passos.
+   *
+   * O passo 1 é a própria raiz, porque ainda não existe faixa. Do passo 2 em
+   * diante o id entra no caminho (`/artista/enviar/<faixaId>/contexto`): o
+   * progresso é persistido na linha, e sem o id na URL a retomada não teria
+   * endereço — é a mesma razão que fez o wizard do curador ter uma rota por
+   * passo.
+   */
+  ARTISTA_ENVIAR: '/artista/enviar',
   /** "Configurações" na sidebar, `/artista/conta` na URL — os dois são do protótipo (`route === 'conta'`). */
   ARTISTA_CONTA: '/artista/conta',
   CURADOR: '/curador',
   CURADOR_CONTA: '/curador/conta',
+  /** Fila de avaliações (13) e o detalhe do item (13.1). */
+  CURADOR_FILA: '/curador/fila',
+  /** Wizard de avaliação (14) — uma rota por envio. */
+  CURADOR_AVALIAR: '/curador/avaliar',
   CURADOR_CADASTRO: '/curador/cadastro',
   /**
    * "Meu cadastro" na sidebar — a manutenção de mídias e serviços (12.6).

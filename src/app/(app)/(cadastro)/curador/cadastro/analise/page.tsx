@@ -49,7 +49,7 @@ export default async function Pagina() {
       </Aviso>
 
       <form action={sair} className={estilos.formulario}>
-        <Botao type="submit" blocoInteiro>
+        <Botao type="submit" tamanho="denso" blocoInteiro>
           {CURADOR_CLASSIFICACAO.entendi}
         </Botao>
       </form>

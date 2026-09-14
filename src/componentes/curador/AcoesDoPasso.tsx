@@ -49,9 +49,12 @@ export function AcoesDoPasso({
           mesma ação para os oito passos, e é ele que diz de onde saímos. */}
       <input type="hidden" name="passo" value={passo} />
 
+      {/* `neutro`, e não `ghost`: no protótipo "Voltar" é cinza, e não roxo —
+          ele desfaz, e desfazer não é convite. */}
       <Botao
         type="submit"
-        variante="ghost"
+        variante="neutro"
+        tamanho="sm"
         formAction={acaoDeVoltar}
         formNoValidate
         disabled={pending}
@@ -60,10 +63,13 @@ export function AcoesDoPasso({
       </Botao>
 
       <div className={estilos.direita}>
+        {/* "Pular" é o mesmo botão neutro de "Voltar" no protótipo, e não um
+            secundário de 16 px com contorno roxo. */}
         {podePular ? (
           <Botao
             type="submit"
-            variante="secundario"
+            variante="neutro"
+            tamanho="sm"
             formAction={acaoDePular}
             formNoValidate
             disabled={pending}
@@ -72,7 +78,7 @@ export function AcoesDoPasso({
           </Botao>
         ) : null}
 
-        <Botao type="submit" carregando={pending}>
+        <Botao type="submit" tamanho="denso" carregando={pending}>
           {ultimo ? CURADOR_CADASTRO.enviarCadastro : CURADOR_CADASTRO.continuar}
         </Botao>
       </div>

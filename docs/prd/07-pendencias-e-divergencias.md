@@ -372,3 +372,336 @@ Nenhum dos dois é bug da aplicação; ficam registrados para não serem
   componente. Aqui a aplicação **segue o protótipo tela por tela**, pelo prop
   `tamanho` de `BotoesSociais` — a diferença acompanha o papel do social em
   cada tela (atalho no login, alternativa no cadastro).
+
+---
+
+## Divergências das telas da R1 com sessão · 2026-09-11
+
+Segunda passada da comparação visual, agora nas telas que exigem login
+(`e2e/prototipo/telas-da-r1.spec.ts`): onboarding, conta do artista e do
+curador, os oito passos do wizard, classificação, Bronze, análise e a conta e
+equipe do admin. A maioria do que ela achou era **escala de tipografia** e virou
+correção; o que segue divergindo está aqui.
+
+### 1. Os dois botões da tela de Bronze estão com as variantes trocadas
+
+No protótipo, "Começar o curso" é o primário (branco sobre laranja) e "Ir para o
+painel" é o secundário (roxo sobre branco). Na aplicação o curso está
+**desabilitado** — o conteúdo é de outra release —, e com isso "Ir para o
+painel" assumiu o primário. É a decisão certa enquanto o curso não existir: a
+tela não pode ter como ação principal um botão que não leva a lugar nenhum.
+Quando o curso entrar, os dois voltam ao protótipo.
+
+### 2. A nota da tela de análise é um `Aviso`, e no protótipo é texto solto
+
+*"A equipe já recebeu o alerta para avaliar suas credenciais"* aparece num aviso
+informativo roxo; no protótipo é uma linha de 12 px em `ink-500`. O aviso dá
+mais peso à frase do que o protótipo lhe dá. Decisão de design, não de
+implementação.
+
+### 3. O upload de foto do admin é pendência, e o botão está desabilitado
+
+"Trocar foto" sai cinza em vez de roxo por estar desabilitado — o protótipo, ao
+clicar nele, ele mesmo diz *"Upload de imagem indisponível no protótipo"*.
+
+### 4. Dois verdes de sucesso quase iguais no próprio protótipo
+
+O status "Completo" da revisão (passo 8) usa `#1B7A46`; as outras telas usam
+`#1E7A4A`. Os dois estão no §1.1 do Design System, com 4,76:1 e 4,74:1 de
+contraste. A aplicação segue o token `--dsn-success-fg`; um segundo token para
+0,02 de diferença de contraste seria ruído.
+
+### 5. Onde o protótipo ainda não foi lido
+
+- **Telas derivadas**, sem protótipo nenhum com que comparar: seleção de perfil
+  (1.4), `/cadastrar/confirmar` (1.6) e o aceite de convite do admin. Para elas
+  a referência é o Design System, e a suíte de paridade não as cobre.
+- **Telas de R2**: painel do artista, fila e avaliação do curador, pacotes do
+  admin. O protótipo tem todas (`telaInicial` cobre Fila, Avaliação, Enviar,
+  Carteira, Pacotes de Claves), e a suíte de paridade já tem o mecanismo — falta
+  escrever os cenários.
+
+
+---
+
+## Divergências levantadas pela implementação do perfil do artista · 2026-09-14
+
+### 1. Os catálogos de gênero do artista e do curador não são o mesmo
+
+O protótipo do **artista** traz onze gêneros; o do **curador**, doze. A
+diferença é uma entrada: **"Pagode"**, que existe só no lado do curador.
+
+| | Catálogo |
+|---|---|
+| Artista (perfil 7.1 e passo 2 do envio) | MPB contemporânea · Rap nacional · Trap · Funk · Eletrônico · Rock alternativo · Indie · Samba · Sertanejo · Jazz · Experimental |
+| Curador (passo 2 do cadastro) | os mesmos, **mais Pagode** |
+
+Cada lado foi implementado com o catálogo do seu próprio protótipo —
+`GENEROS_DO_ARTISTA` em [`src/textos/prototipo.ts`](../../src/textos/prototipo.ts)
+e `CURADOR_CADASTRO.generos` em [`src/textos/curador.ts`](../../src/textos/curador.ts) —
+porque a precedência do [AGENTS.md](../../AGENTS.md) manda seguir o protótipo, e
+aqui os dois protótipos discordam entre si.
+
+**Por que importa, e não é cosmético.** A R3 faz *matching* de gênero entre a
+faixa enviada e o que o curador declara receber ([módulo 4](02-ambiente-artista.md#4-seleção-de-curadores)).
+Com vocabulários diferentes, "Pagode" é um gênero que um curador pode declarar e
+que **nenhuma faixa jamais terá** — o filtro devolve vazio para sempre, sem erro
+nenhum que denuncie a causa.
+
+**Pergunta ao cliente:** o catálogo é um só (e então "Pagode" entra no lado do
+artista), ou são dois de propósito? Se for um só, o lugar dele deixa de ser
+`textos/` e passa a ser tabela — do contrário a R3 vai precisar de uma terceira
+cópia para o filtro.
+
+**Custo de corrigir agora:** uma linha em `GENEROS_DO_ARTISTA`. Depois da R3,
+é migração de dado.
+
+### 2. Onde o perfil do artista foi além do protótipo
+
+O protótipo não desenha teto de seleção nos chips de gênero — ele deixa marcar
+quantos quiser. Mas `perfil_artista` tem
+`check (coalesce(array_length(generos, 1), 0) <= 3)` desde a `0002`, e o próprio
+rótulo da tela diz *"Gêneros · até 3"*.
+
+Implementado com o teto na interface (`Chips` ganhou a prop `maximo`, que
+desabilita os não marcados ao chegar no limite). É a mesma decisão já registrada
+para a tela 21: o protótipo, sendo mock, deixa passar o que o banco recusaria —
+e recusar antes é melhor que estourar `23514` depois do formulário preenchido.
+
+### 3. O perfil do curador (17.1) ficou em leitura, e não editável
+
+O PRD §17.1 descreve a tela com **foto, bio e gêneros editáveis** ("Ações:
+upload/trocar foto · Salvar") e só as credenciais em leitura. Implementada
+**inteira em leitura**, com um link para "Meu cadastro" (12.6).
+
+A razão é que **12.6 já edita exatamente esses campos** — bio, gêneros, mídias e
+serviços —, e foi entregue na R1. Dar um segundo formulário para o mesmo dado
+repetiria, em bio e gêneros, o problema que a própria `TelaDeConta` evita para
+senha e exclusão: dois caminhos para a mesma escrita, e a chance de corrigir um
+e esquecer o outro.
+
+A classe e as credenciais seguem em leitura nos dois lugares, o que não é
+decisão de tela: o trigger `proibir_autopromocao_de_classe` da `0002c` recusa a
+escrita do próprio curador, e o único caminho é a RPC
+`concluir_cadastro_curador`.
+
+**Pergunta ao cliente:** 17.1 pode continuar sendo a vitrine em leitura, com a
+edição concentrada em "Meu cadastro"? Se a intenção era ter a edição nos dois
+lugares, o custo é baixo — mas aí "Meu cadastro" e "Perfil" passam a ser a mesma
+tela em dois endereços, e vale eliminar um dos dois.
+
+### 4. Onde o perfil vive é diferente nos dois ambientes
+
+No artista, "Perfil" é **rota própria** (`/artista/perfil`) com item na sidebar;
+no curador, é **aba** de Conta (`/curador/conta?aba=perfil`).
+
+Não é inconsistência nossa: é o que cada protótipo faz. O do artista tem
+"Perfil" na sidebar e uma tela "Editar cadastro" separada; o do curador não tem
+item de perfil na sidebar nenhum, e o PRD lista 17.1 como uma das quatro telas
+de Conta. Pela precedência do [AGENTS.md](../../AGENTS.md), cada lado segue o seu.
+
+Consequência prática registrada em código: `ehAbaDeConta` passou a receber o
+ambiente. Sem isso, `/artista/conta?aba=perfil` passaria na validação e
+renderizaria uma aba que aquele ambiente não tem — tela em branco, sem erro.
+
+---
+
+## Achado da suíte E2E · 2026-09-14
+
+### `E2E_SENHA` duplicada no `.env.local` derrubava a suíte inteira
+
+Nenhum dos 16 cenários passava nesta máquina — nem os três que o backlog dava
+como verdes (A1–A3). Todos falhavam no **login**, com "E-mail ou senha
+inválidos", e o sintoma apontava para uma causa errada: senha trocada no banco.
+
+A causa era outra. `.env.local` tinha **duas** linhas `E2E_SENHA=`, com valores
+diferentes — uma senha gerada e um `Dissona2026` acrescentado depois. E
+[`e2e/setup/ambiente.ts`](../../e2e/setup/ambiente.ts) nunca sobrescreve o que
+já está definido:
+
+```ts
+if (process.env[chave] !== undefined) continue;
+```
+
+A regra existe por um bom motivo — no CI a variável vem do secret do job, e um
+`.env.local` esquecido na máquina não deve vencer dele. O efeito colateral é que
+**a primeira ocorrência do arquivo ganha**, e a segunda é silenciosamente
+ignorada. O banco tinha o hash da segunda; o Playwright mandava a primeira.
+
+Resolvido mantendo a senha forte, removendo a duplicata e rotacionando as oito
+contas `e2e_` para ela. Depois disso: 78 testes passando, 11 em `skip`.
+
+**Vale como lição de diagnóstico:** o carregador de `.env` do projeto é
+deliberadamente "primeiro vence", e isso torna chave repetida um erro mudo. Se
+a suíte voltar a falhar em massa no login, conferir duplicata antes de suspeitar
+do banco:
+
+```bash
+grep -c '^E2E_SENHA=' .env.local   # tem de devolver 1
+```
+
+---
+
+## Achados da implementação do envio · 2026-09-14
+
+### 1. O artista não conseguia ver o nome de curador nenhum
+
+A policy de `perfil_curador` libera os aprovados para qualquer autenticado. Mas
+o **nome** não mora ali — mora em `perfil`, cuja policy é:
+
+```sql
+using (id = auth.uid() or e_admin())
+```
+
+O efeito: um embed `perfil_curador!inner(perfil!inner(nome_completo))` devolve
+**zero linha** para o artista, sem erro nenhum. A tela cai no estado vazio como
+se não houvesse curador disponível — e a mesma coisa acontecia na tela de status
+do envio, que parecia dizer que a faixa não tinha sido enviada a ninguém.
+
+Isso bloquearia igualmente a **Seleção de Curadores (módulo 4)** da R3, que é a
+tela de verdade.
+
+Resolvido pela migration **`0002f`**, que cria a view `curador_publico` com
+exatamente quatro colunas — `perfil_curador_id`, `classe`, `situacao`, `nome` —
+restrita aos aprovados e ativos.
+
+**Por que view e não policy:** RLS filtra linha, não coluna. Uma policy de
+`select` em `perfil` liberaria junto `handle`, `cidade`, `idioma`, `situacao`,
+`aceite_termos_em` e `desativada_em`. A view expõe só o necessário.
+
+⚠️ É o **oposto** da decisão de `saldo_carteira`, que é `security_invoker = true`
+para herdar a RLS. A diferença é o propósito: lá, recorte privado de dado
+financeiro; aqui, vitrine deliberadamente pública. Está escrito no cabeçalho da
+migration para quem for mexer.
+
+### 2. `pnpm db:tipos` destruía o arquivo quando falhava
+
+O script era `supabase gen types … > src/lib/supabase/tipos-bd.ts`. O `>` do
+shell **trunca antes de o comando rodar** — e a CLI falha sem
+`SUPABASE_ACCESS_TOKEN`, que não é versionável. O resultado era `tipos-bd.ts`
+com uma linha de JSON de erro, e o typecheck quebrando em centenas de lugares
+sem que nenhuma mensagem citasse o token.
+
+Aconteceu de fato nesta sessão; o arquivo foi recuperado do git.
+
+Substituído por [`scripts/gerar-tipos-bd.mjs`](../../scripts/gerar-tipos-bd.mjs),
+que captura a saída, confere que ela contém `export type Database` e só então
+escreve. Falhou, o arquivo anterior fica intacto e a mensagem diz o que fazer.
+
+> **Pendência:** `curador_publico` ainda não está em `tipos-bd.ts`, porque
+> regenerá-lo exige o token. Enquanto isso, `modulos/selecao/repositorio.ts`
+> declara a linha à mão, num ponto só e com o cast anotado. Rodar
+> `pnpm db:tipos` com um token remove os dois.
+
+### 3. Componentes com input visualmente escondido e o Playwright
+
+`Chips` e `Checkbox` escondem o `<input>` com `clip-path`/posicionamento e
+deixam o `<label>` receber o clique — que é o padrão acessível correto. Mas
+`locator.check()` do Playwright tenta clicar no **input**, e o label intercepta.
+
+Nos cenários, a forma que funciona é a que uma pessoa usa: clicar no rótulo
+(`getByText(...).click()`), ou `check({ force: true })` quando o rótulo não é
+único. Vale lembrar ao escrever C3–C5, que usam os mesmos componentes.
+
+---
+
+## Divergências levantadas pela implementação da avaliação · 2026-09-14
+
+Módulo 14 e suas quatro subtelas. Três divergências com o protótipo, dois
+defeitos encontrados no que já existia, e uma limitação da suíte.
+
+### 1. A escolha de compartilhamento é **exclusiva**, e no protótipo é múltipla
+
+O protótipo de 14.2 deixa marcar playlist **e** post **e** matéria ao mesmo
+tempo (`avShare` é um mapa de booleanos). O banco guarda **uma** escolha por
+avaliação: `compartilhamento.avaliacao_id` é `unique` e `modalidade` é uma
+coluna só.
+
+E o acréscimo é o mesmo 8% em qualquer caso — `calcular_remuneracao` lê
+`compartilhou` como booleano. Então a multiescolha do protótipo não muda nem a
+remuneração nem o registro: ela só prometeria gravar três coisas e gravaria uma.
+
+Implementado como `<input type="radio">`, com "Não vou compartilhar desta vez"
+fora da grade dos quatro, como no protótipo. **Se o cliente quiser a
+multiescolha de verdade**, é mudança de schema — `compartilhamento` passaria a
+ter uma linha por modalidade —, e não de tela.
+
+### 2. "Curadora Prata" virou "Sua classe" + selo
+
+O cabeçalho de 14.4 no protótipo diz "Curadora {classe}", no feminino, porque a
+persona dele é a Marina. Flexionar o cabeçalho pelo gênero de quem está logado é
+informação que a aplicação não tem — e não deveria pedir para exibir um selo.
+
+A classe aparece pelo `<SeloClasse>`, sob o rótulo neutro "Sua classe".
+
+### 3. Uma justificativa por critério, e não um `<textarea>` que troca de assunto
+
+Em 14 o protótipo tem **um** campo de justificativa, e clicar num critério troca
+o que ele edita. Aqui cada critério traz o seu, empilhado sob a nota.
+
+O motivo não é preferência: com um campo só, preencher onze justificativas exige
+JavaScript funcionando e um `<textarea>` cujo rótulo muda de significado
+conforme o estado — que o leitor de tela anuncia sempre igual. Com um por
+critério, o formulário inteiro viaja num `POST` e cada campo tem nome próprio.
+
+### 4. 🐞 `proibir_alteracao_de_ganho` cancela **todo** `delete`, inclusive o do superusuário
+
+A função da `0009` faz `if current_user <> 'authenticated' then return new; end
+if;`. Num trigger `before delete` por linha, `NEW` é `NULL` — e retornar `NULL`
+num `before` **cancela a operação**. Resultado: `delete from ganho_curador`
+apaga zero linhas e **não levanta erro nenhum**, para qualquer papel.
+
+Comprovado nesta sessão com uma tabela temporária que usa a mesma função: uma
+linha inserida, um `delete`, `row_count = 0`, linha intacta.
+
+Para `authenticated` o efeito pretendido continua valendo (o `raise` da linha
+seguinte nunca é alcançado, mas o `delete` também não passa). O que não vale é
+a intenção do `if`: ele queria deixar as RPCs e os jobs passarem. Hoje ninguém
+passa — nem uma correção de payout, nem um expurgo de LGPD.
+
+Correção sugerida, para uma migration própria: `return old` no ramo de `delete`
+(ou `coalesce(new, old)`), e uma asserção na suíte da `0009` provando que o
+`delete` de fato apaga quando o papel é privilegiado.
+
+**Não corrigido aqui**: é DDL, e a avaliação não depende disso.
+
+### 5. 🐞 `perfil_curador` é legível por qualquer autenticado, e `maybeSingle()` sem filtro falhava
+
+A policy de leitura é `situacao in ('bronze_aprovado','prata_aprovado') or
+perfil_id = auth.uid() or e_admin()` — todo curador aprovado é público para
+autenticados, porque a seleção de curadores (4) precisa listá-los.
+
+`garantirRascunho` fazia `from('perfil_curador').select('id').maybeSingle()` sem
+filtro, contando com a RLS para sobrar uma linha só. Com mais de um curador
+aprovado no banco, a consulta passa a devolver várias e o `maybeSingle()` falha
+— e falha parecendo "você não é curador", que é o diagnóstico errado.
+
+Corrigido em `modulos/avaliacao/repositorio.ts`: a leitura filtra por
+`perfil_id = auth.uid()`. **Vale a varredura**: qualquer outro `maybeSingle()`
+sobre `perfil_curador` tem o mesmo defeito latente.
+
+### 6. `iniciarAvaliacao` recusava um envio já `avaliando`
+
+O `update` aceitava só `recebeu` e `ouviu`. Mas "Iniciar avaliação" também é a
+porta da **retomada** — quem usou "Salvar e sair" volta pela fila e clica no
+mesmo botão —, e a segunda entrada afetava zero linhas, com a tela dizendo que a
+faixa não estava mais disponível.
+
+`avaliando` entrou na lista, e `iniciou_em` só é gravado na primeira vez.
+
+### 7. A suíte E2E consome um envio por execução, e o seed o repõe
+
+C6 conclui uma avaliação, e concluir é irreversível: o envio vira `pronto` e
+`ganho_curador` não se apaga (ver a divergência 4 — hoje nem por superusuário).
+Então o cenário usa uma faixa própria, `e2e_Faixa para concluir`, e
+[`dados-e2e.sql`](../../supabase/testes/dados-e2e.sql) cria outra sempre que não
+houver nenhuma pendente.
+
+**Consequência operacional:** o seed tem de rodar **antes de cada execução** da
+suíte, e não uma vez só. Sem isso, o último teste de C6 falha com a mensagem
+"a fila precisa listar ... — rode supabase/testes/dados-e2e.sql". Os outros 31
+cenários do curador são idempotentes.
+
+O CI ainda não roda o seed — ver o job `e2e` de [`ci.yml`](../../.github/workflows/ci.yml).
+Automatizá-lo depende de credencial de banco no job, que é a mesma pendência de
+`SUPABASE_SERVICE_ROLE_KEY`.

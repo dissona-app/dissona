@@ -56,7 +56,7 @@ export function FormularioDeServicos({ servicos, acao }: PropsFormularioDeServic
 
       <ListaDeServicos servicos={servicos} />
 
-      <p className={estilos.nota}>{CURADOR_CADASTRO.notaClaves}</p>
+      <p className={estilos.notaRodape}>{CURADOR_CADASTRO.notaClaves}</p>
 
       <div className={estilos.acoes}>
         <Botao type="submit" tamanho="denso" carregando={pendente}>

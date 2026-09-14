@@ -73,9 +73,13 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
     const motivo = resultado.campos?.[campo];
     if (motivo !== undefined) return TEXTO_DO_MOTIVO[motivo] ?? CADASTRAR.erroEmailInvalido;
 
-    // `campo` é o caminho de um erro único — é como o Auth devolve senha fraca.
+    // `campo` é o caminho de um erro único — é como o Auth devolve os dois
+    // erros que ele julga por conta própria: senha fraca e endereço recusado.
     if (resultado.campo === campo && resultado.codigo === CodigoErro.SENHA_FRACA) {
       return CADASTRAR.erroSenhaFraca;
+    }
+    if (resultado.campo === campo && resultado.codigo === CodigoErro.EMAIL_INVALIDO) {
+      return CADASTRAR.erroEmailInvalido;
     }
     return undefined;
   };

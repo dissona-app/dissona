@@ -58,7 +58,7 @@ export function CartaoDeCredencial({
       valor={valor}
       nota={nota}
       acao={
-        <Botao variante="secundario" tamanho="denso" onClick={() => setAberto(true)}>
+        <Botao variante="secundario" tamanho="sm" onClick={() => setAberto(true)}>
           {rotuloDaAcao}
         </Botao>
       }

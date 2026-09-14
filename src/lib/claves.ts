@@ -28,6 +28,23 @@ export function paraClaves(quantidade: string): Claves {
   return BigInt(inteiro) * CENTESIMOS + BigInt(decimal.padEnd(2, '0'));
 }
 
+/**
+ * Como `paraClaves`, mas aceita sinal — é o formato do **ledger**.
+ *
+ * `lancamento_clave.quantidade` é assinada por desenho: o `check`
+ * `lancamento_clave_sinal_coerente` exige `consumo < 0` e `compra > 0`, e é o
+ * que faz o saldo ser a soma simples da coluna. `paraClaves` recusa negativo
+ * de propósito — ela serve a preço e a pacote, onde negativo é erro —, então
+ * ler o extrato com ela estouraria `VALOR_INVALIDO` em toda linha de consumo.
+ */
+export function paraClavesComSinal(quantidade: string): Claves {
+  const corpo = quantidade.trim().replace(',', '.');
+  const negativo = corpo.startsWith('-');
+  const semSinal = negativo ? corpo.slice(1) : corpo;
+  const magnitude = paraClaves(semSinal);
+  return negativo ? -magnitude : magnitude;
+}
+
 /** Constrói a partir de uma quantidade inteira de Claves. */
 export function deClavesInteiras(quantidade: number): Claves {
   if (!Number.isInteger(quantidade) || quantidade < 0) {
@@ -36,10 +53,21 @@ export function deClavesInteiras(quantidade: number): Claves {
   return BigInt(quantidade) * CENTESIMOS;
 }
 
+/**
+ * `250n` → `"2.50"`. **Com sinal**, que é o que o ledger exige.
+ *
+ * O sinal sai antes e a parte decimal é tirada do valor absoluto. Sem isso,
+ * `-650n` viraria `"-6.-50"` — porque em `bigint` o resto herda o sinal do
+ * dividendo — e `Intl.NumberFormat` sobre aquilo devolve `NaN`. Um consumo de
+ * 6,50 Claves apareceria como "NaN" no extrato, que é o tipo de defeito que
+ * passa despercebido enquanto todos os valores de teste forem inteiros.
+ */
 export function paraStringDecimal(claves: Claves): string {
-  const inteiro = claves / CENTESIMOS;
-  const resto = claves % CENTESIMOS;
-  return `${inteiro}.${resto.toString().padStart(2, '0')}`;
+  const negativo = claves < 0n;
+  const absoluto = negativo ? -claves : claves;
+  const inteiro = absoluto / CENTESIMOS;
+  const resto = absoluto % CENTESIMOS;
+  return `${negativo ? '-' : ''}${inteiro}.${resto.toString().padStart(2, '0')}`;
 }
 
 /** Formata para exibição: `250n` → `"2,50"`. Sem sufixo — a View escolhe. */

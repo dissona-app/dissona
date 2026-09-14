@@ -28,6 +28,7 @@ export type ResultadoDeCadastro =
       readonly precisaVerificar: boolean;
     }
   | { readonly estado: 'email_ja_cadastrado' }
+  | { readonly estado: 'email_invalido' }
   | { readonly estado: 'senha_fraca' }
   | { readonly estado: 'limite_de_envio' };
 
@@ -74,6 +75,17 @@ export async function criarConta(
 
   if (error !== null) {
     if (error.code === 'user_already_exists') return { estado: 'email_ja_cadastrado' };
+    /*
+     * O Auth recusa endereços que a nossa validação aceita — `.local`,
+     * `example.com`, domínios sem MX. A regra dele é mais rigorosa que a do
+     * Zod, e não é documentada: não há como replicá-la do nosso lado.
+     *
+     * Sem este ramo o `throw` abaixo levava o erro até o boundary do Next, e a
+     * tela de cadastro inteira virava "A server error occurred" — para alguém
+     * que só digitou um e-mail que o provedor não quis. Agora é erro do campo,
+     * como qualquer outro.
+     */
+    if (error.code === 'email_address_invalid') return { estado: 'email_invalido' };
     if (error.code === 'weak_password') return { estado: 'senha_fraca' };
     if (error.code === 'over_email_send_rate_limit' || error.status === 429) {
       return { estado: 'limite_de_envio' };

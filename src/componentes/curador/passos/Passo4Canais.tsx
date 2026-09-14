@@ -64,7 +64,10 @@ export function Passo4Canais({
   const [proximaChave, setProximaChave] = useState(linhas.length);
 
   function acrescentar() {
-    setLinhas((atuais) => [...atuais, { chave: proximaChave, tipo: 'playlist', nome: '', url: '' }]);
+    setLinhas((atuais) => [
+      ...atuais,
+      { chave: proximaChave, tipo: 'playlist', nome: '', url: '' },
+    ]);
     setProximaChave((chave) => chave + 1);
   }
 
@@ -76,7 +79,11 @@ export function Passo4Canais({
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
-      {erro !== undefined ? <Aviso tom="erro" titulo={erro}>{CURADOR_CADASTRO.subtitulos[3]}</Aviso> : null}
+      {erro !== undefined ? (
+        <Aviso tom="erro" titulo={erro}>
+          {CURADOR_CADASTRO.subtitulos[3]}
+        </Aviso>
+      ) : null}
 
       <ul className={estilos.linhas}>
         {linhas.map((linha) => (
@@ -129,7 +136,7 @@ export function Passo4Canais({
       </ul>
 
       <div className={estilos.acessorio}>
-        <Botao type="button" variante="secundario" tamanho="denso" onClick={acrescentar}>
+        <Botao type="button" variante="secundario" tamanho="sm" onClick={acrescentar}>
           {CURADOR_CADASTRO.adicionarCanal}
         </Botao>
       </div>

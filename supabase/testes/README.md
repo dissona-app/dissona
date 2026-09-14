@@ -25,6 +25,12 @@ o catálogo da suíte Playwright. Ele **commita**, ao contrário de todos os
 outros — as contas têm de sobreviver para o navegador entrar com elas. Ver o
 cabeçalho do arquivo para a senha, que não é versionada.
 
+> ⚠️ **Rode-o antes de cada execução da suíte, e não uma vez só.** O cenário C6
+> conclui uma avaliação, e concluir é irreversível: o envio vira `pronto` e
+> `ganho_curador` não se apaga. O seed repõe a faixa descartável sempre que não
+> houver nenhuma pendente. Sem isso, o último teste de C6 falha dizendo
+> exatamente qual comando falta.
+
 Saída esperada: uma única linha `OK <migration>`. Qualquer falha aborta a
 transação e nomeia a asserção — `FALHOU: <rótulo>`.
 

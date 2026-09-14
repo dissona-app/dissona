@@ -12,6 +12,20 @@
 
 .nota {
   margin: 0;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-700);
+  text-wrap: pretty;
+}
+
+/*
+ * Nota de **rodapé** do passo, e não dica de campo: 12 px e `ink-500`, contra
+ * os 13 px e `ink-700` de `.nota`. O protótipo separa os dois papéis — a dica
+ * explica o campo ao lado ("Nome e e-mail vêm da conta"), a nota fecha a tela
+ * ("1 Clave equivale a R$ 10").
+ */
+.notaRodape {
+  margin: 0;
   font-size: var(--dsn-text-2xs);
   line-height: var(--dsn-leading-normal);
   color: var(--dsn-ink-500);
@@ -130,7 +144,7 @@
 }
 
 .leituraRotulo {
-  font-size: var(--dsn-text-3xs);
+  font-size: var(--dsn-text-4xs);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;
@@ -276,9 +290,23 @@
   color: var(--dsn-ink);
 }
 
+/*
+ * O rótulo de credencial (passo 6) é mais leve que o título de serviço (passo
+ * 5), e é assim no protótipo: 13 px em peso 500 contra 14 px em 600. A caixa
+ * de credencial é item de lista para marcar; o cartão de serviço é uma oferta
+ * com preço ao lado.
+ */
+.credencialRotulo {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-medium);
+  /* 1.35, o valor do protótipo: a caixa tem duas linhas no máximo. */
+  line-height: 1.35;
+  color: var(--dsn-ink-700);
+}
+
 .cartaoDescricao {
   font-size: var(--dsn-text-2xs);
-  line-height: var(--dsn-leading-normal);
+  line-height: var(--dsn-leading-dense);
   color: var(--dsn-ink-500);
 }
 
@@ -360,7 +388,7 @@
   padding: var(--dsn-space-6) var(--dsn-space-7);
   background: var(--dsn-purple-050);
   border-radius: var(--dsn-radius-lg);
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-2xs);
 }
 
 .dicaPrata {
@@ -420,24 +448,26 @@
 }
 
 .blocoRotulo {
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-sm);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-ink);
 }
 
 .blocoResumo {
   font-size: var(--dsn-text-2xs);
+  line-height: var(--dsn-leading-snug);
   color: var(--dsn-ink-500);
   overflow-wrap: anywhere;
 }
 
+/* Texto, e não badge: o protótipo escreve "Completo" em caixa normal e 12 px,
+   sem tracking. Em caixa alta com espaçamento ele lia como etiqueta de status
+   e competia com o rótulo da seção ao lado. */
 .statusCompleto,
 .statusFaltaPouco,
 .statusOpcional {
-  font-size: var(--dsn-text-3xs);
+  font-size: var(--dsn-text-2xs);
   font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-badge);
-  text-transform: uppercase;
   white-space: nowrap;
 }
 

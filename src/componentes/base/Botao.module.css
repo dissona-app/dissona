@@ -9,7 +9,6 @@
   border-radius: var(--dsn-radius-lg);
   font-family: inherit;
   font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-snug);
   cursor: pointer;
   transition:
     background var(--dsn-duration-base) var(--dsn-ease-out),
@@ -34,7 +33,6 @@
    * --dsn-orange-600 (4,99:1). Ver design-system.md §4.2. */
   background: var(--dsn-orange-500);
   color: #ffffff;
-  font-size: var(--dsn-text-md);
 }
 
 .primario:hover:not(:disabled) {
@@ -53,7 +51,6 @@
   background: var(--dsn-surface);
   color: var(--dsn-purple-600);
   border: var(--dsn-border-width) solid var(--dsn-purple-600);
-  font-size: var(--dsn-text-md);
 }
 
 .secundario:hover:not(:disabled) {
@@ -102,6 +99,15 @@
 .perigo {
   background: var(--dsn-danger-fg);
   color: #ffffff;
+}
+
+/*
+ * Os dois vermelhos com caixa têm corpo **próprio** — 15 px no sólido e 14 px
+ * no contorno (§2.3.3b) —, e ele não acompanha o `padding` do tamanho: o
+ * contorno do protótipo é 14 px num botão com folga de `denso`. Daí a
+ * especificidade dobrada, que é o que vence a classe de tamanho logo abaixo.
+ */
+.base.perigo {
   font-size: var(--dsn-text-base);
 }
 
@@ -114,6 +120,9 @@
   background: var(--dsn-surface);
   color: var(--dsn-danger-fg);
   border: var(--dsn-border-width) solid var(--dsn-danger-border-strong);
+}
+
+.base.perigoContorno {
   font-size: var(--dsn-text-sm);
 }
 
@@ -124,16 +133,49 @@
 
 /* -------------------------------------------------------------- tamanhos */
 
+/*
+ * O corpo do rótulo vem do **tamanho**, e não da variante.
+ *
+ * Vinha da variante — `primario` e `secundario` fixavam 16 px — e o resultado
+ * era um botão de 16 px em toda tela do produto, inclusive onde o protótipo
+ * põe 15 px ou 14 px. `tamanho` só mexia no `padding`, o que fazia um
+ * `tamanho="sm"` com rótulo de 16 px: menor por fora, igual por dentro.
+ *
+ * As três medidas são as do protótipo:
+ *
+ * | Tamanho | Corpo | Onde o R2 usa |
+ * |---|---|---|
+ * | `md`    | 16 px | CTA de tela de autenticação (tela 1, verificação) |
+ * | `denso` | 15 px | botão de fluxo: "Continuar", "Salvar", "Entendi" |
+ * | `sm`    | 14 px | ação secundária dentro de card: "Alterar e-mail" |
+ *
+ * Estas regras vêm **depois** das variantes de propósito: com a mesma
+ * especificidade, quem está mais abaixo vence, e é o tamanho que decide. As
+ * variantes sem caixa (`ghost`, `destrutivo`) não recebem classe de tamanho —
+ * ver `SEM_CAIXA` no TSX — e mantêm os 14 px que declaram.
+ */
+/*
+ * O `letter-spacing` é só do `md`, e não de `.base`.
+ *
+ * O Design System o registra para **rótulo de botão primário** de 16 px (§1.2),
+ * e é lá que o protótipo o aplica — o CTA das telas de autenticação. Nos botões
+ * de 15 px e 14 px, das outras 15 telas, o protótipo não põe tracking nenhum;
+ * herdá-lo de `.base` apertava todos eles.
+ */
 .md {
   padding: 15px var(--dsn-space-11);
+  font-size: var(--dsn-text-md);
+  letter-spacing: var(--dsn-tracking-snug);
 }
 
 .denso {
   padding: clamp(10px, 1.5vh, 13px) var(--dsn-space-11);
+  font-size: var(--dsn-text-base);
 }
 
 .sm {
   padding: var(--dsn-space-4) var(--dsn-space-5);
+  font-size: var(--dsn-text-sm);
 }
 
 .semPadding {

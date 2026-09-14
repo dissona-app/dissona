@@ -1,0 +1,39 @@
+/* Passo 3 do envio (3) — revisão. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--dsn-space-6);
+  margin: 0;
+}
+
+.rotulo {
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.valor {
+  margin: var(--dsn-space-2) 0 0;
+  color: var(--dsn-ink);
+}
+
+.contexto {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--dsn-ink);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+}

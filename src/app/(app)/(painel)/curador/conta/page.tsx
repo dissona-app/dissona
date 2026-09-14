@@ -5,6 +5,8 @@ import { TelaDeConta, ehAbaDeConta } from '@/componentes/conta/TelaDeConta';
 import { ROTA } from '@/lib/guarda-rota';
 import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
 import { lerSessoesDaConta } from '@/modulos/conta/consultas';
+import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
+import { lerPreferencias } from '@/modulos/preferencias/consultas';
 
 export const metadata: Metadata = {
   title: 'Conta e configurações · Dissona',
@@ -25,7 +27,7 @@ export default async function Pagina({
   readonly searchParams: Promise<{ readonly aba?: string }>;
 }) {
   const { aba: bruta } = await searchParams;
-  const aba = ehAbaDeConta(bruta) ? bruta : 'dados';
+  const aba = ehAbaDeConta(bruta, 'curador') ? bruta : 'dados';
 
   const [contexto, identidade] = await Promise.all([
     lerContextoDaSessao(),
@@ -34,7 +36,10 @@ export default async function Pagina({
 
   if (contexto.estado !== 'ok' || identidade === null) redirect(ROTA.ENTRAR);
 
+  // Cada leitura só na aba que a usa — a mesma decisão já aplicada às sessões.
   const sessoes = aba === 'seguranca' ? await lerSessoesDaConta() : [];
+  const cadastroDoCurador = aba === 'perfil' ? await lerCadastroDoCurador() : null;
+  const preferencias = aba === 'preferencias' ? await lerPreferencias('curador') : null;
 
   return (
     <TelaDeConta
@@ -44,6 +49,8 @@ export default async function Pagina({
       email={identidade.email}
       papeis={contexto.papeis}
       sessoes={sessoes}
+      cadastroDoCurador={cadastroDoCurador}
+      preferencias={preferencias}
     />
   );
 }

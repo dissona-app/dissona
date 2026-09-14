@@ -19,11 +19,12 @@
  *  - A auditoria de fidelidade é um diff: comparar este arquivo com o `.txt`
  *    extraído mostra o que foi inventado.
  *
- * Dois módulos moram em arquivos próprios e são **reexportados** daqui: o
- * cadastro do curador (`curador.ts`, oito telas e cinco listas de opção) e
- * Conta e configurações (`conta.ts`, quatro modais). Juntos eles empurrariam
- * este arquivo para além de mil linhas. A fonte é a mesma; quem importa
- * continua tendo um caminho só.
+ * Alguns módulos moram em arquivos próprios e são **reexportados** daqui: o
+ * cadastro do curador (`curador.ts`, oito telas e cinco listas de opção),
+ * Conta e configurações (`conta.ts`, quatro modais) e a avaliação
+ * (`avaliacao.ts`, cinco etapas e a tabela de acréscimos). Juntos eles
+ * empurrariam este arquivo para além de mil linhas. A fonte é a mesma; quem
+ * importa continua tendo um caminho só.
  *
  * Regra: **cópia literal, acentuação inclusive**. Onde o protótipo é corrigido
  * de propósito, o comentário diz por quê e aponta a decisão — é o caso de
@@ -31,6 +32,7 @@
  * protótipo, sendo mock, não tem.
  */
 
+export { AVALIAR } from './avaliacao';
 export { CONTA } from './conta';
 export { CURADOR_CADASTRO, CURADOR_CLASSIFICACAO, CURADOR_MANUTENCAO } from './curador';
 export { EQUIPE } from './equipe';
@@ -728,4 +730,406 @@ export const ADMIN_NAVEGACAO = {
   contaEEquipe: 'Conta e equipe',
   rodape: 'Ambiente administrativo',
   sair: 'Sair',
+} as const;
+
+// ---------------------------------------------------------------------------
+// Perfil do artista (7.1) — protótipo do Artista, tela "Editar cadastro"
+// ---------------------------------------------------------------------------
+
+/**
+ * Catálogo de gêneros do **artista**.
+ *
+ * São onze, e o do curador (`CURADOR_CADASTRO.generos`) são doze: o protótipo
+ * do curador tem "Pagode" e o do artista não. A divergência é do próprio
+ * material e está registrada em
+ * [07-pendencias](docs/prd/07-pendencias-e-divergencias.md) — importa porque a
+ * R3 faz matching de gênero entre a faixa e o que o curador declara receber, e
+ * vocabulários diferentes deixam "Pagode" sem par possível.
+ *
+ * A mesma lista alimenta o passo 2 do envio (módulo 3), que é onde o protótipo
+ * do artista a usa pela segunda vez.
+ */
+export const GENEROS_DO_ARTISTA = [
+  'MPB contemporânea',
+  'Rap nacional',
+  'Trap',
+  'Funk',
+  'Eletrônico',
+  'Rock alternativo',
+  'Indie',
+  'Samba',
+  'Sertanejo',
+  'Jazz',
+  'Experimental',
+] as const;
+
+export const ARTISTA_PERFIL = {
+  titulo: 'Editar cadastro',
+  subtitulo: 'Curadores veem essas informações antes de ouvir você.',
+
+  rotuloNomeExibicao: 'Nome artístico',
+  rotuloCidade: 'Cidade',
+  rotuloHandle: 'Usuário',
+  auxiliarHandle: 'Letras minúsculas, números e _ · de 3 a 30 caracteres',
+  rotuloBio: 'Bio',
+  rotuloGeneros: 'Gêneros',
+  sufixoGeneros: '· até 3',
+  rotuloLinks: 'Links e redes',
+  rotuloInstagram: 'Instagram',
+  rotuloSpotify: 'Spotify',
+  rotuloYoutube: 'YouTube',
+  rotuloSite: 'Site',
+
+  salvar: 'Salvar alterações',
+  cancelar: 'Cancelar',
+  nota: 'Dados sensíveis, como e-mail e senha, ficam em Configurações.',
+
+  contagemBio: (usados: number, total: number) => `${usados}/${total}`,
+  contagemGeneros: (quantos: number, maximo: number) =>
+    quantos === 0
+      ? `Escolha até ${maximo}`
+      : quantos === 1
+        ? `1 de ${maximo} escolhido`
+        : `${quantos} de ${maximo} escolhidos`,
+
+  salvo: 'Perfil atualizado.',
+
+  erroNomeExibicaoLongo: 'O nome artístico passa de 80 caracteres.',
+  erroCidadeLonga: 'A cidade passa de 80 caracteres.',
+  erroHandleFormato: 'Use de 3 a 30 caracteres, só letras minúsculas, números e _.',
+  erroHandleEmUso: 'Esse usuário já está em uso.',
+  erroBioLonga: 'A bio passa de 280 caracteres.',
+  erroGenerosDemais: 'Escolha no máximo 3 gêneros.',
+  erroGeneroDesconhecido: 'Gênero fora da lista.',
+  erroLinkInvalido: 'Link inválido. Use um endereço como site.com/voce.',
+  erroLinkComEspaco: 'O link não pode ter espaço.',
+} as const;
+
+// ---------------------------------------------------------------------------
+// Carteira e Claves (5, 5.3) — protótipo do Artista
+// ---------------------------------------------------------------------------
+
+export const CARTEIRA = {
+  saldoTitulo: 'Saldo disponível',
+  saldoUnidade: 'Claves',
+  /** `caSaldoReais` — o valor da Clave vem de `configuracao`, nunca daqui. */
+  saldoNota: (emReais: string, valorDaClave: string) =>
+    `${emReais} em crédito. Uma Clave equivale a ${valorDaClave}.`,
+
+  comprometidas: 'Comprometidas em análise',
+  devolvidas: 'Devolvidas por falta de resposta',
+
+  comprar: 'Comprar Claves',
+  /** A compra (5.1/5.2) depende da integração de pagamento — fatia do Asaas. */
+  comprarPendente: 'A compra de Claves chega junto com o pagamento, em uma próxima entrega.',
+  verExtrato: 'Ver extrato',
+
+  resumo: {
+    adquiridas: { rotulo: 'Adquiridas', descricao: 'Compradas em pacotes até aqui' },
+    usadas: { rotulo: 'Usadas', descricao: 'Gastas em envios para curadores' },
+    devolvidas: { rotulo: 'Devolvidas', descricao: 'Voltaram por falta de resposta' },
+  },
+
+  ultimasTitulo: 'Últimas movimentações',
+  verTudo: 'Ver tudo',
+
+  vazioTitulo: 'Nenhuma movimentação ainda',
+  vazioDescricao: 'Compre Claves para enviar sua primeira faixa para curadoria.',
+
+  // --------------------------------------------------------- extrato (5.3) --
+  extratoTitulo: 'Extrato',
+  voltarParaCarteira: 'Voltar para a carteira',
+
+  colunas: {
+    data: 'Data',
+    origem: 'Origem',
+    tipo: 'Tipo',
+    claves: 'Claves',
+    saldo: 'Saldo',
+  },
+
+  filtros: {
+    todas: 'Todas',
+    adquiridas: 'Adquiridas',
+    usadas: 'Usadas',
+    devolvidas: 'Devolvidas',
+  },
+  filtrosRotulo: 'Tipo de movimentação',
+
+  /** Estado vazio **por recorte** — há lançamentos, mas nenhum neste filtro. */
+  vazioPorFiltroTitulo: 'Nada nesse filtro',
+  vazioPorFiltroDescricao: 'Troque o tipo de movimentação para ver o restante.',
+
+  notaDevolucao:
+    'Quando um curador não responde em 7 dias, a Clave volta para a sua carteira e aparece aqui como devolvida.',
+
+  /** Rótulo de `tipo_lancamento_clave` na coluna "Tipo". */
+  tipos: {
+    compra: 'Adquiridas',
+    consumo: 'Usadas',
+    devolucao: 'Devolvidas',
+    estorno: 'Estornadas',
+    ajuste: 'Ajuste',
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Envio de música (3) — protótipo do Artista, wizard de 3 passos
+// ---------------------------------------------------------------------------
+
+export const ENVIAR = {
+  passos: ['Envio da faixa', 'Contexto', 'Revisar'] as const,
+  passoDe: (atual: number, total: number) => `Passo ${atual} de ${total}`,
+
+  herois: [
+    'Sua faixa vai ser ouvida por quem entende.',
+    'Diga o que você quer descobrir com essa faixa.',
+    'Última olhada antes de soltar.',
+  ] as const,
+
+  // ------------------------------------------------------ passo 1 ---------
+  colarLink: 'Colar link',
+  colarLinkApoio: 'Spotify ou YouTube',
+  detectar: 'Detectar faixa',
+  detectando: 'Procurando os dados da faixa',
+  faixaEncontrada: 'Faixa encontrada',
+  corrigirDados: 'Corrigir dados',
+
+  enviarArquivo: 'Enviar arquivo',
+  enviarArquivoApoio: 'Upload de mp3 ou wav',
+  /**
+   * O limite vem de `configuracao.upload.tamanho_max_mb`, nunca embutido. O
+   * protótipo escreve "até 30 MB" aqui e "até 50 MB" no onboarding — a
+   * configuração diz 50, e a divergência está em 07-pendências.
+   */
+  dropzone: (tamanhoMaxMb: number) => `mp3 ou wav até ${tamanhoMaxMb} MB`,
+  dropzoneVazia: 'Arraste o arquivo aqui, ou clique para escolher',
+  arquivoEscolhido: (nome: string) => `Arquivo escolhido: ${nome}`,
+
+  /**
+   * O arquivo é **sempre** exigido, inclusive no caminho por link.
+   *
+   * `configuracao.escuta_exigida_quando_link` e `upload.armazenar_sempre` são
+   * os dois `true`: o curador precisa de um áudio que o player consiga medir,
+   * e um iframe de streaming não expõe posição de reprodução — sem o arquivo,
+   * o gate de 60% fica inverificável e a avaliação perde a trava. O link vira
+   * fonte de metadado. Divergência registrada em 07-pendências.
+   */
+  arquivoSempreNecessario:
+    'O arquivo é necessário mesmo com o link: é ele que o curador ouve, e é o que permite medir a escuta.',
+
+  /** Nome do bloco de 3.1/3.2 — "Detalhes". Não repete o rótulo do campo de
+      título, senão o painel e o campo disputam o mesmo nome acessível. */
+  detalhesTitulo: 'Detalhes da faixa',
+  capaEnviar: 'Enviar capa',
+  capaTrocar: 'Trocar capa',
+  rotuloTitulo: 'Título da faixa',
+  rotuloEstilo: 'Estilo predominante',
+  perguntaLancada: 'A faixa já foi lançada?',
+  lancadaSim: 'Sim',
+  lancadaNao: 'Ainda não',
+  /** O rótulo da data muda conforme o caminho e a resposta — é do protótipo. */
+  rotuloData: (lancada: boolean | null) =>
+    lancada === true ? 'Data de lançamento' : 'Previsão de lançamento',
+  rotuloSpotify: 'Spotify',
+  rotuloYoutube: 'YouTube',
+
+  // ------------------------------------------------------ passo 2 ---------
+  rotuloGenero: 'Gênero da faixa',
+  rotuloContexto: 'O que o curador precisa saber?',
+  /** Obrigatório por RF-038 — ver o cabeçalho de `esquemaContexto`. */
+  contextoApoio: 'Obrigatório. É o que direciona a escuta do curador.',
+  contagemContexto: (usados: number) => `${usados} caracteres`,
+
+  // ------------------------------------------------------ passo 3 ---------
+  resumoFaixa: 'Faixa',
+  resumoFonte: {
+    arquivo: (nome: string) => `Arquivo enviado: ${nome}`,
+    link: 'Link detectado no streaming',
+    manual: 'Dados preenchidos por você',
+  },
+  resumoContexto: 'O que o curador precisa saber',
+  avisoSelecao: (saldo: string) =>
+    `A escolha dos curadores vem em seguida. Não existe limite por faixa: o teto é o seu saldo, hoje ${saldo}, e as Claves só saem quando você confirma a seleção.`,
+  enviarParaCuradoria: 'Enviar para curadoria',
+
+  // --------------------------------------------------- confirmação --------
+  /**
+   * "Seu envio chegou", e não "Sua submissão chegou".
+   *
+   * É a **única** divergência em que o protótipo não vence: a terminologia
+   * decidida é "Envios", nunca "Submissões" (PRD §9, arquitetura §8), e o
+   * guia de testes manda corrigir. O protótipo erra em dois lugares — esta
+   * frase e o título do cabeçalho —, e os dois foram corrigidos.
+   */
+  confirmacaoTitulo: 'Seu envio chegou.',
+  confirmacaoTexto:
+    'Em breve alguém vai ouvir com atenção. Avisamos assim que a primeira leitura estiver pronta.',
+  acompanharStatus: 'Acompanhar status',
+  voltarParaInicio: 'Voltar para o início',
+  enviarOutra: 'Enviar outra faixa',
+
+  // -------------------------------------------------------- ações ---------
+  continuar: 'Continuar',
+  voltar: 'Voltar',
+  salvando: 'Salvando…',
+
+  // -------------------------------------------------------- erros ---------
+  erroTituloVazio: 'Informe o título da faixa.',
+  erroTituloLongo: 'O título passa de 160 caracteres.',
+  erroEstiloLongo: 'O estilo passa de 80 caracteres.',
+  erroDataInvalida: 'Informe a data no formato dia/mês/ano.',
+  erroDataObrigatoria: 'A faixa foi lançada — informe a data.',
+  erroArquivoAusente: 'Escolha o arquivo de áudio da faixa.',
+  erroArquivoFormato: (formatos: readonly string[]) =>
+    `Formato não aceito. Envie ${formatos.join(' ou ').toUpperCase()}.`,
+  erroArquivoTamanho: (tamanhoMaxMb: number) => `O arquivo passa de ${tamanhoMaxMb} MB.`,
+  erroGeneroInvalido: 'Escolha um gênero da lista.',
+  erroContextoVazio: 'Escreva o que o curador precisa saber.',
+  erroContextoLongo: 'O texto passa de 1000 caracteres.',
+  erroLinkInvalido: 'Link inválido. Use um endereço como open.spotify.com/track/…',
+  erroLinkComEspaco: 'O link não pode ter espaço.',
+  erroLinkNaoSuportado: 'Por ora detectamos só links do Spotify e do YouTube.',
+  erroFaixaEmCuradoria: 'Esta faixa já foi enviada para curadoria e não pode mais ser alterada.',
+} as const;
+
+// ---------------------------------------------------------------------------
+// Seleção de curadores — PLACEHOLDER da R2 (a tela real, módulo 4, é da R3)
+// ---------------------------------------------------------------------------
+
+/**
+ * O protótipo **não tem** esta tela: `enView:'selecao'` existe no estado dele
+ * mas não tem bloco de render — é um beco sem saída, e o guia de testes diz que
+ * a seleção "aparece como placeholder, entra na R3".
+ *
+ * Estes textos são, portanto, **derivados**. Foram escritos para dizer o mínimo
+ * verdadeiro: quem recebe, quanto custa e que é aqui que as Claves saem.
+ */
+export const SELECAO = {
+  titulo: 'Escolha quem vai ouvir',
+  subtitulo:
+    'Versão simplificada. A busca por gênero, o ranking e o detalhe do curador chegam na próxima release.',
+
+  totalDaLeitura: 'Total da seleção',
+  saldoApos: (saldo: string) => `Saldo depois da confirmação: ${saldo}`,
+
+  servicoObrigatorio: 'Feedback escrito · sempre incluso',
+  confirmar: 'Confirmar e enviar',
+  voltar: 'Voltar para a revisão',
+
+  vazioTitulo: 'Nenhum curador disponível agora',
+  vazioDescricao:
+    'Nenhum curador aprovado tem o serviço de feedback ativo. Sem ele não há devolutiva, e o envio não pode ser criado.',
+
+  erroSelecaoVazia: 'Escolha ao menos um curador.',
+  erroSaldo: 'Saldo insuficiente para esta seleção.',
+  erroCuradorInvalido: 'Um dos curadores escolhidos não está disponível.',
+  erroSemFeedback: 'Um dos curadores não oferece o feedback escrito.',
+  erroFaixaInvalida: 'Esta faixa não está mais aguardando seleção.',
+} as const;
+
+// ---------------------------------------------------------------------------
+// Status de envio (3.3) — versão mínima da R2
+// ---------------------------------------------------------------------------
+
+/**
+ * O módulo 3.3 está alocado na **R3** no PRD, com barras animadas por etapa e
+ * detalhe do curador. Esta é a versão mínima, somente leitura, que existe para
+ * fechar o cenário B7 ("Acompanhar status") sem antecipar horas da R3.
+ *
+ * O botão "Simular avanço" do protótipo é recurso **do protótipo**, não do
+ * produto, e por isso não existe aqui.
+ */
+export const STATUS_DO_ENVIO = {
+  titulo: 'Status do envio',
+  colunas: {
+    curador: 'Curador',
+    andamento: 'Andamento',
+    prazo: 'Prazo',
+    etapa: 'Etapa',
+  },
+  /** Os quatro estados que `envio.situacao` assume no caminho feliz. */
+  etapas: {
+    recebeu: 'Recebeu',
+    ouviu: 'Ouviu',
+    avaliando: 'Avaliando',
+    pronto: 'Pronto',
+    devolvido: 'Devolvido',
+    cancelado: 'Cancelado',
+  },
+  vazioTitulo: 'Nenhum curador ainda',
+  vazioDescricao: 'Confirme a seleção para a faixa entrar na fila de alguém.',
+  nota: 'Cada curador tem 72h para responder com repasse cheio. Sem resposta em 7 dias, a Clave volta para a sua carteira e aparece no extrato.',
+} as const;
+
+// ---------------------------------------------------------------------------
+// Fila de avaliações (13, 13.1) — protótipo do Curador
+// ---------------------------------------------------------------------------
+
+export const FILA = {
+  titulo: 'Fila de avaliações',
+
+  colunas: {
+    musica: 'Música',
+    genero: 'Gênero',
+    servico: 'Serviço',
+    prazo: 'Prazo',
+    status: 'Status',
+  },
+
+  /** `filaResumo` do protótipo: "N faixas na fila · M com prazo curto". */
+  resumo: (naFila: number, curtos: number) =>
+    `${naFila} ${naFila === 1 ? 'faixa' : 'faixas'} na fila · ${curtos} com prazo curto`,
+
+  filtros: {
+    todas: 'Todas',
+    nova: 'Nova',
+    em_escuta: 'Em escuta',
+    atrasada: 'Atrasada',
+  },
+  filtrosRotulo: 'Status da faixa',
+  generoRotulo: 'Gênero',
+  generoTodos: 'Todos os gêneros',
+
+  /** Formato de `filaPrazo`, literal do protótipo. */
+  prazoVencidoDias: (dias: number) => `Vencido há ${dias}d`,
+  prazoVencidoHoras: (horas: number) => `Vencido há ${horas}h`,
+  prazoHoras: (horas: number) => `${horas}h`,
+  prazoDias: (dias: number, horas: number) => `${dias}d ${horas}h`,
+
+  vazioTitulo: 'Nada nesse recorte',
+  vazioDescricao: 'Troque o status ou o gênero para ver outras faixas.',
+  vazioFilaTitulo: 'Nenhuma faixa na sua fila',
+  vazioFilaDescricao: 'Quando um artista escolher você, a faixa aparece aqui.',
+
+  nota: 'Você tem 72h para responder com repasse cheio. Sem resposta em 7 dias, a Clave volta para o artista e a faixa sai da sua fila.',
+
+  // ------------------------------------------------------- 13.1 ------------
+  voltarParaFila: 'Voltar para a fila',
+  enviadaEm: (quando: string) => `Enviada ${quando}`,
+  rotuloDuracao: 'Duração',
+  rotuloStatus: 'Status',
+  rotuloFaixa: 'Faixa',
+  oQueOArtistaQuerSaber: 'O que o artista quer saber',
+  semContexto: 'O artista não escreveu nada.',
+  prazoRestante: 'Prazo restante',
+  /** As duas notas condicionais do protótipo, conforme o prazo. */
+  notaNoPrazo:
+    'Responda dentro das 72h para receber o repasse cheio. Sem resposta em 7 dias, a Clave volta para o artista.',
+  notaAtrasado: (dias: number) =>
+    `Fora das 72h, o repasse cai. Em ${dias} ${dias === 1 ? 'dia' : 'dias'} sem resposta a Clave volta para o artista.`,
+  rotuloServico: 'Serviço',
+  totalDaLeitura: 'Total da leitura',
+  iniciarAvaliacao: 'Iniciar avaliação',
+  /** O envio saiu de `recebeu`/`ouviu` — outra aba, ou o job de 7 dias. */
+  erroNaoEstaMaisNaFila:
+    'Esta faixa não está mais disponível para avaliação. Volte para a fila e recarregue.',
+
+  servicos: {
+    feedback: 'Feedback escrito',
+    playlist: 'Playlist',
+    post: 'Post no Instagram',
+    materia: 'Matéria',
+    outro: 'Outra divulgação',
+  },
 } as const;

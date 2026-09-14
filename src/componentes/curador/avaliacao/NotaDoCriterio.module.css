@@ -1,0 +1,101 @@
+/* Uma linha da tabela de critérios (14).
+ *
+ * O protótipo põe nota e justificativa em painéis separados, ligados por uma
+ * seleção: clicar no critério troca o assunto do único `<textarea>` da tela.
+ * Aqui cada critério traz o seu, empilhado logo abaixo da nota — é o que
+ * permite preencher onze justificativas sem JavaScript, e o que dá a cada
+ * `<textarea>` um rótulo próprio em vez de um que muda de significado. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+  padding: var(--dsn-space-6);
+  border: var(--dsn-border-width) solid var(--dsn-border-faint);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-surface);
+}
+
+.linha {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dsn-space-5);
+}
+
+.linha > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.remover {
+  flex: 0 0 auto;
+  margin-top: var(--dsn-space-1);
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  cursor: pointer;
+}
+
+.remover:hover {
+  text-decoration: underline;
+}
+
+.rotuloJustificativa {
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-medium);
+  color: var(--dsn-ink-500);
+}
+
+.justificativa {
+  width: 100%;
+  min-height: 5.5rem;
+  padding: var(--dsn-space-4) var(--dsn-space-5);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-md);
+  background: var(--dsn-surface);
+  font-family: inherit;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink);
+  resize: vertical;
+}
+
+.justificativa:focus-visible {
+  outline: none;
+  border-color: var(--dsn-purple-400);
+  box-shadow: var(--dsn-shadow-focus);
+}
+
+.rodape {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+}
+
+.dica {
+  font-size: var(--dsn-text-3xs);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.dicaAtingida {
+  composes: dica;
+  color: var(--dsn-success-fg);
+}
+
+.contador {
+  font-size: var(--dsn-text-3xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink-500);
+}
+
+.contadorAtingido {
+  composes: contador;
+  color: var(--dsn-success-fg);
+  font-weight: var(--dsn-weight-semibold);
+}

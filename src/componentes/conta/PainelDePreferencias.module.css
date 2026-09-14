@@ -1,0 +1,65 @@
+/* 7.3 / 17.3 · Preferências. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.auto {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+  padding: var(--dsn-space-3) var(--dsn-space-2);
+  border-bottom: 1px solid var(--dsn-border-faint);
+  text-align: left;
+  font-weight: 400;
+}
+
+.tabela thead th {
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.tabela tbody tr:last-child th,
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* O nome do aviso e a etiqueta de "sempre ativo" na mesma linha, quebrando
+   juntos quando a coluna aperta. */
+.evento {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-3);
+  color: var(--dsn-ink);
+}
+
+/* Colunas de canal estreitas e centradas: são duas caixas, não texto. */
+.canal {
+  width: 6rem;
+  text-align: center;
+}
+
+.canal input {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--dsn-purple-500);
+  cursor: pointer;
+}
+
+.canal input:disabled {
+  cursor: not-allowed;
+}

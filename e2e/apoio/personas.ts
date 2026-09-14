@@ -37,6 +37,23 @@ export const PERSONA = {
   ADMIN_SUPORTE: { email: `e2e_suporte@${DOMINIO_E2E}`, nome: 'E2E Suporte' },
   /** Artista com saldo — usado a partir de B1. */
   ARTISTA: { email: `e2e_artista@${DOMINIO_E2E}`, nome: 'E2E Artista' },
+
+  /*
+   * As cinco abaixo existem para a suíte de paridade visual (`e2e/prototipo/`),
+   * que precisa de uma conta **por estado de tela** — a tela só existe no
+   * estado que a abre, e a guarda de rota não deixa chegar nela de outro jeito.
+   */
+
+  /** Sem papel nenhum: é o único estado que abre a seleção de perfil (1.4). */
+  SEM_PAPEL: { email: `e2e_sem_papel@${DOMINIO_E2E}`, nome: 'E2E Sem Papel' },
+  /** Artista com o tour pendente — cai em `/onboarding` (1.5). */
+  TOUR: { email: `e2e_tour@${DOMINIO_E2E}`, nome: 'E2E Tour' },
+  /** Curador no passo 1 do wizard, em rascunho (12). */
+  WIZARD: { email: `e2e_wizard@${DOMINIO_E2E}`, nome: 'E2E Wizard' },
+  /** Curador Bronze aprovado — painel, conta e "Meu cadastro" abertos (12.5). */
+  CURADOR_BRONZE: { email: `e2e_bronze@${DOMINIO_E2E}`, nome: 'E2E Bronze' },
+  /** Candidato a Prata em análise: fora do painel, na tela de espera (12.5). */
+  CURADOR_PRATA: { email: `e2e_prata@${DOMINIO_E2E}`, nome: 'E2E Prata' },
 } as const satisfies Record<string, Persona>;
 
 export function senhaDeTeste(): string {

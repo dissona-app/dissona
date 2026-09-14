@@ -46,9 +46,7 @@ export default async function Pagina() {
       selo={candidato ? CURADOR_CLASSIFICACAO.tituloPrata : CURADOR_CLASSIFICACAO.tituloBronze}
       titulo={candidato ? CURADOR_CLASSIFICACAO.tituloPrata : CURADOR_CLASSIFICACAO.tituloBronze}
       subtitulo={
-        candidato
-          ? CURADOR_CLASSIFICACAO.subPrata(minimo)
-          : CURADOR_CLASSIFICACAO.subBronze
+        candidato ? CURADOR_CLASSIFICACAO.subPrata(minimo) : CURADOR_CLASSIFICACAO.subBronze
       }
       texto={
         candidato
@@ -59,9 +57,7 @@ export default async function Pagina() {
     >
       <div className={estilos.painel}>
         <div className={estilos.painelCabecalho}>
-          <span className={estilos.painelTitulo}>
-            {CURADOR_CLASSIFICACAO.painelCredenciais}
-          </span>
+          <span className={estilos.painelTitulo}>{CURADOR_CLASSIFICACAO.painelCredenciais}</span>
           <span className={candidato ? estilos.contagemOk : estilos.contagemFalta}>
             {CURADOR_CLASSIFICACAO.contagem(comprovadas, minimo)}
           </span>
@@ -93,6 +89,7 @@ export default async function Pagina() {
 
       <BotaoLink
         href={candidato ? ROTA.CURADOR_CADASTRO_ANALISE : `${ROTA.CURADOR_CADASTRO}/bronze`}
+        tamanho="denso"
         blocoInteiro
       >
         {CURADOR_CLASSIFICACAO.continuar}

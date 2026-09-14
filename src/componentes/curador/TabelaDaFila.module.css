@@ -1,0 +1,30 @@
+/* Tabela da fila (13). */
+
+/* A célula inteira é o link — alvo de toque grande, e não só o título. */
+.musica {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.musica:hover .titulo {
+  text-decoration: underline;
+}
+
+.titulo {
+  font-weight: 500;
+  color: var(--dsn-ink);
+}
+
+.artista {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+/* Prazo curto em vermelho — é o sinal que o protótipo usa para "corre". */
+.urgente {
+  color: var(--dsn-danger-fg);
+  font-weight: 600;
+}

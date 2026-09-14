@@ -1,10 +1,10 @@
 'use client';
 
+import { Chips } from '@/componentes/base';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
-import { Chips } from '../Chips';
 import { usePasso } from '../usePasso';
 import estilos from './Passos.module.css';
 import type { PropsDoPasso } from './tipos';

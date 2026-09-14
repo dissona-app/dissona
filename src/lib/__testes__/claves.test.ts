@@ -7,6 +7,7 @@ import {
   formatar,
   paraCentavos,
   paraClaves,
+  paraClavesComSinal,
   paraStringDecimal,
   precoPorClave,
   somar,
@@ -31,6 +32,55 @@ describe('paraClaves', () => {
     for (const entrada of ['1,234', '', 'abc', '-1']) {
       expect(() => paraClaves(entrada)).toThrow(ErroDominio);
     }
+  });
+});
+
+describe('paraClavesComSinal', () => {
+  it('aceita negativo — é o formato do ledger', () => {
+    // `lancamento_clave.quantidade` é assinada por desenho: o check
+    // `lancamento_clave_sinal_coerente` exige consumo < 0. Ler o extrato com
+    // `paraClaves` estouraria em toda linha de consumo.
+    expect(paraClavesComSinal('-6')).toBe(-600n);
+    expect(paraClavesComSinal('-2,50')).toBe(-250n);
+  });
+
+  it('continua aceitando positivo, com e sem sinal', () => {
+    expect(paraClavesComSinal('6')).toBe(600n);
+    expect(paraClavesComSinal('2.5')).toBe(250n);
+  });
+
+  it('zero não tem sinal', () => {
+    expect(paraClavesComSinal('0')).toBe(0n);
+    expect(paraClavesComSinal('-0')).toBe(0n);
+  });
+
+  it('herda as recusas de paraClaves', () => {
+    for (const entrada of ['1,234', '', 'abc', '-', '--1']) {
+      expect(() => paraClavesComSinal(entrada)).toThrow(ErroDominio);
+    }
+  });
+});
+
+describe('paraStringDecimal e formatar, com sinal', () => {
+  it('formata negativo com a casa decimal certa', () => {
+    // Em `bigint` o resto herda o sinal do dividendo, então `-650n % 100n` é
+    // `-50n`. Sem tratar isso, a saída era "-6.-50" e o `Intl` devolvia NaN —
+    // um consumo de 6,50 Claves aparecia como "NaN" no extrato.
+    expect(paraStringDecimal(-650n)).toBe('-6.50');
+    expect(paraStringDecimal(-600n)).toBe('-6.00');
+    expect(paraStringDecimal(-1n)).toBe('-0.01');
+  });
+
+  it('positivo e zero não ganham sinal', () => {
+    expect(paraStringDecimal(650n)).toBe('6.50');
+    expect(paraStringDecimal(0n)).toBe('0.00');
+  });
+
+  it('formatar nunca devolve NaN para valor do ledger', () => {
+    for (const valor of [-650n, -600n, -1n, 0n, 650n]) {
+      expect(semNbsp(formatar(valor))).not.toContain('NaN');
+    }
+    expect(semNbsp(formatar(-650n))).toBe('-6,50');
   });
 });
 

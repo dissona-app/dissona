@@ -1,0 +1,59 @@
+/* Placeholder da seleção de curadores (módulo 4 real é da R3). */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.lista,
+.opcionais {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista {
+  gap: var(--dsn-space-5);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+  padding-bottom: var(--dsn-space-5);
+  border-bottom: 1px solid var(--dsn-border-faint);
+}
+
+.item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-3);
+}
+
+.servicoBase {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+/* Os opcionais só aparecem com o curador marcado — recuados para o vínculo
+   ficar visual, e não só posicional. */
+.opcionais {
+  gap: var(--dsn-space-2);
+  padding-left: var(--dsn-space-8);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+}

@@ -26,7 +26,7 @@
     "supabase": "supabase",
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
-    "db:tipos": "supabase gen types typescript --project-id fhqcibjzmowcjkdrqyvi > src/lib/supabase/tipos-bd.ts",
+    "db:tipos": "node scripts/gerar-tipos-bd.mjs",
     "e2e:navegadores": "playwright install --with-deps chromium",
     "e2e:relatorio": "playwright show-report"
   },

@@ -1,4 +1,10 @@
-import { test } from '@playwright/test';
+import { join } from 'node:path';
+
+import { expect, test } from '@playwright/test';
+
+import { PERSONA } from '../apoio/personas';
+import { entrarComo } from '../apoio/sessao';
+import { ENVIAR } from '../apoio/textos';
 
 /**
  * B5 · Enviar por arquivo — módulo 3 · 3.2
@@ -13,10 +19,56 @@ import { test } from '@playwright/test';
  * **Resultado esperado**
  * - Aceita o arquivo e segue para o contexto.
  *
- * ⚠️ Depende de #7 (armazenar o mp3 sempre ou só fora do streaming).
+ * O mp3 de teste é um frame MPEG silencioso gerado em `e2e/apoio/arquivos/` —
+ * o que importa é ter bytes e o MIME certo, porque a validação do servidor
+ * confere o **tipo**, não a extensão do nome.
  */
-test.skip('B5 · Enviar por arquivo', async ({ page }) => {
-  // Implementar junto da tela, na R2. Enquanto o teste está `skip`, o
-  // cenário aparece na saída da suíte como pendente — e não como aprovado.
-  await page.goto('/');
+
+const MP3 = join(process.cwd(), 'e2e', 'apoio', 'arquivos', 'e2e-faixa.mp3');
+
+test.describe('B5 · Enviar por arquivo', () => {
+  test('aceita o mp3 e segue para o contexto', async ({ page }, info) => {
+    await entrarComo(page, PERSONA.ARTISTA);
+    await page.goto('/artista/enviar');
+
+    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+    await page
+      .getByLabel(ENVIAR.rotuloTitulo, { exact: true })
+      .fill(`e2e_Faixa B5 ${info.workerIndex}-${Date.now().toString(36)}`);
+
+    await page.getByRole('button', { name: ENVIAR.continuar }).click();
+
+    // O passo 2 é o destino: a faixa foi criada e o arquivo subiu.
+    await page.waitForURL(/\/artista\/enviar\/[0-9a-f-]{36}\/contexto/);
+    await expect(page.getByText(ENVIAR.passoDe(2, 3))).toBeVisible();
+    await expect(page.getByText(ENVIAR.rotuloContexto).first()).toBeVisible();
+  });
+
+  test('recusa formato fora da configuração', async ({ page }) => {
+    await entrarComo(page, PERSONA.ARTISTA);
+    await page.goto('/artista/enviar');
+
+    // O `accept` do input filtra o seletor, mas não o que chega ao servidor —
+    // é a validação de lá que este teste exercita.
+    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles({
+      name: 'documento.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('%PDF-1.4'),
+    });
+    await page.getByLabel(ENVIAR.rotuloTitulo, { exact: true }).fill('e2e_Formato errado');
+    await page.getByRole('button', { name: ENVIAR.continuar }).click();
+
+    await expect(page.getByText(/Formato não aceito/i)).toBeVisible();
+  });
+
+  test('sem arquivo, o passo não avança', async ({ page }) => {
+    await entrarComo(page, PERSONA.ARTISTA);
+    await page.goto('/artista/enviar');
+
+    await page.getByLabel(ENVIAR.rotuloTitulo, { exact: true }).fill('e2e_Sem arquivo');
+    await page.getByRole('button', { name: ENVIAR.continuar }).click();
+
+    await expect(page.getByText(ENVIAR.erroArquivoAusente)).toBeVisible();
+    await expect(page).toHaveURL(/\/artista\/enviar$/);
+  });
 });

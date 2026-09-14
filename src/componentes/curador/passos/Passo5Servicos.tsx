@@ -44,7 +44,7 @@ export function Passo5Servicos({
 
       <ListaDeServicos servicos={estado.servicos} />
 
-      <p className={estilos.nota}>{CURADOR_CADASTRO.notaClaves}</p>
+      <p className={estilos.notaRodape}>{CURADOR_CADASTRO.notaClaves}</p>
 
       <AcoesDoPasso
         passo={passo}

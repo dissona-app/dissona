@@ -1,0 +1,22 @@
+/* 13 · Fila de avaliações. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+/* Abas de status e select de gênero na mesma linha, quebrando juntos. */
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-4);
+}
+
+.nota {
+  margin: var(--dsn-space-6) 0 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

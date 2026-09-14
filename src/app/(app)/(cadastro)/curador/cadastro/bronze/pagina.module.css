@@ -17,10 +17,15 @@
   gap: var(--dsn-space-4) var(--dsn-space-6);
 }
 
+/* "Curso de curadoria" é o **rótulo** do painel no protótipo — 10 px, roxo,
+   em caixa alta —, e não o título de um card. O conteúdo do painel são os três
+   módulos abaixo; este texto só diz o que eles são. */
 .cursoTitulo {
-  font-size: var(--dsn-text-sm);
+  font-size: var(--dsn-text-4xs);
   font-weight: var(--dsn-weight-semibold);
-  color: var(--dsn-ink);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-purple-600);
 }
 
 .cursoResumo {
@@ -28,12 +33,13 @@
   color: var(--dsn-ink-500);
 }
 
+/* "Opcional" não é badge de status: no protótipo é uma pastilha em caixa
+   normal, 11 px, ao lado do rótulo. Em caixa alta com tracking ela competia
+   com o rótulo pela mesma atenção. */
 .cursoSelo {
   margin-left: auto;
-  font-size: var(--dsn-text-4xs);
+  font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-badge);
-  text-transform: uppercase;
   color: var(--dsn-ink-500);
   background: var(--dsn-neutral-bg);
   border-radius: var(--dsn-radius-full);
@@ -58,8 +64,7 @@
 
 .moduloNumero {
   font-size: var(--dsn-text-3xs);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-badge);
+  font-weight: var(--dsn-weight-bold);
   color: var(--dsn-purple-600);
   font-variant-numeric: tabular-nums;
 }
@@ -72,14 +77,15 @@
 }
 
 .moduloTitulo {
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-sm);
   font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
   color: var(--dsn-ink);
 }
 
 .moduloDescricao {
   font-size: var(--dsn-text-2xs);
-  line-height: var(--dsn-leading-normal);
+  line-height: var(--dsn-leading-dense);
   color: var(--dsn-ink-500);
   text-wrap: pretty;
 }
@@ -102,7 +108,7 @@
 .cursoBotao {
   appearance: none;
   font-family: inherit;
-  font-size: var(--dsn-text-sm);
+  font-size: var(--dsn-text-base);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-ink);
   background: var(--dsn-surface);

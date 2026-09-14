@@ -45,7 +45,8 @@ export function MolduraDaClasse({
           <span className={CLASSE_DO_TOM[tom]}>{selo}</span>
 
           <div className={estilos.cabecalho}>
-            <h1 className={estilos.titulo}>{titulo}</h1>
+            {/* O Bronze tem um degrau a mais na escala — ver o CSS. */}
+            <h1 className={tom === 'bronze' ? tituloBronze : estilos.titulo}>{titulo}</h1>
             {subtitulo === undefined ? null : (
               <span className={estilos.subtitulo}>{subtitulo}</span>
             )}
@@ -58,6 +59,8 @@ export function MolduraDaClasse({
     </div>
   );
 }
+
+const tituloBronze = `${estilos.titulo ?? ''} ${estilos.tituloBronze ?? ''}`;
 
 const CLASSE_DO_TOM: Record<TomDaClasse, string> = {
   bronze: estilos.seloBronze ?? '',

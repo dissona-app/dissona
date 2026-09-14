@@ -149,8 +149,8 @@ Nomear `Inter` em `--dsn-font-sans` **não basta** — sem `@font-face` o navega
 | `--dsn-text-sm` | `14px` | 173 | Item de nav, item de menu, botão secundário/ghost, corpo denso |
 | `--dsn-text-xs` | `13px` | 182 | Texto de apoio, mensagem de erro inline, célula de tabela, chip |
 | `--dsn-text-2xs` | `12px` | 87 | Legenda, nota de rodapé de card |
-| `--dsn-text-3xs` | `11px` | 129 | **Label de campo** (uppercase), badge de classe |
-| `--dsn-text-4xs` | `10px` | 98 | Overline de grupo de nav, cabeçalho de coluna de tabela, badge de status |
+| `--dsn-text-3xs` | `11px` | 129 | **Label de campo** (uppercase) nas telas de auth e de conta, badge de classe |
+| `--dsn-text-4xs` | `10px` | 98 | Overline de grupo de nav, cabeçalho de coluna de tabela, badge de status, **label de campo no wizard do curador** (§3.6) |
 
 #### Estilos nomeados (composições reais do protótipo)
 
@@ -170,11 +170,13 @@ Nomear `Inter` em `--dsn-font-sans` **não basta** — sem `@font-face` o navega
 | **Cabeçalho de coluna** | `10px` · 600 · `letter-spacing:0.16em` · uppercase · `#6B6675` |
 | **Badge / status** | `10px` · 700 · `letter-spacing:0.10em`–`0.12em` · uppercase |
 | **Numeral (KPI, saldo, valor)** | 700 · `font-variant-numeric: tabular-nums` · `letter-spacing:-0.01em`–`-0.03em` |
-| **Label de botão primário** | `16px` · 600 · `-0.01em` |
+| **Label de botão primário** | `16px` · 600 · `-0.01em` — o CTA das telas de autenticação |
+| **Label de botão de fluxo** | `15px` · 600, sem tracking — "Continuar", "Salvar", "Entendi", "Ir para o painel" |
+| **Label de ação secundária em card** | `14px` · 600, sem tracking — "Alterar e-mail", "Alterar senha", "Trocar foto", "Pular" |
 | **Label de tab** | `15px` · 600 · `-0.01em` |
 | **Item de nav** | `14px` · 500 (inativo) / 600 (ativo) |
 
-`line-height` em uso: `1` · `1.04` · `1.06` · `1.08` · `1.1` · `1.14` · `1.4` · `1.45` · `1.5` · `1.55` · `1.6`. Regra prática do protótipo: quanto maior o texto, menor o `line-height` e mais negativo o `letter-spacing`.
+`line-height` em uso: `1` · `1.04` · `1.06` · `1.08` · `1.1` · `1.14` · `1.16` · `1.35` · `1.4` · `1.45` · `1.5` · `1.55` · `1.6`. Regra prática do protótipo: quanto maior o texto, menor o `line-height` e mais negativo o `letter-spacing`.
 
 Links globais: `a { color:#5B2E8F; text-decoration:none }` · `a:hover { color:#7F47DD; text-decoration:underline }`.
 

@@ -1,0 +1,31 @@
+/* Moldura do wizard de envio (3). */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+  max-width: 46rem;
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+}
+
+.contador {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.heroi {
+  margin: 0;
+  font-size: var(--dsn-text-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--dsn-ink);
+}

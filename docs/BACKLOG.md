@@ -125,7 +125,7 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [x] Onboarding do curador em 4 passos (1.5) — **derivado**: o PRD dá só os quatro títulos, e os textos foram escritos a partir do que aquelas telas de fato fazem (72h, gate de 60%, escala por classe)
 - [x] Onboarding do admin em versão enxuta (1.5) — **derivado**, sobre a navegação real do painel
 - [x] Reabrir o onboarding — no **menu da conta**, e não no de ajuda: é onde o protótipo o põe, e "Sair" num menu de ajuda seria um alvo perigoso num lugar inesperado. O menu da conta entrou aqui porque `sair` existia desde a R0 sem nenhuma UI que o chamasse
-- [ ] Reautenticação para troca de e-mail e de senha
+- [x] Reautenticação para troca de e-mail e de senha — **já estava entregue**; o item seguia aberto por deriva do backlog. `conferirSenhaAtual` porteia as duas trocas em `modulos/conta/servico.ts`, e o `ModalDeCredencial` traz o overline "Reautenticação" nos dois modos. A diferença entre elas é deliberada e está documentada no serviço: a troca de senha encerra as outras sessões, a de e-mail não — ali nada mudou ainda, e o endereço só passa a valer quando o link chegar à caixa nova
 - [x] Encerramento das demais sessões ao trocar credencial — **depois** da troca, e não antes: derrubar sessões e falhar na troca seria o pior dos dois mundos
 - [x] Notificação de novo cadastro concluído → admin — disparada quando a conta passa a **servir**, e não quando a linha nasce: com verificação exigida, avisar no `signUp` encheria a caixa do admin de contas que nunca confirmaram
 
@@ -146,16 +146,16 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 ### Conta e configurações (7 / 17)
 As telas de Conta são **uma** (`TelaDeConta`) servindo os dois ambientes: o protótipo escreve os mesmos três cards de segurança, palavra por palavra, nos dois arquivos. Duplicá-las daria duas versões do fluxo mais sensível do produto — troca de senha e exclusão de conta — e a chance de corrigir uma e esquecer a outra. A aba viaja em `?aba=`, e não em estado local: é o que dá endereço à Segurança (a própria copy diz "gere outro em Configurações › Segurança"), faz a tela funcionar sem JavaScript e permite ler as sessões só para quem abriu aquela aba.
 
-- [ ] Perfil do artista com bio 280, até 3 gêneros e links validados (7.1)
+- [x] Perfil do artista com bio 280, até 3 gêneros e links validados (7.1) — o perfil vive em **duas** tabelas (`perfil` para nome/handle/cidade, `perfil_artista` para bio/gêneros/links) e a tela é uma só. Não virou RPC: a lista de escritas atômicas ([arquitetura §4.1](architecture.md)) é a das que deixam dinheiro ou estado inconsistente pela metade, e aqui a metade é um nome salvo sem a bio. A regra de link saiu de `modulos/curador` para [`lib/link.ts`](../src/lib/link.ts), e o `Chips` saiu de `componentes/curador` para o Design System, com a prop `maximo` que o `check` de 3 gêneros exige. Os dois catálogos de gênero divergem entre os protótipos — ver [07-pendências](prd/07-pendencias-e-divergencias.md)
 - [x] Dados da conta do artista, com o bloco de cobrança declarado como pendente (7.2) — o card aparece com o aviso em vez de escondido: a forma da tela não muda a cada entrega
 - [x] Troca de e-mail com confirmação no novo endereço (7.2) — reautentica com a senha atual e **não** encerra sessões, ao contrário da troca de senha: aqui nada mudou ainda, e o e-mail só passa a valer quando o link chegar à caixa nova
 - [x] Ativação do papel de curador pelo artista (7.2) — leva ao wizard do módulo 12, com Bronze aprovado na hora; a frase "depende de aprovação da curadoria" é honrada pelo caminho Prata, e a divergência está registrada em [07-pendências](prd/07-pendencias-e-divergencias.md) — [#12](open-questions.md#12-ativação-do-2º-papel-exige-aprovação)
-- [ ] Preferências do artista: notificações e idioma, com eventos críticos não desativáveis (7.3)
+- [x] Preferências do artista: notificações e idioma, com eventos críticos não desativáveis (7.3) — salva a cada toque, sem botão ("Salvo automaticamente" é do protótipo), com estado otimista que volta atrás se a ação falhar. A **ausência** de linha em `preferencia_notificacao` é o padrão, não "desligado": tratá-la como desligado silenciaria todo aviso de quem nunca abriu a tela, e ninguém reclamaria. O evento crítico aparece travado e com etiqueta — a trava real é do servidor, que lê a criticidade do catálogo e recusa o desligamento
 - [x] Segurança do artista com painel de sessões ativas (7.4) — a sessão atual não tem "Encerrar": isso é "Sair", que já está no menu do header, e a RPC recusaria a própria sessão de qualquer forma. "há 3 dias" é formatado no cliente, porque depende do relógio de quem lê
 - [x] Fluxo de exclusão de conta em 2 passos, com exportação LGPD em `.zip` (7.4) — a exportação é **oferta**, não pedágio: "Continuar" está sempre ativo, porque obrigar a baixar os dados para poder sair seria cobrar pela saída
-- [ ] Perfil do curador com credenciais e classe somente leitura (17.1)
+- [x] Perfil do curador com credenciais e classe somente leitura (17.1) — **aba** de Conta, e não rota própria como no artista: o protótipo do curador não tem item de perfil na sidebar, e o do artista tem. Ficou **inteira em leitura**, com link para 12.6, porque 12.6 já edita bio, gêneros, mídias e serviços — um segundo formulário para o mesmo dado é o que `TelaDeConta` evita para senha e exclusão. `ehAbaDeConta` passou a receber o ambiente, senão `/artista/conta?aba=perfil` renderizaria uma aba inexistente sem erro. Ver [07-pendências](prd/07-pendencias-e-divergencias.md)
 - [x] Dados da conta do curador, com o bloco de recebimento declarado como pendente (17.2)
-- [ ] Preferências do curador (17.3)
+- [x] Preferências do curador (17.3) — o mesmo `PainelDePreferencias`, com a nota de idioma do protótipo do curador. Os cinco eventos que servem artista **e** curador têm uma linha só de preferência por conta: desligar num ambiente desliga no outro, que é o certo — a conta é uma, e `destinatario` é `papel[]` justamente por isso
 - [x] Segurança do curador (17.4) — a mesma tela do artista; `/curador/conta` fica **fora** dos desvios do painel, senão uma conta só de curador em `prata_em_analise` não teria porta nenhuma para o direito de exclusão da LGPD
 
 ### Admin (19 / 27)
@@ -211,23 +211,23 @@ código pode contornar:
 - [x] Migration `0010` — RPCs `confirmar_selecao_curadores`, `devolver_claves_sem_resposta` e `avisar_prazo_72h`; índices da fila na `0006`. `0010b` corrige um estado intermediário que o `check` recusava
 
 ### Envio de música (3)
-- [ ] Passo 1 — colar link com autodetecção de metadados (3)
-- [ ] Passo 1 — upload de WAV/MP3 até 50 MB, com validação no servidor (3)
-- [ ] Detalhes quando o link não retorna dados (3.1)
-- [ ] Detalhes do arquivo enviado (3.2)
-- [ ] Passo 2 — gênero e campo obrigatório "O que o curador precisa saber?"
-- [ ] Passo 3 — revisão do envio, com o aviso sobre saldo e seleção
-- [ ] Tela de confirmação do envio
-- [ ] **Placeholder da Seleção de curadores** criando os `envio`, para a R2 ser testável fim a fim — a tela real (módulo 4) é da R3
+- [ ] Passo 1 — colar link com autodetecção de metadados (3) — os campos de link existem e são validados; a **autodetecção** (Spotify/YouTube) é fatia própria e depende de credenciais
+- [x] Passo 1 — upload de WAV/MP3 até 50 MB, com validação no servidor (3) — validado por **MIME**, não por extensão (há teste com `.exe` renomeado), e contra `configuracao`, nunca contra um 50 embutido. O caminho gravado vem de `data.path` do Storage: a policy do curador compara `storage.objects.name` com `faixa.arquivo_caminho` por igualdade exata, e divergir ali não dá erro — só faz o player ficar mudo
+- [x] Detalhes quando o link não retorna dados (3.1) — bloco **inline** no passo 1, como no protótipo, e não tela separada
+- [x] Detalhes do arquivo enviado (3.2) — título, capa, estilo, "já foi lançada?" e data, com o rótulo da data mudando conforme a resposta
+- [x] Passo 2 — gênero e campo obrigatório "O que o curador precisa saber?" — obrigatório por RF-038; o protótipo o chama de opcional, e a divergência está registrada
+- [x] Passo 3 — revisão do envio, com o aviso sobre saldo e seleção — o progresso é **derivado** dos campos preenchidos, não uma coluna: `podeAbrir` impede pular para a revisão sem contexto
+- [x] Tela de confirmação do envio — **"Seu envio chegou"**, nunca "Sua submissão": é a única divergência em que o protótipo não vence, e o E2E de B7 fixa isso afirmando que a palavra não aparece na tela
+- [x] **Placeholder da Seleção de curadores** criando os `envio` — lista curadores **reais** de `curador_publico`, porque a RPC recusa quem não está aprovado (`DS011`) ou não tem `feedback` ativo (`DS012`). É aqui que as Claves saem
 
 ### Carteira e Claves (5)
-- [ ] Carteira com saldo disponível, comprometido e devolvido (5)
-- [ ] Últimas movimentações na carteira (5)
+- [x] Carteira com saldo disponível, comprometido e devolvido (5) — ⚠️ `disponivel` da view **já exclui** o comprometido (o consumo é debitado na confirmação da seleção); `comprometido` é recorte de exibição e nunca se subtrai um do outro. "Adquiridas" e "Usadas" são somadas do ledger no serviço, porque a view não as tem; "Devolvidas" vem da view, para não haver duas fontes do mesmo número
+- [x] Últimas movimentações na carteira (5) — as três mais recentes, com "Ver tudo" para o extrato
 - [ ] Lista de pacotes ativos com desconto progressivo e preço por Clave (5.1)
 - [ ] Checkout com Pix — QR e copia e cola (5.2)
 - [ ] Checkout com cartão tokenizado, sem persistir dados do cartão (5.2)
 - [ ] Estados de pagamento: processando, aprovado e recusado (5.2)
-- [ ] Extrato de Claves com filtro por tipo e estado vazio por filtro (5.3)
+- [x] Extrato de Claves com filtro por tipo e estado vazio por filtro (5.3) — o filtro viaja em `?tipo=`, como a aba de Conta: dá endereço ao recorte e funciona sem JavaScript. O saldo acumulado é calculado sobre o histórico **completo**, nunca sobre a lista filtrada — senão a coluna "Saldo" mostraria números que nunca existiram na conta, e há teste fixando isso
 - [ ] Bloqueio por saldo insuficiente com alerta e CTA de compra
 
 ### Pacotes de Claves — admin (21)
@@ -237,24 +237,24 @@ código pode contornar:
 - [x] Excluir pacote com confirmação, mantendo compras já feitas, com registro em log — exclusão **lógica** (`0007b`), que é o que preserva a FK de `pedido_clave`
 
 ### Fila de avaliações (13)
-- [ ] Fila com prazo de 72h, status e ordenação por urgência (13)
-- [ ] Ordenação por Música, Prazo e Status com `aria-sort` (13)
-- [ ] Filtros por status e gênero, com estado vazio por recorte (13)
-- [ ] Detalhe do item com serviços contratados, total e contexto do artista (13.1)
-- [ ] "Iniciar avaliação" movendo o envio para `avaliando` (13.1)
+- [x] Fila com prazo de 72h, status e ordenação por urgência (13) — a leitura vem da view `fila_do_curador` (`0006d`), e não de um embed: o nome do artista mora em `perfil`, que é privado, e o inner join devolvia fila **vazia sem erro**
+- [x] Ordenação por Música, Prazo e Status com `aria-sort` (13) — ordenação no **serviço**, não no SQL: "Status" é derivado do relógio (atrasada = prazo vencido) e "Música" ordena por **artista** com `localeCompare` pt-BR, que o `order by` faria por colação de banco. O recorte viaja na URL, então o `aria-sort` descreve algo real
+- [x] Filtros por status e gênero, com estado vazio por recorte (13) — o resumo conta a fila **inteira**, e não o recorte
+- [x] Detalhe do item com serviços contratados, total e contexto do artista (13.1) — os serviços vêm de `servico_envio`, com o preço **congelado** na seleção, e não de `servico_curador`, que o curador pode ter mudado depois
+- [x] "Iniciar avaliação" movendo o envio para `avaliando` (13.1) — uma das três transições que o cliente pode escrever; `pronto` e `devolvido` são das RPCs por trigger. A falha é mostrada porque é real: o envio pode ter saído da fila noutra aba ou pelo job de 7 dias
 
 ### Avaliação (14)
-- [ ] Player com medição de escuta e trava de envio (14) — *bloqueado por [#1](open-questions.md#1-escuta-mínima-60-ou-100-da-faixa)*
-- [ ] Notas objetivas por critério, 0–5 com uma casa decimal (14)
-- [ ] Justificativa por critério com contador de 250 caracteres (14)
-- [ ] Resumo das notas objetivas com média e contagem por grupo (14)
-- [ ] Nota subjetiva com slider de 0,0 a 5,0 (14.1)
-- [ ] Feedback escrito obrigatório com contador de 150 caracteres (14.1)
-- [ ] Escolha de compartilhamento e opção "Não vou compartilhar desta vez" (14.2)
-- [ ] Outras formas de divulgação, com especificação obrigatória (14.3)
-- [ ] Resumo da remuneração por classe com composição do valor (14.4)
-- [ ] Concluir avaliação e liberar crédito, em transação única (14.4)
-- [ ] Salvar e sair em todas as etapas, com retomada pelo `passo_atual`
+- [x] Player com medição de escuta e trava de envio (14) — o mínimo vem de `configuracao.escuta_minima_percentual`, que o protótipo fixou em 60% ([#1](open-questions.md#1-escuta-mínima-60-ou-100-da-faixa) resolvida). A medição é do cliente e a **fronteira é a RPC**: `enviar_avaliacao` recusa com `DS001`. Persistida a cada 5 pontos, no máximo uma vez por 10 s, porque o `<Player>` publica quatro vezes por segundo
+- [x] Notas objetivas por critério, 0–5 com uma casa decimal (14) — **C3 verde**. O `CampoNota` é um range sem `name`, e o valor viaja num campo escondido: com o `name` no range, um critério nunca tocado enviaria `0`, e nota 0,0 é uma avaliação
+- [x] Justificativa por critério com contador de 250 caracteres (14) — um campo **por critério**, e não o `<textarea>` que troca de assunto do protótipo; ver [07-pendências](prd/07-pendencias-e-divergencias.md). O contador conta o **piso do acréscimo**, não um teto, e por isso não usa o `limite` do `AreaTexto`
+- [x] Resumo das notas objetivas com média e contagem por grupo (14.1) — de `mediaObjetiva` e `mediasPorGrupo`, puras e testadas
+- [x] Nota subjetiva com slider de 0,0 a 5,0 (14.1) — **C4 verde**. O rótulo do campo difere do título do painel de propósito: `Painel` expõe `aria-label`, e nomes iguais colidem
+- [x] Feedback escrito obrigatório com contador de 150 caracteres (14.1) — obrigatório é **não ser vazio** (`DS003`); os 150 caracteres são do **acréscimo**. Confundi-los transformaria um bônus em barreira. `required` no HTML barra o "Avançar"; "Salvar e sair" o contorna, porque rascunho incompleto é estado legítimo
+- [x] Escolha de compartilhamento e opção "Não vou compartilhar desta vez" (14.2) — **C5 verde**. Escolha **exclusiva**, e não a multiescolha do protótipo: o banco guarda uma modalidade e o acréscimo é o mesmo em qualquer caso
+- [x] Outras formas de divulgação, com especificação obrigatória (14.3) — a etapa é pulada quando a modalidade não é `outros`, e escolher `outros` sem descrição **não grava nada**: gravar violaria `compartilhamento_outros_exige_descricao`, e inventar uma descrição seria dado falso
+- [x] Resumo da remuneração por classe com composição do valor (14.4) — **C6 verde**. A previsão vem de `calcular_remuneracao`, a **mesma** função que `enviar_avaliacao` usa para gravar. Concluída, a tela passa a mostrar `ganho_curador`, que congelou classe, prazo e percentuais — uma nova previsão leria a `configuracao` de hoje
+- [x] Concluir avaliação e liberar crédito, em transação única (14.4) — a ação manda o que está **gravado**, não o que a tela tem em mão. Provado de ponta a ponta: Bronze no prazo, piso 30% + 3% do feedback = 33% de R$ 20,00 → R$ 6,60, com `valor + comissão = base`
+- [x] Salvar e sair em todas as etapas, com retomada pelo `passo_atual` — "Voltar" é **link**, e não submit: voltar não grava, e como submit precisaria burlar a validação do passo
 
 ### Integrações
 - [ ] Spotify — metadados de faixa por link
@@ -273,9 +273,9 @@ código pode contornar:
 - [x] Estados do envio `Recebeu → Ouviu → Avaliando → Pronto` gravados. `Pronto` e `Devolvido` são reservados às RPCs por trigger
 
 ### Gate da R2
-- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — **3 de 16 verdes** (A1, A2, A3, em 13 testes); os outros 13 seguem `skip`, e cada um sai do skip na fatia que o desbloqueia
+- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — **14 de 16 verdes** (A1–A3, B1, B3, B5–B7, C1–C6, em 119 testes); faltam B2 (checkout) e B4 (detecção por link), cada um preso à sua fatia
 - [ ] Compra de Claves credita uma única vez sob webhook duplicado
-- [ ] Avaliação concluída gera ganho com o percentual correto por classe e prazo
+- [x] Avaliação concluída gera ganho com o percentual correto por classe e prazo — provado nos dois níveis: a RPC direto na suíte da `0009`, e o fio tela → ação → RPC em C6. Bronze no prazo com o feedback longo: piso 30% + 3% = 33% de R$ 20,00 → R$ 6,60
 - [ ] Devolução de 7 dias aparece no extrato e remove a faixa da fila
 - [x] `repasse + comissão = valor da transação` — garantido por `check` em `ganho_curador`, e não por convenção
 
@@ -286,10 +286,10 @@ código pode contornar:
 ### Testes
 - [x] Cálculo de remuneração por classe coberto na suíte SQL da `0009` (piso, acréscimos, teto, penalidade, arredondamento e invariante do rateio)
 - [x] Saldo derivado de `lancamento_clave` coberto nas suítes da `0007` e `0010`
-- [ ] Testes unitários dos schemas Zod
+- [x] Testes unitários dos schemas Zod — os da avaliação; o que eles fixam não é "o Zod funciona", são as decisões que o esquema carrega: vazio é `null` e não 0, rascunho incompleto passa, e `nao_compartilhou` não leva link
 - [x] Testes de RLS tabela por tabela — 231 asserções em [`supabase/testes/`](../supabase/testes/)
 - [x] Teste de idempotência do webhook de pagamento — na suíte da `0007`
-- [ ] E2E dos 16 cenários do Guia de Testes da Release 2
+- [ ] E2E dos 16 cenários do Guia de Testes da Release 2 — 14 verdes; a carteira de `e2e_artista` é semeada pelas **RPCs reais** (compra, seleção e devolução por SLA), nunca por `insert` no ledger, que é append-only. ⚠️ C6 **consome** um envio por execução, e [`dados-e2e.sql`](../supabase/testes/dados-e2e.sql) o repõe: o seed tem de rodar antes de cada rodada, e o CI ainda não o roda
 
 ### Interface
 - [ ] Revisão de empty states em todas as listas — no beta tudo começa sem dados

@@ -150,7 +150,9 @@ export function Passo8Revisao({
 
       <p className={estilos.nota}>{CURADOR_CADASTRO.avisoAvaliacao}</p>
 
-      <p className={estilos.nota}>
+      {/* O aceite fecha a tela, e no protótipo tem o corpo de nota de rodapé —
+          12 px — e não o de dica de campo. */}
+      <p className={estilos.notaRodape}>
         {CURADOR_CADASTRO.aceiteAntes}
         <Link className={estilos.link} href={ROTA.TERMOS}>
           {CURADOR_CADASTRO.aceiteTermos}
@@ -179,9 +181,7 @@ export function Passo8Revisao({
 
   function textoDoStatus(bloco: Bloco): string {
     if (bloco.completo) return CURADOR_CADASTRO.statusCompleto;
-    return bloco.opcional
-      ? CURADOR_CADASTRO.statusOpcional
-      : CURADOR_CADASTRO.statusFaltaPouco;
+    return bloco.opcional ? CURADOR_CADASTRO.statusOpcional : CURADOR_CADASTRO.statusFaltaPouco;
   }
 }
 

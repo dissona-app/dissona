@@ -1,0 +1,175 @@
+/* 14.4 · Remuneração e conclusão. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+}
+
+.classe {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dsn-space-4);
+}
+
+.classeRotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+/* A linha do piso e as quatro de acréscimo compartilham a grade: marca à
+   esquerda, texto no meio, percentual à direita, alinhado. */
+.linha {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--dsn-space-5);
+  padding: var(--dsn-space-5) 0;
+  border-bottom: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+.linhaTexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.linhaRotulo {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+.linhaApoio {
+  font-size: var(--dsn-text-3xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.percentual {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink);
+}
+
+.acrescimos {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.acrescimo {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: var(--dsn-space-5);
+  padding: var(--dsn-space-5) 0;
+  border-bottom: var(--dsn-border-width) solid var(--dsn-border-faint);
+  color: var(--dsn-ink-500);
+}
+
+/* Cumprido escurece o texto e acende a marca. O `✓` é o indicador redundante
+   que a cor sozinha não pode ser (WCAG 1.4.1); o percentual à direita, que sai
+   de "—" para "+3%", é a terceira pista. */
+.acrescimoAtivo {
+  composes: acrescimo;
+  color: var(--dsn-ink);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--dsn-icon-md);
+  height: var(--dsn-icon-md);
+  border-radius: var(--dsn-radius-circle);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  font-size: var(--dsn-text-3xs);
+  line-height: 1;
+  color: transparent;
+}
+
+.acrescimoAtivo .marca {
+  border-color: var(--dsn-purple-600);
+  background: var(--dsn-purple-600);
+  color: var(--dsn-surface);
+}
+
+.acrescimo .percentual,
+.acrescimo .linhaRotulo {
+  color: inherit;
+}
+
+.notaTeto {
+  margin: var(--dsn-space-6) 0 0;
+  font-size: var(--dsn-text-3xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}
+
+.valor {
+  margin: 0;
+  font-size: var(--dsn-text-3xl);
+  font-weight: var(--dsn-weight-semibold);
+  line-height: var(--dsn-leading-none);
+  letter-spacing: var(--dsn-tracking-tighter);
+  color: var(--dsn-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.valorNota {
+  margin: var(--dsn-space-3) 0 0;
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+  margin: var(--dsn-space-7) 0;
+  padding-top: var(--dsn-space-6);
+  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-5);
+}
+
+.itemRotulo {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+.itemValor {
+  margin: 0;
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-medium);
+  color: var(--dsn-ink);
+  text-align: right;
+}
+
+.concluida {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--dsn-space-6);
+}
+
+.rodape {
+  display: flex;
+  padding-top: var(--dsn-space-6);
+  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+}

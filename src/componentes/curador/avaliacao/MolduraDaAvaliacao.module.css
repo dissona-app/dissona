@@ -1,0 +1,42 @@
+/* Moldura das cinco etapas da avaliação — módulo 14.
+ *
+ * Ao contrário de `MolduraDoWizard` (cadastro do curador), esta vive **dentro**
+ * do shell do curador: a avaliação é trabalho do painel, e sair dela é voltar
+ * para a fila, que está na sidebar. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-6);
+}
+
+.faixa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--dsn-text-lg);
+  font-weight: var(--dsn-weight-semibold);
+  line-height: var(--dsn-leading-title);
+  letter-spacing: var(--dsn-tracking-tight);
+  color: var(--dsn-ink);
+}
+
+.artista {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}

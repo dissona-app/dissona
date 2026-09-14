@@ -1,6 +1,7 @@
 import { ROTA } from '@/lib/guarda-rota';
 import type { Papel } from '@/lib/papeis';
 import { CURADOR_MANUTENCAO } from '@/textos/curador';
+import { ARTISTA_PERFIL } from '@/textos/prototipo';
 
 import { NOME_AMBIENTE } from './navegacao-por-ambiente';
 
@@ -72,6 +73,46 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
     sublegenda: 'Dados de recebimento, preferências e segurança.',
   },
 
+  // 7.1 — o protótipo chama a tela de "Editar cadastro" e põe a sublegenda
+  // dentro do card, não no cabeçalho. Aqui ela sobe para o cabeçalho, que é
+  // onde esta aplicação põe sublegenda de tela.
+  [ROTA.ARTISTA_PERFIL]: {
+    titulo: ARTISTA_PERFIL.titulo,
+    sublegenda: ARTISTA_PERFIL.subtitulo,
+  },
+
+  // 5 e 5.3. O extrato vem **antes** da carteira no objeto por clareza; a
+  // resolução é por chave exata, então a ordem não decide nada — quem casaria
+  // por prefixo é o mapa de baixo.
+  [ROTA.ARTISTA_EXTRATO]: {
+    titulo: 'Extrato',
+    sublegenda: 'Tudo que entrou e saiu da sua carteira.',
+  },
+  [ROTA.ARTISTA_CARTEIRA]: {
+    titulo: 'Carteira',
+    sublegenda: 'Seu saldo de Claves e o que já foi usado.',
+  },
+
+  // 3 — o wizard de envio. As subrotas (`/<faixaId>/<passo>`) caem no mapa de
+  // prefixo, logo abaixo, porque têm segmento dinâmico.
+  [ROTA.ARTISTA_ENVIAR]: {
+    titulo: 'Enviar música',
+    sublegenda: 'Uma faixa por envio. O teto é o seu saldo.',
+  },
+
+  // 13 — a fila. O detalhe (13.1) tem segmento dinâmico e cai no prefixo.
+  [ROTA.CURADOR_FILA]: {
+    titulo: 'Fila de avaliações',
+    sublegenda: 'O que está esperando você.',
+  },
+
+  // 14 — a avaliação. As cinco etapas têm segmento dinâmico e caem no prefixo;
+  // esta entrada existe para a raiz `/curador/avaliar`, que redireciona.
+  [ROTA.CURADOR_AVALIAR]: {
+    titulo: 'Avaliação',
+    sublegenda: 'Ouça, dê as notas e escreva a devolutiva.',
+  },
+
   // 12.6 — derivada: o protótipo tem "Meu cadastro" na sidebar e o aponta para
   // o wizard. Título e sublegenda vêm do PRD §12.6.
   [ROTA.CURADOR_MEU_CADASTRO]: {
@@ -96,6 +137,16 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
     `${ROTA.ADMIN}/pacotes/`,
     { titulo: 'Editar pacote', sublegenda: 'Defina a quantidade, o valor e o desconto.' },
   ],
+  // Os passos 2 e 3 do envio — `/artista/enviar/<faixaId>/<passo>`. O título é
+  // o mesmo do passo 1: o wizard é uma tela só, e quem diz onde a pessoa está
+  // é o indicador de passo, não o cabeçalho.
+  [`${ROTA.ARTISTA_ENVIAR}/`, EXATOS[ROTA.ARTISTA_ENVIAR] as TituloDeModulo],
+  // 13.1 — o detalhe herda o título da fila; quem diz onde a pessoa está é o
+  // "Voltar para a fila" e o próprio título da faixa no painel.
+  [`${ROTA.CURADOR_FILA}/`, EXATOS[ROTA.CURADOR_FILA] as TituloDeModulo],
+  // 14 · 14.1 · 14.2 · 14.3 · 14.4 — as cinco etapas, como no envio: o
+  // cabeçalho não muda, e quem diz onde a pessoa está é o indicador de passo.
+  [`${ROTA.CURADOR_AVALIAR}/`, EXATOS[ROTA.CURADOR_AVALIAR] as TituloDeModulo],
 ];
 
 export function tituloDoCaminho(caminho: string, papel: Papel): TituloDeModulo {

@@ -5,6 +5,7 @@ import { TelaDeConta, ehAbaDeConta } from '@/componentes/conta/TelaDeConta';
 import { ROTA } from '@/lib/guarda-rota';
 import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
 import { lerSessoesDaConta } from '@/modulos/conta/consultas';
+import { lerPreferencias } from '@/modulos/preferencias/consultas';
 
 export const metadata: Metadata = {
   title: 'Configurações · Dissona',
@@ -31,7 +32,7 @@ export default async function Pagina({
   readonly searchParams: Promise<{ readonly aba?: string }>;
 }) {
   const { aba: bruta } = await searchParams;
-  const aba = ehAbaDeConta(bruta) ? bruta : 'dados';
+  const aba = ehAbaDeConta(bruta, 'artista') ? bruta : 'dados';
 
   const [contexto, identidade] = await Promise.all([
     lerContextoDaSessao(),
@@ -43,6 +44,7 @@ export default async function Pagina({
   if (contexto.estado !== 'ok' || identidade === null) redirect(ROTA.ENTRAR);
 
   const sessoes = aba === 'seguranca' ? await lerSessoesDaConta() : [];
+  const preferencias = aba === 'preferencias' ? await lerPreferencias('artista') : null;
 
   return (
     <TelaDeConta
@@ -52,6 +54,7 @@ export default async function Pagina({
       email={identidade.email}
       papeis={contexto.papeis}
       sessoes={sessoes}
+      preferencias={preferencias}
     />
   );
 }

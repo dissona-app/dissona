@@ -80,7 +80,7 @@ export default async function Pagina() {
           {CURADOR_CLASSIFICACAO.comecarCurso}
         </button>
 
-        <BotaoLink href={ROTA.CURADOR} blocoInteiro>
+        <BotaoLink href={ROTA.CURADOR} tamanho="denso" blocoInteiro>
           {CURADOR_CLASSIFICACAO.irAoPainel}
         </BotaoLink>
       </div>

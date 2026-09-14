@@ -7,7 +7,14 @@
 }
 
 .rotulo {
-  font-size: var(--dsn-text-3xs);
+  /*
+   * `--dsn-rotulo-corpo` com 11 px de padrão: é o rótulo das telas de
+   * autenticação e de conta. O wizard do curador redefine a variável para
+   * 10 px na sua moldura — lá o protótipo usa o menor degrau da escala, e a
+   * alternativa seria um prop de tamanho atravessando oito passos e três
+   * componentes de campo.
+   */
+  font-size: var(--dsn-rotulo-corpo, var(--dsn-text-3xs));
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;

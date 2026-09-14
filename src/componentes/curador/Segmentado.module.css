@@ -12,7 +12,7 @@
 .legenda {
   padding: 0;
   margin-bottom: var(--dsn-space-2);
-  font-size: var(--dsn-text-3xs);
+  font-size: var(--dsn-rotulo-corpo, var(--dsn-text-3xs));
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;
