@@ -68,6 +68,28 @@ de qualquer derivação, então cada uma destas precisa de razão explícita.
 | 21.1 · criar pacote | `salvarPacote()` **coage em silêncio**: nome vazio vira `"Pacote 30 Claves"`, quantidade inválida vira `30`, desconto inválido vira `5`, e valor acima da base é capado | erro no campo, e não salva | Comportamento de mock. O cenário **A2** do guia de testes pede o contrário — *"Validações barram valores/percentuais inválidos"* — e o guia é o gate. Salvar um preço que não foi o digitado é pior que recusar. |
 | 21 · lista de pacotes | o `flash` de confirmação desaparece em 2,6 s | permanece até a próxima ação | Confirmação que se apaga sozinha é inútil para quem lê devagar. O `role="status"` já a anuncia ao leitor de tela sem interromper. |
 
+E as da fatia de compra de Claves (5.1 e 5.2), que merecem tabela própria
+porque o protótipo daquelas duas telas é, por construção, um mock de
+pagamento:
+
+| Tela | Protótipo | Implementado | Razão |
+|---|---|---|---|
+| 5.1 · pacotes | quatro pacotes fixos em `caPacotesSeed()`, `[[10,100,0],[30,285,5],[60,540,10],[100,850,15]]` | os pacotes **ativos** de `pacote_clave` | É o que a tela 21 do admin edita, e a nota dela promete que "ativo aparece na Carteira do artista". Duas listas do mesmo pacote é como o preço da vitrine passa a discordar do preço cobrado. Os valores do protótipo continuam existindo — são o seed. |
+| 5.1 · selo | "Mais escolhido" no pacote de 60 | **ausente** | No mock ele é `p[0] === 60`, fixo. "Mais escolhido" é uma afirmação sobre vendas, e destacar um card porque o mock destacava seria inventar uma estatística que ninguém mediu. |
+| 5.1/5.2 · navegação | `caView` troca dentro da Carteira | duas rotas (`/artista/pacotes` e `/artista/pacotes/<id>`) | "Comprar Claves" é destino de **três** CTAs — Carteira, estado vazio da Carteira e o bloqueio por saldo na seleção de curadores. Um estado local não tem endereço para nenhum dos três, e não sobrevive a um F5 no meio de uma compra. |
+| 5.2 · cartão | `caConfirmar` **preenche** os campos inválidos com valores fictícios e segue | erro no campo, e a ação não roda | Mesma coerção silenciosa da tela 21.1, e mesma recusa — ver a primeira linha desta seção. Aqui é pior: o campo coagido seria um meio de pagamento. |
+| 5.2 · cartão | campos comuns de formulário | `<input>` **sem `name`** | O item da R2 é "sem persistir dados do cartão", e a forma mais forte de não persistir é o dado não sair do navegador: sem `name` ele não entra no `FormData`, não chega à Server Action e não aparece em log de servidor. Quando o Asaas entrar, quem ganha `name` é o **token**. O preço é que esta tela exige JavaScript, ao contrário do resto do produto — e um checkout de cartão sem JS teria de mandar o PAN ao servidor, que é o que não se quer. |
+| 5.2 · Pix | QR e "Copiar código" funcionais no mock | meio selecionável, **código declarado pendente** | `pedido_clave.pix_payload` e `pix_qr` nascem no provedor, e não há provedor. Botão desabilitado com o motivo visível, como o bloco de cobrança em 7.2 — inventar um código copia e cola que ninguém pode pagar seria pior que declarar a ausência. |
+| 5.2 · simulação | "Pagamento simulado neste protótipo" | a nota aparece **só** quando o provedor é o simulado | Em produção com Asaas a frase passaria a ser falsa. Ela é condicional a `PAGAMENTO_SIMULADO`, que é a mesma chave que escolhe o provedor. |
+
+⚠️ **O simulador não é um mock que vazou para o código de produção** — é a
+especificação da release: o protótipo tem o controle "Simular resultado ·
+Aprovado / Recusado" na própria tela. Ele existe porque o Asaas está bloqueado
+por [#6](../open-questions.md#6-modelo-de-split-no-asaas), que é decisão do
+contador do cliente. Enquanto `PAGAMENTO_SIMULADO` não for `false`, **a compra
+credita Claves sem cobrança nenhuma**; com `false`, a ação falha com
+`pagamento_indisponivel` em vez de creditar de graça.
+
 E uma divergência que o protótipo criou contra si mesmo, resolvida a favor da
 copy: a tela 21 tem **Desativar** e **Excluir** como ações distintas, com o
 modal dizendo *"Se a ideia for só tirar de circulação, desative"* — mas a

@@ -1579,6 +1579,7 @@ export type Database = {
         Returns: boolean
       }
       posso_ver_envio: { Args: { p_envio_id: string }; Returns: boolean }
+      recusar_pedido_clave: { Args: { p_pedido_id: string }; Returns: boolean }
       registrar_evento_provedor: {
         Args: {
           p_carga: Json

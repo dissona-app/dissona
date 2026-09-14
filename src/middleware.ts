@@ -50,7 +50,11 @@ export async function middleware(requisicao: NextRequest) {
     }
   }
 
-  const decisao = decidirAcesso({ caminho: requisicao.nextUrl.pathname, leitura });
+  const decisao = decidirAcesso({
+    caminho: requisicao.nextUrl.pathname,
+    codigoDeAutenticacao: requisicao.nextUrl.searchParams.get('code'),
+    leitura,
+  });
 
   if (decisao.tipo === 'seguir') return resposta;
 

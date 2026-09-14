@@ -10,6 +10,7 @@ import { EstadoVazio } from '@/componentes/base/EstadoVazio';
 import { Painel } from '@/componentes/base/Painel';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
 import type { ResultadoDeAcao } from '@/lib/acoes';
+import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
 import { SELECAO as TEXTOS } from '@/textos/prototipo';
 
@@ -88,7 +89,22 @@ export function SelecaoDeCuradores({ faixaId, curadores, acao }: PropsSelecaoDeC
     <form action={enviar} className={estilos.base} noValidate>
       <input type="hidden" name="faixaId" value={faixaId} />
 
-      {erro !== null ? <Aviso tom="erro">{erro}</Aviso> : null}
+      {erro !== null ? (
+        <Aviso
+          tom="erro"
+          acao={
+            /* O bloqueio por saldo é o único dos cinco erros com saída: os
+               outros quatro se resolvem mudando a seleção, e este não. */
+            falha?.codigo === CodigoErro.SALDO_INSUFICIENTE ? (
+              <BotaoLink href={ROTA.ARTISTA_PACOTES} variante="secundario" tamanho="sm">
+                {TEXTOS.erroSaldoAcao}
+              </BotaoLink>
+            ) : undefined
+          }
+        >
+          {erro}
+        </Aviso>
+      ) : null}
 
       <Painel titulo={TEXTOS.titulo} sublegenda={TEXTOS.subtitulo}>
         <ul className={estilos.lista}>

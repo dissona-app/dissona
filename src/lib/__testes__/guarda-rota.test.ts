@@ -61,6 +61,45 @@ describe('route handlers de autenticação', () => {
   });
 });
 
+describe('código de OAuth que caiu na home', () => {
+  const decidirComCodigo = (caminho: string, leitura: LeituraDePapeis, codigo: string | null) =>
+    decidirAcesso({ caminho, codigoDeAutenticacao: codigo, leitura });
+
+  it('encaminha o `code` da raiz para o handler que o troca por sessão', () => {
+    // O GoTrue descarta um `redirect_to` fora da allow-list e usa o Site URL,
+    // sem erro nenhum. Sem este desvio o código morre na home e o login falha
+    // calado — que foi exatamente o bug do login com Google.
+    expect(decidirComCodigo(ROTA.HOME, semSessao, 'f4843dac-05b3-4672')).toEqual({
+      tipo: 'redirecionar',
+      para: `${ROTA.API_AUTH_CALLBACK}?code=f4843dac-05b3-4672`,
+    });
+  });
+
+  it('escapa o código antes de o pôr na query', () => {
+    expect(decidirComCodigo(ROTA.HOME, semSessao, 'a b&c=d')).toEqual({
+      tipo: 'redirecionar',
+      para: `${ROTA.API_AUTH_CALLBACK}?code=a%20b%26c%3Dd`,
+    });
+  });
+
+  it('não mexe na home sem código', () => {
+    for (const codigo of [null, '']) {
+      expect(decidirComCodigo(ROTA.HOME, semSessao, codigo)).toEqual({ tipo: 'seguir' });
+    }
+    expect(decidir(ROTA.HOME, semSessao)).toEqual({ tipo: 'seguir' });
+  });
+
+  it('só vale para a raiz — nas demais rotas a guarda de papel continua mandando', () => {
+    expect(decidirComCodigo(ROTA.ARTISTA, semSessao, 'abc')).toEqual({
+      tipo: 'redirecionar',
+      para: `${ROTA.ENTRAR}?proximo=${encodeURIComponent(ROTA.ARTISTA)}`,
+    });
+    expect(decidirComCodigo(ROTA.API_AUTH_CALLBACK, semSessao, 'abc')).toEqual({
+      tipo: 'seguir',
+    });
+  });
+});
+
 describe('(auth)', () => {
   it('deixa entrar quem não tem sessão', () => {
     for (const caminho of [

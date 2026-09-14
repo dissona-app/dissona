@@ -1,0 +1,140 @@
+/* 5.2 · Checkout. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+  align-items: flex-start;
+}
+
+/* `minmax(0, 1.4fr)` e `minmax(19rem, 0.95fr)` no protótipo. O `auto-fit` não
+   serve aqui porque as duas colunas têm papéis diferentes: a da esquerda é o
+   formulário e a da direita é o resumo, e elas empilham nessa ordem. */
+.colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(19rem, 0.95fr);
+  gap: var(--dsn-space-5);
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 60rem) {
+  .colunas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pagamento {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}
+
+.cartao {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--dsn-space-4);
+}
+
+.linhaInteira {
+  grid-column: 1 / -1;
+}
+
+.pix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-5);
+  align-items: center;
+  padding: var(--dsn-space-5);
+  background: var(--dsn-surface-muted);
+  border-radius: var(--dsn-radius-md);
+}
+
+.qr {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 6.5rem;
+  height: 6.5rem;
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--dsn-ink-400);
+  background: var(--dsn-surface);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-sm);
+}
+
+.pixTitulo {
+  margin: 0 0 var(--dsn-space-2);
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.simulacao {
+  padding-top: var(--dsn-space-4);
+  border-top: 1px solid var(--dsn-border-faint);
+}
+
+.lateral {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+  margin: 0;
+}
+
+.linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dsn-space-3);
+}
+
+.linha dt,
+.linha dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.totalLinha {
+  padding-top: var(--dsn-space-3);
+  border-top: 1px solid var(--dsn-border-faint);
+}
+
+.total {
+  font-size: var(--dsn-text-2xl);
+  font-weight: 600;
+  color: var(--dsn-purple-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.economia {
+  color: var(--dsn-success-fg);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--dsn-ink-500);
+}
+
+.desfecho {
+  margin: 0 0 var(--dsn-space-2);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+  margin-top: var(--dsn-space-3);
+}

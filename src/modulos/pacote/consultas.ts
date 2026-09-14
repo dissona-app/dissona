@@ -59,3 +59,46 @@ export async function lerValorDaClave(): Promise<Centavos> {
   const centavos = await lerConfiguracao('clave_valor_centavos');
   return BigInt(centavos);
 }
+
+export type Vitrine = {
+  readonly pacotes: readonly PacoteNaLista[];
+  readonly valorDaClave: Centavos;
+};
+
+/**
+ * Tela 5.1 — a vitrine do artista.
+ *
+ * Mesma função de enriquecimento da tela 21 (`paraLista`), e é a razão de esta
+ * consulta morar aqui e não em `modulos/claves`: o preço por Clave, o desconto
+ * e a economia que a vitrine mostra têm de ser os mesmos números que a equipe
+ * vê ao cadastrar o pacote. Dois cálculos do mesmo pacote é como a tela do
+ * admin e a do artista passam a discordar do que está à venda.
+ */
+export async function lerVitrine(): Promise<Vitrine> {
+  const [pacotes, valorDaClave] = await Promise.all([
+    repositorio.listarAtivos(),
+    lerValorDaClave(),
+  ]);
+
+  return {
+    pacotes: pacotes.map((pacote) => paraLista(pacote, valorDaClave)),
+    valorDaClave,
+  };
+}
+
+/**
+ * Um pacote pelo id, já enriquecido — o checkout (5.2) e a ação de compra.
+ *
+ * `null` quando o id não resolve **ou** quando a RLS o esconde, que para o
+ * artista significa "não está ativo". São indistinguíveis daqui de propósito:
+ * distinguir revelaria a existência de um pacote que ele não pode comprar.
+ */
+export async function buscarPacote(pacoteId: string): Promise<PacoteNaLista | null> {
+  const [pacote, valorDaClave] = await Promise.all([
+    repositorio.buscar(pacoteId),
+    lerValorDaClave(),
+  ]);
+
+  if (pacote === null || !pacote.ativo) return null;
+  return paraLista(pacote, valorDaClave);
+}

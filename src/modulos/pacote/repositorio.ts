@@ -69,6 +69,29 @@ export async function listarParaEquipe(): Promise<readonly Pacote[]> {
   return (data ?? []).map(paraDominio);
 }
 
+/**
+ * Vitrine do artista (5.1): os ativos, na mesma ordem da tela 21.
+ *
+ * O `.eq('ativo', true)` é redundante com a policy — ela já diz `ativo or
+ * tem_permissao('pacotes')` — e está aqui porque quem gere pacotes **também**
+ * é artista às vezes. Sem o filtro, um administrador abrindo a própria
+ * Carteira veria os pacotes desativados na vitrine, que é justamente o que a
+ * nota da tela 21 promete que não acontece.
+ */
+export async function listarAtivos(): Promise<readonly Pacote[]> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('pacote_clave')
+    .select(COLUNAS)
+    .eq('ativo', true)
+    .is('excluido_em', null)
+    .order('quantidade_claves', { ascending: true });
+
+  estourarSeErro(error);
+  return (data ?? []).map(paraDominio);
+}
+
 /** Um pacote pelo id. `null` quando nao existe ou a RLS o esconde. */
 export async function buscar(pacoteId: string): Promise<Pacote | null> {
   const supabase = await criarClienteServidor();

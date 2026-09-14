@@ -74,3 +74,25 @@ export function temChaveDeServico(): boolean {
   const chave = process.env.SUPABASE_SERVICE_ROLE_KEY;
   return chave !== undefined && chave.trim() !== '';
 }
+
+/**
+ * O checkout (5.2) roda com o provedor **simulado**?
+ *
+ * Ligado por padrão, e desligado por `PAGAMENTO_SIMULADO=false` — a mesma
+ * inversão de `soundcloudLigado`, e pela mesma razão: o simulador é a única
+ * implementação que existe hoje. O Asaas está bloqueado por
+ * [#6](../../docs/open-questions.md), que é uma decisão de contador, não de
+ * código; até ela sair não há credencial a ler, e um opt-in deixaria a tela
+ * morta em todo ambiente sem nenhum motivo visível.
+ *
+ * ⚠️ **Enquanto isto devolver `true`, a compra credita Claves sem cobrança
+ * nenhuma.** É o que o próprio protótipo da R2 desenha — ele tem o controle
+ * "Simular resultado · Aprovado / Recusado" na tela, e a nota "Pagamento
+ * simulado. Nenhuma cobrança é feita" —, e a tela repete essa nota para quem
+ * está olhando. No dia em que o Asaas entrar, `false` é o que fecha a porta:
+ * sem provedor real configurado a ação falha com `PAGAMENTO_INDISPONIVEL`, que
+ * é melhor do que creditar de graça em produção.
+ */
+export function pagamentoSimulado(): boolean {
+  return process.env.PAGAMENTO_SIMULADO !== 'false';
+}

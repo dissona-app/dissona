@@ -1,4 +1,5 @@
 import type { Claves } from '@/lib/claves';
+import type { Centavos } from '@/lib/dinheiro';
 import type { Database } from '@/lib/supabase/tipos-bd';
 
 /**
@@ -51,3 +52,54 @@ export type FiltroDoExtrato = (typeof FILTROS_DO_EXTRATO)[number];
 export function ehFiltroDoExtrato(valor: string | undefined): valor is FiltroDoExtrato {
   return (FILTROS_DO_EXTRATO as readonly string[]).includes(valor ?? '');
 }
+
+// ---------------------------------------------------------------------------
+// Compra de Claves — pacotes (5.1) e checkout (5.2)
+// ---------------------------------------------------------------------------
+
+export type MeioPagamento = Database['public']['Enums']['meio_pagamento'];
+
+export type SituacaoPedido = Database['public']['Enums']['situacao_pedido'];
+
+/**
+ * O resumo do pedido da tela 5.2, derivado do pacote.
+ *
+ * **Derivado, e nunca persistido antes do "Confirmar compra".** Quem congela
+ * os valores é `criar_pedido_clave`, no banco, a partir da mesma linha de
+ * `pacote_clave` — este resumo existe só para a pessoa ver o que vai pagar. Se
+ * ele calculasse diferente da RPC, a tela mostraria um total e o pedido
+ * gravaria outro, e o erro só apareceria na fatura.
+ *
+ * `bruto - desconto = total` é o mesmo invariante do check
+ * `pedido_clave_desconto_fecha`.
+ */
+export type ResumoDoPedido = {
+  readonly quantidade: Claves;
+  readonly bruto: Centavos;
+  readonly desconto: Centavos;
+  readonly total: Centavos;
+  readonly precoPorClave: Centavos;
+  /** Derivado do valor, como na tela 21 — nunca a coluna `desconto_percentual`. */
+  readonly descontoPercentual: number;
+};
+
+/**
+ * O que o simulador do protótipo permite escolher: "Simular resultado ·
+ * Aprovado / Recusado".
+ *
+ * Existe no **domínio**, e não só na tela, porque é o que a ação manda ao
+ * provedor simulado. Quando o Asaas entrar, este tipo some junto com o
+ * simulador — quem decide passa a ser o banco.
+ */
+export const RESULTADOS_SIMULADOS = ['aprovado', 'recusado'] as const;
+
+export type ResultadoSimulado = (typeof RESULTADOS_SIMULADOS)[number];
+
+/** O desfecho de uma compra, como a tela 5.2 o mostra. */
+export type DesfechoDaCompra = {
+  readonly pedidoId: string;
+  /** Claves creditadas, já formatadas — `bigint` não atravessa Server→Client. */
+  readonly claves: string;
+  /** O saldo depois do crédito, para o "Novo saldo: … Claves". */
+  readonly saldo: string;
+};

@@ -33,6 +33,17 @@ export const ROTA = {
   ARTISTA_CARTEIRA: '/artista/carteira',
   ARTISTA_EXTRATO: '/artista/carteira/extrato',
   /**
+   * Pacotes de Claves (5.1) e checkout (5.2).
+   *
+   * Duas rotas, e não duas abas da Carteira como no protótipo: o protótipo é
+   * uma tela só que troca de `caView`, e aqui "Comprar Claves" precisa de
+   * endereço — é o destino do CTA da Carteira, do estado vazio e do bloqueio
+   * por saldo insuficiente na seleção de curadores. O checkout leva o id do
+   * pacote no caminho porque é dele que o resumo do pedido é derivado; o
+   * pedido só nasce no "Confirmar compra".
+   */
+  ARTISTA_PACOTES: '/artista/pacotes',
+  /**
    * Envio de música (3) — wizard de 3 passos.
    *
    * O passo 1 é a própria raiz, porque ainda não existe faixa. Do passo 2 em
@@ -130,6 +141,15 @@ export type Decisao =
 
 export type ContextoDeAcesso = {
   readonly caminho: string;
+  /**
+   * O `?code=` da requisição, quando houver — só o valor, não a query inteira.
+   *
+   * Existe por causa de uma falha que não dá sinal nenhum: o GoTrue **descarta**
+   * um `redirect_to` que não esteja na allow-list de Redirect URLs e usa o Site
+   * URL no lugar, sem erro. O código do OAuth chega então na home, que não lê
+   * `searchParams`, e o login falha calado.
+   */
+  readonly codigoDeAutenticacao?: string | null;
   readonly leitura: LeituraDePapeis;
 };
 
@@ -223,7 +243,24 @@ function exigirPapel(leitura: LeituraDePapeis, papel: Papel, destinoAlternativo:
 }
 
 export function decidirAcesso(contexto: ContextoDeAcesso): Decisao {
-  const { caminho, leitura } = contexto;
+  const { caminho, codigoDeAutenticacao, leitura } = contexto;
+
+  // --- código de OAuth que caiu na home ------------------------------------
+  //
+  // Rede de proteção para o Site URL divergir da allow-list: nesse caso o
+  // Supabase manda o `code` para a raiz, onde ninguém o troca por sessão. Vem
+  // antes de `PUBLICAS` porque `/` está lá e devolveria `seguir`, engolindo o
+  // código. Encaminhar custa um redirecionamento e faz o login funcionar.
+  //
+  // Não cicla: `/api/auth/callback` está em `API_SEM_SESSAO`, logo abaixo.
+  if (
+    caminho === ROTA.HOME &&
+    codigoDeAutenticacao !== undefined &&
+    codigoDeAutenticacao !== null &&
+    codigoDeAutenticacao !== ''
+  ) {
+    return para(`${ROTA.API_AUTH_CALLBACK}?code=${encodeURIComponent(codigoDeAutenticacao)}`);
+  }
 
   // --- sem guarda ----------------------------------------------------------
   if (PUBLICAS.includes(caminho)) return seguir;

@@ -5,10 +5,23 @@
  * quem junta as duas coisas é `consultas.ts`.
  */
 
-import { deClavesInteiras, somar } from '@/lib/claves';
+import {
+  deClavesInteiras,
+  paraCentavos as clavesParaCentavos,
+  precoPorClave,
+  somar,
+} from '@/lib/claves';
 import type { Claves } from '@/lib/claves';
+import type { Centavos } from '@/lib/dinheiro';
+import { descontoDerivado } from '@/modulos/pacote/servico';
 
-import type { FiltroDoExtrato, LinhaDoExtrato, Movimentacao, TipoLancamento } from './tipos';
+import type {
+  FiltroDoExtrato,
+  LinhaDoExtrato,
+  Movimentacao,
+  ResumoDoPedido,
+  TipoLancamento,
+} from './tipos';
 
 const ZERO = deClavesInteiras(0);
 
@@ -108,4 +121,43 @@ export function ultimas(
   quantas: number,
 ): readonly Movimentacao[] {
   return [...movimentacoes].sort((a, b) => b.data.getTime() - a.data.getTime()).slice(0, quantas);
+}
+
+// ---------------------------------------------------------------------------
+// Compra de Claves (5.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * O resumo que a tela 5.2 mostra ao lado do "Confirmar compra".
+ *
+ * A aritmética é a de `criar_pedido_clave`, transcrita: o **bruto** é a
+ * quantidade ao valor cheio da Clave, com o mesmo `greatest` que a RPC aplica
+ * (um pacote cadastrado acima do cheio vira "sem desconto" em vez de desconto
+ * negativo, que o check `pedido_clave_valores_nao_negativos` recusaria); o
+ * **desconto** é a diferença, e nunca um segundo arredondamento sobre o
+ * percentual — é o que faz `bruto - desconto = total` fechar sem centavo
+ * perdido, exatamente como o check `pedido_clave_desconto_fecha` exige.
+ *
+ * Duas implementações da mesma conta é o que se está evitando aqui: esta
+ * mostra, a RPC grava, e o teste `pedido.test.ts` prende as duas ao mesmo
+ * resultado. O `descontoPercentual` reusa `descontoDerivado` do módulo de
+ * pacote, que é a função que a tela 21 do admin já usa — a vitrine do artista
+ * e a lista do admin não podem discordar do mesmo pacote.
+ */
+export function resumoDoPedido(
+  quantidade: Claves,
+  valorDoPacote: Centavos,
+  valorDaClave: Centavos,
+): ResumoDoPedido {
+  const cheio = clavesParaCentavos(quantidade, valorDaClave);
+  const bruto = cheio > valorDoPacote ? cheio : valorDoPacote;
+
+  return {
+    quantidade,
+    bruto,
+    desconto: bruto - valorDoPacote,
+    total: valorDoPacote,
+    precoPorClave: precoPorClave(valorDoPacote, quantidade),
+    descontoPercentual: descontoDerivado(valorDoPacote, bruto),
+  };
 }

@@ -70,6 +70,14 @@ export const CodigoErro = {
   CURADOR_DUPLICADO: 'curador_duplicado',
   SERVICO_FEEDBACK_OBRIGATORIO: 'servico_feedback_obrigatorio',
 
+  // Pagamento (5.2)
+  //
+  // Os dois são estados do **provedor**, e não do nosso domínio, mas a View
+  // precisa distingui-los: recusado pede trocar de cartão e tentar de novo;
+  // indisponível é falha nossa, e pedir para tentar de novo seria mentira.
+  PAGAMENTO_RECUSADO: 'pagamento_recusado',
+  PAGAMENTO_INDISPONIVEL: 'pagamento_indisponivel',
+
   // Pacotes e equipe
   PACOTE_EXCLUIDO: 'pacote_excluido',
   CONVITE_INVALIDO: 'convite_invalido',

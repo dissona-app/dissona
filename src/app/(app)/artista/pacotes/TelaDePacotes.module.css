@@ -1,0 +1,79 @@
+/* 5.1 · Pacotes de Claves. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+  align-items: flex-start;
+}
+
+.chamada {
+  max-width: 39rem;
+  margin: 0;
+  line-height: 1.6;
+  color: var(--dsn-ink-700);
+}
+
+/* Quatro colunas no protótipo (`repeat(4, minmax(0, 1fr))`), com `auto-fit`
+   no lugar do número fixo: os pacotes vêm da tela 21, e a equipe pode ter
+   três ou cinco. */
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--dsn-space-4);
+  width: 100%;
+  margin: var(--dsn-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+  align-items: flex-start;
+}
+
+.chamadaCard {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.quantidade {
+  margin: 0;
+  font-size: var(--dsn-text-3xl);
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink);
+}
+
+.unidade {
+  font-size: var(--dsn-text-base);
+  font-weight: 400;
+  color: var(--dsn-ink-500);
+}
+
+.preco {
+  margin: 0;
+  font-size: var(--dsn-text-xl);
+  font-weight: 600;
+  color: var(--dsn-purple-600);
+}
+
+.porClave {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  line-height: 1.5;
+  color: var(--dsn-ink-500);
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

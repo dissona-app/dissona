@@ -320,11 +320,24 @@ Segredo do `pg_net` vem do Vault, nunca inline — `cron.job.command` é legíve
 
 ## 9. Ambientes e deploy
 
-**Hospedagem: Vercel.** Um projeto, **Production Branch = `main`**. Produção em **`https://dissona.vercel.app`**.
+**Hospedagem: Vercel.** Um projeto, **Production Branch = `main`**. Produção em **`https://dissona.com.br`**, que é o domínio canônico; `https://dissona.vercel.app` continua respondendo como alias.
 
 Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `pdx1` que a R0 havia sugerido. O efeito é uma troca: melhor tempo de resposta para o usuário brasileiro, e ~120 ms a mais em cada ida ao banco, que está em `us-west-2`. Como o `middleware.ts` faz um `getUser()` por requisição, essa ida acontece em toda navegação. Vale revisar junto da pendência [#25](open-questions.md), quando os projetos dedicados forem provisionados.
 
-⚠️ O **Site URL** do Supabase Auth precisa ser **`https://`**. Com `http://`, os links dos e-mails de verificação e recuperação saem inseguros, e a Vercel responde `308` para o `https` — o que pode fazer o redirect de OAuth não casar com a allow list.
+⚠️ O **Site URL** do Supabase Auth precisa ser **`https://dissona.com.br`**, e com `https://`. Com `http://`, os links dos e-mails de verificação e recuperação saem inseguros, e a Vercel responde `308` para o `https` — o que pode fazer o redirect de OAuth não casar com a allow list.
+
+⚠️ E as **Redirect URLs** têm de listar **toda** origem que o app usa, porque `origemDaRequisicao()` deriva o `redirectTo` do cabeçalho da requisição (ver [`lib/origem.ts`](../src/lib/origem.ts)):
+
+| Origem | Entrada na allow list |
+|---|---|
+| Produção | `https://dissona.com.br/**` |
+| Alias da Vercel | `https://dissona.vercel.app/**` |
+| Preview | o curinga do projeto, `https://dissona-*.vercel.app/**` |
+| Local | `http://localhost:3000/**` |
+
+O `/**` não é decoração: sem ele só a raiz casa, e os destinos reais são `/api/auth/callback`, `/api/auth/confirmar` e `/admin/convite`.
+
+Falhar nisso **não dá erro**. O GoTrue descarta em silêncio um `redirect_to` fora da lista e usa o Site URL no lugar — o `code` do OAuth chega na home e o login não acontece. Foi o que quebrou o login com Google e com Facebook em produção. A guarda de rota hoje encaminha um `?code=` que caia em `/` para o callback ([`lib/guarda-rota.ts`](../src/lib/guarda-rota.ts)), mas isso é rede de proteção, não substituto da configuração.
 
 | Ambiente | App | Supabase | Gatilho |
 |---|---|---|---|

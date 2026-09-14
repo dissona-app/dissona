@@ -1,4 +1,3 @@
-import { Botao } from '@/componentes/base/Botao';
 import { BotaoLink } from '@/componentes/base/BotaoLink';
 import { Cartao } from '@/componentes/base/Cartao';
 import { EstadoVazio } from '@/componentes/base/EstadoVazio';
@@ -57,12 +56,7 @@ export function TelaDaCarteira({
           </div>
 
           <div className={estilos.acoes}>
-            {/* A compra (5.1/5.2) depende da integração de pagamento e chega na
-                fatia do Asaas. Desabilitado com o motivo visível, e não
-                escondido: a forma da tela não muda a cada entrega. */}
-            <Botao disabled title={TEXTOS.comprarPendente}>
-              {TEXTOS.comprar}
-            </Botao>
+            <BotaoLink href={ROTA.ARTISTA_PACOTES}>{TEXTOS.comprar}</BotaoLink>
             <BotaoLink href={ROTA.ARTISTA_EXTRATO} variante="secundario">
               {TEXTOS.verExtrato}
             </BotaoLink>
@@ -115,9 +109,9 @@ export function TelaDaCarteira({
             titulo={TEXTOS.vazioTitulo}
             descricao={TEXTOS.vazioDescricao}
             acao={
-              <Botao disabled tamanho="sm" title={TEXTOS.comprarPendente}>
+              <BotaoLink href={ROTA.ARTISTA_PACOTES} tamanho="sm">
                 {TEXTOS.comprar}
-              </Botao>
+              </BotaoLink>
             }
           />
         ) : (

@@ -79,7 +79,7 @@ Um único projeto Supabase, tratado como desenvolvimento — `dissona` / `fhqcib
 - [x] Repositório conectado à Vercel — há deploy em `https://dissona.vercel.app`
 - [ ] ⚠️ **Publicar `main`.** Em 2026-09-08 produção devolvia **500 em `/` e `/termos`**, e a causa não é código: o commit `5065f1a`, que fez o middleware degradar em vez de cair, **nunca foi publicado**. O branch local está à frente de `origin/main`, e o deploy roda um build anterior ao conserto. `NEXT_PUBLIC_*` é embutida no build, então acrescentar env var não conserta um deploy já feito — é preciso republicar
 - [ ] Configurar as env vars da Vercel nos escopos Production e Preview — conferir depois do push, porque o 500 mascara o diagnóstico. Agora inclui `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] Cadastrar as Redirect URLs de Preview e produção no Supabase Auth — **necessário antes da verificação de e-mail** (fatia de autenticação): sem elas o link do e-mail sai quebrado
+- [ ] ⚠️ Cadastrar as Redirect URLs de Preview e produção no Supabase Auth — **necessário antes da verificação de e-mail** (fatia de autenticação): sem elas o link do e-mail sai quebrado. **Já quebrou o login social em produção**: em 2026-09-14 o app mandava `redirect_to=https://dissona.com.br/api/auth/callback`, que não estava na lista, e o Auth devolvia o `code` para o Site URL (`https://dissona.vercel.app/?code=…`) sem erro nenhum. Site URL passa a ser `https://dissona.com.br`, e a lista precisa de `https://dissona.com.br/**`, `https://dissona.vercel.app/**`, o curinga de Preview e `http://localhost:3000/**` — ver [architecture.md §9](architecture.md#9-ambientes-e-deploy)
 - [ ] **Configuração do Auth no dashboard**, que a fatia de autenticação depende e não é versionável: confirmação de e-mail ligada, templates reescritos para `{{ .TokenHash }}` apontando para `/api/auth/confirmar`, credenciais de Google e Facebook, e proteção contra senha vazada (o único achado acionável do `get_advisors`)
 - [x] Criar páginas públicas de Termos de uso e Política de privacidade — estrutura pronta, **texto pendente do jurídico**
 
@@ -187,7 +187,7 @@ então ficam marcados como pendentes até a passada manual.
 Nada disto é versionável (`config.toml` só tem `project_id`), e nada disto o
 código pode contornar:
 
-- [ ] *Confirm email* ligado; Site URL e Redirect URLs de local, Preview e produção — inclui `/admin/convite`, que é onde o `inviteUserByEmail` devolve a pessoa
+- [ ] *Confirm email* ligado; **Site URL `https://dissona.com.br`** e Redirect URLs de local, Preview e produção — inclui `/admin/convite`, que é onde o `inviteUserByEmail` devolve a pessoa. É o item que derrubou o login com Google e Facebook; a lista exata está em [architecture.md §9](architecture.md#9-ambientes-e-deploy)
 - [ ] Templates de e-mail reescritos para `{{ .TokenHash }}` apontando para `/api/auth/confirmar` — sem isso o link do Supabase não fecha sessão no fluxo SSR/PKCE
 - [x] Providers Google e Facebook com credenciais — feito no dashboard; o redirect registrado nos consoles do Google e da Meta é o do **Supabase** (`https://<ref>.supabase.co/auth/v1/callback`), nunca o nosso `/api/auth/callback`, que é para onde o Auth devolve depois
 - [ ] **Custom provider `custom:soundcloud`** — Auth → Providers → New Provider → *Manual configuration*, com `client_id` `oXgbfsAkK3HZ96jVO0mXCbZ6spU3P93A`, o segredo da tela do SoundCloud, authorize `https://secure.soundcloud.com/authorize`, token `https://secure.soundcloud.com/oauth/token` e **userinfo apontando para a nossa Edge Function**, `https://fhqcibjzmowcjkdrqyvi.supabase.co/functions/v1/soundcloud-userinfo` — nunca para `api.soundcloud.com/me`, que não devolve `sub`. Se `email_optional` não estiver no formulário, fechar com um `PUT` parcial em `/auth/v1/admin/custom-providers/custom:soundcloud` mandando só `{"email_optional": true}`; sem ele o login falha com "Error getting user email from external provider"
@@ -209,6 +209,7 @@ código pode contornar:
 - [x] Função `calcular_remuneracao` — algoritmo do protótipo, 31 asserções. Resolve [#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe) (percentual sobre o **bruto**), mas com semântica diferente da tabela do board — ver o cabeçalho da `0009`
 - [x] Migration `0009` — `ganho_curador` (com `base_centavos`, para o `check` do rateio existir) e RPC `enviar_avaliacao`
 - [x] Migration `0010` — RPCs `confirmar_selecao_curadores`, `devolver_claves_sem_resposta` e `avisar_prazo_72h`; índices da fila na `0006`. `0010b` corrige um estado intermediário que o `check` recusava
+- [x] Migration `0007d` — `recusar_pedido_clave`, o único estado de `situacao_pedido` que a `0007` deixou sem função. Mesmo contrato de `confirmar_pedido_clave`: `security definer`, revogada até de `authenticated`, chamada pelo webhook. **Não** regride pedido aprovado — reentrega fora de ordem é normal, e desfazer crédito é estorno, que tem outro estado e exige lançamento
 
 ### Envio de música (3)
 - [ ] Passo 1 — colar link com autodetecção de metadados (3) — os campos de link existem e são validados; a **autodetecção** (Spotify/YouTube) é fatia própria e depende de credenciais
@@ -223,12 +224,13 @@ código pode contornar:
 ### Carteira e Claves (5)
 - [x] Carteira com saldo disponível, comprometido e devolvido (5) — ⚠️ `disponivel` da view **já exclui** o comprometido (o consumo é debitado na confirmação da seleção); `comprometido` é recorte de exibição e nunca se subtrai um do outro. "Adquiridas" e "Usadas" são somadas do ledger no serviço, porque a view não as tem; "Devolvidas" vem da view, para não haver duas fontes do mesmo número
 - [x] Últimas movimentações na carteira (5) — as três mais recentes, com "Ver tudo" para o extrato
-- [ ] Lista de pacotes ativos com desconto progressivo e preço por Clave (5.1)
-- [ ] Checkout com Pix — QR e copia e cola (5.2)
-- [ ] Checkout com cartão tokenizado, sem persistir dados do cartão (5.2)
-- [ ] Estados de pagamento: processando, aprovado e recusado (5.2)
+- [x] Lista de pacotes ativos com desconto progressivo e preço por Clave (5.1) — rota própria em `/artista/pacotes`, e não uma aba da Carteira como no protótipo: "Comprar Claves" é destino de três CTAs (Carteira, estado vazio e o bloqueio por saldo), e um `caView` não tem endereço. Os números saem de `paraLista`, a **mesma** função da tela 21 — vitrine e admin não podem discordar do mesmo pacote. Sem o selo "Mais escolhido" do protótipo: ele é fixo no mock (`p[0] === 60`), e não há de onde tirar a estatística
+- [x] Checkout com Pix — **meio selecionável e pedido gravado com `meio = 'pix'`**; o QR e o copia e cola ficam **declarados como pendentes**, porque `pix_payload`/`pix_qr` nascem no provedor. Botão desabilitado com o motivo visível, como o bloco de cobrança em 7.2
+- [x] Checkout com cartão tokenizado, sem persistir dados do cartão (5.2) — os quatro campos do cartão **não têm `name`**, então não entram no `FormData` e não atravessam a rede: não chegam à Server Action, não aparecem em log e não existem para ninguém gravar. É o mesmo mecanismo do `CampoNota`. Quando o Asaas entrar, quem ganha `name` é o **token** que o SDK devolve no navegador
+- [x] Estados de pagamento: processando, aprovado e recusado (5.2) — e a recusa **grava**: a `0007d` acrescentou `recusar_pedido_clave`, porque o enum previa `recusado` desde a `0001` e ninguém podia escrevê-lo. Sem ela, um pagamento negado ficaria em `criado` dentro de `pedido_clave_pendentes_idx`, que é a fila de conciliação
+- [x] **Provedor de pagamento atrás de uma porta** (`modulos/claves/pagamento.ts`) — o Asaas segue bloqueado por [#6](open-questions.md#6-modelo-de-split-no-asaas), que é decisão de contador, e a única implementação é o **simulador que o próprio protótipo desenha** (o seletor "Simular resultado · Aprovado / Recusado"). ⚠️ Enquanto `PAGAMENTO_SIMULADO` não for `false`, a compra credita sem cobrança; com `false` a ação falha com `pagamento_indisponivel` em vez de creditar de graça. O que falta para o provedor real é **um arquivo**: nenhuma tela, ação ou RPC muda
 - [x] Extrato de Claves com filtro por tipo e estado vazio por filtro (5.3) — o filtro viaja em `?tipo=`, como a aba de Conta: dá endereço ao recorte e funciona sem JavaScript. O saldo acumulado é calculado sobre o histórico **completo**, nunca sobre a lista filtrada — senão a coluna "Saldo" mostraria números que nunca existiram na conta, e há teste fixando isso
-- [ ] Bloqueio por saldo insuficiente com alerta e CTA de compra
+- [x] Bloqueio por saldo insuficiente com alerta e CTA de compra — o alerta já existia na seleção de curadores; o que faltava era **para onde mandar a pessoa**. O CTA só aparece em `SALDO_INSUFICIENTE`: dos cinco erros daquela tela, é o único que não se resolve mudando a seleção
 
 ### Pacotes de Claves — admin (21)
 - [x] Lista de pacotes com preço por Clave e status (21) — **A1 verde**
@@ -273,8 +275,8 @@ código pode contornar:
 - [x] Estados do envio `Recebeu → Ouviu → Avaliando → Pronto` gravados. `Pronto` e `Devolvido` são reservados às RPCs por trigger
 
 ### Gate da R2
-- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — **14 de 16 verdes** (A1–A3, B1, B3, B5–B7, C1–C6, em 119 testes); faltam B2 (checkout) e B4 (detecção por link), cada um preso à sua fatia
-- [ ] Compra de Claves credita uma única vez sob webhook duplicado
+- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — **15 de 16** (A1–A3, B1–B3, B5–B7, C1–C6); falta **B4** (detecção por link), preso às credenciais de Spotify e YouTube. ⚠️ Dos cinco testes de B2, os **três de leitura** passam; os dois que confirmam ou recusam o pagamento exigem `SUPABASE_SERVICE_ROLE_KEY` no ambiente — as RPCs são revogadas de `authenticated` de propósito, e a variável é o item pendente de R0 logo acima. A cadeia de banco (criar → recusar → confirmar → confirmar de novo → recusar depois de aprovado) está provada por sonda no projeto, com rollback
+- [x] Compra de Claves credita uma única vez sob webhook duplicado — em três camadas: o índice único de uma compra por pedido (`0007`), o `return null` de `confirmar_pedido_clave` quando o pedido já está aprovado, e o `if (eventoNovo)` da ação, que só confirma quando `registrar_evento_provedor` diz que o evento é novo. O checkout simulado percorre esse caminho de propósito — um caminho que só o webhook exercita é um caminho que ninguém testa
 - [x] Avaliação concluída gera ganho com o percentual correto por classe e prazo — provado nos dois níveis: a RPC direto na suíte da `0009`, e o fio tela → ação → RPC em C6. Bronze no prazo com o feedback longo: piso 30% + 3% = 33% de R$ 20,00 → R$ 6,60
 - [ ] Devolução de 7 dias aparece no extrato e remove a faixa da fila
 - [x] `repasse + comissão = valor da transação` — garantido por `check` em `ganho_curador`, e não por convenção

@@ -820,8 +820,6 @@ export const CARTEIRA = {
   devolvidas: 'Devolvidas por falta de resposta',
 
   comprar: 'Comprar Claves',
-  /** A compra (5.1/5.2) depende da integração de pagamento — fatia do Asaas. */
-  comprarPendente: 'A compra de Claves chega junto com o pagamento, em uma próxima entrega.',
   verExtrato: 'Ver extrato',
 
   resumo: {
@@ -1023,6 +1021,12 @@ export const SELECAO = {
 
   erroSelecaoVazia: 'Escolha ao menos um curador.',
   erroSaldo: 'Saldo insuficiente para esta seleção.',
+  /**
+   * O CTA que acompanha o bloqueio por saldo. Ele só passou a existir quando a
+   * 5.1 ganhou endereço — antes, mandar a pessoa "comprar Claves" a deixaria
+   * numa Carteira com o botão desabilitado, que é pior que não oferecer nada.
+   */
+  erroSaldoAcao: 'Comprar Claves',
   erroCuradorInvalido: 'Um dos curadores escolhidos não está disponível.',
   erroSemFeedback: 'Um dos curadores não oferece o feedback escrito.',
   erroFaixaInvalida: 'Esta faixa não está mais aguardando seleção.',
@@ -1132,4 +1136,120 @@ export const FILA = {
     materia: 'Matéria',
     outro: 'Outra divulgação',
   },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Pacotes de Claves (5.1) e checkout (5.2) — protótipo do Artista
+//
+// A copy é a da tela `isPacotes`/`isCheckout` de `docs/R2/extraido/Artista.html`,
+// palavra por palavra. O que **não** vem de lá são os números: o protótipo
+// semeia `[[10, 100, 0], [30, 285, 5], [60, 540, 10], [100, 850, 15]]` em
+// `caPacotesSeed()`, e aqui os pacotes vêm de `pacote_clave`, que é o que a
+// tela 21 do admin edita. Duas listas do mesmo pacote é como o preço da
+// vitrine passa a discordar do preço cobrado.
+// ---------------------------------------------------------------------------
+
+export const PACOTES = {
+  titulo: 'Comprar Claves',
+  chamada:
+    'Quanto maior o pacote, menor o preço por Clave. O crédito não expira e vale para qualquer curador da plataforma.',
+  voltarParaCarteira: 'Voltar para a carteira',
+
+  unidade: 'Claves',
+  escolher: 'Escolher',
+  semDesconto: 'Sem desconto',
+  /** `p.eyebrow` — o desconto **derivado do valor**, não a coluna. */
+  comDesconto: (percentual: string) => `${percentual} de desconto`,
+  /** `p.porClave`, com a economia só quando existe. */
+  porClave: (preco: string) => `${preco} por Clave`,
+  porClaveComEconomia: (preco: string, economia: string) =>
+    `${preco} por Clave · economia de ${economia}`,
+
+  /**
+   * A nota de rodapé do protótipo, que ali dizia "Pagamento simulado neste
+   * protótipo". Aqui ela só aparece quando o provedor **é** o simulado — em
+   * produção com Asaas ela some, porque passaria a ser falsa.
+   */
+  notaSimulado: 'Pagamento simulado nesta versão. Nenhuma cobrança é feita.',
+
+  vazioTitulo: 'Nenhum pacote disponível',
+  vazioDescricao: 'Os pacotes voltam assim que a equipe reativar algum.',
+} as const;
+
+export const CHECKOUT = {
+  titulo: 'Checkout',
+  trocarDePacote: 'Trocar de pacote',
+
+  meioRotulo: 'Forma de pagamento',
+  meios: {
+    cartao: 'Cartão',
+    pix: 'Pix',
+  },
+
+  // ------------------------------------------------------------- cartão ----
+  numero: 'Número do cartão',
+  numeroDica: '0000 0000 0000 0000',
+  nome: 'Nome impresso',
+  nomeDica: 'Como está no cartão',
+  validade: 'Validade',
+  validadeDica: 'MM/AA',
+  cvv: 'Código de segurança',
+  cvvDica: '000',
+  /**
+   * O que a tela promete, e o que o código cumpre: os quatro campos acima
+   * **não** são enviados ao servidor. Ver `FormularioDeCheckout`.
+   */
+  cartaoNota: 'Os dados do cartão não saem deste navegador e não são guardados.',
+
+  // ---------------------------------------------------------------- pix ----
+  pixQr: 'QR PIX',
+  pixTitulo: 'Pague com o código copia e cola',
+  pixDescricao: 'O crédito entra na carteira assim que o banco confirma.',
+  pixCopiar: 'Copiar código',
+  /** O código real nasce no provedor; até lá o botão fica desabilitado. */
+  pixPendente: 'O código copia e cola chega junto com a integração de pagamento.',
+
+  // --------------------------------------------------------- simulação ----
+  simularRotulo: 'Simular resultado',
+  simulacoes: {
+    aprovado: 'Aprovado',
+    recusado: 'Recusado',
+  },
+
+  // ------------------------------------------------------------ resumo ----
+  resumoTitulo: 'Resumo do pedido',
+  quantidade: (claves: string) => `${claves} Claves`,
+  desconto: 'Desconto do pacote',
+  descontoValor: (valor: string, percentual: string) => `-${valor} (${percentual})`,
+  total: 'Total',
+  porClave: (preco: string) => `${preco} por Clave. O crédito não expira.`,
+  confirmar: 'Confirmar compra',
+
+  // ------------------------------------------------------------ estados ---
+  processando: 'Processando o pagamento',
+
+  aprovadoTitulo: 'Pagamento aprovado',
+  aprovadoTexto: (claves: string, saldo: string) =>
+    `${claves} Claves entraram na sua carteira. Novo saldo: ${saldo} Claves.`,
+  irParaCarteira: 'Ir para a carteira',
+  verNoExtrato: 'Ver no extrato',
+
+  recusadoTitulo: 'Pagamento recusado',
+  recusadoTexto: 'O banco não autorizou a cobrança.',
+  recusadoApoio:
+    'Nada foi debitado e o saldo continua o mesmo. Troque a forma de pagamento ou tente de novo.',
+  tentarDeNovo: 'Tentar de novo',
+
+  // --------------------------------------------------------------- erros ---
+  erroCartaoNumero: 'Informe um número de cartão válido.',
+  erroCartaoNome: 'Informe o nome impresso no cartão.',
+  erroCartaoValidade: 'Informe a validade no formato MM/AA.',
+  erroCartaoCvv: 'Informe o código de segurança.',
+  /**
+   * Provedor de pagamento ausente. Não é "tente de novo": tentar de novo não
+   * resolve nada enquanto o Asaas não estiver configurado.
+   */
+  erroIndisponivel: 'A compra está indisponível no momento. A equipe já foi avisada.',
+  erroPacote: 'Este pacote saiu de circulação. Escolha outro.',
+  erroGenerico: 'Não foi possível concluir a compra. Tente de novo em instantes.',
 } as const;
