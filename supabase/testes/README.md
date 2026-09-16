@@ -135,9 +135,9 @@ tipos `veiculo` e `premio`, que a `0002c` substituiu pelos seis do protótipo.
    não foi relaxar o check: foi apurar o subtotal antes de inserir (`0010b`).
 
 4. **Aritmética da tabela de remuneração.** Duas asserções que eu havia escrito
-   estavam erradas, e o teste as pegou: o piso do Ouro é 45, não 50 — os 50%
-   são o **teto na avaliação**; e o vão uniforme de 12 pontos está entre
-   `teto_base` e `teto_max`, não entre piso e `teto_base` (esse varia: 8, 3, 5).
+   estavam erradas, e o teste as pegou: o piso do Ouro era lido como 45, não 50, e o
+   vão uniforme de 12 pontos estava entre os dois tetos, não entre piso e teto.
+   (Leitura do protótipo, substituída pela tabela do board na `0009b`.)
 
 5. **Colisão de `SQLSTATE`.** A `0007b` levantou `DS030` na guarda de exclusão
    de pacote. `DS030` já era o código de "catálogo ou `configuracao`
@@ -151,11 +151,10 @@ tipos `veiculo` e `premio`, que a `0002c` substituiu pelos seis do protótipo.
    códigos precisa morar num arquivo só; espalhada por módulo, a colisão não
    tem onde aparecer.
 
-6. **`teto_max` é inalcançável.** Com os acréscimos do catálogo, o máximo real é
-   46 / 51 / 58 contra tetos de 50 / 55 / 62 — sobram exatamente 4 pontos nas
-   três classes. Ou falta um acréscimo de 4 pontos, ou os tetos são
-   aspiracionais. **Pergunta aberta para o cliente**, e o teste fixa a folga
-   para ela não mudar em silêncio.
+6. **`teto_max` era inalcançável.** Na leitura do protótipo, o máximo real era
+   46 / 51 / 58 contra tetos de 50 / 55 / 62. O cliente decidiu pela tabela do
+   board (2026-09-16): a `0009b` troca a forma para *(piso em atraso, piso no
+   prazo, teto)* com teto único, e a suíte agora afirma que o teto é alcançável.
 
 7. **`citext` comparado como `text`.** A suíte da `0003b` reenviou um convite
    para `NOVO@dissona.com.br` sobre um pendente de `novo@dissona.com.br` e

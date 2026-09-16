@@ -38,6 +38,10 @@ export function carregarEnvLocal(raiz: string = process.cwd()): void {
     ) {
       valor = valor.slice(1, -1);
     }
+    // Valor com `\$` (a chave do Asaas, `\$aact_…`) fica **escapado** aqui. O
+    // servidor que o Playwright sobe herda este ambiente, e o Next expande `$`
+    // até em variável herdada — sem a barra, a chave chegaria vazia. Quem
+    // precisa do valor literal neste processo tira a barra na hora de usar.
     process.env[chave] = valor;
   }
 }

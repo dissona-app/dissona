@@ -97,3 +97,41 @@
   font-size: var(--dsn-text-sm, var(--dsn-text-base));
   color: var(--dsn-ink);
 }
+
+/* 3.1 · "Faixa encontrada" — capa, título e artista vindos do oEmbed. */
+.detectada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-8);
+  padding: var(--dsn-space-8);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-md);
+  background: var(--dsn-surface);
+}
+
+.capaDetectada {
+  flex: none;
+  border-radius: var(--dsn-radius-md);
+  object-fit: cover;
+}
+
+.detectadaTexto {
+  display: flex;
+  flex: 1 1 12rem;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.detectadaRotulo,
+.detectadaArtista {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.detectadaTitulo {
+  font-weight: 500;
+  color: var(--dsn-ink);
+  overflow-wrap: anywhere;
+}

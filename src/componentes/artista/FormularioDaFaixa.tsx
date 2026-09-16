@@ -1,14 +1,15 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import Image from 'next/image';
+import { useActionState, useRef, useState, useTransition } from 'react';
 
 import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
 import { Campo } from '@/componentes/base/Campo';
 import { Grupo } from '@/componentes/base/Grupo';
 import { Painel } from '@/componentes/base/Painel';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import type { FaixaEmEdicao, LimitesDeUpload } from '@/modulos/faixa/tipos';
+import type { FalhaDeAcao, ResultadoDeAcao } from '@/lib/acoes';
+import type { FaixaEmEdicao, LimitesDeUpload, MetadadosDetectados } from '@/modulos/faixa/tipos';
 import { ENVIAR as TEXTOS } from '@/textos/prototipo';
 
 import estilos from './FormularioDaFaixa.module.css';
@@ -17,6 +18,7 @@ export type PropsFormularioDaFaixa = {
   readonly faixa: FaixaEmEdicao | null;
   readonly limites: LimitesDeUpload;
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
+  readonly detectar: (link: string) => Promise<ResultadoDeAcao<MetadadosDetectados>>;
 };
 
 /**
@@ -27,11 +29,12 @@ export type PropsFormularioDaFaixa = {
  * `escuta_exigida_quando_link = true`, o link é fonte de metadado e o áudio é
  * o que o curador ouve. Sem ele, o gate de 60% fica inverificável.
  *
- * A detecção por link (Spotify/YouTube) é de outra fatia — enquanto ela não
- * chega, os campos de link são preenchidos à mão, que é o caminho que o próprio
- * protótipo já oferece em "Corrigir dados".
+ * "Detectar faixa" (3.1) lê o oEmbed do link e preenche o título; capa e
+ * artista aparecem no cartão "Faixa encontrada". Sem detecção, a tela abre o
+ * preenchimento manual — o mesmo formulário, sem nada preenchido. O que foi
+ * detectado viaja num campo escondido e é conferido de novo no servidor.
  */
-export function FormularioDaFaixa({ faixa, limites, acao }: PropsFormularioDaFaixa) {
+export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormularioDaFaixa) {
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => acao(dados),
     null,
@@ -43,6 +46,16 @@ export function FormularioDaFaixa({ faixa, limites, acao }: PropsFormularioDaFai
   const [nomeDoArquivo, setNomeDoArquivo] = useState<string | null>(null);
   const [nomeDaCapa, setNomeDaCapa] = useState<string | null>(null);
 
+  const [titulo, setTitulo] = useState(faixa?.titulo ?? '');
+  const [urlSpotify, setUrlSpotify] = useState(faixa?.urlSpotify ?? '');
+  const [urlYoutube, setUrlYoutube] = useState(faixa?.urlYoutube ?? '');
+  const [detectado, setDetectado] = useState<MetadadosDetectados | null>(
+    faixa?.metadadosDetectados ?? null,
+  );
+  const [falhaDaDeteccao, setFalhaDaDeteccao] = useState<FalhaDeAcao | null>(null);
+  const [detectando, iniciarDeteccao] = useTransition();
+  const formulario = useRef<HTMLFormElement>(null);
+
   const falha = resultado !== null && !resultado.ok ? resultado : null;
 
   const MOTIVOS: Readonly<Record<string, string>> = {
@@ -51,8 +64,10 @@ export function FormularioDaFaixa({ faixa, limites, acao }: PropsFormularioDaFai
     estilo_longo: TEXTOS.erroEstiloLongo,
     data_invalida: TEXTOS.erroDataInvalida,
     data_obrigatoria: TEXTOS.erroDataObrigatoria,
+    link_vazio: TEXTOS.erroLinkVazio,
     link_invalido: TEXTOS.erroLinkInvalido,
     link_com_espaco: TEXTOS.erroLinkComEspaco,
+    link_nao_suportado: TEXTOS.erroLinkNaoSuportado,
     ausente: TEXTOS.erroArquivoAusente,
     formato: TEXTOS.erroArquivoFormato(limites.formatos),
     tamanho: TEXTOS.erroArquivoTamanho(limites.tamanhoMaxMb),
@@ -68,11 +83,49 @@ export function FormularioDaFaixa({ faixa, limites, acao }: PropsFormularioDaFai
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // A detecção lê o Spotify primeiro; o erro dela aparece no campo que ela leu.
+  const linkLido: 'urlSpotify' | 'urlYoutube' =
+    urlSpotify.trim() !== '' ? 'urlSpotify' : 'urlYoutube';
+  const motivoDoLink = falhaDaDeteccao?.detalhes?.['motivo'];
+  const erroDoLink = typeof motivoDoLink === 'string' ? MOTIVOS[motivoDoLink] : undefined;
+  const naoEncontrada = falhaDaDeteccao !== null && erroDoLink === undefined;
+
+  const detectarFaixa = () => {
+    const link = linkLido === 'urlSpotify' ? urlSpotify : urlYoutube;
+    iniciarDeteccao(async () => {
+      const resposta = await detectar(link);
+      if (resposta.ok) {
+        setFalhaDaDeteccao(null);
+        setDetectado(resposta.dados);
+        setTitulo(resposta.dados.titulo);
+      } else {
+        setFalhaDaDeteccao(resposta);
+        setDetectado(null);
+      }
+    });
+  };
+
+  // Trocar o link invalida o que foi detectado com o anterior.
+  const mudarLink = (mudar: (valor: string) => void, valor: string) => {
+    mudar(valor);
+    setDetectado(null);
+    setFalhaDaDeteccao(null);
+  };
+
+  const focarTitulo = () => {
+    formulario.current?.querySelector<HTMLInputElement>('input[name="titulo"]')?.focus();
+  };
+
   const aceitos = limites.formatos.map((f) => `.${f}`).join(',');
 
   return (
-    <form action={enviar} className={estilos.base} noValidate>
+    <form ref={formulario} action={enviar} className={estilos.base} noValidate>
       {faixa !== null ? <input type="hidden" name="faixaId" value={faixa.id} /> : null}
+      <input
+        type="hidden"
+        name="metadados"
+        value={detectado === null ? '' : JSON.stringify(detectado)}
+      />
 
       <Painel titulo={TEXTOS.enviarArquivo} sublegenda={TEXTOS.enviarArquivoApoio}>
         <label className={estilos.dropzone}>
@@ -105,25 +158,69 @@ export function FormularioDaFaixa({ faixa, limites, acao }: PropsFormularioDaFai
           <Campo
             name="urlSpotify"
             rotulo={TEXTOS.rotuloSpotify}
-            defaultValue={faixa?.urlSpotify ?? ''}
-            erro={erroDe('urlSpotify')}
+            value={urlSpotify}
+            onChange={(e) => mudarLink(setUrlSpotify, e.target.value)}
+            erro={erroDe('urlSpotify') ?? (linkLido === 'urlSpotify' ? erroDoLink : undefined)}
             inputMode="url"
           />
           <Campo
             name="urlYoutube"
             rotulo={TEXTOS.rotuloYoutube}
-            defaultValue={faixa?.urlYoutube ?? ''}
-            erro={erroDe('urlYoutube')}
+            value={urlYoutube}
+            onChange={(e) => mudarLink(setUrlYoutube, e.target.value)}
+            erro={erroDe('urlYoutube') ?? (linkLido === 'urlYoutube' ? erroDoLink : undefined)}
             inputMode="url"
           />
         </div>
+
+        <div className={estilos.acoes}>
+          <Botao
+            type="button"
+            variante="secundario"
+            carregando={detectando}
+            disabled={urlSpotify.trim() === '' && urlYoutube.trim() === ''}
+            onClick={detectarFaixa}
+          >
+            {detectando ? TEXTOS.detectando : TEXTOS.detectar}
+          </Botao>
+        </div>
+
+        {detectado !== null ? (
+          <div className={estilos.detectada} aria-live="polite">
+            {detectado.capaUrl !== null ? (
+              <Image
+                // A capa vem do CDN do provedor; `unoptimized` evita abrir
+                // `remotePatterns` para hosts de terceiros.
+                unoptimized
+                src={detectado.capaUrl}
+                alt={TEXTOS.capaDetectada(detectado.titulo)}
+                width={64}
+                height={64}
+                className={estilos.capaDetectada}
+              />
+            ) : null}
+            <span className={estilos.detectadaTexto}>
+              <span className={estilos.detectadaRotulo}>{TEXTOS.faixaEncontrada}</span>
+              <span className={estilos.detectadaTitulo}>{detectado.titulo}</span>
+              {detectado.artista !== null ? (
+                <span className={estilos.detectadaArtista}>{detectado.artista}</span>
+              ) : null}
+            </span>
+            <Botao type="button" variante="neutro" tamanho="sm" onClick={focarTitulo}>
+              {TEXTOS.corrigirDados}
+            </Botao>
+          </div>
+        ) : null}
+
+        {naoEncontrada ? <Aviso tom="alerta">{TEXTOS.naoDetectada}</Aviso> : null}
       </Painel>
 
       <Painel titulo={TEXTOS.detalhesTitulo} nivel={3}>
         <Campo
           name="titulo"
           rotulo={TEXTOS.rotuloTitulo}
-          defaultValue={faixa?.titulo ?? ''}
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
           erro={erroDe('titulo')}
           required
         />

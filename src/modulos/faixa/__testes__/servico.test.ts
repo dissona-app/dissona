@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { passoAlcancado, podeAbrir, rotuloDaFonte, validarAudio } from '../servico';
-import type { FaixaEmEdicao, LimitesDeUpload } from '../tipos';
+import {
+  enderecoDoOembed,
+  interpretarOembed,
+  lerMetadados,
+  passoAlcancado,
+  podeAbrir,
+  provedorDoLink,
+  rotuloDaFonte,
+  validarAudio,
+} from '../servico';
+import type { FaixaEmEdicao, LimitesDeUpload, MetadadosDetectados } from '../tipos';
 
 /**
  * Regra do envio (módulo 3).
@@ -35,6 +44,7 @@ const FAIXA: FaixaEmEdicao = {
   arquivoCaminho: 'uid/faixa.mp3',
   duracaoSegundos: 212,
   situacao: 'rascunho',
+  metadadosDetectados: null,
 };
 
 describe('validarAudio', () => {
@@ -119,8 +129,100 @@ describe('podeAbrir', () => {
 
 describe('rotuloDaFonte', () => {
   it('distingue link, arquivo e preenchimento manual', () => {
-    expect(rotuloDaFonte({ ...FAIXA, origem: 'link' })).toBe('link');
+    expect(rotuloDaFonte({ ...FAIXA, origem: 'link', metadadosDetectados: DETECTADO })).toBe(
+      'link',
+    );
     expect(rotuloDaFonte(FAIXA)).toBe('arquivo');
     expect(rotuloDaFonte({ ...FAIXA, arquivoCaminho: null })).toBe('manual');
+  });
+
+  it('link sem detecção é preenchimento manual', () => {
+    expect(rotuloDaFonte({ ...FAIXA, origem: 'link' })).toBe('manual');
+  });
+});
+
+const DETECTADO: MetadadosDetectados = {
+  provedor: 'youtube',
+  url: 'https://www.youtube.com/watch?v=abc',
+  titulo: 'Aurora',
+  artista: 'Banda',
+  capaUrl: 'https://i.ytimg.com/vi/abc/hqdefault.jpg',
+};
+
+describe('provedorDoLink', () => {
+  it('reconhece Spotify e YouTube pelo host, com ou sem esquema', () => {
+    expect(provedorDoLink('https://open.spotify.com/track/123')).toBe('spotify');
+    expect(provedorDoLink('open.spotify.com/track/123')).toBe('spotify');
+    expect(provedorDoLink('https://www.youtube.com/watch?v=abc')).toBe('youtube');
+    expect(provedorDoLink('youtu.be/abc')).toBe('youtube');
+    expect(provedorDoLink('https://music.youtube.com/watch?v=abc')).toBe('youtube');
+  });
+
+  it('recusa host que só menciona o provedor — a URL vai para um fetch do servidor', () => {
+    expect(provedorDoLink('https://evil.com/?u=open.spotify.com')).toBeNull();
+    expect(provedorDoLink('https://open.spotify.com.evil.com/track/1')).toBeNull();
+    expect(provedorDoLink('https://youtube.com@evil.com/x')).toBeNull();
+  });
+
+  it('recusa http e o que não é URL', () => {
+    expect(provedorDoLink('http://open.spotify.com/track/1')).toBeNull();
+    expect(provedorDoLink('não é link')).toBeNull();
+  });
+});
+
+describe('enderecoDoOembed', () => {
+  it('monta o endpoint de cada provedor com o link codificado', () => {
+    expect(enderecoDoOembed('open.spotify.com/track/1')).toBe(
+      'https://open.spotify.com/oembed?url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F1',
+    );
+    expect(enderecoDoOembed('https://youtu.be/abc')).toBe(
+      'https://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fyoutu.be%2Fabc',
+    );
+    expect(enderecoDoOembed('https://evil.com')).toBeNull();
+  });
+});
+
+describe('interpretarOembed', () => {
+  it('traduz a resposta do YouTube', () => {
+    expect(
+      interpretarOembed('https://www.youtube.com/watch?v=abc', {
+        title: 'Aurora',
+        author_name: 'Banda',
+        thumbnail_url: 'https://i.ytimg.com/vi/abc/hqdefault.jpg',
+      }),
+    ).toEqual(DETECTADO);
+  });
+
+  it('aceita o Spotify, que não informa artista', () => {
+    expect(
+      interpretarOembed('https://open.spotify.com/track/1', {
+        title: 'Aurora',
+        thumbnail_url: 'https://image-cdn-ak.spotifycdn.com/image/x',
+      }),
+    ).toMatchObject({ provedor: 'spotify', artista: null });
+  });
+
+  it('sem título não há faixa encontrada; capa fora de https é descartada', () => {
+    expect(interpretarOembed('https://youtu.be/abc', { author_name: 'Banda' })).toBeNull();
+    expect(interpretarOembed('https://youtu.be/abc', 'erro')).toBeNull();
+    expect(
+      interpretarOembed('https://youtu.be/abc', { title: 'A', thumbnail_url: 'javascript:1' }),
+    ).toBeNull();
+  });
+});
+
+describe('lerMetadados', () => {
+  it('lê do banco e do campo escondido', () => {
+    expect(lerMetadados(DETECTADO)).toEqual(DETECTADO);
+    expect(lerMetadados(JSON.stringify(DETECTADO))).toEqual(DETECTADO);
+    expect(lerMetadados('')).toBeNull();
+    expect(lerMetadados(null)).toBeNull();
+    expect(lerMetadados('{quebrado')).toBeNull();
+  });
+
+  it('descarta metadado forjado: provedor e URL têm de concordar', () => {
+    expect(lerMetadados({ ...DETECTADO, url: 'https://evil.com/x' })).toBeNull();
+    expect(lerMetadados({ ...DETECTADO, provedor: 'spotify' })).toBeNull();
+    expect(lerMetadados({ ...DETECTADO, capaUrl: 'http://x.com/a.jpg' })).toBeNull();
   });
 });

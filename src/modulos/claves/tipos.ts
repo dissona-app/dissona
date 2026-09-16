@@ -96,10 +96,30 @@ export const RESULTADOS_SIMULADOS = ['aprovado', 'recusado'] as const;
 export type ResultadoSimulado = (typeof RESULTADOS_SIMULADOS)[number];
 
 /** O desfecho de uma compra, como a tela 5.2 o mostra. */
-export type DesfechoDaCompra = {
-  readonly pedidoId: string;
-  /** Claves creditadas, já formatadas — `bigint` não atravessa Server→Client. */
-  readonly claves: string;
-  /** O saldo depois do crédito, para o "Novo saldo: … Claves". */
-  readonly saldo: string;
-};
+export type DesfechoDaCompra =
+  | {
+      readonly situacao: 'aprovado';
+      readonly pedidoId: string;
+      /** Claves creditadas, já formatadas — `bigint` não atravessa Server→Client. */
+      readonly claves: string;
+      /** O saldo depois do crédito, para o "Novo saldo: … Claves". */
+      readonly saldo: string;
+    }
+  | {
+      /**
+       * Pix gerado e ainda não pago. O crédito vem do webhook do Asaas; a tela
+       * mostra o QR code e acompanha o pedido até ele sair deste estado.
+       */
+      readonly situacao: 'aguardando_pix';
+      readonly pedidoId: string;
+      /** O "copia e cola". */
+      readonly pixPayload: string;
+      /** PNG em base64, sem o prefixo `data:`. */
+      readonly pixQr: string;
+    };
+
+/** O que a tela do Pix recebe ao consultar o pedido de novo. */
+export type AcompanhamentoDoPix =
+  | { readonly situacao: 'aguardando' }
+  | { readonly situacao: 'recusado' }
+  | { readonly situacao: 'aprovado'; readonly claves: string; readonly saldo: string };

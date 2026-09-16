@@ -284,8 +284,8 @@ causou.
 | 1 | O grupo Produção não tinha item nomeado | Tem **dois**: Mixagem e Arranjo. O board perdeu dois itens, não um | `0008` |
 | 2 | Quais cinco critérios são obrigatórios | afinação, ritmo, melodia, personalidade, conexão — **não** um por grupo | `0004` |
 | 3 | Escuta mínima 60% × 100% | **60%**; a copy do artista é que muda | `0004` |
-| 4 | Semântica de `remuneracao.*` | *(piso, teto na avaliação, teto com compartilhamento)*, e não *(atraso, prazo, teto)*. **RF-066 foi corrigido** | `0004`, `0009` |
-| 5 | Penalidade de atraso | −8 pontos no **piso**, mínimo 15. `teto_atraso_percentual` deixou de existir | `0004`, `0009` |
+| 4 | Semântica de `remuneracao.*` | **Tabela do board**: *(piso em atraso, piso no prazo, teto)* — decisão do cliente em 2026-09-16 ([#5](../open-questions.md)), revertendo a leitura do protótipo. Bronze no prazo recebe 38% | `0004`, `0009`, `0009b` |
+| 5 | Penalidade de atraso | Piso de atraso da tabela e total capado em `teto_atraso_percentual` (50). A penalidade de −8 pontos do protótipo saiu | `0009b` |
 | 6 | `evento_notificacao.destinatario` | `papel[]`, e não escalar: cinco eventos servem artista e curador | `0005` |
 | 7 | `log_auditoria.registro_id` | `text`, e não `uuid`: `lancamento_clave.id` é `bigint` | `0003` |
 | 8 | Faixa das migrations | `0011` são os jobs de R1+R2; a R3 começa em `0012` | `0011` |
@@ -477,6 +477,12 @@ cópia para o filtro.
 
 **Custo de corrigir agora:** uma linha em `GENEROS_DO_ARTISTA`. Depois da R3,
 é migração de dado.
+
+> **Adotado em 2026-09-16: catálogo único, com "Pagode" no lado do artista.**
+> É o default reversível — acrescentar não invalida dado nenhum já gravado —, e
+> um teste em `modulos/artista/__testes__/esquemas.test.ts` falha se as duas
+> listas voltarem a divergir. Se o cliente disser que são dois catálogos de
+> propósito, basta remover a linha. A mudança para tabela fica para a R3.
 
 ### 2. Onde o perfil do artista foi além do protótipo
 

@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { CHAVES_PENDENTES, ESQUEMAS_CONFIGURACAO, TODAS_AS_CHAVES } from '../chaves';
 
 /**
- * Deriva entre o registro Zod e o seed da migration `0004`.
+ * Deriva entre o registro Zod e as chaves que as migrations deixam no banco.
  *
  * O registro aqui e o seed no banco descrevem o mesmo conjunto de chaves, e
  * nada os mantém sincronizados automaticamente. Uma chave acrescentada só no
@@ -17,27 +17,69 @@ import { CHAVES_PENDENTES, ESQUEMAS_CONFIGURACAO, TODAS_AS_CHAVES } from '../cha
 
 const MIGRATIONS = join(process.cwd(), 'supabase', 'migrations');
 
-function lerSeedDaConfiguracao(): readonly string[] {
-  const arquivo = readdirSync(MIGRATIONS).find((nome) => nome.includes('_0004_configuracao'));
-  if (arquivo === undefined) {
-    throw new Error('migration 0004_configuracao não encontrada em supabase/migrations/');
-  }
+/** As chaves de cada tupla de um `insert into configuracao ... values`. */
+function chavesInseridas(sql: string): readonly string[] {
+  const inicio = sql.indexOf('insert into configuracao');
+  if (inicio === -1) return [];
 
-  const sql = readFileSync(join(MIGRATIONS, arquivo), 'utf8');
-  const seed = sql.slice(sql.indexOf('insert into configuracao'));
+  // Até o fim do statement — `)` seguido de `;` no fim da linha. Sem esse
+  // recorte, uma linha qualquer do resto do arquivo que começasse com `  ('`
+  // viraria chave.
+  const resto = sql.slice(inicio);
+  const fim = resto.search(/\);\s*$/m);
+  const statement = fim === -1 ? resto : resto.slice(0, fim);
 
   // As chaves são o primeiro literal de cada tupla do `values`. O grupo 1
   // sempre casa quando a regex casa, mas `noUncheckedIndexedAccess` não sabe
   // disso — daí o filtro, em vez de um `!`.
-  return [...seed.matchAll(/^ {2}\('([^']+)',/gm)]
+  return [...statement.matchAll(/^ {2}\('([^']+)',/gm)]
     .map((casado) => casado[1])
     .filter((chave): chave is string => chave !== undefined);
 }
 
-describe('registro de chaves de configuração', () => {
-  const doSeed = lerSeedDaConfiguracao();
+/** As chaves de um `delete from configuracao where chave in (...)`. */
+function chavesRemovidas(sql: string): readonly string[] {
+  const casado = /delete from configuracao\s+where chave in \(([^)]*)\)/.exec(sql);
+  if (casado?.[1] === undefined) return [];
+  return [...casado[1].matchAll(/'([^']+)'/g)]
+    .map((c) => c[1])
+    .filter((chave): chave is string => chave !== undefined);
+}
 
-  it('o seed da 0004 e o registro Zod cobrem exatamente as mesmas chaves', () => {
+/**
+ * O conjunto de chaves **depois de todas as migrations**, e não só do seed.
+ *
+ * A `0009b` tira `penalidade_atraso_pontos` e `piso_minimo_atraso_percentual` e
+ * devolve `teto_atraso_percentual`. Comparar o registro Zod só com a `0004`
+ * faria este teste acusar deriva exatamente quando o registro está certo. O
+ * prefixo de timestamp do nome é a ordem de aplicação, então a ordem
+ * lexicográfica dos arquivos é a ordem do banco.
+ */
+function lerChavesDaConfiguracao(): readonly string[] {
+  const arquivos = readdirSync(MIGRATIONS)
+    .filter((nome) => nome.endsWith('.sql'))
+    .sort();
+
+  if (!arquivos.some((nome) => nome.includes('_0004_configuracao'))) {
+    throw new Error('migration 0004_configuracao não encontrada em supabase/migrations/');
+  }
+
+  const chaves: string[] = [];
+  for (const arquivo of arquivos) {
+    const sql = readFileSync(join(MIGRATIONS, arquivo), 'utf8');
+    for (const removida of chavesRemovidas(sql)) {
+      const indice = chaves.indexOf(removida);
+      if (indice !== -1) chaves.splice(indice, 1);
+    }
+    chaves.push(...chavesInseridas(sql));
+  }
+  return chaves;
+}
+
+describe('registro de chaves de configuração', () => {
+  const doSeed = lerChavesDaConfiguracao();
+
+  it('as migrations e o registro Zod cobrem exatamente as mesmas chaves', () => {
     expect([...doSeed].sort()).toEqual([...TODAS_AS_CHAVES].sort());
   });
 

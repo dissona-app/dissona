@@ -1,32 +1,26 @@
 import 'server-only';
 
 /**
- * A porta do provedor de pagamento, e a única implementação que existe hoje.
+ * A porta do provedor de pagamento, e as duas implementações: o **simulador**
+ * do protótipo e o **Asaas**.
  *
- * ## Por que existe uma porta, se só há um provedor
+ * ## Qual está em vigor
  *
- * Porque o provedor real está **bloqueado por decisão de terceiro**: o modelo
- * de repasse do Asaas — transferência, subcontas ou split diferido — depende
- * do contador do cliente ([#6](../../../docs/open-questions.md)), e enquanto
- * ele não sai não há conta, chave nem webhook. Sem a porta, as telas 5.1 e 5.2
- * ficariam esperando por uma decisão fiscal, e é exatamente o que já
- * aconteceu: a Carteira passou a release inteira com o botão "Comprar Claves"
- * desabilitado.
+ * `PAGAMENTO_SIMULADO=false` liga o Asaas; qualquer outro valor (inclusive a
+ * ausência) mantém o simulador, que é o que o protótipo da R2 desenha — o
+ * seletor "Simular resultado" e a nota de que nada é cobrado. Sem simulador e
+ * sem `ASAAS_API_KEY`, a compra **falha**: creditar Clave de graça porque a
+ * configuração está pela metade é o pior desfecho possível.
  *
- * Com a porta, o que falta é **um arquivo** — `asaas.ts`, implementando
- * `ProvedorDePagamento` —, e nenhuma tela, ação ou RPC muda.
+ * ## Os três desfechos
  *
- * ## O que o simulador é, e o que ele não é
+ *  - `aprovado` — cartão autorizado (ou simulação aprovada). A ação credita na
+ *    hora, pelo mesmo caminho idempotente do webhook.
+ *  - `recusado` — o emissor negou. Nada é cobrado.
+ *  - `pendente` — Pix gerado. Quem credita é o webhook, quando o Pix cair.
  *
- * Ele é o que o protótipo da R2 desenha: a tela tem o controle "Simular
- * resultado · Aprovado / Recusado", e a nota "Pagamento simulado. Nenhuma
- * cobrança é feita". Não é um mock de teste que vazou para o código de
- * produção — é a especificação da release, e some com `PAGAMENTO_SIMULADO=false`.
- *
- * Ele **não** cobra, não fala com banco nenhum e não tem estado. O que ele
- * devolve é o desfecho que a pessoa escolheu na tela, com um id de evento
- * único — e é esse id que faz o crédito passar pelo mesmo caminho idempotente
- * do webhook real, em vez de por um atalho que só existiria na simulação.
+ * O split com curadores ([#6](../../../docs/open-questions.md)) continua fora:
+ * a cobrança cai inteira na conta da Dissona.
  */
 
 import { randomUUID } from 'node:crypto';
@@ -34,33 +28,69 @@ import { randomUUID } from 'node:crypto';
 import { pagamentoSimulado } from '@/lib/ambiente';
 import { CodigoErro, falhar } from '@/lib/erros';
 
+import {
+  buscarClientePorCpf,
+  criarCliente,
+  criarCobrancaCartao,
+  criarCobrancaPix,
+  ehRecusaDoCartao,
+  lerQrCodePix,
+} from './asaas';
 import type { MeioPagamento, ResultadoSimulado } from './tipos';
 
-/** O nome que vai para `evento_provedor.provedor` e `pedido_clave.provedor`. */
 export const PROVEDOR_SIMULADO = 'simulado';
+export const PROVEDOR_ASAAS = 'asaas';
+
+export type Comprador = {
+  readonly perfilId: string;
+  readonly nome: string;
+  readonly email: string;
+  readonly cpf: string;
+};
+
+export type Cartao = {
+  readonly titular: string;
+  readonly numero: string;
+  readonly mes: string;
+  readonly ano: string;
+  readonly cvv: string;
+  readonly telefone: string;
+  readonly cep: string;
+};
 
 export type Cobranca = {
   readonly pedidoId: string;
   readonly meio: MeioPagamento;
-  /** Só o simulador lê: com provedor real quem decide é o banco. */
+  readonly valorCentavos: bigint;
+  readonly descricao: string;
+  readonly comprador: Comprador;
+  /** Só no meio `cartao`. */
+  readonly cartao?: Cartao | undefined;
+  readonly ipRemoto: string | null;
+  /** Só o simulador lê. */
   readonly desfechoDesejado?: ResultadoSimulado | undefined;
 };
 
-/**
- * O que o provedor devolve.
- *
- * `idEvento` é o que torna a confirmação idempotente: é a chave primária de
- * `evento_provedor`, e é por ela que uma segunda entrega do mesmo desfecho não
- * credita duas vezes. O provedor real o tira da carga do webhook; o simulado
- * gera um UUID, porque duas compras do mesmo pacote no mesmo segundo são
- * eventos diferentes e precisam de ids diferentes.
- */
-export type RespostaDoProvedor = {
-  readonly provedor: string;
-  readonly idEvento: string;
-  readonly tipo: string;
-  readonly aprovado: boolean;
-};
+export type RespostaDoProvedor =
+  | {
+      readonly desfecho: 'aprovado' | 'recusado';
+      readonly provedor: string;
+      /**
+       * A chave de `evento_provedor`. O simulador gera um UUID; o Asaas usa o
+       * id da cobrança — o webhook da mesma cobrança chega com outro id
+       * (`evt_…`) e cai em `confirmar_pedido_clave`, que não credita duas vezes.
+       */
+      readonly idEvento: string;
+      readonly tipo: string;
+      readonly cobrancaId: string | null;
+    }
+  | {
+      readonly desfecho: 'pendente';
+      readonly provedor: string;
+      readonly cobrancaId: string;
+      readonly pixPayload: string;
+      readonly pixQr: string;
+    };
 
 export type ProvedorDePagamento = {
   readonly nome: string;
@@ -74,33 +104,105 @@ const simulador: ProvedorDePagamento = {
   simulado: true,
 
   cobrar(cobranca) {
-    // Sem `await`: não há I/O nenhuma aqui, e fingir latência com um `setTimeout`
-    // só tornaria a suíte lenta. O estado "Processando" da tela é do React, e
-    // existe porque a Server Action leva tempo de verdade — ela fala com o
-    // banco duas vezes.
     const aprovado = cobranca.desfechoDesejado !== 'recusado';
-
     return Promise.resolve({
+      desfecho: aprovado ? 'aprovado' : 'recusado',
       provedor: PROVEDOR_SIMULADO,
       idEvento: `${PROVEDOR_SIMULADO}:${randomUUID()}`,
       tipo: aprovado ? 'PAYMENT_CONFIRMED' : 'PAYMENT_REFUSED',
-      aprovado,
+      cobrancaId: null,
     });
   },
 };
 
-/**
- * O provedor em vigor.
- *
- * Com `PAGAMENTO_SIMULADO=false` e nenhum provedor real implementado, isto
- * **falha** em vez de cair no simulador — creditar Clave de graça porque a
- * configuração está pela metade é o pior desfecho possível dos três.
- */
+/** Hoje em `YYYY-MM-DD`, no fuso do Brasil — é o que o Asaas compara. */
+function hojeNoBrasil(diasAFrente = 0): string {
+  const data = new Date(Date.now() + diasAFrente * 86_400_000);
+  return data.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+}
+
+const asaas: ProvedorDePagamento = {
+  nome: PROVEDOR_ASAAS,
+  simulado: false,
+
+  async cobrar(cobranca) {
+    const { comprador } = cobranca;
+    const cliente =
+      (await buscarClientePorCpf(comprador.cpf)) ??
+      (await criarCliente({
+        nome: comprador.nome,
+        cpfCnpj: comprador.cpf,
+        email: comprador.email,
+        referencia: comprador.perfilId,
+      }));
+
+    if (cobranca.meio === 'pix') {
+      const pix = await criarCobrancaPix({
+        clienteId: cliente.id,
+        valorCentavos: cobranca.valorCentavos,
+        pedidoId: cobranca.pedidoId,
+        descricao: cobranca.descricao,
+        vencimento: hojeNoBrasil(1),
+      });
+      const qr = await lerQrCodePix(pix.id);
+      return {
+        desfecho: 'pendente',
+        provedor: PROVEDOR_ASAAS,
+        cobrancaId: pix.id,
+        pixPayload: qr.payload,
+        pixQr: qr.encodedImage,
+      };
+    }
+
+    const cartao = cobranca.cartao;
+    if (cartao === undefined) falhar(CodigoErro.ENTRADA_INVALIDA, { motivo: 'cartao_ausente' });
+
+    try {
+      const cobrado = await criarCobrancaCartao({
+        clienteId: cliente.id,
+        valorCentavos: cobranca.valorCentavos,
+        pedidoId: cobranca.pedidoId,
+        descricao: cobranca.descricao,
+        vencimento: hojeNoBrasil(),
+        cartao,
+        titular: {
+          nome: cartao.titular,
+          email: comprador.email,
+          cpf: comprador.cpf,
+          cep: cartao.cep,
+          telefone: cartao.telefone,
+        },
+        ipRemoto: cobranca.ipRemoto,
+      });
+      const aprovado = cobrado.status === 'CONFIRMED' || cobrado.status === 'RECEIVED';
+      return {
+        desfecho: aprovado ? 'aprovado' : 'recusado',
+        provedor: PROVEDOR_ASAAS,
+        idEvento: `${PROVEDOR_ASAAS}:cobranca:${cobrado.id}`,
+        tipo: aprovado ? 'PAYMENT_CONFIRMED' : `PAYMENT_${cobrado.status}`,
+        cobrancaId: cobrado.id,
+      };
+    } catch (erro) {
+      if (!ehRecusaDoCartao(erro)) throw erro;
+      return {
+        desfecho: 'recusado',
+        provedor: PROVEDOR_ASAAS,
+        idEvento: `${PROVEDOR_ASAAS}:recusa:${randomUUID()}`,
+        tipo: 'PAYMENT_CREDIT_CARD_REFUSED',
+        cobrancaId: null,
+      };
+    }
+  },
+};
+
+/** O provedor em vigor. Ver o cabeçalho. */
 export function provedorEmVigor(): ProvedorDePagamento {
-  if (!pagamentoSimulado()) {
+  if (pagamentoSimulado()) return simulador;
+  const chave = process.env.ASAAS_API_KEY;
+  if (chave === undefined || chave.trim() === '') {
     falhar(CodigoErro.PAGAMENTO_INDISPONIVEL, { motivo: 'provedor_nao_configurado' });
   }
-  return simulador;
+  return asaas;
 }
 
 /** A tela pergunta isto para decidir se mostra o seletor de simulação. */

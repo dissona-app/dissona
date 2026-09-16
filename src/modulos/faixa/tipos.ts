@@ -38,14 +38,26 @@ export type FaixaEmEdicao = {
   readonly arquivoCaminho: string | null;
   readonly duracaoSegundos: number | null;
   readonly situacao: SituacaoFaixa;
+  /** O que a detecção por link trouxe. `null` = nada detectado. */
+  readonly metadadosDetectados: MetadadosDetectados | null;
 };
 
-/** Metadados que a autodetecção por link devolve. Todos opcionais. */
+/** De onde a detecção leu — o link colado decide. */
+export const PROVEDORES_DE_LINK = ['spotify', 'youtube'] as const;
+export type ProvedorDeLink = (typeof PROVEDORES_DE_LINK)[number];
+
+/**
+ * Metadados que a autodetecção por link devolve (`faixa.metadados_detectados`).
+ *
+ * Só o título é garantido: é o único campo que o oEmbed dos dois provedores
+ * sempre traz. O Spotify não informa artista; nenhum dos dois informa duração.
+ */
 export type MetadadosDetectados = {
-  readonly titulo?: string;
-  readonly capaUrl?: string;
-  readonly duracaoSegundos?: number;
-  readonly artista?: string;
+  readonly provedor: ProvedorDeLink;
+  readonly url: string;
+  readonly titulo: string;
+  readonly artista: string | null;
+  readonly capaUrl: string | null;
 };
 
 /**

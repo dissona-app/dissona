@@ -81,6 +81,8 @@ export const ROTA = {
   ADMIN_CONVITE: '/admin/convite',
   API_AUTH_CALLBACK: '/api/auth/callback',
   API_AUTH_CONFIRMAR: '/api/auth/confirmar',
+  /** Webhook do Asaas: sem sessão — quem autentica é o header `asaas-access-token`. */
+  API_WEBHOOK_ASAAS: '/api/webhooks/asaas',
 } as const;
 
 /**
@@ -107,7 +109,11 @@ const PUBLICAS: readonly string[] = [ROTA.HOME, ROTA.TERMOS, ROTA.PRIVACIDADE];
  * ponto em que a sessão nasce — o `code` do OAuth e o `token_hash` do e-mail
  * chegam aqui para virar cookie.
  */
-const API_SEM_SESSAO: readonly string[] = [ROTA.API_AUTH_CALLBACK, ROTA.API_AUTH_CONFIRMAR];
+const API_SEM_SESSAO: readonly string[] = [
+  ROTA.API_AUTH_CALLBACK,
+  ROTA.API_AUTH_CONFIRMAR,
+  ROTA.API_WEBHOOK_ASAAS,
+];
 
 /** `(auth)` — sem sessão; redireciona quem já está autenticado. */
 const AUTH_SEM_SESSAO: readonly string[] = [ROTA.ENTRAR, ROTA.CADASTRAR, ROTA.RECUPERAR_SENHA];

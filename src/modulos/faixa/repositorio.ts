@@ -14,13 +14,14 @@ import { estourarSeErro } from '@/lib/supabase/erros';
 import { criarClienteServidor } from '@/lib/supabase/servidor';
 import type { Database } from '@/lib/supabase/tipos-bd';
 
-import type { FaixaEmEdicao } from './tipos';
+import { lerMetadados } from './servico';
+import type { FaixaEmEdicao, MetadadosDetectados } from './tipos';
 
 /** O tipo gerado do `update` — nunca um `Record<string, unknown>` solto. */
 type PatchDeFaixa = Database['public']['Tables']['faixa']['Update'];
 
 const COLUNAS =
-  'id, titulo, capa_caminho, estilo, genero, contexto_curador, lancada, data_lancamento, origem, url_spotify, url_youtube, arquivo_caminho, duracao_segundos, situacao';
+  'id, titulo, capa_caminho, estilo, genero, contexto_curador, lancada, data_lancamento, origem, url_spotify, url_youtube, arquivo_caminho, duracao_segundos, situacao, metadados_detectados';
 
 type Linha = {
   readonly id: string;
@@ -37,6 +38,7 @@ type Linha = {
   readonly arquivo_caminho: string | null;
   readonly duracao_segundos: number | null;
   readonly situacao: FaixaEmEdicao['situacao'];
+  readonly metadados_detectados: unknown;
 };
 
 function paraDominio(linha: Linha): FaixaEmEdicao {
@@ -55,6 +57,7 @@ function paraDominio(linha: Linha): FaixaEmEdicao {
     arquivoCaminho: linha.arquivo_caminho,
     duracaoSegundos: linha.duracao_segundos,
     situacao: linha.situacao,
+    metadadosDetectados: lerMetadados(linha.metadados_detectados),
   };
 }
 
@@ -84,6 +87,7 @@ export type NovaFaixa = {
   readonly lancada: boolean | null;
   readonly dataLancamento: string | null;
   readonly duracaoSegundos: number | null;
+  readonly metadadosDetectados: MetadadosDetectados | null;
 };
 
 export async function inserir(dados: NovaFaixa): Promise<string> {
@@ -103,6 +107,7 @@ export async function inserir(dados: NovaFaixa): Promise<string> {
       lancada: dados.lancada,
       data_lancamento: dados.dataLancamento,
       duracao_segundos: dados.duracaoSegundos,
+      metadados_detectados: dados.metadadosDetectados,
       situacao: 'rascunho',
     })
     .select('id')
@@ -147,6 +152,7 @@ export async function atualizarDetalhes(
     lancada: dados.lancada,
     data_lancamento: dados.dataLancamento,
     duracao_segundos: dados.duracaoSegundos,
+    metadados_detectados: dados.metadadosDetectados,
   };
   // Só sobrescreve o áudio quando veio arquivo novo — reenviar o passo 1 sem
   // trocar o arquivo não pode apagar o que já está no bucket.

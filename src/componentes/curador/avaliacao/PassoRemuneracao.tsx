@@ -41,15 +41,11 @@ const ORDEM: readonly (keyof OpcionaisCumpridos)[] = [
  * Depois de concluída, o que aparece já não é previsão: é `ganho_curador`, que
  * congelou classe, prazo e percentuais do momento da entrega.
  *
- * ## Duas pendências que esta tela torna visíveis
+ * ## A tabela é a do board
  *
- *  - **#5** — um Bronze no prazo sem nenhum opcional recebe **30%**, o piso da
- *    classe, e não os 38% que o RF-066 afirma. 38% é o teto na avaliação. O
- *    protótipo tem precedência e é o que está implementado; a confirmação do
- *    cliente segue pendente.
- *  - **#5b** — com os acréscimos do catálogo o `teto_max` **nunca** é
- *    alcançado: o máximo real é 46/51/58 contra tetos de 50/55/62. A frase do
- *    teto é a do protótipo, e exibe um número inalcançável.
+ * Pela resposta do cliente à open-questions #5 (2026-09-16): piso em atraso,
+ * piso no prazo e um teto só — Bronze no prazo sem opcionais recebe **38%**.
+ * Com um teto só, ele é alcançável nas três classes, e a #5b deixou de existir.
  */
 export function PassoRemuneracao({ tela, voltarPara, acao }: PropsPassoRemuneracao) {
   const { item, avaliacao, criterios, regras, remuneracao, classe } = tela;
@@ -87,7 +83,7 @@ export function PassoRemuneracao({ tela, voltarPara, acao }: PropsPassoRemunerac
             </span>
             <span className={estilos.linhaApoio}>
               {remuneracao.penalidadePrazo
-                ? AVALIAR.pisoNotaAtrasado(tela.penalidadeAtrasoPontos)
+                ? AVALIAR.pisoNotaAtrasado(tela.tetoAtrasoPercentual)
                 : AVALIAR.pisoNotaNoPrazo}
             </span>
           </span>
@@ -121,7 +117,7 @@ export function PassoRemuneracao({ tela, voltarPara, acao }: PropsPassoRemunerac
         </ul>
 
         <p className={estilos.notaTeto}>
-          {AVALIAR.tetoNota(rotuloDaClasse, tela.tetoBasePercentual, remuneracao.tetoPercentual)}
+          {AVALIAR.tetoNota(rotuloDaClasse, remuneracao.tetoPercentual)}
         </p>
       </Painel>
 

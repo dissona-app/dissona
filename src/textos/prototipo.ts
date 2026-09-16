@@ -737,14 +737,14 @@ export const ADMIN_NAVEGACAO = {
 // ---------------------------------------------------------------------------
 
 /**
- * Catálogo de gêneros do **artista**.
+ * Catálogo de gêneros do **artista** — o mesmo do curador.
  *
- * São onze, e o do curador (`CURADOR_CADASTRO.generos`) são doze: o protótipo
- * do curador tem "Pagode" e o do artista não. A divergência é do próprio
- * material e está registrada em
- * [07-pendencias](docs/prd/07-pendencias-e-divergencias.md) — importa porque a
- * R3 faz matching de gênero entre a faixa e o que o curador declara receber, e
- * vocabulários diferentes deixam "Pagode" sem par possível.
+ * O protótipo do artista tem onze e o do curador doze ("Pagode" só no
+ * curador). A R3 faz matching de gênero entre a faixa e o que o curador
+ * declara receber, e vocabulários diferentes deixariam "Pagode" sem par
+ * possível. Adotado um catálogo só, com "Pagode" (2026-09-16, registrado em
+ * [07-pendencias](docs/prd/07-pendencias-e-divergencias.md)); um teste
+ * garante que as duas listas não voltem a divergir.
  *
  * A mesma lista alimenta o passo 2 do envio (módulo 3), que é onde o protótipo
  * do artista a usa pela segunda vez.
@@ -758,6 +758,7 @@ export const GENEROS_DO_ARTISTA = [
   'Rock alternativo',
   'Indie',
   'Samba',
+  'Pagode',
   'Sertanejo',
   'Jazz',
   'Experimental',
@@ -892,6 +893,10 @@ export const ENVIAR = {
   detectando: 'Procurando os dados da faixa',
   faixaEncontrada: 'Faixa encontrada',
   corrigirDados: 'Corrigir dados',
+  /** Sem detecção, o protótipo abre o preenchimento manual. */
+  naoDetectada: 'Não encontramos a faixa por esse link. Preencha os dados abaixo.',
+  capaDetectada: (titulo: string) => `Capa de ${titulo}`,
+  erroLinkVazio: 'Cole o link do Spotify ou do YouTube.',
 
   enviarArquivo: 'Enviar arquivo',
   enviarArquivoApoio: 'Upload de mp3 ou wav',
@@ -1196,18 +1201,35 @@ export const CHECKOUT = {
   cvv: 'Código de segurança',
   cvvDica: '000',
   /**
-   * O que a tela promete, e o que o código cumpre: os quatro campos acima
-   * **não** são enviados ao servidor. Ver `FormularioDeCheckout`.
+   * O que a tela promete, e o que o código cumpre: os dados do cartão seguem
+   * para o processador e não são gravados. Ver `modulos/claves/esquemas.ts`.
    */
-  cartaoNota: 'Os dados do cartão não saem deste navegador e não são guardados.',
+  cartaoNota: 'Os dados do cartão vão direto para o processador de pagamento e não são guardados.',
+
+  // ------------------------------------------------------ dados pessoais ---
+  /** **Derivado.** O Asaas só gera cobrança com CPF, nos dois meios. */
+  cpf: 'CPF',
+  cpfDica: '000.000.000-00',
+  cpfNota: 'Exigido pelo processador de pagamento para emitir a cobrança.',
+  telefone: 'Telefone com DDD',
+  telefoneDica: '(11) 90000-0000',
+  cep: 'CEP do titular',
+  cepDica: '00000-000',
 
   // ---------------------------------------------------------------- pix ----
   pixQr: 'QR PIX',
   pixTitulo: 'Pague com o código copia e cola',
   pixDescricao: 'O crédito entra na carteira assim que o banco confirma.',
   pixCopiar: 'Copiar código',
-  /** O código real nasce no provedor; até lá o botão fica desabilitado. */
-  pixPendente: 'O código copia e cola chega junto com a integração de pagamento.',
+  pixCopiado: 'Código copiado',
+  /** Antes de confirmar: o código nasce no provedor, depois do pedido. */
+  pixPendente: 'O QR code e o código copia e cola aparecem depois de confirmar a compra.',
+  pixAguardandoTitulo: 'Aguardando o Pix',
+  pixAguardandoTexto:
+    'Escaneie o QR code ou use o copia e cola no app do seu banco. Esta tela atualiza sozinha quando o pagamento cair.',
+  pixQrAlt: 'QR code do Pix desta compra',
+  pixCodigoRotulo: 'Código copia e cola',
+  pixExpirado: 'Este Pix venceu sem pagamento. Nada foi cobrado; gere outro para tentar de novo.',
 
   // --------------------------------------------------------- simulação ----
   simularRotulo: 'Simular resultado',
@@ -1245,6 +1267,9 @@ export const CHECKOUT = {
   erroCartaoNome: 'Informe o nome impresso no cartão.',
   erroCartaoValidade: 'Informe a validade no formato MM/AA.',
   erroCartaoCvv: 'Informe o código de segurança.',
+  erroCpf: 'Informe um CPF válido.',
+  erroTelefone: 'Informe um telefone com DDD.',
+  erroCep: 'Informe um CEP com 8 dígitos.',
   /**
    * Provedor de pagamento ausente. Não é "tente de novo": tentar de novo não
    * resolve nada enquanto o Asaas não estiver configurado.

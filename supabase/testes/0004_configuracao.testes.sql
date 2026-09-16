@@ -9,9 +9,11 @@ select id, 'administrador' from ator where papel = 'admin';
 
 -- ------------------------------------------------------------------- o seed
 
+-- 32 no seed da 0004; a 0009b tira as duas chaves da penalidade em pontos e
+-- devolve `teto_atraso_percentual` — 31.
 select pg_temp.afirmar(
-  (select count(*) from configuracao) = 32,
-  'o seed tem 32 chaves'
+  (select count(*) from configuracao) = 31,
+  'configuracao tem 31 chaves depois da 0009b'
 );
 
 -- As chaves que o prototipo decidiu, e que o data-model tinha como pendentes.
@@ -31,85 +33,63 @@ select pg_temp.afirmar(
   'os percentuais incidem sobre o bruto'
 );
 
--- A forma nova de `remuneracao.*`: piso <= teto_base <= teto_max nas tres classes.
+-- A forma de `remuneracao.*` desde a `0009b` (open-questions #5, decisao do
+-- cliente): a tabela do board — piso em atraso, piso no prazo e teto.
 select pg_temp.afirmar(
   (select bool_and(
-            (valor ->> 'piso')::numeric <= (valor ->> 'teto_base')::numeric
-        and (valor ->> 'teto_base')::numeric <= (valor ->> 'teto_max')::numeric)
+            (valor ->> 'piso_atraso')::numeric <= (valor ->> 'piso_prazo')::numeric
+        and (valor ->> 'piso_prazo')::numeric <= (valor ->> 'teto')::numeric)
      from configuracao where chave like 'remuneracao.%' and chave <> 'remuneracao.base'),
-  'piso <= teto_base <= teto_max nas tres classes'
+  'piso_atraso <= piso_prazo <= teto nas tres classes'
 );
 
--- O **teto na avaliacao** do Ouro (50%) e o ponto de paridade com a margem
--- declarada. Nao e o piso: um Ouro que entrega no prazo sem nenhum opcional
--- recebe 45%, e chega aos 50% fazendo o trabalho completo.
+-- Os valores literais da tabela do board (regras §3).
 select pg_temp.afirmar(
-  (select (valor ->> 'teto_base')::numeric from configuracao where chave = 'remuneracao.ouro')
+  (select valor from configuracao where chave = 'remuneracao.bronze')
+    = '{"piso_atraso": 30, "piso_prazo": 38, "teto": 50}'::jsonb
+  and (select valor from configuracao where chave = 'remuneracao.prata')
+    = '{"piso_atraso": 40, "piso_prazo": 43, "teto": 55}'::jsonb
+  and (select valor from configuracao where chave = 'remuneracao.ouro')
+    = '{"piso_atraso": 45, "piso_prazo": 50, "teto": 62}'::jsonb,
+  'as tres faixas sao as da tabela do board'
+);
+
+-- O **piso no prazo** do Ouro (50%) e o ponto de paridade com a margem de
+-- referencia: um Ouro que entrega no prazo sem nenhum opcional fica em 50/50.
+select pg_temp.afirmar(
+  (select (valor ->> 'piso_prazo')::numeric from configuracao where chave = 'remuneracao.ouro')
     = (select valor::text::numeric from configuracao where chave = 'margem_plataforma_percentual'),
-  'o teto na avaliacao do Ouro coincide com a margem de referencia de 50%'
+  'o piso no prazo do Ouro coincide com a margem de referencia de 50%'
 );
 
--- O vao entre `teto_base` e `teto_max` e **uniforme**: 12 pontos nas tres
--- classes. Ja o vao entre piso e teto_base varia (8, 3, 5), o que descarta a
--- leitura de que os acrescimos foram dimensionados para preencher esse vao.
+-- Com os quatro acrescimos do catalogo (3+3+3+8 = 17) o teto e **alcancavel**
+-- nas tres classes: 38+17 >= 50, 43+17 >= 55, 50+17 >= 62. A folga de 4 pontos
+-- da leitura antiga (open-questions #5b) deixou de existir.
 select pg_temp.afirmar(
   (select bool_and(
-            (c.valor ->> 'teto_max')::numeric - (c.valor ->> 'teto_base')::numeric = 12)
+            (c.valor ->> 'piso_prazo')::numeric
+              + (select sum(valor::text::numeric) from configuracao
+                  where chave in ('acrescimo_onze_criterios_percentual',
+                                  'acrescimo_justificativa_percentual',
+                                  'acrescimo_feedback_150_percentual',
+                                  'acrescimo_compartilhamento_percentual'))
+            >= (c.valor ->> 'teto')::numeric)
      from configuracao c
     where c.chave in ('remuneracao.bronze', 'remuneracao.prata', 'remuneracao.ouro')),
-  'teto_max - teto_base = 12 pontos nas tres classes'
+  'com todos os acrescimos o teto e alcancavel nas tres classes'
 );
 
--- Os tres acrescimos de conteudo (3% cada) **saturam** `teto_base` em todas as
--- classes: 30+9 >= 38, 40+9 >= 43, 45+9 >= 50. Ou seja, quem responde os onze
--- criterios, justifica e escreve o feedback longo chega ao teto da avaliacao
--- independentemente da classe.
+-- O atraso limita o acumulado (regras §3.1, item 3) — a chave que a leitura do
+-- prototipo tinha removido voltou, e a penalidade em pontos saiu.
 select pg_temp.afirmar(
-  (select bool_and(
-            (c.valor ->> 'piso')::numeric
-              + (select valor::text::numeric from configuracao
-                  where chave = 'acrescimo_onze_criterios_percentual')
-              + (select valor::text::numeric from configuracao
-                  where chave = 'acrescimo_justificativa_percentual')
-              + (select valor::text::numeric from configuracao
-                  where chave = 'acrescimo_feedback_150_percentual')
-            >= (c.valor ->> 'teto_base')::numeric)
-     from configuracao c
-    where c.chave in ('remuneracao.bronze', 'remuneracao.prata', 'remuneracao.ouro')),
-  'os tres acrescimos de conteudo saturam teto_base em todas as classes'
-);
-
--- ATENCAO — achado a levar ao cliente: com o conjunto de acrescimos do
--- prototipo, `teto_max` **nunca e alcancado**. O maximo real e
--- `teto_base + acrescimo_compartilhamento` = 46 / 51 / 58, contra tetos de
--- 50 / 55 / 62 — sobram exatamente 4 pontos em todas as tres classes.
--- Ou falta um acrescimo de 4 pontos no catalogo, ou `teto_max` e aspiracional.
--- O teste fixa a folga para que ela nao mude sem alguem notar.
-select pg_temp.afirmar(
-  (select bool_and(
-            (c.valor ->> 'teto_max')::numeric
-              - least(
-                  (c.valor ->> 'teto_base')::numeric
-                    + (select valor::text::numeric from configuracao
-                        where chave = 'acrescimo_compartilhamento_percentual'),
-                  (c.valor ->> 'teto_max')::numeric)
-            = 4)
-     from configuracao c
-    where c.chave in ('remuneracao.bronze', 'remuneracao.prata', 'remuneracao.ouro')),
-  'sobram 4 pontos entre o maximo alcancavel e teto_max, nas tres classes'
-);
-
--- `teto_atraso_percentual` saiu: no prototipo o atraso derruba o piso, nao capa
--- o acumulado.
-select pg_temp.afirmar(
-  not exists (select 1 from configuracao where chave = 'teto_atraso_percentual'),
-  'teto_atraso_percentual nao existe mais'
+  (select valor from configuracao where chave = 'teto_atraso_percentual') = '50'::jsonb,
+  'teto_atraso_percentual e 50'
 );
 
 select pg_temp.afirmar(
-  (select valor from configuracao where chave = 'penalidade_atraso_pontos') = '8'::jsonb
-  and (select valor from configuracao where chave = 'piso_minimo_atraso_percentual') = '15'::jsonb,
-  'a penalidade de atraso e de 8 pontos, com piso minimo de 15'
+  not exists (select 1 from configuracao
+               where chave in ('penalidade_atraso_pontos', 'piso_minimo_atraso_percentual')),
+  'a penalidade de atraso em pontos nao existe mais'
 );
 
 -- Toda chave tem descricao: e o que faz a tabela ser legivel por quem opera.

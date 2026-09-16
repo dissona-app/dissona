@@ -34,6 +34,8 @@ import { criarClienteServidor } from '@/lib/supabase/servidor';
 import { criarClienteDeServico } from '@/lib/supabase/servico';
 import { estourarSeErro } from '@/lib/supabase/erros';
 
+import type { Database } from '@/lib/supabase/tipos-bd';
+
 import type { MeioPagamento } from './tipos';
 
 /**
@@ -109,4 +111,90 @@ export async function recusarPedido(pedidoId: string): Promise<boolean> {
 
   estourarSeErro(error);
   return data === true;
+}
+
+export type PedidoDoArtista = {
+  readonly id: string;
+  readonly situacao: Database['public']['Enums']['situacao_pedido'];
+  readonly quantidadeClaves: number;
+  readonly valorTotalCentavos: bigint;
+};
+
+/**
+ * Lê o pedido **como o artista**: a policy de `pedido_clave` só mostra o
+ * próprio. `null` é pedido de outra pessoa ou inexistente — indistinguíveis de
+ * propósito.
+ */
+export async function lerPedido(pedidoId: string): Promise<PedidoDoArtista | null> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('pedido_clave')
+    .select('id, situacao, quantidade_claves, valor_total_centavos')
+    .eq('id', pedidoId)
+    .maybeSingle();
+
+  estourarSeErro(error);
+  if (data === null) return null;
+  return {
+    id: data.id,
+    situacao: data.situacao,
+    quantidadeClaves: Number(data.quantidade_claves),
+    valorTotalCentavos: BigInt(data.valor_total_centavos),
+  };
+}
+
+/**
+ * Grava a cobrança do Asaas no pedido: o id (é por ele que se concilia) e, no
+ * Pix, o copia e cola e o QR — para a tela poder mostrá-los de novo.
+ *
+ * Pela service role: `pedido_clave` não tem policy de update, de propósito
+ * (ver o cabeçalho). O filtro por id é a única coisa entre esta escrita e a
+ * linha errada, e o `select` confere que ela alcançou uma linha.
+ */
+export async function registrarCobranca(
+  pedidoId: string,
+  cobranca: {
+    readonly provedor: string;
+    readonly cobrancaId: string;
+    readonly pixPayload?: string;
+    readonly pixQr?: string;
+  },
+): Promise<void> {
+  const servico = criarClienteDeServico();
+
+  const patch: Database['public']['Tables']['pedido_clave']['Update'] = {
+    provedor: cobranca.provedor,
+    provedor_cobranca_id: cobranca.cobrancaId,
+    ...(cobranca.pixPayload === undefined
+      ? {}
+      : {
+          pix_payload: cobranca.pixPayload,
+          pix_qr: cobranca.pixQr ?? null,
+          situacao: 'processando',
+        }),
+  };
+
+  const { data, error } = await servico
+    .from('pedido_clave')
+    .update(patch)
+    .eq('id', pedidoId)
+    .select('id');
+
+  estourarSeErro(error);
+  if ((data ?? []).length === 0) {
+    throw new Error(`pedido ${pedidoId} nao encontrado ao registrar a cobranca`);
+  }
+}
+
+/** O nome da conta da sessão, para o cadastro do cliente no Asaas. */
+export async function lerNomeDaConta(perfilId: string): Promise<string | null> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .from('perfil')
+    .select('nome_completo')
+    .eq('id', perfilId)
+    .maybeSingle();
+  estourarSeErro(error);
+  return data?.nome_completo ?? null;
 }

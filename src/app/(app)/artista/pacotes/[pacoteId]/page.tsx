@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import * as dinheiro from '@/lib/dinheiro';
-import { comprarClaves } from '@/modulos/claves/acoes';
+import { acompanharPix, comprarClaves } from '@/modulos/claves/acoes';
 import { checkoutSimulado } from '@/modulos/claves/pagamento';
 import { resumoDoPedido } from '@/modulos/claves/servico';
 import { lerValorDaClave, buscarPacote } from '@/modulos/pacote/consultas';
@@ -45,6 +45,7 @@ export default async function PaginaDoCheckout({
       pacoteId={pacote.id}
       simulado={checkoutSimulado()}
       acao={comprarClaves}
+      acompanhar={acompanharPix}
       resumo={{
         quantidade: TEXTOS.quantidade(formatarQuantidade(resumo.quantidade)),
         bruto: dinheiro.formatar(resumo.bruto),

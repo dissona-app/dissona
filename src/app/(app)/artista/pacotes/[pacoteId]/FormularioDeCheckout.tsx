@@ -1,7 +1,7 @@
 'use client';
 
 import type { FormEvent } from 'react';
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 
 import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
@@ -12,7 +12,14 @@ import { Painel } from '@/componentes/base/Painel';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
-import type { DesfechoDaCompra, MeioPagamento, ResultadoSimulado } from '@/modulos/claves/tipos';
+import { cpfValido, mascararCpf, mascararTelefone, telefoneValido } from '@/lib/mascaras';
+import { luhnValido } from '@/modulos/claves/esquemas';
+import type {
+  AcompanhamentoDoPix,
+  DesfechoDaCompra,
+  MeioPagamento,
+  ResultadoSimulado,
+} from '@/modulos/claves/tipos';
 import { CHECKOUT as TEXTOS } from '@/textos/prototipo';
 
 import estilos from './FormularioDeCheckout.module.css';
@@ -32,11 +39,24 @@ export type PropsFormularioDeCheckout = {
   /** Mostra o seletor "Simular resultado" e a nota de que nada é cobrado. */
   readonly simulado: boolean;
   readonly acao: (entrada: unknown) => Promise<ResultadoDeAcao<DesfechoDaCompra>>;
+  readonly acompanhar: (pedidoId: string) => Promise<ResultadoDeAcao<AcompanhamentoDoPix>>;
 };
 
-type ErrosDoCartao = Readonly<Partial<Record<'numero' | 'nome' | 'validade' | 'cvv', string>>>;
+type Campos = 'cpf' | 'numero' | 'titular' | 'validade' | 'cvv' | 'telefone' | 'cep';
+type Erros = Readonly<Partial<Record<Campos, string>>>;
 
-const SEM_ERRO: ErrosDoCartao = {};
+const SEM_ERRO: Erros = {};
+
+/** Código do schema (`esquemas.ts`) → texto. */
+const MOTIVOS: Readonly<Record<string, string>> = {
+  cpf_invalido: TEXTOS.erroCpf,
+  numero_invalido: TEXTOS.erroCartaoNumero,
+  titular_vazio: TEXTOS.erroCartaoNome,
+  validade_invalida: TEXTOS.erroCartaoValidade,
+  cvv_invalido: TEXTOS.erroCartaoCvv,
+  telefone_invalido: TEXTOS.erroTelefone,
+  cep_invalido: TEXTOS.erroCep,
+};
 
 const MENSAGEM: Readonly<Partial<Record<string, string>>> = {
   [CodigoErro.PAGAMENTO_INDISPONIVEL]: TEXTOS.erroIndisponivel,
@@ -44,62 +64,61 @@ const MENSAGEM: Readonly<Partial<Record<string, string>>> = {
   [CodigoErro.PACOTE_EXCLUIDO]: TEXTOS.erroPacote,
 };
 
-/** Dígitos do número, sem os espaços que a máscara acrescenta. */
+/** De quanto em quanto tempo a tela do Pix pergunta se o pagamento caiu. */
+const INTERVALO_DO_PIX_MS = 4000;
+
 function digitos(valor: string): string {
   return valor.replace(/\D/g, '');
 }
 
 /**
- * Valida o cartão **no cliente**, e só o formato.
- *
- * O protótipo, sendo mock, faz o contrário: `caConfirmar` preenche os campos
- * inválidos com valores fictícios (`'4539 8123 4567 8901'`, `'Aurora
- * Menezes'`) e segue em frente. É a mesma coerção silenciosa que a tela 21.1
- * fazia com o preço do pacote, e a razão de não a copiar é a mesma — ver
- * `07-pendencias-e-divergencias.md`, Parte B.1.
- *
- * Só formato porque quem autoriza é o banco: um cartão bem formatado e sem
- * saldo é exatamente o caminho "Recusado" que o cenário B2 pede.
+ * Valida **no cliente**, e só o formato — a mesma regra do schema do servidor,
+ * que é quem decide. Aqui ela só evita uma ida e volta para dizer "CPF
+ * inválido".
  */
-function validarCartao(numero: string, nome: string, validade: string, cvv: string): ErrosDoCartao {
-  const erros: Record<string, string> = {};
+function validar(meio: MeioPagamento, valores: Readonly<Record<Campos, string>>): Erros {
+  const erros: Partial<Record<Campos, string>> = {};
+  if (!cpfValido(valores.cpf)) erros.cpf = TEXTOS.erroCpf;
+  if (meio !== 'cartao') return erros;
 
-  if (digitos(numero).length < 13 || digitos(numero).length > 19) {
-    erros['numero'] = TEXTOS.erroCartaoNumero;
+  if (!luhnValido(valores.numero)) erros.numero = TEXTOS.erroCartaoNumero;
+  if (valores.titular.trim() === '') erros.titular = TEXTOS.erroCartaoNome;
+  if (!/^(0[1-9]|1[0-2])\/?\d{2}$/.test(valores.validade.trim())) {
+    erros.validade = TEXTOS.erroCartaoValidade;
   }
-  if (nome.trim() === '') erros['nome'] = TEXTOS.erroCartaoNome;
-  if (!/^\d{2}\/?\d{2}$/.test(validade.trim())) erros['validade'] = TEXTOS.erroCartaoValidade;
-  if (digitos(cvv).length < 3) erros['cvv'] = TEXTOS.erroCartaoCvv;
-
+  if (![3, 4].includes(digitos(valores.cvv).length)) erros.cvv = TEXTOS.erroCartaoCvv;
+  if (!telefoneValido(valores.telefone)) erros.telefone = TEXTOS.erroTelefone;
+  if (digitos(valores.cep).length !== 8) erros.cep = TEXTOS.erroCep;
   return erros;
+}
+
+function mascararCep(valor: string): string {
+  const d = digitos(valor).slice(0, 8);
+  return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
 }
 
 /**
  * 5.2 · Checkout.
  *
- * ## Os campos do cartão não têm `name`, e isso é o requisito
+ * ## Os três desfechos
  *
- * "Checkout com cartão tokenizado, **sem persistir dados do cartão**" é o item
- * da R2. A forma mais forte de não persistir é o dado não sair do navegador:
- * um `<input>` sem `name` não entra no `FormData`, então número, titular,
- * validade e código de segurança não atravessam a rede, não chegam à Server
- * Action, não aparecem em log de servidor e não existem para ninguém gravar
- * por engano. É o mesmo mecanismo que o `CampoNota` usa para não enviar `0` de
- * um critério nunca tocado.
+ * Cartão (ou simulação) volta **aprovado** ou **recusado** na própria
+ * resposta. Pix volta **aguardando**: a tela troca o formulário pelo QR code e
+ * pelo copia e cola, e pergunta ao servidor de tempos em tempos se o webhook
+ * do Asaas já confirmou — quando confirma, mostra o mesmo "Pagamento aprovado"
+ * do cartão.
  *
- * Quando o Asaas entrar, é o SDK dele que lê estes campos no navegador e
- * devolve um **token** — e é o token que ganha um `name`. A troca é de um
- * campo; o resto da tela não muda.
+ * ## Dados do cartão
  *
- * O preço disso é que esta tela exige JavaScript, ao contrário do resto do
- * produto. Um checkout de cartão sem JS teria de mandar o PAN para o servidor,
- * que é precisamente o que não se quer.
+ * Os campos têm `name` e vão à Server Action, que os repassa ao Asaas e os
+ * descarta. Não há SDK de navegador do Asaas; ver `modulos/claves/esquemas.ts`.
  */
 export function FormularioDeCheckout({
   pacoteId,
   resumo,
   simulado,
   acao,
+  acompanhar,
 }: PropsFormularioDeCheckout) {
   const [resultado, enviar, pendente] = useActionState<
     ResultadoDeAcao<DesfechoDaCompra> | null,
@@ -109,29 +128,83 @@ export function FormularioDeCheckout({
   const [meio, setMeio] = useState<MeioPagamento>('cartao');
   const [simulacao, setSimulacao] = useState<ResultadoSimulado>('aprovado');
 
-  const [numero, setNumero] = useState('');
-  const [nome, setNome] = useState('');
-  const [validade, setValidade] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [erros, setErros] = useState<ErrosDoCartao>(SEM_ERRO);
+  const [valores, setValores] = useState<Record<Campos, string>>({
+    cpf: '',
+    numero: '',
+    titular: '',
+    validade: '',
+    cvv: '',
+    telefone: '',
+    cep: '',
+  });
+  const [erros, setErros] = useState<Erros>(SEM_ERRO);
+  const [acompanhamento, setAcompanhamento] = useState<AcompanhamentoDoPix | null>(null);
+  const [copiado, setCopiado] = useState(false);
 
-  const aprovado = resultado !== null && resultado.ok ? resultado.dados : null;
+  const desfecho = resultado !== null && resultado.ok ? resultado.dados : null;
+  const pix = desfecho?.situacao === 'aguardando_pix' ? desfecho : null;
+
+  const aprovado =
+    desfecho?.situacao === 'aprovado'
+      ? desfecho
+      : acompanhamento?.situacao === 'aprovado'
+        ? acompanhamento
+        : null;
+  const pixVencido = acompanhamento?.situacao === 'recusado';
+
   const falha = resultado !== null && !resultado.ok ? resultado : null;
   const recusado = falha?.codigo === CodigoErro.PAGAMENTO_RECUSADO;
+  const errosDoServidor = falha?.campos;
   const erroGeral =
-    falha === null || recusado ? null : (MENSAGEM[falha.codigo] ?? TEXTOS.erroGenerico);
+    falha === null || recusado || errosDoServidor !== undefined
+      ? null
+      : (MENSAGEM[falha.codigo] ?? TEXTOS.erroGenerico);
+
+  const pedidoDoPix = pix?.pedidoId ?? null;
+
+  // Acompanha o Pix até ele sair de "aguardando". Um `setInterval` simples:
+  // a consulta é barata, e o que ela lê é uma linha só.
+  useEffect(() => {
+    if (pedidoDoPix === null) return;
+    let ativo = true;
+    const id = setInterval(() => {
+      void acompanhar(pedidoDoPix).then((resposta) => {
+        if (!ativo || !resposta.ok || resposta.dados.situacao === 'aguardando') return;
+        setAcompanhamento(resposta.dados);
+        clearInterval(id);
+      });
+    }, INTERVALO_DO_PIX_MS);
+    return () => {
+      ativo = false;
+      clearInterval(id);
+    };
+  }, [pedidoDoPix, acompanhar]);
+
+  const erroDe = (campo: Campos): string | undefined => {
+    const doServidor = errosDoServidor?.[campo];
+    return erros[campo] ?? (doServidor === undefined ? undefined : MOTIVOS[doServidor]);
+  };
+
+  const mudar = (campo: Campos, valor: string) =>
+    setValores((atual) => ({ ...atual, [campo]: valor }));
 
   function aoEnviar(evento: FormEvent<HTMLFormElement>) {
-    if (meio !== 'cartao') {
-      setErros(SEM_ERRO);
-      return;
-    }
-    const encontrados = validarCartao(numero, nome, validade, cvv);
+    const encontrados = validar(meio, valores);
     setErros(encontrados);
-    // Cancela a Server Action: `onSubmit` corre antes do `action` do form, e
-    // `preventDefault` impede que ele chegue a rodar.
+    // `onSubmit` corre antes do `action` do form; `preventDefault` o cancela.
     if (Object.keys(encontrados).length > 0) evento.preventDefault();
   }
+
+  async function copiarCodigo(codigo: string) {
+    try {
+      await navigator.clipboard.writeText(codigo);
+      setCopiado(true);
+    } catch {
+      setCopiado(false);
+    }
+  }
+
+  const formularioAtivo = pix === null && aprovado === null;
 
   return (
     <form action={enviar} onSubmit={aoEnviar} className={estilos.base} noValidate>
@@ -148,105 +221,161 @@ export function FormularioDeCheckout({
       <div className={estilos.colunas}>
         <Painel titulo={TEXTOS.meioRotulo} nivel={2}>
           <div className={estilos.pagamento}>
-            <Grupo
-              rotulo={TEXTOS.meioRotulo}
-              rotuloOculto
-              valor={meio}
-              onMudar={setMeio}
-              opcoes={[
-                { valor: 'cartao', rotulo: TEXTOS.meios.cartao },
-                { valor: 'pix', rotulo: TEXTOS.meios.pix },
-              ]}
-            />
-
-            {meio === 'cartao' ? (
-              <div className={estilos.cartao}>
-                <div className={estilos.linhaInteira}>
-                  <Campo
-                    rotulo={TEXTOS.numero}
-                    placeholder={TEXTOS.numeroDica}
-                    inputMode="numeric"
-                    autoComplete="cc-number"
-                    value={numero}
-                    erro={erros.numero}
-                    onChange={(evento) =>
-                      setNumero(evento.target.value.replace(/[^0-9 ]/g, '').slice(0, 19))
-                    }
-                  />
-                </div>
-                <div className={estilos.linhaInteira}>
-                  <Campo
-                    rotulo={TEXTOS.nome}
-                    placeholder={TEXTOS.nomeDica}
-                    autoComplete="cc-name"
-                    value={nome}
-                    erro={erros.nome}
-                    onChange={(evento) => setNome(evento.target.value)}
-                  />
-                </div>
-                <Campo
-                  rotulo={TEXTOS.validade}
-                  placeholder={TEXTOS.validadeDica}
-                  inputMode="numeric"
-                  autoComplete="cc-exp"
-                  value={validade}
-                  erro={erros.validade}
-                  onChange={(evento) =>
-                    setValidade(evento.target.value.replace(/[^0-9/]/g, '').slice(0, 5))
-                  }
-                />
-                <Campo
-                  rotulo={TEXTOS.cvv}
-                  placeholder={TEXTOS.cvvDica}
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                  value={cvv}
-                  erro={erros.cvv}
-                  onChange={(evento) => setCvv(digitos(evento.target.value).slice(0, 4))}
-                />
-                <p className={[estilos.nota, estilos.linhaInteira].join(' ')}>
-                  {TEXTOS.cartaoNota}
-                </p>
-              </div>
-            ) : (
+            {pix !== null ? (
               <div className={estilos.pix}>
-                <span className={estilos.qr} aria-hidden="true">
-                  {TEXTOS.pixQr}
-                </span>
-                <div>
-                  <p className={estilos.pixTitulo}>{TEXTOS.pixTitulo}</p>
-                  <p className={estilos.nota}>{TEXTOS.pixDescricao}</p>
-                  {/* O código copia e cola nasce no provedor, em
-                      `pedido_clave.pix_payload`. Desabilitado com o motivo
-                      visível, e não escondido: a forma da tela não muda a cada
-                      entrega — é o mesmo tratamento que "Dados de cobrança"
-                      recebe em 7.2. */}
+                {/* eslint-disable-next-line @next/next/no-img-element -- data URI do QR, sem otimização possível */}
+                <img
+                  className={estilos.qrImagem}
+                  src={`data:image/png;base64,${pix.pixQr}`}
+                  alt={TEXTOS.pixQrAlt}
+                  width={168}
+                  height={168}
+                />
+                <div className={estilos.pixCorpo}>
+                  <p className={estilos.pixTitulo}>{TEXTOS.pixAguardandoTitulo}</p>
+                  <p className={estilos.nota}>{TEXTOS.pixAguardandoTexto}</p>
+                  <Campo rotulo={TEXTOS.pixCodigoRotulo} value={pix.pixPayload} readOnly denso />
                   <Botao
                     type="button"
                     variante="secundario"
                     tamanho="sm"
-                    disabled
-                    title={TEXTOS.pixPendente}
+                    onClick={() => void copiarCodigo(pix.pixPayload)}
                   >
-                    {TEXTOS.pixCopiar}
+                    {copiado ? TEXTOS.pixCopiado : TEXTOS.pixCopiar}
                   </Botao>
+                  {pixVencido ? <Aviso tom="alerta">{TEXTOS.pixExpirado}</Aviso> : null}
                 </div>
               </div>
-            )}
-
-            {simulado ? (
-              <div className={estilos.simulacao}>
+            ) : (
+              <>
                 <Grupo
-                  rotulo={TEXTOS.simularRotulo}
-                  valor={simulacao}
-                  onMudar={setSimulacao}
+                  rotulo={TEXTOS.meioRotulo}
+                  rotuloOculto
+                  valor={meio}
+                  onMudar={(valor) => {
+                    setMeio(valor);
+                    setErros(SEM_ERRO);
+                  }}
                   opcoes={[
-                    { valor: 'aprovado', rotulo: TEXTOS.simulacoes.aprovado },
-                    { valor: 'recusado', rotulo: TEXTOS.simulacoes.recusado },
+                    { valor: 'cartao', rotulo: TEXTOS.meios.cartao },
+                    { valor: 'pix', rotulo: TEXTOS.meios.pix },
                   ]}
                 />
-              </div>
-            ) : null}
+
+                <Campo
+                  name="cpf"
+                  rotulo={TEXTOS.cpf}
+                  placeholder={TEXTOS.cpfDica}
+                  auxiliar={TEXTOS.cpfNota}
+                  inputMode="numeric"
+                  value={valores.cpf}
+                  erro={erroDe('cpf')}
+                  onChange={(evento) => mudar('cpf', mascararCpf(evento.target.value))}
+                />
+
+                {meio === 'cartao' ? (
+                  <div className={estilos.cartao}>
+                    <div className={estilos.linhaInteira}>
+                      <Campo
+                        name="numero"
+                        rotulo={TEXTOS.numero}
+                        placeholder={TEXTOS.numeroDica}
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        value={valores.numero}
+                        erro={erroDe('numero')}
+                        onChange={(evento) =>
+                          mudar('numero', evento.target.value.replace(/[^0-9 ]/g, '').slice(0, 23))
+                        }
+                      />
+                    </div>
+                    <div className={estilos.linhaInteira}>
+                      <Campo
+                        name="titular"
+                        rotulo={TEXTOS.nome}
+                        placeholder={TEXTOS.nomeDica}
+                        autoComplete="cc-name"
+                        value={valores.titular}
+                        erro={erroDe('titular')}
+                        onChange={(evento) => mudar('titular', evento.target.value)}
+                      />
+                    </div>
+                    <Campo
+                      name="validade"
+                      rotulo={TEXTOS.validade}
+                      placeholder={TEXTOS.validadeDica}
+                      inputMode="numeric"
+                      autoComplete="cc-exp"
+                      value={valores.validade}
+                      erro={erroDe('validade')}
+                      onChange={(evento) =>
+                        mudar('validade', evento.target.value.replace(/[^0-9/]/g, '').slice(0, 5))
+                      }
+                    />
+                    <Campo
+                      name="cvv"
+                      rotulo={TEXTOS.cvv}
+                      placeholder={TEXTOS.cvvDica}
+                      inputMode="numeric"
+                      autoComplete="cc-csc"
+                      value={valores.cvv}
+                      erro={erroDe('cvv')}
+                      onChange={(evento) => mudar('cvv', digitos(evento.target.value).slice(0, 4))}
+                    />
+                    <Campo
+                      name="telefone"
+                      rotulo={TEXTOS.telefone}
+                      placeholder={TEXTOS.telefoneDica}
+                      inputMode="tel"
+                      autoComplete="tel-national"
+                      value={valores.telefone}
+                      erro={erroDe('telefone')}
+                      onChange={(evento) =>
+                        mudar('telefone', mascararTelefone(evento.target.value))
+                      }
+                    />
+                    <Campo
+                      name="cep"
+                      rotulo={TEXTOS.cep}
+                      placeholder={TEXTOS.cepDica}
+                      inputMode="numeric"
+                      autoComplete="postal-code"
+                      value={valores.cep}
+                      erro={erroDe('cep')}
+                      onChange={(evento) => mudar('cep', mascararCep(evento.target.value))}
+                    />
+                    <p className={[estilos.nota, estilos.linhaInteira].join(' ')}>
+                      {TEXTOS.cartaoNota}
+                    </p>
+                  </div>
+                ) : (
+                  <div className={estilos.pix}>
+                    <span className={estilos.qr} aria-hidden="true">
+                      {TEXTOS.pixQr}
+                    </span>
+                    <div>
+                      <p className={estilos.pixTitulo}>{TEXTOS.pixTitulo}</p>
+                      <p className={estilos.nota}>{TEXTOS.pixDescricao}</p>
+                      <p className={estilos.nota}>{TEXTOS.pixPendente}</p>
+                    </div>
+                  </div>
+                )}
+
+                {simulado ? (
+                  <div className={estilos.simulacao}>
+                    <Grupo
+                      rotulo={TEXTOS.simularRotulo}
+                      valor={simulacao}
+                      onMudar={setSimulacao}
+                      opcoes={[
+                        { valor: 'aprovado', rotulo: TEXTOS.simulacoes.aprovado },
+                        { valor: 'recusado', rotulo: TEXTOS.simulacoes.recusado },
+                      ]}
+                    />
+                  </div>
+                ) : null}
+              </>
+            )}
           </div>
         </Painel>
 
@@ -292,14 +421,10 @@ export function FormularioDeCheckout({
             </Aviso>
           ) : null}
 
-          {/* Um botão só nos três estados. O protótipo troca "Confirmar
-              compra" por um bloco de status e some com o botão; aqui ele
-              permanece e vira "Tentar de novo" na recusa, porque é o que a
-              própria copy do protótipo oferece e porque tirar o alvo do lugar
-              depois do erro obriga a procurá-lo de novo. No aprovado ele sai:
-              não há segunda compra a confirmar, e os dois caminhos daqui são
-              a Carteira e o extrato. */}
-          {aprovado === null ? (
+          {/* Um botão só. Some no aprovado (não há segunda compra a confirmar)
+              e enquanto o Pix aguarda (confirmar de novo geraria outra
+              cobrança). Na recusa vira "Tentar de novo". */}
+          {formularioAtivo ? (
             <Botao type="submit" carregando={pendente} blocoInteiro>
               {pendente ? TEXTOS.processando : recusado ? TEXTOS.tentarDeNovo : TEXTOS.confirmar}
             </Botao>

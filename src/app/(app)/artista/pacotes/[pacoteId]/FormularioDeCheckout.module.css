@@ -66,6 +66,24 @@
   border-radius: var(--dsn-radius-sm);
 }
 
+.qrImagem {
+  flex: none;
+  width: 168px;
+  max-width: 100%;
+  height: auto;
+  background: var(--dsn-surface);
+  border: 1px solid var(--dsn-border);
+  border-radius: var(--dsn-radius-sm);
+}
+
+.pixCorpo {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-direction: column;
+  gap: var(--dsn-space-4);
+  min-width: 0;
+}
+
 .pixTitulo {
   margin: 0 0 var(--dsn-space-2);
   font-weight: 600;

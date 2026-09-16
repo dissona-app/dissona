@@ -19,11 +19,17 @@ insert into perfil_artista (perfil_id) select id from ator where papel = 'vizinh
 insert into perfil_curador (perfil_id, classe, situacao, cadastro_concluido_em, passo_cadastro)
 select id, 'bronze', 'bronze_aprovado', now(), 8 from ator where papel = 'curador';
 
+-- Todo fixture filtra pelo ator. O projeto é compartilhado com a suíte E2E, e
+-- um `from perfil_curador pc` sem filtro pega também os curadores dela: o
+-- `servico_curador` batia na unique `(perfil_curador_id, tipo)` e o `envio`
+-- virava produto cartesiano.
 insert into servico_curador (perfil_curador_id, tipo, preco_claves)
-select pc.id, 'feedback', 2.00 from perfil_curador pc;
+select pc.id, 'feedback', 2.00 from perfil_curador pc
+ where pc.perfil_id = (select id from ator where papel = 'curador');
 
 insert into midia_curador (perfil_curador_id, tipo, nome, url)
-select pc.id, 'playlist', 'Radar', 'https://sp.test/pl' from perfil_curador pc;
+select pc.id, 'playlist', 'Radar', 'https://sp.test/pl' from perfil_curador pc
+ where pc.perfil_id = (select id from ator where papel = 'curador');
 
 insert into faixa (perfil_artista_id, titulo, origem, arquivo_caminho, duracao_segundos, situacao)
 select pa.id, 'Faixa em avaliacao', 'arquivo', a.id::text || '/f/1.mp3', 200, 'em_curadoria'
@@ -31,26 +37,39 @@ from perfil_artista pa join ator a on a.id = pa.perfil_id where a.papel = 'artis
 
 insert into envio (faixa_id, perfil_curador_id, total_claves, prazo_em, devolucao_em, situacao)
 select f.id, pc.id, 2.00, now() + interval '72 hours', now() + interval '7 days', 'avaliando'
-from faixa f, perfil_curador pc where f.titulo = 'Faixa em avaliacao';
+from faixa f
+join perfil_artista pa on pa.id = f.perfil_artista_id
+join perfil_curador pc on pc.perfil_id = (select id from ator where papel = 'curador')
+where f.titulo = 'Faixa em avaliacao'
+  and pa.perfil_id = (select id from ator where papel = 'artista');
 
 -- ============================== calcular_remuneracao, caso a caso =========
 
--- A tabela do protótipo, valor a valor. `confere` cobre piso, percentual,
--- base, valor, comissão **e** a invariante do rateio na mesma linha.
+-- A tabela do board (regras §3), valor a valor — decisão do cliente em
+-- open-questions #5, aplicada pela `0009b`. `confere` cobre piso, percentual,
+-- teto, base, valor, comissão **e** a invariante do rateio na mesma linha.
+--
+-- Acréscimos: onze 3 · justificativa 3 · feedback 3 · compartilhou 8, todos
+-- somando até **um** teto só.
 do $$
 declare
   v_n integer;
 begin
   select count(*) into v_n from (
     with esperado(classe, no_prazo, claves, onze, just, fb, comp,
-                  e_piso, e_pct, e_base, e_valor, e_comissao) as (values
-      ('bronze'::classe_curador, true,  2.00, false,false,false,false, 30, 30,  2000,  600, 1400),
-      ('bronze'::classe_curador, true,  2.00, true, true, true, false, 30, 38,  2000,  760, 1240),
-      ('bronze'::classe_curador, true,  2.00, true, true, true, true,  30, 46,  2000,  920, 1080),
-      ('bronze'::classe_curador, false, 2.00, false,false,false,false, 22, 22,  2000,  440, 1560),
-      ('prata'::classe_curador,  false, 2.00, true, true, true, true,  32, 49,  2000,  980, 1020),
-      ('ouro'::classe_curador,   true,  2.00, true, true, true, true,  45, 58,  2000, 1160,  840),
-      ('ouro'::classe_curador,   true, 10.00, false,false,false,false, 45, 45, 10000, 4500, 5500)
+                  e_piso, e_pct, e_teto, e_base, e_valor, e_comissao) as (values
+      -- no prazo: piso da coluna "no prazo"
+      ('bronze'::classe_curador, true,  2.00, false,false,false,false, 38, 38, 50,  2000,  760, 1240),
+      ('bronze'::classe_curador, true,  2.00, true, true, true, false, 38, 47, 50,  2000,  940, 1060),
+      ('bronze'::classe_curador, true,  2.00, true, true, true, true,  38, 50, 50,  2000, 1000, 1000),
+      ('prata'::classe_curador,  true,  2.00, true, true, true, true,  43, 55, 55,  2000, 1100,  900),
+      ('ouro'::classe_curador,   true,  2.00, true, true, true, true,  50, 62, 62,  2000, 1240,  760),
+      ('ouro'::classe_curador,   true, 10.00, false,false,false,false, 50, 50, 62, 10000, 5000, 5000),
+      -- em atraso: piso da coluna "em atraso", acumulado limitado a 50
+      ('bronze'::classe_curador, false, 2.00, false,false,false,false, 30, 30, 50,  2000,  600, 1400),
+      ('prata'::classe_curador,  false, 2.00, true, true, true, true,  40, 50, 50,  2000, 1000, 1000),
+      ('ouro'::classe_curador,   false, 2.00, false,false,false,false, 45, 45, 50,  2000,  900, 1100),
+      ('ouro'::classe_curador,   false, 2.00, true, true, true, true,  45, 50, 50,  2000, 1000, 1000)
     )
     select 1
       from esperado e
@@ -60,6 +79,7 @@ begin
                            'feedback_150', e.fb, 'compartilhou', e.comp)) r
      where not (r.piso_percentual = e.e_piso
             and r.percentual_aplicado = e.e_pct
+            and r.teto_percentual = e.e_teto
             and r.base_centavos = e.e_base
             and r.valor_centavos = e.e_valor
             and r.comissao_centavos = e.e_comissao
@@ -67,14 +87,13 @@ begin
   ) as divergentes;
 
   perform pg_temp.afirmar(v_n = 0,
-    format('os 7 casos da tabela de remuneracao conferem (%s divergiram)', v_n));
+    format('os 10 casos da tabela de remuneracao conferem (%s divergiram)', v_n));
 end $$;
 
--- O atraso derruba o piso em 8 pontos, com mínimo de 15 — e **não** capa o
--- acumulado em 50%, como o data-model §10 descrevia.
+-- A resposta do cliente, isolada: Bronze no prazo sem opcionais é 38%.
 select pg_temp.afirmar(
-  (select piso_percentual from calcular_remuneracao('bronze', false, 2.00)) = 22,
-  'Bronze atrasado tem piso 22 = max(15, 30 - 8)'
+  (select percentual_aplicado from calcular_remuneracao('bronze', true, 2.00)) = 38,
+  'Bronze no prazo sem opcionais recebe 38% (open-questions #5, decisao do cliente)'
 );
 
 select pg_temp.afirmar(
@@ -82,34 +101,37 @@ select pg_temp.afirmar(
   'penalidade_prazo marca a entrega fora das 72h'
 );
 
--- O teto de atraso de 50% não existe mais: Prata atrasada com tudo dá 49%, e
--- sob a leitura antiga daria exatamente 50%.
+-- Atraso limita o acumulado a `teto_atraso_percentual`: Ouro com tudo iria a
+-- 62, e atrasado para em 50.
 select pg_temp.afirmar(
-  (select percentual_aplicado from calcular_remuneracao('prata', false, 2.00,
-    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true,"compartilhou":true}')) = 49,
-  'Prata atrasada com tudo chega a 49%, e nao ao teto de atraso de 50%'
+  (select teto_percentual from calcular_remuneracao('ouro', false, 2.00)) = 50,
+  'fora das 72h o teto do Ouro cai para 50'
 );
 
--- Os três acréscimos de conteúdo saturam `teto_base` nas três classes.
+-- Um teto só, e ele é alcançável nas três classes — a #5b deixa de existir.
+select pg_temp.afirmar(
+  (select teto_percentual = percentual_aplicado from calcular_remuneracao('bronze', true, 2.00,
+    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true,"compartilhou":true}'))
+  and (select teto_percentual = percentual_aplicado from calcular_remuneracao('prata', true, 2.00,
+    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true,"compartilhou":true}'))
+  and (select teto_percentual = percentual_aplicado from calcular_remuneracao('ouro', true, 2.00,
+    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true,"compartilhou":true}')),
+  'com todos os opcionais o teto e alcancado nas tres classes'
+);
+
+-- O compartilhamento não é mais especial: sozinho, soma como qualquer outro.
 select pg_temp.afirmar(
   (select percentual_aplicado from calcular_remuneracao('bronze', true, 2.00,
-    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true}')) = 38
-  and (select percentual_aplicado from calcular_remuneracao('prata', true, 2.00,
-    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true}')) = 43
-  and (select percentual_aplicado from calcular_remuneracao('ouro', true, 2.00,
-    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true}')) = 50,
-  'os tres acrescimos de conteudo saturam teto_base: 38 / 43 / 50'
+    '{"compartilhou":true}')) = 46,
+  'compartilhar sozinho soma 8 ao piso de 38'
 );
 
--- E `teto_max` nunca é alcançado: sobram 4 pontos nas três classes.
+-- As chaves da leitura antiga saíram, e a do teto de atraso voltou.
 select pg_temp.afirmar(
-  (select teto_percentual - percentual_aplicado from calcular_remuneracao('bronze', true, 2.00,
-    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true,"compartilhou":true}')) = 4
-  and (select teto_percentual - percentual_aplicado from calcular_remuneracao('prata', true, 2.00,
-    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true,"compartilhou":true}')) = 4
-  and (select teto_percentual - percentual_aplicado from calcular_remuneracao('ouro', true, 2.00,
-    '{"onze_criterios":true,"justificativas_250":true,"feedback_150":true,"compartilhou":true}')) = 4,
-  'sobram 4 pontos ate teto_max nas tres classes — achado a levar ao cliente'
+  not exists (select 1 from configuracao
+               where chave in ('penalidade_atraso_pontos', 'piso_minimo_atraso_percentual'))
+  and exists (select 1 from configuracao where chave = 'teto_atraso_percentual'),
+  'configuracao sem penalidade em pontos, com teto_atraso_percentual'
 );
 
 -- Ordem fixa do jsonb de acréscimos: é o que o torna comparável em teste.
@@ -130,8 +152,8 @@ select pg_temp.afirmar(
 );
 
 select pg_temp.afirmar(
-  (select valor_centavos from calcular_remuneracao('bronze', true, 2.01)) = 603,
-  '30% de 2010 centavos = 603, com arredondamento meia-unidade-pra-cima'
+  (select valor_centavos from calcular_remuneracao('bronze', true, 2.01)) = 764,
+  '38% de 2010 centavos = 763,8 -> 764, com arredondamento meia-unidade-pra-cima'
 );
 
 -- Determinismo: duas chamadas iguais devolvem o mesmo resultado.
@@ -199,7 +221,7 @@ begin
 end $$;
 
 -- O caminho feliz: cinco obrigatórios, feedback curto, sem compartilhar.
--- Bronze no prazo, sem nenhum opcional -> 30% de 2000 = 600.
+-- Bronze no prazo, sem nenhum opcional -> 38% de 2000 = 760.
 do $$
 declare
   v_ganho_id uuid;
@@ -216,12 +238,12 @@ begin
 
   perform pg_temp.afirmar(v_g.classe = 'bronze', 'a classe foi congelada no ganho');
   perform pg_temp.afirmar(v_g.no_prazo, 'entregue dentro das 72h');
-  perform pg_temp.afirmar(v_g.piso_percentual = 30, 'piso do Bronze no prazo e 30%');
-  perform pg_temp.afirmar(v_g.percentual_aplicado = 30,
-    'sem opcionais, o percentual e o piso — e NAO 38%, como RF-066 afirma');
+  perform pg_temp.afirmar(v_g.piso_percentual = 38, 'piso do Bronze no prazo e 38% (tabela do board)');
+  perform pg_temp.afirmar(v_g.percentual_aplicado = 38,
+    'sem opcionais, o percentual e o piso no prazo: 38% (open-questions #5)');
   perform pg_temp.afirmar(v_g.base_centavos = 2000, 'base de 2 Claves = R$ 20,00');
-  perform pg_temp.afirmar(v_g.valor_centavos = 600, 'o curador recebe R$ 6,00');
-  perform pg_temp.afirmar(v_g.comissao_centavos = 1400, 'a plataforma fica com R$ 14,00');
+  perform pg_temp.afirmar(v_g.valor_centavos = 760, 'o curador recebe R$ 7,60');
+  perform pg_temp.afirmar(v_g.comissao_centavos = 1240, 'a plataforma fica com R$ 12,40');
   perform pg_temp.afirmar(v_g.valor_centavos + v_g.comissao_centavos = v_g.base_centavos,
     'repasse + comissao = base (RNF-010)');
   perform pg_temp.afirmar(v_g.acrescimos = '[]'::jsonb, 'nenhum acrescimo');
@@ -257,17 +279,24 @@ select pg_temp.afirmar(
 -- da sessao do curador.
 reset role;
 
+-- Filtrado pelos atores do fixture: depois do `reset role` a consulta roda como
+-- `postgres`, que enxerga o banco inteiro — e o projeto é compartilhado com a
+-- suíte E2E, que conclui avaliações de verdade.
 select pg_temp.afirmar(
-  (select count(*) from notificacao where evento = 'feedback_concluido') = 1
-  and (select count(*) from notificacao where evento = 'credito_liberado') = 1,
+  (select count(*) from notificacao
+    where evento = 'feedback_concluido' and perfil_id in (select id from ator)) = 1
+  and (select count(*) from notificacao
+    where evento = 'credito_liberado' and perfil_id in (select id from ator)) = 1,
   'os dois lados foram notificados'
 );
 
 select pg_temp.afirmar(
-  (select n.perfil_id from notificacao n where n.evento = 'feedback_concluido')
-    = (select id from ator where papel = 'artista')
-  and (select n.perfil_id from notificacao n where n.evento = 'credito_liberado')
-    = (select id from ator where papel = 'curador'),
+  exists (select 1 from notificacao n
+           where n.evento = 'feedback_concluido'
+             and n.perfil_id = (select id from ator where papel = 'artista'))
+  and exists (select 1 from notificacao n
+               where n.evento = 'credito_liberado'
+                 and n.perfil_id = (select id from ator where papel = 'curador')),
   'cada notificacao foi para a pessoa certa'
 );
 
@@ -386,8 +415,11 @@ update membro_admin set papel_admin = 'financeiro'
 set local request.jwt.claims = '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}';
 set local role authenticated;
 
+-- Contado só o do curador do fixture: o financeiro enxerga **todos** os ganhos,
+-- inclusive os que a suíte E2E grava no projeto compartilhado.
 select pg_temp.afirmar(
-  pg_temp.quantas('select 1 from ganho_curador') = 1,
+  pg_temp.quantas('select 1 from ganho_curador g join perfil_curador pc on pc.id = g.perfil_curador_id
+                    where pc.perfil_id = ''33333333-3333-3333-3333-333333333333''') = 1,
   'o financeiro le os ganhos, para conciliar o rateio'
 );
 

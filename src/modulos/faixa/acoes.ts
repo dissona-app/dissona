@@ -20,7 +20,8 @@ import { ROTA } from '@/lib/guarda-rota';
 import { usuarioAtual } from '@/lib/supabase/servidor';
 
 import { lerLimitesDeUpload } from './consultas';
-import { esquemaContexto, esquemaDetalhes } from './esquemas';
+import { detectarPorLink } from './deteccao';
+import { esquemaContexto, esquemaDeteccao, esquemaDetalhes } from './esquemas';
 import {
   atualizarContexto,
   atualizarDetalhes,
@@ -30,7 +31,8 @@ import {
   subirAudio,
   subirCapa,
 } from './repositorio';
-import { validarAudio } from './servico';
+import { lerMetadados, provedorDoLink, validarAudio } from './servico';
+import type { MetadadosDetectados } from './tipos';
 
 function texto(dados: FormData, campo: string): string {
   const valor = dados.get(campo);
@@ -58,6 +60,44 @@ async function usuarioDaSessao(): Promise<string> {
   const usuario = await usuarioAtual();
   if (usuario === null) falhar(CodigoErro.NAO_AUTENTICADO);
   return usuario.id;
+}
+
+function metadadosDoFormulario(
+  bruto: string,
+  urlSpotify: string | null,
+  urlYoutube: string | null,
+): MetadadosDetectados | null {
+  const metadados = lerMetadados(bruto);
+  if (metadados === null) return null;
+  return metadados.url === urlSpotify || metadados.url === urlYoutube ? metadados : null;
+}
+
+/**
+ * 3.1 · "Detectar faixa".
+ *
+ * Não grava nada: devolve o que o provedor disse, e a tela preenche o
+ * formulário. Gravar é do "Continuar", junto com o arquivo — detectar e
+ * desistir não pode deixar faixa em rascunho para trás.
+ *
+ * Sessão exigida: sem ela, a ação seria um proxy anônimo para o oEmbed.
+ */
+export async function detectarFaixa(link: string): Promise<ResultadoDeAcao<MetadadosDetectados>> {
+  return executar(async () => {
+    await usuarioDaSessao();
+
+    const analise = esquemaDeteccao.safeParse({ url: link });
+    if (!analise.success || provedorDoLink(analise.data.url) === null) {
+      return falha(CodigoErro.ENTRADA_INVALIDA, 'link', {
+        motivo: analise.success
+          ? 'link_nao_suportado'
+          : (analise.error.issues[0]?.message ?? 'link_invalido'),
+      });
+    }
+
+    const metadados = await detectarPorLink(analise.data.url);
+    if (metadados === null) return falha(CodigoErro.NAO_ENCONTRADO, 'link');
+    return sucesso(metadados);
+  });
 }
 
 /**
@@ -127,6 +167,13 @@ export async function salvarFaixa(dados: FormData): Promise<ResultadoDeAcao> {
       lancada,
       dataLancamento: analise.data.dataLancamento,
       duracaoSegundos: null,
+      // Só vale se o link detectado ainda é um dos links gravados — quem
+      // detectou e depois trocou o link não pode carregar metadado alheio.
+      metadadosDetectados: metadadosDoFormulario(
+        texto(dados, 'metadados'),
+        analise.data.urlSpotify,
+        analise.data.urlYoutube,
+      ),
     };
 
     if (existente === null) {

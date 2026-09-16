@@ -23,25 +23,24 @@ const centavos = z
   .transform((valor) => BigInt(valor));
 
 /**
- * Faixa de remuneração de uma classe.
+ * Faixa de remuneração de uma classe — a **tabela do board** (regras §3).
  *
- * A forma vem do protótipo da R2, não da tabela do board: os três números são
- * **piso dentro das 72h**, **teto na avaliação** e **teto com
- * compartilhamento** — e não (atraso, prazo, teto), como `docs/data-model.md`
- * §5 lê. As legendas da tela de remuneração não deixam margem: "Piso da classe
- * dentro das 72h" exibe 30% para Bronze, e "Teto da classe Bronze: 38% na
- * avaliação e 50% com compartilhamento".
+ * Os três números são **piso em atraso**, **piso no prazo** e **teto**. Foi a
+ * resposta do cliente à open-questions #5, em 2026-09-16: um Bronze no prazo
+ * sem opcionais recebe 38%.
  *
- * Consequência: RF-066 está incorreto ao afirmar que o piso no prazo é 38%.
+ * Até a migration `0009b` a forma era a do protótipo — (piso, teto na
+ * avaliação, teto com compartilhamento), com Bronze no prazo a 30%. Os valores
+ * numéricos são os mesmos; o que mudou foi o significado de cada posição.
  */
 const faixaRemuneracao = z
   .object({
-    piso: percentual,
-    teto_base: percentual,
-    teto_max: percentual,
+    piso_atraso: percentual,
+    piso_prazo: percentual,
+    teto: percentual,
   })
-  .refine((faixa) => faixa.piso <= faixa.teto_base && faixa.teto_base <= faixa.teto_max, {
-    message: 'esperado piso <= teto_base <= teto_max',
+  .refine((faixa) => faixa.piso_atraso <= faixa.piso_prazo && faixa.piso_prazo <= faixa.teto, {
+    message: 'esperado piso_atraso <= piso_prazo <= teto',
   });
 
 const pesosRanking = z
@@ -80,8 +79,8 @@ export const ESQUEMAS_CONFIGURACAO = {
   'remuneracao.bronze': faixaRemuneracao,
   'remuneracao.prata': faixaRemuneracao,
   'remuneracao.ouro': faixaRemuneracao,
-  penalidade_atraso_pontos: percentual,
-  piso_minimo_atraso_percentual: percentual,
+  /** Fora das 72h o acumulado vai no máximo a este valor (regras §3.1, item 3). */
+  teto_atraso_percentual: percentual,
   acrescimo_onze_criterios_percentual: percentual,
   acrescimo_justificativa_percentual: percentual,
   acrescimo_justificativa_min_itens: inteiroPositivo,
@@ -128,12 +127,12 @@ export type ValorConfiguracao<C extends ChaveConfiguracao> = z.output<
  *   quando a origem é streaming ([#7]).
  * - `compartilhamento.acrescimo_retido` — a copy diz que a equipe confere antes
  *   de liberar o acréscimo, mas o cálculo o concede na hora ([#8]).
- * - `remuneracao.base` — resolvido pelo protótipo, mas a divergência de
- *   semântica com a tabela do board é grande o bastante para o número
- *   continuar marcado até o cliente confirmar ([#5]).
+ *
+ * `remuneracao.base` saiu da lista em 2026-09-16: a pergunta #5 foi feita em
+ * termos de "o valor pago pelo artista", e a resposta (38%) confirmou a base
+ * `bruto` junto com a tabela do board.
  */
 export const CHAVES_PENDENTES: readonly ChaveConfiguracao[] = [
-  'remuneracao.base',
   'upload.armazenar_sempre',
   'escuta_exigida_quando_link',
   'compartilhamento.acrescimo_retido',

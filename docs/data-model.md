@@ -386,16 +386,15 @@ Chave-valor tipada. **Nenhum número de negócio vive no código.**
 | `justificativa_min_caracteres` | `250` | acréscimo |
 | `criterios_obrigatorios` | `["afinacao","ritmo","melodia","personalidade","conexao"]` | flags do protótipo. **Não** é um por grupo |
 | `remuneracao.base` | `"bruto"` | protótipo: `pct` incide sobre o valor pago pelo artista |
-| `remuneracao.bronze` | `{"piso":30,"teto_base":38,"teto_max":50}` | **outra semântica** — ver o aviso abaixo |
-| `remuneracao.prata` | `{"piso":40,"teto_base":43,"teto_max":55}` | |
-| `remuneracao.ouro` | `{"piso":45,"teto_base":50,"teto_max":62}` | |
-| `penalidade_atraso_pontos` | `8` | o atraso derruba o **piso**, não capa o acumulado |
-| `piso_minimo_atraso_percentual` | `15` | piso absoluto depois da penalidade |
+| `remuneracao.bronze` | `{"piso_atraso":30,"piso_prazo":38,"teto":50}` | tabela do board — ver o aviso abaixo |
+| `remuneracao.prata` | `{"piso_atraso":40,"piso_prazo":43,"teto":55}` | |
+| `remuneracao.ouro` | `{"piso_atraso":45,"piso_prazo":50,"teto":62}` | |
+| `teto_atraso_percentual` | `50` | fora das 72h, o total é capado aqui |
 | `acrescimo_onze_criterios_percentual` | `3` | |
 | `acrescimo_justificativa_percentual` | `3` | |
 | `acrescimo_justificativa_min_itens` | `1` | booleano, não 3% por item |
 | `acrescimo_feedback_150_percentual` | `3` | |
-| `acrescimo_compartilhamento_percentual` | `8` | o único que passa de `teto_base` |
+| `acrescimo_compartilhamento_percentual` | `8` | |
 | `compartilhamento.acrescimo_retido` | `false` | ⚠️ default provisional — [#8](open-questions.md) |
 | `classe.prata_min_credenciais` | `2` | |
 | `classe.ouro_min_curadorias` | `60` | |
@@ -409,34 +408,28 @@ Chave-valor tipada. **Nenhum número de negócio vive no código.**
 | `upload.armazenar_sempre` | `true` | ⚠️ default provisional — [#7](open-questions.md) |
 | `lgpd.dias_expurgo` | `30` | |
 
-> ### ⚠️ `remuneracao.*` mudou de forma, e de significado
+> ### `remuneracao.*` segue a tabela do board (decisão do cliente, 2026-09-16)
 >
-> A tabela de [regras §3](prd/01-regras-de-negocio.md) lê os três números por
-> classe como *(piso em atraso, piso no prazo, teto)*. O **protótipo da R2** —
-> que o [AGENTS.md](../AGENTS.md) põe acima do board — os lê como *(piso dentro
-> das 72h, teto na avaliação, teto com compartilhamento)*, e as legendas da
-> própria tela não deixam margem: *"Piso da classe dentro das 72h"* exibe **30%**
-> para Bronze, e *"Teto da classe Bronze: 38% na avaliação e 50% com
-> compartilhamento"*.
+> O protótipo da R2 lia os três números por classe como *(piso, teto na
+> avaliação, teto com compartilhamento)* — Bronze no prazo sem opcionais
+> receberia 30%. O cliente respondeu a [#5](open-questions.md): **vale a tabela
+> de [regras §3](prd/01-regras-de-negocio.md)**, *(piso em atraso, piso no
+> prazo, teto)*. A migration `0009b_remuneracao_da_tabela` aplicou a decisão:
 >
-> Consequências, todas já refletidas no banco e cobertas por teste:
->
-> - **Um Bronze que entrega no prazo sem nenhum opcional recebe 30%**, não 38%.
->   `RF-066` de [requirements.md](requirements.md) está incorreto.
-> - `teto_atraso_percentual` **saiu**. O atraso derruba o piso em 8 pontos, com
->   mínimo de 15; não existe teto de 50% sobre o acumulado.
-> - Com os acréscimos deste seed, `teto_max` **nunca é alcançado**: o máximo real
->   é 46 / 51 / 58 contra tetos de 50 / 55 / 62. Sobram exatamente 4 pontos nas
->   três classes — ou falta um acréscimo, ou os tetos são aspiracionais.
->   **Pergunta aberta para o cliente.**
+> - **Um Bronze que entrega no prazo sem nenhum opcional recebe 38%**
+>   (`RF-066`). Fora das 72h, o piso é 30 / 40 / 45.
+> - Os quatro acréscimos somam até **um único teto** (50 / 55 / 62), alcançável
+>   nas três classes — a [#5b](open-questions.md) deixou de existir.
+> - Fora das 72h, o total é capado em `teto_atraso_percentual` (50).
+>   `penalidade_atraso_pontos` e `piso_minimo_atraso_percentual` saíram.
 >
 > `remuneracao.base` existe para a decisão ser reversível: com `"cota_curador"`
 > os percentuais passam a incidir sobre a margem, e `calcular_remuneracao` já
 > ramifica nos dois modos.
 
-O total é de **32 chaves**, e o registro Zod em
+O total é de **31 chaves**, e o registro Zod em
 `src/lib/configuracao/chaves.ts` tem de cobrir exatamente as mesmas — há teste
-de deriva que lê este `.sql` e compara.
+de deriva que aplica os `insert`/`delete` de todas as migrations e compara.
 
 **RLS:** leitura para qualquer sessão autenticada; escrita apenas para `papel_admin = administrador`.
 
@@ -799,19 +792,19 @@ calcular_remuneracao(
 
 Pura e determinística: nenhum `now()`, nenhum `auth.uid()` — o prazo e a classe entram **congelados** como parâmetro. `stable`, porque lê `configuracao`, numa única consulta que **falha** quando falta chave em vez de cair num default silencioso.
 
-O algoritmo é o do protótipo da R2:
+O algoritmo é o da tabela do board (migration `0009b`, decisão do cliente em [#5](open-questions.md)):
 
 ```
-piso     = no_prazo ? faixa.piso : max(piso_minimo_atraso, faixa.piso - penalidade_pontos)
-pct_base = min(piso + 3·onze + 3·just250 + 3·fb150, faixa.teto_base)
-pct      = min(pct_base + 8·compartilhou, faixa.teto_max)
+piso     = no_prazo ? faixa.piso_prazo : faixa.piso_atraso
+teto     = no_prazo ? faixa.teto : min(faixa.teto, teto_atraso_percentual)
+pct      = max(piso, min(piso + 3·onze + 3·just250 + 3·fb150 + 8·compartilhou, teto))
 valor    = round(base_calculo * pct / 100)
 comissao = base_centavos - valor
 ```
 
 Três coisas que valem registro:
 
-1. Os **três acréscimos de conteúdo** são capados em `teto_base`, e saturam-no em todas as classes (30+9 ≥ 38, 40+9 ≥ 43, 45+9 ≥ 50). Só o compartilhamento passa disso, e é por isso que vale 8 pontos, não 3.
+1. Os **quatro acréscimos** somam 17 pontos contra um único teto: o teto é alcançável nas três classes (38+12 ≥ 50, 43+12 ≥ 55, 50+12 ≥ 62). O `max(piso, …)` garante que um teto de atraso abaixo do piso nunca reduza o piso.
 2. Os acréscimos entram em **ordem fixa declarada** no `jsonb` — a ordem não muda o total, mas torna o resultado byte a byte comparável em teste.
 3. A comissão sai por **subtração**, nunca por um segundo arredondamento: é o que faz o rateio fechar sem centavo perdido nem sobrando.
 

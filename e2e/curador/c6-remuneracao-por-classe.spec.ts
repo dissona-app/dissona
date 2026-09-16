@@ -36,12 +36,11 @@ import { AVALIAR } from '../apoio/textos';
  * concluído. É o último teste deste arquivo, e ele **consome** um envio — por
  * isso usa uma faixa própria, que `dados-e2e.sql` repõe.
  *
- * ## Uma pendência que esta tela torna visível
+ * ## A tabela é a do board
  *
- * Um Bronze no prazo sem nenhum opcional recebe o **piso** da classe, 30%, e
- * não os 38% que o RF-066 afirma — 38% é o teto na avaliação
- * ([#5](../../docs/open-questions.md)). O teste afirma sobre o que está
- * implementado, que é o protótipo; a confirmação do cliente segue pendente.
+ * O cliente respondeu a [#5](../../docs/open-questions.md) em 2026-09-16: vale
+ * a tabela do board, e um Bronze no prazo tem piso de **38%**. O primeiro teste
+ * afirma esse número na tela — é a decisão, e não um detalhe de layout.
  */
 // Os três primeiros compartilham um envio; o último consome o seu.
 test.describe.configure({ mode: 'serial' });
@@ -57,9 +56,10 @@ test.describe('C6 · Remuneração por classe', () => {
     await expect(page.getByText(AVALIAR.suaClasse, { exact: true })).toBeVisible();
     await expect(page.getByText(AVALIAR.classes.bronze, { exact: true })).toBeVisible();
 
-    // O piso, com a legenda de dentro do prazo.
+    // O piso, com a legenda de dentro do prazo — e o número que o cliente
+    // decidiu: Bronze no prazo é 38%, pela tabela do board (open-questions #5).
     await expect(page.getByText(AVALIAR.pisoNoPrazo)).toBeVisible();
-    await expect(page.getByText(/^\d+%$/).first()).toBeVisible();
+    await expect(page.getByText('38%', { exact: true })).toBeVisible();
 
     // Os quatro acréscimos do catálogo.
     await expect(page.getByText(AVALIAR.acrescimos.onze_criterios(11))).toBeVisible();
@@ -67,10 +67,10 @@ test.describe('C6 · Remuneração por classe', () => {
     await expect(page.getByText(/Feedback com \d+ caracteres/)).toBeVisible();
     await expect(page.getByText(AVALIAR.acrescimos.compartilhou)).toBeVisible();
 
-    // O teto da classe, com os dois números de `configuracao.remuneracao.*`.
-    await expect(
-      page.getByText(/Teto da classe Bronze: \d+% na avaliação e \d+% com/),
-    ).toBeVisible();
+    // Um teto só desde a `0009b` — o degrau "na avaliação / com
+    // compartilhamento" do protótipo não existe na tabela do board.
+    await expect(page.getByText(AVALIAR.tetoNota(AVALIAR.classes.bronze, 50))).toBeVisible();
+    await expect(page.getByText(/na avaliação e \d+% com/)).toHaveCount(0);
   });
 
   test('distingue acréscimo cumprido de não cumprido', async ({ page }) => {

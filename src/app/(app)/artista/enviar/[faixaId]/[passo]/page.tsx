@@ -9,7 +9,7 @@ import { Aviso } from '@/componentes/base/Aviso';
 import * as claves from '@/lib/claves';
 import { ROTA } from '@/lib/guarda-rota';
 import { lerCarteira } from '@/modulos/claves/consultas';
-import { salvarContexto, salvarFaixa } from '@/modulos/faixa/acoes';
+import { detectarFaixa, salvarContexto, salvarFaixa } from '@/modulos/faixa/acoes';
 import { lerFaixaDoPasso, lerLimitesDeUpload } from '@/modulos/faixa/consultas';
 import { ehPassoDoEnvio } from '@/modulos/faixa/tipos';
 import { CARTEIRA, ENVIAR } from '@/textos/prototipo';
@@ -58,7 +58,9 @@ export default async function PaginaDoPasso({
   // Adiantou-se no wizard — volta para onde ele de fato está.
   if (estado.estado === 'adiantado') {
     redirect(
-      estado.ate === 'faixa' ? ROTA.ARTISTA_ENVIAR : `${ROTA.ARTISTA_ENVIAR}/${faixaId}/${estado.ate}`,
+      estado.ate === 'faixa'
+        ? ROTA.ARTISTA_ENVIAR
+        : `${ROTA.ARTISTA_ENVIAR}/${faixaId}/${estado.ate}`,
     );
   }
 
@@ -68,7 +70,12 @@ export default async function PaginaDoPasso({
     const limites = await lerLimitesDeUpload();
     return (
       <MolduraDoEnvio passo="faixa">
-        <FormularioDaFaixa faixa={faixa} limites={limites} acao={salvarFaixa} />
+        <FormularioDaFaixa
+          faixa={faixa}
+          limites={limites}
+          acao={salvarFaixa}
+          detectar={detectarFaixa}
+        />
       </MolduraDoEnvio>
     );
   }

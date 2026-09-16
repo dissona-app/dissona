@@ -457,19 +457,13 @@ Idênticos a RF-022, RF-023 e RF-024, com o catálogo de eventos do curador.
 ### RF-066 · Remuneração por classe
 
 - **Dado** que chego à etapa 5, **quando** ela carrega, **então** vejo classe atual, **piso** conforme o prazo, **acréscimos** item a item com rótulo e valor, **teto** da classe e **"Você recebe"**.
-- **Dado** que entreguei **dentro de 72h**, **quando** o cálculo roda, **então** o piso é **30%** (Bronze), **40%** (Prata) ou **45%** (Ouro).
-- **Dado** que respondi os onze critérios, justifiquei e escrevi o feedback longo, **quando** o cálculo roda, **então** chego ao teto na avaliação: 38% / 43% / 50%.
-- **Dado** que também compartilhei, **quando** o cálculo roda, **então** somo 8 pontos: 46% / 51% / 58%.
-- **Dado** que entreguei **fora das 72h**, **quando** o cálculo roda, **então** o piso cai 8 pontos, com mínimo de 15%.
-
-> ⚠️ **Este requisito foi corrigido.** A versão anterior afirmava que o piso
-> dentro de 72h era 38% / 43% / 50%. Esses são os **tetos na avaliação**: o
-> protótipo da R2 lê os três números por classe como *(piso, teto na avaliação,
-> teto com compartilhamento)*, e um Bronze que entrega no prazo sem nenhum
-> opcional recebe **30%**. Ver o aviso em [data-model §5](data-model.md) e o
-> cabeçalho da migration `0009`.
+- **Dado** que entreguei **dentro de 72h**, **quando** o cálculo roda, **então** o piso é **38%** (Bronze), **43%** (Prata) ou **50%** (Ouro).
 - **Dado** que entreguei **após 72h**, **quando** o cálculo roda, **então** o piso é 30/40/45% e o **acumulado é limitado a 50%**.
 - **Dado** que cumpri opcionais, **quando** o cálculo roda, **então** os acréscimos somam **até o teto** da classe (50/55/62%).
+
+> **Decisão do cliente (2026-09-16, [#5](open-questions.md)):** vale a tabela
+> do board. O protótipo da R2 sugeria piso de 30% no prazo; essa leitura foi
+> descartada. Implementado pela migration `0009b_remuneracao_da_tabela`.
 
 ### RF-067 · Concluir e liberar crédito
 

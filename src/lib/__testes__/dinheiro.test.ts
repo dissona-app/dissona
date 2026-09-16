@@ -79,7 +79,7 @@ describe('paraStringDecimal e formatar', () => {
 
 describe('aplicarPercentual', () => {
   it('aplica os percentuais de remuneração por classe', () => {
-    // remuneracao.bronze = { piso: 30, teto_base: 38, teto_max: 50 }
+    // remuneracao.bronze = { piso_atraso: 30, piso_prazo: 38, teto: 50 }
     expect(aplicarPercentual(1000n, 30)).toBe(300n);
     expect(aplicarPercentual(1000n, 38)).toBe(380n);
     expect(aplicarPercentual(1000n, 50)).toBe(500n);

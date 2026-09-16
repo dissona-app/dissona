@@ -141,11 +141,16 @@ export const AVALIAR = {
   tituloRemuneracao: 'Como sua remuneração foi calculada',
   suaClasse: 'Sua classe',
 
+  /**
+   * Os pisos são os da tabela do board (regras §3), decisão do cliente em
+   * open-questions #5: um piso para quem entrega no prazo e outro, menor, para
+   * quem atrasa — e o atraso também limita o total.
+   */
   pisoNoPrazo: 'Piso da classe dentro das 72h',
-  pisoAtrasado: 'Piso reduzido por resposta fora do prazo',
+  pisoAtrasado: 'Piso da classe fora das 72h',
   pisoNotaNoPrazo: 'Entrega dentro do prazo garante o piso cheio da sua classe.',
-  pisoNotaAtrasado: (pontos: number) =>
-    `A faixa passou do prazo, então o piso da classe cai ${pontos} pontos.`,
+  pisoNotaAtrasado: (tetoAtraso: number) =>
+    `A faixa passou do prazo: vale o piso de atraso, e o total vai no máximo a ${tetoAtraso}%.`,
 
   /** Os quatro opcionais de `calcular_remuneracao`, na ordem em que ela os devolve. */
   acrescimos: {
@@ -170,14 +175,13 @@ export const AVALIAR = {
   acrescimoPercentual: (percentual: number) => `+${percentual}%`,
 
   /**
-   * ⚠️ `teto_base` e `teto_max` vêm de `configuracao.remuneracao.<classe>`.
-   *
-   * Com os acréscimos do catálogo, `teto_max` **nunca é alcançado** — sobram 4
-   * pontos nas três classes. A frase é a do protótipo; a divergência está
-   * registrada em open-questions #5b.
+   * Um teto só, desde a `0009b`. O protótipo dizia "N% na avaliação e M% com
+   * compartilhamento" — dois degraus que a tabela do board não tem. O valor é o
+   * teto **efetivo** que `calcular_remuneracao` devolve: fora das 72h ele já
+   * vem limitado.
    */
-  tetoNota: (classe: string, tetoBase: number, tetoMax: number) =>
-    `Teto da classe ${classe}: ${tetoBase}% na avaliação e ${tetoMax}% com compartilhamento. Acréscimos somam até o teto.`,
+  tetoNota: (classe: string, teto: number) =>
+    `Teto da classe ${classe}: ${teto}%. Os acréscimos somam até o teto.`,
 
   voceRecebe: 'Você recebe',
   valorNota: (percentual: number, pagoPeloArtista: string) =>

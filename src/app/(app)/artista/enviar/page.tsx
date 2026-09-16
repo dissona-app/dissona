@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { MolduraDoEnvio } from '@/componentes/artista/MolduraDoEnvio';
 import { FormularioDaFaixa } from '@/componentes/artista/FormularioDaFaixa';
-import { salvarFaixa } from '@/modulos/faixa/acoes';
+import { detectarFaixa, salvarFaixa } from '@/modulos/faixa/acoes';
 import { lerLimitesDeUpload } from '@/modulos/faixa/consultas';
 
 export const metadata: Metadata = {
@@ -21,7 +21,12 @@ export default async function PaginaDoEnvio() {
 
   return (
     <MolduraDoEnvio passo="faixa">
-      <FormularioDaFaixa faixa={null} limites={limites} acao={salvarFaixa} />
+      <FormularioDaFaixa
+        faixa={null}
+        limites={limites}
+        acao={salvarFaixa}
+        detectar={detectarFaixa}
+      />
     </MolduraDoEnvio>
   );
 }

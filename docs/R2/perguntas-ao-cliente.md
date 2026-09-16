@@ -17,6 +17,9 @@ difere da tabela do board não nos números, mas no **significado** deles.
 
 ## 1 · Um Bronze no prazo recebe 30% ou 38%?
 
+> ✅ **Respondida em 2026-09-16: 38% — vale a tabela do board.** Implementada
+> pela migration `0009b_remuneracao_da_tabela`.
+
 A tabela de remuneração tem três números por classe: Bronze 30/38/50,
 Prata 40/43/55, Ouro 45/50/62.
 
@@ -46,6 +49,9 @@ uma linha de configuração mais um ajuste na função de cálculo.*
 ---
 
 ## 2 · Falta um acréscimo de 4 pontos, ou o teto é aspiracional?
+
+> ✅ **Superada pela resposta da pergunta 1.** Com a tabela do board há um teto
+> único, e os acréscimos o alcançam nas três classes.
 
 Somando os acréscimos que o protótipo concede — três de 3 pontos (responder os
 onze critérios, justificar, feedback longo) e 8 pontos de compartilhamento — o

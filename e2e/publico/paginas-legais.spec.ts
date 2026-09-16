@@ -10,9 +10,11 @@ import { expect, test } from '@playwright/test';
  */
 
 test.describe('páginas legais', () => {
-  test('a home pública abre sem sessão', async ({ page }) => {
+  // Enquanto a home da R5 não existe, a raiz leva ao login (commit 3f0a3c1).
+  test('a raiz pública leva ao login, sem exigir sessão', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Dissona' })).toBeVisible();
+    await page.waitForURL('**/entrar');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 
   test('os termos de uso abrem e avisam que o texto está pendente', async ({ page }) => {

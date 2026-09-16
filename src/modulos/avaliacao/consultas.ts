@@ -121,9 +121,12 @@ export type TelaDaRemuneracao = TelaDaAvaliacao & {
   /** Congelado pela RPC na conclusão; aqui é previsão, medida contra o relógio. */
   readonly noPrazo: boolean;
   readonly remuneracao: Remuneracao | null;
-  /** O teto **na avaliação**, que `calcular_remuneracao` não devolve. */
-  readonly tetoBasePercentual: number;
-  readonly penalidadeAtrasoPontos: number;
+  /**
+   * Até onde o acumulado vai fora das 72h. O teto **efetivo** já vem de
+   * `calcular_remuneracao` em `remuneracao.tetoPercentual`; este é só para a
+   * nota do piso explicar a regra quando a entrega atrasa.
+   */
+  readonly tetoAtrasoPercentual: number;
   readonly servicos: readonly ServicoContratado[];
   /** Quantos critérios alcançaram o mínimo de caracteres — o detalhe do acréscimo. */
   readonly justificativasLongas: number;
@@ -144,13 +147,10 @@ export async function lerRemuneracao(envioId: string): Promise<TelaDaRemuneracao
   const base = await lerAvaliacao(envioId);
   if (base === null) return null;
 
-  const [classe, servicos, faixaBronze, faixaPrata, faixaOuro, penalidade] = await Promise.all([
+  const [classe, servicos, tetoAtraso] = await Promise.all([
     classeDoCurador(),
     servicosDoEnvio(envioId),
-    lerConfiguracao('remuneracao.bronze'),
-    lerConfiguracao('remuneracao.prata'),
-    lerConfiguracao('remuneracao.ouro'),
-    lerConfiguracao('penalidade_atraso_pontos'),
+    lerConfiguracao('teto_atraso_percentual'),
   ]);
 
   // Sem papel de curador não há classe, e sem classe não há o que calcular. O
@@ -173,15 +173,12 @@ export async function lerRemuneracao(envioId: string): Promise<TelaDaRemuneracao
           opcionais,
         );
 
-  const faixa = { bronze: faixaBronze, prata: faixaPrata, ouro: faixaOuro }[classe];
-
   return {
     ...base,
     classe,
     noPrazo,
     remuneracao,
-    tetoBasePercentual: faixa.teto_base,
-    penalidadeAtrasoPontos: penalidade,
+    tetoAtrasoPercentual: tetoAtraso,
     servicos,
     justificativasLongas: justificativasLongas(base.avaliacao, base.regras),
   };

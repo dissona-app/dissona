@@ -1,21 +1,28 @@
 /**
  * Schema Zod do checkout (5.2).
  *
- * ## O que **não** está aqui, e é a decisão mais importante do arquivo
+ * ## Os dados do cartão atravessam o servidor, e não ficam nele
  *
- * Os quatro campos do cartão — número, nome, validade e código de segurança —
- * não entram neste schema porque **não são enviados ao servidor**. O
- * requisito da R2 é "checkout com cartão tokenizado, sem persistir dados do
- * cartão", e a forma mais forte de não persistir é o dado não atravessar a
- * rede: a validação de formato acontece no cliente, em
- * `FormularioDeCheckout`, e o que chega aqui é só pacote, meio e — enquanto o
- * provedor for o simulado — o desfecho a simular.
+ * O Asaas não tem SDK de navegador: a cobrança e a tokenização são chamadas de
+ * API com a chave da conta, que não pode ir ao navegador. Então número,
+ * titular, validade e código de segurança **passam** pela Server Action a
+ * caminho do Asaas — e morrem ali. Nada disso é gravado no banco, entra em
+ * log ou volta na resposta; o requisito "sem persistir dados do cartão" é
+ * cumprido por esse caminho curto, e não por o dado não sair do navegador.
  *
- * Quando o Asaas entrar, o campo que aparece neste schema é o **token** que o
- * SDK deles devolve no navegador, nunca o PAN. O lugar já está marcado.
+ * As mensagens são **códigos**; a View traduz (architecture.md §8). Nenhuma
+ * delas ecoa o valor recebido.
+ *
+ * ## CPF nos dois meios
+ *
+ * O Asaas só gera cobrança para cliente com CPF válido — Pix inclusive. O
+ * cartão pede ainda telefone com DDD e CEP do titular; sem eles a API recusa
+ * com `invalid_creditCard` (verificado no sandbox em 2026-09-16).
  */
 
 import { z } from 'zod';
+
+import { cpfValido, telefoneValido } from '@/lib/mascaras';
 
 import { RESULTADOS_SIMULADOS } from './tipos';
 import type { MeioPagamento } from './tipos';
@@ -26,9 +33,7 @@ import type { MeioPagamento } from './tipos';
  *
  * As duas amarras abaixo prendem a cópia ao original nos dois sentidos: o
  * `satisfies` recusa um literal que o enum não tenha, e `Exaustivo` recusa um
- * valor do enum que falte na lista. Sem a segunda, acrescentar `boleto` no
- * banco passaria despercebido até alguém reparar que a opção não aparece na
- * tela — e é o tipo de ausência que ninguém procura.
+ * valor do enum que falte na lista.
  */
 export const MEIOS_DE_PAGAMENTO = ['pix', 'cartao'] as const satisfies readonly MeioPagamento[];
 
@@ -38,15 +43,65 @@ type Exaustivo =
 const MEIOS_COBREM_O_ENUM: Exaustivo = true;
 void MEIOS_COBREM_O_ENUM;
 
-export const esquemaDeCompra = z.object({
+const digitos = (valor: string) => valor.replace(/\D/g, '');
+
+const cpf = z.string().transform(digitos).refine(cpfValido, { message: 'cpf_invalido' });
+
+/** Luhn: pega número digitado errado antes de gastar uma chamada ao Asaas. */
+export function luhnValido(numero: string): boolean {
+  const d = digitos(numero);
+  if (d.length < 13 || d.length > 19) return false;
+  let soma = 0;
+  for (let i = 0; i < d.length; i += 1) {
+    let n = Number(d[d.length - 1 - i]);
+    if (i % 2 === 1) {
+      n *= 2;
+      if (n > 9) n -= 9;
+    }
+    soma += n;
+  }
+  return soma % 10 === 0;
+}
+
+const comuns = {
   pacoteId: z.uuid(),
-  meio: z.enum(MEIOS_DE_PAGAMENTO),
+  cpf,
   /**
    * Opcional de propósito: com o provedor real ele não existe, e a ação
-   * ignora o que vier. Um campo obrigatório aqui faria a migração para o
-   * Asaas exigir mudança de schema, de ação e de tela ao mesmo tempo.
+   * ignora o que vier.
    */
   simulacao: z.enum(RESULTADOS_SIMULADOS).optional(),
-});
+};
+
+export const esquemaDeCompra = z.discriminatedUnion('meio', [
+  z.object({ ...comuns, meio: z.literal('pix') }),
+  z.object({
+    ...comuns,
+    meio: z.literal('cartao'),
+    titular: z.string().trim().min(1, { message: 'titular_vazio' }).max(100),
+    numero: z.string().transform(digitos).refine(luhnValido, { message: 'numero_invalido' }),
+    validade: z
+      .string()
+      .trim()
+      .regex(/^(0[1-9]|1[0-2])\/?\d{2}$/, { message: 'validade_invalida' })
+      .transform((valor) => {
+        const d = digitos(valor);
+        return { mes: d.slice(0, 2), ano: `20${d.slice(2, 4)}` };
+      }),
+    cvv: z
+      .string()
+      .transform(digitos)
+      .refine((v) => v.length === 3 || v.length === 4, { message: 'cvv_invalido' }),
+    telefone: z
+      .string()
+      .transform(digitos)
+      .refine(telefoneValido, { message: 'telefone_invalido' }),
+    cep: z
+      .string()
+      .transform(digitos)
+      .refine((v) => v.length === 8, { message: 'cep_invalido' }),
+  }),
+]);
 
 export type EntradaDeCompra = z.input<typeof esquemaDeCompra>;
+export type Compra = z.output<typeof esquemaDeCompra>;

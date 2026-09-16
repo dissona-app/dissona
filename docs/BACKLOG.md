@@ -18,11 +18,11 @@ Detalhamento e perguntas objetivas em [open-questions](open-questions.md).
 - [x] **11º critério** — o grupo Produção tem **dois** itens, Mixagem e Arranjo. O board perdeu dois, não um
 - [x] **Quais 5 são obrigatórios** — afinação, ritmo, melodia, personalidade, conexão. Não é um por grupo
 - [x] **Tabela de pacotes** — Ensaio, Repertório, Turnê e Catálogo (inativo), do protótipo do Admin
-- [ ] **Base de cálculo da remuneração** — respondida pelo protótipo (incide sobre o **bruto**), mas com **outra semântica**: os três números por classe são (piso, teto na avaliação, teto com compartilhamento). Um Bronze no prazo sem opcionais recebe **30%**, não 38% ([#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe)). Implementado e coberto por teste; **confirmar com o cliente antes da tela 14.4**
+- [x] **Base de cálculo da remuneração** — incide sobre o **bruto**; o cliente decidiu em 2026-09-16 pela **tabela do board** (piso em atraso, piso no prazo, teto): Bronze no prazo sem opcionais recebe **38%** ([#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe)). Migration `0009b`
 - [ ] **Modelo de split com o Asaas**, junto do contador do cliente ([#6](open-questions.md#6-modelo-de-split-no-asaas))
 - [ ] **Armazenamento do mp3: sempre ou só fora do streaming** ([#7](open-questions.md#7-armazenamento-do-arquivo-de-áudio)) · default provisional `true` em `configuracao`, porque um iframe de streaming não expõe posição de reprodução e o gate de escuta ficaria inverificável
 - [ ] **Acréscimo de compartilhamento fica retido?** — o protótipo se contradiz internamente ([#8](open-questions.md#8-liberação-do-crédito-versus-compartilhamento)). Adotado o cálculo (libera na hora), com a decisão gravada no `jsonb` do ganho
-- [ ] **`teto_max` é inalcançável** — com os acréscimos do catálogo o máximo real é 46/51/58 contra tetos de 50/55/62; sobram 4 pontos nas três classes ([#5b](open-questions.md#5b-teto_max-é-inalcançável))
+- [x] **`teto_max` é inalcançável** — deixou de existir com a decisão da #5: teto único, alcançável nas três classes ([#5b](open-questions.md#5b-teto_max-é-inalcançável))
 - [ ] **LGPD × retenção fiscal no expurgo** — o job anonimiza em vez de apagar, porque o ledger é append-only. **Decisão de jurídico** ([#27](open-questions.md#27-lgpd-versus-retenção-fiscal-no-expurgo))
 
 ### Travam a R1
@@ -205,6 +205,8 @@ código pode contornar:
 - [x] Migration `0006` — `faixa`, `envio`, `servico_envio`, mais a policy do bucket `faixas` que a R0 deixou pendente (corrigida: o rascunho comparava uma coluna que não existe). `0006b` quebra a recursão mútua de policy e `0006c` conserta um trigger de guarda que nascera cego
 - [x] Migration `0007` — `pacote_clave`, `pedido_clave`, `evento_provedor`, `lancamento_clave`, view `saldo_carteira` (com `security_invoker`), e as RPCs `criar_pedido_clave`, `registrar_evento_provedor` e `confirmar_pedido_clave`
 - [x] Migrations `0007b` e `0007c` — `pacote_clave.excluido_em`: portar a tela 21 mostrou que "desativar" e "excluir" são ações **diferentes** no protótipo, e a `0007` as havia colapsado numa só. A `0007c` corrige a colisão de `SQLSTATE` que a `0007b` introduziu (`DS030` já era "configuração ausente")
+- [x] Migration `0008b` — **falha de acesso achada pela suíte de RLS**: um curador criava, em nome próprio, a avaliação do envio de outro curador e, pelo `unique` de `envio_id`, bloqueava o colega. O `with check` de insert e update passou a exigir `envio_e_meu(envio_id)`. Nenhuma linha divergente existia
+- [x] Suítes SQL da `0008` (policies, triggers e views de nota) e das views de fronteira `0002f`/`0006d`
 - [x] Migration `0008` — `criterio` (**seed com os 11 do protótipo**), `avaliacao`, `nota_criterio`, `compartilhamento`, views `nota_avaliacao` e `nota_artista`. Resolve [#2](open-questions.md#2-11º-critério-de-avaliação) e [#3](open-questions.md#3-quais-5-dos-11-critérios-são-obrigatórios)
 - [x] Função `calcular_remuneracao` — algoritmo do protótipo, 31 asserções. Resolve [#5](open-questions.md#5-base-de-cálculo-da-remuneração-por-classe) (percentual sobre o **bruto**), mas com semântica diferente da tabela do board — ver o cabeçalho da `0009`
 - [x] Migration `0009` — `ganho_curador` (com `base_centavos`, para o `check` do rateio existir) e RPC `enviar_avaliacao`
@@ -212,7 +214,7 @@ código pode contornar:
 - [x] Migration `0007d` — `recusar_pedido_clave`, o único estado de `situacao_pedido` que a `0007` deixou sem função. Mesmo contrato de `confirmar_pedido_clave`: `security definer`, revogada até de `authenticated`, chamada pelo webhook. **Não** regride pedido aprovado — reentrega fora de ordem é normal, e desfazer crédito é estorno, que tem outro estado e exige lançamento
 
 ### Envio de música (3)
-- [ ] Passo 1 — colar link com autodetecção de metadados (3) — os campos de link existem e são validados; a **autodetecção** (Spotify/YouTube) é fatia própria e depende de credenciais
+- [x] Passo 1 — colar link com autodetecção de metadados (3) — pelo **oEmbed** público do Spotify e do YouTube, sem credencial: título, capa e (no YouTube) artista. O host é conferido exatamente (sem SSRF), a detecção nunca bloqueia o envio e o resultado vai para `faixa.metadados_detectados`, reconferido no servidor. Sem detecção, abre o preenchimento manual
 - [x] Passo 1 — upload de WAV/MP3 até 50 MB, com validação no servidor (3) — validado por **MIME**, não por extensão (há teste com `.exe` renomeado), e contra `configuracao`, nunca contra um 50 embutido. O caminho gravado vem de `data.path` do Storage: a policy do curador compara `storage.objects.name` com `faixa.arquivo_caminho` por igualdade exata, e divergir ali não dá erro — só faz o player ficar mudo
 - [x] Detalhes quando o link não retorna dados (3.1) — bloco **inline** no passo 1, como no protótipo, e não tela separada
 - [x] Detalhes do arquivo enviado (3.2) — título, capa, estilo, "já foi lançada?" e data, com o rótulo da data mudando conforme a resposta
@@ -259,11 +261,11 @@ código pode contornar:
 - [x] Salvar e sair em todas as etapas, com retomada pelo `passo_atual` — "Voltar" é **link**, e não submit: voltar não grava, e como submit precisaria burlar a validação do passo
 
 ### Integrações
-- [ ] Spotify — metadados de faixa por link
+- [x] Spotify e YouTube — metadados de faixa por link (oEmbed, sem credencial)
 - [ ] YouTube — metadados de faixa por link
 - [ ] Asaas — cobrança Pix
 - [ ] Asaas — cobrança com cartão tokenizado
-- [ ] Asaas — webhook idempotente por `id_evento_provedor`
+- [ ] Asaas — checkout real (Pix com QR code e acompanhamento; cartão com CPF, telefone e CEP, autorizado na hora) e webhook idempotente em `/api/webhooks/asaas`, registrado no sandbox para `dissona.com.br` com 8 eventos. Ligado por `PAGAMENTO_SIMULADO=false`. **Falta**: a `SUPABASE_SERVICE_ROLE_KEY` correta (a do `.env.local` é um token pessoal `sbp_`, que o PostgREST recusa) e o deploy do endpoint. No `.env.local`, a chave do Asaas vai como `\$aact_…` — o Next expande `$`
 - [ ] Asaas — implementar o modelo de repasse definido (transferência, subcontas ou split diferido) — *bloqueado por [#6](open-questions.md#6-modelo-de-split-no-asaas)*
 - [ ] Asaas — criação de subconta do curador no cadastro, guardando a carteira
 - [ ] Asaas — webhook de situação de KYC liberando o saque
@@ -275,7 +277,7 @@ código pode contornar:
 - [x] Estados do envio `Recebeu → Ouviu → Avaliando → Pronto` gravados. `Pronto` e `Devolvido` são reservados às RPCs por trigger
 
 ### Gate da R2
-- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — **15 de 16** (A1–A3, B1–B3, B5–B7, C1–C6); falta **B4** (detecção por link), preso às credenciais de Spotify e YouTube. ⚠️ Dos cinco testes de B2, os **três de leitura** passam; os dois que confirmam ou recusam o pagamento exigem `SUPABASE_SERVICE_ROLE_KEY` no ambiente — as RPCs são revogadas de `authenticated` de propósito, e a variável é o item pendente de R0 logo acima. A cadeia de banco (criar → recusar → confirmar → confirmar de novo → recusar depois de aprovado) está provada por sonda no projeto, com rollback
+- [ ] Os **16 cenários do [Guia de Testes da Release 2](R2/guia-de-testes-r2.md)** passam em E2E — **15 de 16** (A1–A3, B1–B3, B5–B7, C1–C6); **B4** (detecção por link) passou em 2026-09-16 — **16 de 16** escritos. ⚠️ Dos cinco testes de B2, os **três de leitura** passam; os dois que confirmam ou recusam o pagamento exigem `SUPABASE_SERVICE_ROLE_KEY` no ambiente — as RPCs são revogadas de `authenticated` de propósito, e a variável é o item pendente de R0 logo acima. A cadeia de banco (criar → recusar → confirmar → confirmar de novo → recusar depois de aprovado) está provada por sonda no projeto, com rollback
 - [x] Compra de Claves credita uma única vez sob webhook duplicado — em três camadas: o índice único de uma compra por pedido (`0007`), o `return null` de `confirmar_pedido_clave` quando o pedido já está aprovado, e o `if (eventoNovo)` da ação, que só confirma quando `registrar_evento_provedor` diz que o evento é novo. O checkout simulado percorre esse caminho de propósito — um caminho que só o webhook exercita é um caminho que ninguém testa
 - [x] Avaliação concluída gera ganho com o percentual correto por classe e prazo — provado nos dois níveis: a RPC direto na suíte da `0009`, e o fio tela → ação → RPC em C6. Bronze no prazo com o feedback longo: piso 30% + 3% = 33% de R$ 20,00 → R$ 6,60
 - [ ] Devolução de 7 dias aparece no extrato e remove a faixa da fila

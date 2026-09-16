@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { CURADOR_CADASTRO, GENEROS_DO_ARTISTA } from '@/textos/prototipo';
+
 import { esquemaDadosDoPerfil } from '../esquemas';
 import { MAXIMO_DA_BIO, MAXIMO_DE_GENEROS } from '../tipos';
 
@@ -72,10 +74,13 @@ describe('esquemaDadosDoPerfil', () => {
       );
     });
 
-    it('recusa gênero fora do catálogo do artista', () => {
-      // "Pagode" existe no catálogo do **curador** e não no do artista — é a
-      // divergência registrada em 07-pendencias.
-      expect(motivoDe({ ...VAZIO, generos: ['Pagode'] }, 'generos')).toBeDefined();
+    it('recusa gênero fora do catálogo', () => {
+      expect(motivoDe({ ...VAZIO, generos: ['Forró'] }, 'generos')).toBeDefined();
+    });
+
+    it('usa o mesmo catálogo do curador — o matching da R3 depende disso', () => {
+      expect([...GENEROS_DO_ARTISTA]).toEqual([...CURADOR_CADASTRO.generos]);
+      expect(motivoDe({ ...VAZIO, generos: ['Pagode'] }, 'generos')).toBeUndefined();
     });
   });
 

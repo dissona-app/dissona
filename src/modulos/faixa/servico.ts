@@ -5,7 +5,17 @@
  * Quem orquestra é `acoes.ts`.
  */
 
-import type { FaixaEmEdicao, LimitesDeUpload, PassoDoEnvio } from './tipos';
+import { z } from 'zod';
+
+import { normalizarLink } from '@/lib/link';
+
+import type {
+  FaixaEmEdicao,
+  LimitesDeUpload,
+  MetadadosDetectados,
+  PassoDoEnvio,
+  ProvedorDeLink,
+} from './tipos';
 
 /** MIME aceitos por extensão configurada. O navegador varia o rótulo do wav. */
 const MIME_POR_FORMATO: Readonly<Record<string, readonly string[]>> = {
@@ -66,6 +76,103 @@ export function podeAbrir(faixa: FaixaEmEdicao, passo: PassoDoEnvio): boolean {
  * trouxe os metadados", e não "a faixa toca do streaming".
  */
 export function rotuloDaFonte(faixa: FaixaEmEdicao): 'arquivo' | 'link' | 'manual' {
-  if (faixa.origem === 'link') return 'link';
+  if (faixa.origem === 'link') return faixa.metadadosDetectados !== null ? 'link' : 'manual';
   return faixa.arquivoCaminho !== null ? 'arquivo' : 'manual';
+}
+
+// ---------------------------------------------------------------------------
+// Detecção por link (3.1)
+// ---------------------------------------------------------------------------
+
+/**
+ * O provedor de um link, **pelo host** — nunca por `includes` no texto.
+ *
+ * `evil.com/?spotify.com` casaria com uma regex solta, e a URL seguiria para o
+ * `fetch` do servidor. O host tem de ser exatamente o do provedor, e o esquema
+ * tem de ser https: é isso que impede a detecção de virar um proxy para
+ * endereço arbitrário (SSRF).
+ */
+export function provedorDoLink(link: string): ProvedorDeLink | null {
+  let url: URL;
+  try {
+    url = new URL(normalizarLink(link));
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'https:') return null;
+
+  const host = url.hostname.toLowerCase();
+  if (host === 'open.spotify.com') return 'spotify';
+  if (
+    ['www.youtube.com', 'youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtu.be'].includes(
+      host,
+    )
+  ) {
+    return 'youtube';
+  }
+  return null;
+}
+
+/** O endpoint oEmbed do provedor para o link. Nenhum dos dois exige chave. */
+export function enderecoDoOembed(link: string): string | null {
+  const provedor = provedorDoLink(link);
+  if (provedor === null) return null;
+
+  const alvo = encodeURIComponent(normalizarLink(link));
+  return provedor === 'spotify'
+    ? `https://open.spotify.com/oembed?url=${alvo}`
+    : `https://www.youtube.com/oembed?format=json&url=${alvo}`;
+}
+
+const esquemaOembed = z.object({
+  title: z.string().trim().min(1),
+  author_name: z.string().trim().min(1).optional(),
+  thumbnail_url: z.url({ protocol: /^https$/ }).optional(),
+});
+
+/**
+ * Traduz a resposta oEmbed para o domínio. `null` quando ela não traz título —
+ * sem título não há o que mostrar como "Faixa encontrada".
+ */
+export function interpretarOembed(link: string, carga: unknown): MetadadosDetectados | null {
+  const provedor = provedorDoLink(link);
+  const analise = esquemaOembed.safeParse(carga);
+  if (provedor === null || !analise.success) return null;
+
+  return {
+    provedor,
+    url: normalizarLink(link),
+    titulo: analise.data.title,
+    artista: analise.data.author_name ?? null,
+    capaUrl: analise.data.thumbnail_url ?? null,
+  };
+}
+
+const esquemaMetadados = z.object({
+  provedor: z.enum(['spotify', 'youtube']),
+  url: z.string(),
+  titulo: z.string().min(1),
+  artista: z.string().nullable(),
+  capaUrl: z.url({ protocol: /^https$/ }).nullable(),
+});
+
+/**
+ * Lê `metadados_detectados` — do banco ou do campo escondido do formulário.
+ *
+ * O formulário devolve o que a detecção trouxe, e isso é entrada do cliente:
+ * a URL tem de apontar para um provedor suportado, ou o valor é descartado.
+ */
+export function lerMetadados(valor: unknown): MetadadosDetectados | null {
+  let bruto = valor;
+  if (typeof valor === 'string') {
+    if (valor.trim() === '') return null;
+    try {
+      bruto = JSON.parse(valor);
+    } catch {
+      return null;
+    }
+  }
+  const analise = esquemaMetadados.safeParse(bruto);
+  if (!analise.success || provedorDoLink(analise.data.url) !== analise.data.provedor) return null;
+  return analise.data;
 }

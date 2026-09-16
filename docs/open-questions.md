@@ -16,8 +16,8 @@ Tudo o que ainda **não foi decidido** e trava ou condiciona a implementação. 
 | ~~2~~ | ~~Qual é o 11º critério de avaliação?~~ | — | **resolvida pelo protótipo** → §4 |
 | ~~3~~ | ~~Quais 5 dos 11 critérios são obrigatórios?~~ | — | **resolvida pelo protótipo** → §4 |
 | ~~4~~ | ~~Tabela de pacotes de Claves~~ | — | **resolvida pelo protótipo** → §4 |
-| [5](#5-base-de-cálculo-da-remuneração-por-classe) | Base de cálculo: respondida, mas **com outra semântica** | R2 · tela 14.4 | cliente + financeiro |
-| [5b](#5b-teto_max-é-inalcançável) | `teto_max` é inalcançável — sobram 4 pontos | R2 · tela 14.4 | cliente |
+| ~~[5](#5-base-de-cálculo-da-remuneração-por-classe)~~ | ~~Base de cálculo e leitura da tabela~~ | — | **resolvida pelo cliente** (2026-09-16): tabela do board |
+| ~~[5b](#5b-teto_max-é-inalcançável)~~ | ~~`teto_max` é inalcançável~~ | — | **deixou de existir** com a #5 |
 | [6](#6-modelo-de-split-no-asaas) | Modelo de split no Asaas | **R2** | cliente + contador |
 | [7](#7-armazenamento-do-arquivo-de-áudio) | Armazenar o mp3 sempre? | **R2** | cliente + dev |
 | [8](#8-liberação-do-crédito-versus-compartilhamento) | Crédito retido até verificar o compartilhamento? | **R2** | cliente |
@@ -45,8 +45,15 @@ Tudo o que ainda **não foi decidido** e trava ou condiciona a implementação. 
 
 ### 5. Base de cálculo da remuneração por classe
 
+> ✅ **Resolvida pelo cliente em 2026-09-16: "38% (a tabela do board)".**
+> Os percentuais incidem sobre o **bruto** e os três números por classe são
+> *(piso em atraso, piso no prazo, teto)*. Bronze no prazo sem opcionais recebe
+> **38%**; fora das 72h, piso 30 e total capado em 50. Aplicada pela migration
+> `0009b_remuneracao_da_tabela`, coberta por `0009_remuneracao.testes.sql` e
+> pelo cenário C6. O texto abaixo fica como registro da discussão.
+
 **Respondida pelo protótipo — mas a resposta traz uma mudança de semântica que
-precisa de confirmação.**
+precisava de confirmação.**
 
 O protótipo do curador calcula:
 
@@ -90,7 +97,10 @@ fatias de aplicação: quem depende disso é a tela 14.4 e o cenário C6.
 
 ### 5b. `teto_max` é inalcançável
 
-**Aberto, e só aparece fazendo a aritmética.** Com o conjunto de acréscimos do
+> ✅ **Deixou de existir com a resposta da #5.** Com um teto único, os quatro
+> acréscimos (17 pontos) alcançam 50 / 55 / 62 nas três classes.
+
+**Era aberto, e só aparecia fazendo a aritmética.** Com o conjunto de acréscimos do
 protótipo — três de 3 pontos capados em `teto_base`, mais 8 pontos de
 compartilhamento — o máximo que um curador alcança é:
 

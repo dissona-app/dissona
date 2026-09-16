@@ -422,6 +422,19 @@ begin
   perform set_config('request.jwt.claims',
     json_build_object('sub', v_artista_perfil, 'role', 'authenticated')::text, true);
 
+  -- B7 confirma seleções a cada execução e consome Claves; sem recarga, a
+  -- carteira zera e este bloco (e o B7) passam a falhar com DS010. Recarrega
+  -- pelo caminho real — pedido e confirmação — quando o saldo fica baixo.
+  if coalesce((select s.disponivel from public.saldo_carteira s
+                where s.perfil_artista_id = v_artista_id), 0) < 20 then
+    perform public.confirmar_pedido_clave(public.criar_pedido_clave(
+      (select pc.id from public.pacote_clave pc
+        where pc.ativo and pc.excluido_em is null
+        order by pc.quantidade_claves desc limit 1),
+      'pix'));
+    raise notice 'e2e: carteira recarregada';
+  end if;
+
   foreach v_titulo in array array[
     'e2e_Faixa do C3', 'e2e_Faixa do C4', 'e2e_Faixa do C5', 'e2e_Faixa do C6',
     'e2e_Faixa para concluir'
