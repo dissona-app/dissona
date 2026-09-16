@@ -283,4 +283,20 @@ test.describe('B2 · Comprar Claves', () => {
     });
     expect(resposta.status()).toBe(401);
   });
+
+  // Cobrança que não nasceu deste checkout: 200, ou o Asaas reenvia até pausar
+  // a fila inteira do webhook.
+  test('o webhook ignora pagamento de pedido que não existe', async ({ request }) => {
+    test.skip(!process.env['ASAAS_WEBHOOK_TOKEN'], 'exige ASAAS_WEBHOOK_TOKEN');
+
+    const resposta = await request.post('/api/webhooks/asaas', {
+      headers: { 'asaas-access-token': process.env['ASAAS_WEBHOOK_TOKEN'] ?? '' },
+      data: {
+        id: `evt_e2e_inexistente_${Date.now()}`,
+        event: 'PAYMENT_CONFIRMED',
+        payment: { id: 'pay_e2e_inexistente', externalReference: crypto.randomUUID() },
+      },
+    });
+    expect(resposta.status()).toBe(200);
+  });
 });

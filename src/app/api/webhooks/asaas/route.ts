@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import { CodigoErro, ehErroDominio } from '@/lib/erros';
 import { lerEventoAsaas, tokenConfere } from '@/modulos/claves/webhook-asaas';
 import {
   confirmarPedido,
@@ -34,6 +35,12 @@ const PROVEDOR = 'asaas';
  * inteira** do webhook. 401 para token errado e 400 para carga ilegível — os
  * dois são erro de quem chama, e reenviar não os conserta. 500 só quando algo
  * nosso falhou, que é exatamente o caso em que o reenvio ajuda.
+ *
+ * **Pedido inexistente é 200**, e não 500: a conta do Asaas recebe cobranças
+ * que não nasceram deste checkout (testes, cobranças manuais), e o
+ * `externalReference` delas pode ter forma de UUID sem ser pedido nosso.
+ * Reenviar nunca o fará existir — e cada 500 conta para a pausa da fila, que
+ * atrasaria os pagamentos de verdade. Achado em produção em 2026-09-16.
  */
 export async function POST(requisicao: NextRequest) {
   if (
@@ -60,6 +67,9 @@ export async function POST(requisicao: NextRequest) {
       if (evento.desfecho === 'recusado') await recusarPedido(evento.pedidoId);
     }
   } catch (erro) {
+    if (ehErroDominio(erro) && erro.codigo === CodigoErro.NAO_ENCONTRADO) {
+      return NextResponse.json({ ok: true, ignorado: 'pedido_inexistente' });
+    }
     console.error('[webhook asaas] falha ao processar', evento.idEvento, erro);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
