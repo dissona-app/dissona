@@ -14,6 +14,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { executar, falha, falhaDeCampos, sucesso } from '@/lib/acoes';
+import { caminhoEhDoUsuario } from '@/lib/armazenamento';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro, falhar } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
@@ -27,11 +28,12 @@ import {
   atualizarDetalhes,
   buscar,
   inserir,
+  metadadosDoObjeto,
   meuPerfilArtista,
   subirAudio,
   subirCapa,
 } from './repositorio';
-import { lerMetadados, provedorDoLink, validarAudio } from './servico';
+import { lerMetadados, provedorDoLink, validarAudio, validarAudioNoStorage } from './servico';
 import type { MetadadosDetectados } from './tipos';
 
 function texto(dados: FormData, campo: string): string {
@@ -128,31 +130,54 @@ export async function salvarFaixa(dados: FormData): Promise<ResultadoDeAcao> {
     const faixaId = texto(dados, 'faixaId');
     const existente = faixaId === '' ? null : await buscar(faixaId);
 
-    const audio = arquivoDe(dados, 'audio');
     const limites = await lerLimitesDeUpload();
+    const usuarioId = await usuarioDaSessao();
+
+    // Referência estável do arquivo no bucket. Gerada antes do insert para o
+    // caminho não depender do id da linha — assim a criação é uma ida só.
+    const referencia = existente?.id ?? randomUUID();
+
+    // RF-036 · o áudio chega por **caminho** quando o navegador o subiu direto
+    // ao Storage, e por arquivo quando não houve JavaScript. Os dois caminhos
+    // terminam na mesma validação, com as mesmas mensagens; o que muda é a
+    // fonte do tamanho e do MIME — `File` de um lado, Storage do outro.
+    const caminhoEnviado = texto(dados, 'audioCaminho').trim();
+    const audio = arquivoDe(dados, 'audio');
+    const subiuDireto = caminhoEnviado !== '';
+
+    if (subiuDireto && !caminhoEhDoUsuario(caminhoEnviado, usuarioId)) {
+      return falha(CodigoErro.NAO_AUTORIZADO, 'audio');
+    }
 
     // Na criação o áudio é obrigatório. Na edição, só se veio um novo — quem
     // voltou para corrigir o título não precisa reenviar 40 MB.
-    if (existente === null || audio !== null) {
-      const falhaDoAudio = validarAudio(audio, limites);
+    if (existente === null || subiuDireto || audio !== null) {
+      const falhaDoAudio = subiuDireto
+        ? validarAudioNoStorage(await metadadosDoObjeto('faixas', caminhoEnviado), limites)
+        : validarAudio(audio, limites);
       if (falhaDoAudio !== null) {
         return falha(CodigoErro.ARQUIVO_MUITO_GRANDE, 'audio', { motivo: falhaDoAudio });
       }
     }
 
-    const usuarioId = await usuarioDaSessao();
-    // Referência estável do arquivo no bucket. Gerada antes do insert para o
-    // caminho não depender do id da linha — assim a criação é uma ida só.
-    const referencia = existente?.id ?? randomUUID();
+    const caminhoDaCapaEnviado = texto(dados, 'capaCaminho').trim();
+    if (caminhoDaCapaEnviado !== '' && !caminhoEhDoUsuario(caminhoDaCapaEnviado, usuarioId)) {
+      return falha(CodigoErro.NAO_AUTORIZADO, 'capa');
+    }
 
     const capa = arquivoDe(dados, 'capa');
     const capaCaminho =
-      capa === null
-        ? (existente?.capaCaminho ?? null)
-        : await subirCapa(usuarioId, referencia, capa);
+      caminhoDaCapaEnviado !== ''
+        ? caminhoDaCapaEnviado
+        : capa === null
+          ? (existente?.capaCaminho ?? null)
+          : await subirCapa(usuarioId, referencia, capa);
 
-    const audioCaminho =
-      audio === null ? undefined : await subirAudio(usuarioId, referencia, audio);
+    const audioCaminho = subiuDireto
+      ? caminhoEnviado
+      : audio === null
+        ? undefined
+        : await subirAudio(usuarioId, referencia, audio);
 
     const lancada = analise.data.lancada === null ? null : analise.data.lancada === 'sim';
     const temLink = analise.data.urlSpotify !== null || analise.data.urlYoutube !== null;

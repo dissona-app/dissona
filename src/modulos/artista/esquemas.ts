@@ -46,8 +46,12 @@ export const esquemaDadosDoPerfil = z.object({
   cidade: textoOpcional(80, 'cidade_longa'),
   handle: esquemaHandle,
   bio: textoOpcional(MAXIMO_DA_BIO, 'bio_longa'),
+  // A mensagem vai no `z.enum`, não no `z.array`: em Zod v4 o `message` do
+  // array só vale para o array em si (tipo errado), e o elemento fora do
+  // catálogo cai na mensagem padrão do enum — que não está em `MOTIVOS`, e
+  // some da tela sem deixar rastro.
   generos: z
-    .array(z.enum(GENEROS_DO_ARTISTA), { message: 'genero_desconhecido' })
+    .array(z.enum(GENEROS_DO_ARTISTA, { message: 'genero_desconhecido' }))
     .max(MAXIMO_DE_GENEROS, { message: 'generos_demais' }),
   linkInstagram: esquemaLinkOpcional,
   linkSpotify: esquemaLinkOpcional,

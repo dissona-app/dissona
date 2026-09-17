@@ -47,9 +47,27 @@ import {
   salvarMidia,
   salvarServicosDoCurador,
 } from './servico';
-import type { CredencialMarcada, ResultadoDaManutencao, ResultadoDoPasso } from './servico';
+import type {
+  CredencialMarcada,
+  MotivoDeArquivo,
+  ResultadoDaManutencao,
+  ResultadoDoPasso,
+} from './servico';
 import type { PassoDoCadastro, TipoDeCredencial, TipoDeMidia, TipoDeServico } from './tipos';
 import { CREDENCIAL_POR_ANEXO, ehPasso, TIPOS_DE_CREDENCIAL } from './tipos';
+
+/**
+ * O código de erro de cada motivo de recusa de arquivo.
+ *
+ * `Record` sobre a união, e não uma cadeia de ternários: acrescentar um motivo
+ * sem tratá-lo aqui deixa de compilar, que é exatamente a hora de descobrir.
+ */
+const CODIGO_DO_ARQUIVO: Readonly<Record<MotivoDeArquivo, CodigoErro>> = {
+  tipo: CodigoErro.FORMATO_NAO_SUPORTADO,
+  tamanho: CodigoErro.ARQUIVO_MUITO_GRANDE,
+  ausente: CodigoErro.NAO_ENCONTRADO,
+  alheio: CodigoErro.NAO_AUTORIZADO,
+};
 
 /**
  * Traduz o resultado do serviço em redirecionamento ou falha.
@@ -61,12 +79,7 @@ import { CREDENCIAL_POR_ANEXO, ehPasso, TIPOS_DE_CREDENCIAL } from './tipos';
 function concluir(resultado: ResultadoDoPasso): ResultadoDeAcao | string {
   if (resultado.estado === 'sem_cadastro') return falha(CodigoErro.NAO_AUTENTICADO);
   if (resultado.estado === 'arquivo_invalido') {
-    return falha(
-      resultado.motivo === 'tipo'
-        ? CodigoErro.FORMATO_NAO_SUPORTADO
-        : CodigoErro.ARQUIVO_MUITO_GRANDE,
-      'arquivo',
-    );
+    return falha(CODIGO_DO_ARQUIVO[resultado.motivo], 'arquivo');
   }
   return resultado.destino;
 }
@@ -84,6 +97,12 @@ function motivosPorCampo(
   return motivos;
 }
 
+/** Um campo de texto do formulário, já aparado. Ausente vira string vazia. */
+function texto(dados: FormData, campo: string): string {
+  const valor = dados.get(campo);
+  return typeof valor === 'string' ? valor.trim() : '';
+}
+
 /** Todos os valores de um campo repetido, como texto. */
 function todos(dados: FormData, campo: string): string[] {
   return dados.getAll(campo).map((valor) => (typeof valor === 'string' ? valor : ''));
@@ -92,7 +111,10 @@ function todos(dados: FormData, campo: string): string[] {
 /* ---------------------------------------------------------- passo 1 ------- */
 
 export async function salvarPasso1(dados: FormData): Promise<ResultadoDeAcao> {
-  const saida = concluir(await salvarDadosBasicos(dados.get('foto')));
+  const caminho = texto(dados, 'foto_caminho');
+  const saida = concluir(
+    await salvarDadosBasicos(dados.get('foto'), caminho === '' ? null : caminho),
+  );
   if (typeof saida !== 'string') return saida;
   redirect(saida);
 }
@@ -239,8 +261,14 @@ export async function salvarPasso6(dados: FormData): Promise<ResultadoDeAcao> {
     links[tipo] = String(dados.get(`link_${tipo}`) ?? '');
   }
 
+  // O anexo chega por **caminho** quando o navegador o subiu direto ao Storage,
+  // e por arquivo quando não houve JavaScript. `temAnexoNovo` tem de enxergar os
+  // dois: com o upload direto o `File` sai do `FormData`, e uma leitura só de
+  // `instanceof File` faria quem anexou um PDF perfeitamente válido receber
+  // `credencial_sem_prova` — o passo parado, e a culpa na pessoa errada.
+  const anexoCaminho = texto(dados, 'anexo_formacao_caminho');
   const anexoNovo = dados.get('anexo_formacao');
-  const temAnexoNovo = anexoNovo instanceof File && anexoNovo.size > 0;
+  const temAnexoNovo = anexoCaminho !== '' || (anexoNovo instanceof File && anexoNovo.size > 0);
   const temAnexoGravado = dados.get('anexo_formacao_existente') === '1';
 
   const analise = esquemaCredenciais.safeParse({
@@ -260,7 +288,9 @@ export async function salvarPasso6(dados: FormData): Promise<ResultadoDeAcao> {
     link: tipo === CREDENCIAL_POR_ANEXO ? null : (links[tipo] ?? '').trim(),
   }));
 
-  const saida = concluir(await salvarCredenciais(paraSalvar, anexoNovo));
+  const saida = concluir(
+    await salvarCredenciais(paraSalvar, anexoNovo, anexoCaminho === '' ? null : anexoCaminho),
+  );
   if (typeof saida !== 'string') return saida;
   redirect(saida);
 }

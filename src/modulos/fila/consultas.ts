@@ -2,7 +2,8 @@ import 'server-only';
 
 /** Leituras da fila (13) e do detalhe (13.1). */
 
-import { lerConfiguracao } from '@/lib/configuracao';
+import { lerConfiguracoes } from '@/lib/configuracao';
+import { buscarRascunho, urlDoAudio } from '@/modulos/avaliacao/repositorio';
 
 import { buscarItem, listarFila, servicosDoEnvio } from './repositorio';
 import {
@@ -56,6 +57,11 @@ export type DetalheDoItem = {
   readonly servicos: readonly ServicoContratado[];
   readonly status: ReturnType<typeof statusNaTela>;
   readonly prazoDeDevolucaoDias: number;
+  /** URL assinada do áudio, ou `null` quando não há arquivo que o player toque. */
+  readonly audioUrl: string | null;
+  readonly escutaMinimaPercentual: number;
+  /** O máximo já medido, de `avaliacao.escuta_percentual` — zero sem rascunho. */
+  readonly escutaSalva: number;
   readonly agora: Date;
 };
 
@@ -64,9 +70,15 @@ export async function lerDetalhe(envioId: string): Promise<DetalheDoItem | null>
   const item = await buscarItem(envioId);
   if (item === null) return null;
 
-  const [servicos, prazoDevolucaoDias] = await Promise.all([
+  // RF-071: a escuta acontece **aqui**, antes de assumir a avaliação. Entrar no
+  // wizard grava `avaliando`, e enquanto o único player vivia lá dentro o
+  // estado `ouviu` era inalcançável — `marcarEnvioComoOuvido` existia e nunca
+  // disparava.
+  const [servicos, config, audioUrl, rascunho] = await Promise.all([
     servicosDoEnvio(envioId),
-    lerConfiguracao('prazo_devolucao_dias'),
+    lerConfiguracoes(['prazo_devolucao_dias', 'escuta_minima_percentual'] as const),
+    urlDoAudio(item.arquivoCaminho),
+    buscarRascunho(envioId),
   ]);
 
   const agora = new Date();
@@ -75,7 +87,10 @@ export async function lerDetalhe(envioId: string): Promise<DetalheDoItem | null>
     item,
     servicos,
     status: statusNaTela(item, agora),
-    prazoDeDevolucaoDias: prazoDevolucaoDias,
+    prazoDeDevolucaoDias: config.prazo_devolucao_dias,
+    audioUrl,
+    escutaMinimaPercentual: config.escuta_minima_percentual,
+    escutaSalva: rascunho?.escutaPercentual ?? 0,
     agora,
   };
 }

@@ -11,6 +11,7 @@ import { IconeOlho } from '@/componentes/autenticacao/IconeOlho';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
+import { erroGeralDe } from '@/textos/erros';
 import { CADASTRAR, EQUIPE, SENHA } from '@/textos/prototipo';
 
 import estilos from './AceiteDeConvite.module.css';
@@ -70,7 +71,16 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
   const erroDe = (campo: string): string | undefined => {
     if (!falhou) return undefined;
     const motivo = resultado.campos?.[campo];
-    return motivo === undefined ? undefined : MOTIVOS[motivo];
+    if (motivo !== undefined) return MOTIVOS[motivo];
+
+    // RF-033: `definirSenhaDoConvite` devolve `falha(SENHA_FRACA, 'senha')` —
+    // chave `campo`, singular, que a leitura por `campos` não alcança. É o
+    // caminho de toda senha recusada pelo Auth: fraca, vazada, ou igual à atual
+    // (`same_password` vira `senha_fraca` em `autenticacao/repositorio.ts`).
+    if (resultado.campo === campo && resultado.codigo === CodigoErro.SENHA_FRACA) {
+      return SENHA.erroSenhaFraca;
+    }
+    return undefined;
   };
 
   if (concluido) {
@@ -130,6 +140,11 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
     );
   }
 
+  // Os três estados acima já têm tela própria. O que sobra sem campo — e é
+  // muito: `CONVITE_INVALIDO`, `CONFLITO`, `NAO_AUTORIZADO` — cai aqui, em vez
+  // de deixar "Concluir acesso" sem efeito nenhum.
+  const erroGeral = erroGeralDe(falhou ? resultado : null, [erroDe('senha'), erroDe('confirmar')]);
+
   const olho = (
     <button
       type="button"
@@ -156,11 +171,7 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
             onde a ação o ler senão daqui. */}
         <input type="hidden" name="token" value={token} />
 
-        {falhou &&
-        resultado.codigo === CodigoErro.ENTRADA_INVALIDA &&
-        erroDe('senha') === undefined ? (
-          <Aviso tom="erro">{SENHA.erroSenhaFraca}</Aviso>
-        ) : null}
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
         <div className={estilos.blocoSenha}>
           <Campo

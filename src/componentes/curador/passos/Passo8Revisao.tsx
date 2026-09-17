@@ -7,6 +7,7 @@ import { ROTA } from '@/lib/guarda-rota';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { credenciaisComprovadas, rotuloDoTempo } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';
@@ -46,7 +47,7 @@ export function Passo8Revisao({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo } = usePasso(acao);
+  const { enviar, motivo, falha } = usePasso(acao);
 
   const comprovadas = credenciaisComprovadas(estado);
   const feedback = estado.servicos.find((servico) => servico.tipo === 'feedback');
@@ -118,11 +119,12 @@ export function Passo8Revisao({
   ];
 
   const erro = motivo === undefined ? undefined : MOTIVOS[motivo];
+  const erroGeral = erroGeralDe(falha, [erro]);
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
-      {erro !== undefined ? (
-        <Aviso tom="erro" titulo={erro}>
+      {(erro ?? erroGeral) !== undefined ? (
+        <Aviso tom="erro" titulo={erro ?? erroGeral}>
           {CURADOR_CADASTRO.subtitulos[4]}
         </Aviso>
       ) : null}

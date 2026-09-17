@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+import { ultimoPedidoDe } from '../apoio/banco';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
 import { CARTEIRA, CHECKOUT, PACOTES } from '../apoio/textos';
@@ -140,11 +141,18 @@ async function ultimaCobrancaPix(): Promise<CobrancaDoSandbox> {
 // Em série: três testes creditam ou leem a carteira da **mesma** conta, e o do
 // Pix afirma o crescimento exato do saldo. Em paralelo, a compra de cartão de
 // outro worker entra no meio e o teste acusa crédito em dobro que não houve.
+//
+// O `serial` resolve a disputa dentro do arquivo, e **não** entre arquivos —
+// por isso a conta é a `ARTISTA_COMPRA`, e não a `ARTISTA`. B7 confirma seleção
+// de curadores e gasta 2 Claves da carteira do `e2e_artista`; caindo dentro da
+// janela de medição do Pix, o crescimento medido vem 2 Claves menor e a falha
+// aponta para o webhook, que não tem culpa nenhuma. Foi o que aconteceu em
+// 2026-09-16 (`Expected: 20, Received: 18`).
 test.describe.configure({ mode: 'serial' });
 
 test.describe('B2 · Comprar Claves', () => {
-  test('a vitrine lista os pacotes com preço por Clave', async ({ page }) => {
-    await entrarComo(page, PERSONA.ARTISTA);
+  test('a vitrine lista os pacotes com preço por Clave', { tag: ['@RF-043'] }, async ({ page }) => {
+    await entrarComo(page, PERSONA.ARTISTA_COMPRA);
     await page.goto('/artista/pacotes');
 
     // Escopo em `main`: a sidebar do shell também é uma lista.
@@ -156,18 +164,22 @@ test.describe('B2 · Comprar Claves', () => {
     ).toBeVisible();
   });
 
-  test('o checkout mostra o resumo do pedido com total e preço por Clave', async ({ page }) => {
-    await entrarComo(page, PERSONA.ARTISTA);
-    await abrirCheckout(page);
+  test(
+    'o checkout mostra o resumo do pedido com total e preço por Clave',
+    { tag: ['@RF-044'] },
+    async ({ page }) => {
+      await entrarComo(page, PERSONA.ARTISTA_COMPRA);
+      await abrirCheckout(page);
 
-    const resumo = page.getByRole('region', { name: CHECKOUT.resumoTitulo });
-    await expect(resumo).toBeVisible();
-    await expect(resumo.getByText(CHECKOUT.total, { exact: true })).toBeVisible();
-    await expect(resumo).toContainText(/R\$/);
-  });
+      const resumo = page.getByRole('region', { name: CHECKOUT.resumoTitulo });
+      await expect(resumo).toBeVisible();
+      await expect(resumo.getByText(CHECKOUT.total, { exact: true })).toBeVisible();
+      await expect(resumo).toContainText(/R\$/);
+    },
+  );
 
   test('o checkout recusa antes de cobrar quando os campos não são válidos', async ({ page }) => {
-    await entrarComo(page, PERSONA.ARTISTA);
+    await entrarComo(page, PERSONA.ARTISTA_COMPRA);
     await abrirCheckout(page);
 
     // O protótipo, sendo mock, **preenchia** os campos inválidos com valores
@@ -181,8 +193,8 @@ test.describe('B2 · Comprar Claves', () => {
     await expect(page.getByText(CHECKOUT.recusadoTitulo)).toHaveCount(0);
   });
 
-  test('recusado: o estado aparece e o saldo não muda', async ({ page }) => {
-    await entrarComo(page, PERSONA.ARTISTA);
+  test('recusado: o estado aparece e o saldo não muda', { tag: ['@RF-046'] }, async ({ page }) => {
+    await entrarComo(page, PERSONA.ARTISTA_COMPRA);
     const antes = await lerSaldo(page);
 
     await abrirCheckout(page);
@@ -197,25 +209,144 @@ test.describe('B2 · Comprar Claves', () => {
     expect(await lerSaldo(page)).toBe(antes);
   });
 
-  test('aprovado no cartão: o saldo cresce e o extrato registra a compra', async ({ page }) => {
-    await entrarComo(page, PERSONA.ARTISTA);
-    const antes = await lerSaldo(page);
+  test(
+    'aprovado no cartão: o saldo cresce e o extrato registra a compra',
+    { tag: ['@RF-045', '@RF-046'] },
+    async ({ page }) => {
+      await entrarComo(page, PERSONA.ARTISTA_COMPRA);
+      const antes = await lerSaldo(page);
 
-    await abrirCheckout(page);
-    await preencherCartao(page, CARTAO_APROVADO);
-    await simularSePreciso(page, 'aprovado');
-    await page.getByRole('button', { name: CHECKOUT.confirmar }).click();
+      await abrirCheckout(page);
+      await preencherCartao(page, CARTAO_APROVADO);
+      await simularSePreciso(page, 'aprovado');
+      await page.getByRole('button', { name: CHECKOUT.confirmar }).click();
 
-    await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByText(/entraram na sua carteira/)).toBeVisible();
+      await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByText(/entraram na sua carteira/)).toBeVisible();
 
-    expect(await lerSaldo(page)).toBeGreaterThan(antes);
+      expect(await lerSaldo(page)).toBeGreaterThan(antes);
 
-    await page.goto('/artista/carteira/extrato');
-    await expect(
-      page.getByRole('row').filter({ hasText: CARTEIRA.tipos.compra }).first(),
-    ).toBeVisible();
-  });
+      await page.goto('/artista/carteira/extrato');
+      await expect(
+        page.getByRole('row').filter({ hasText: CARTEIRA.tipos.compra }).first(),
+      ).toBeVisible();
+    },
+  );
+
+  /**
+   * RF-045 · o cartão não é persistido, e não sai para terceiros.
+   *
+   * ## O que dá para afirmar de verdade
+   *
+   * Três coisas, e só três — o resto seria encenação:
+   *
+   * 1. **Nenhuma requisição do navegador para fora da nossa origem carrega os
+   *    dígitos.** É o que se observa interceptando o tráfego da página.
+   * 2. **A linha de `pedido_clave` não contém o cartão.** A tabela nem tem
+   *    coluna para isso (`0007_claves.sql`), e é justamente essa ausência que se
+   *    quer travar contra regressão: o que a plataforma guarda é
+   *    `provedor_cobranca_id`, a referência da cobrança no gateway.
+   * 3. **Nenhum PAN volta para a tela** depois da confirmação.
+   *
+   * ## ⚠️ A ressalva, que o teste não pode esconder
+   *
+   * O Asaas não tem SDK de navegador (ver `src/modulos/claves/esquemas.ts`), e
+   * por isso o número **transita** pelo nosso servidor dentro de
+   * `criarCobrancaCartao`. Se "tokenizados", no RF-045, significar tokenização
+   * no cliente — o cartão nunca tocando a nossa infraestrutura —, isso é lacuna
+   * de produto, e nenhum teste daqui a cobre. Registrado na matriz.
+   */
+  test(
+    'o cartão não é persistido nem sai para terceiros',
+    { tag: ['@RF-045'] },
+    async ({ page }) => {
+      const digitos = CARTAO_APROVADO.replace(/\s/g, '');
+
+      await entrarComo(page, PERSONA.ARTISTA_COMPRA);
+      await abrirCheckout(page);
+
+      const paraTerceiros: string[] = [];
+      page.on('request', (requisicao) => {
+        const url = new URL(requisicao.url());
+        const nossa = new URL(page.url()).host;
+        if (url.host === nossa) return;
+
+        const corpo = requisicao.postData() ?? '';
+        if (corpo.includes(digitos) || url.href.includes(digitos)) {
+          paraTerceiros.push(url.host);
+        }
+      });
+
+      await preencherCartao(page, CARTAO_APROVADO);
+      await simularSePreciso(page, 'aprovado');
+      await page.getByRole('button', { name: CHECKOUT.confirmar }).click();
+      await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toBeVisible({ timeout: 30_000 });
+
+      expect(
+        paraTerceiros,
+        `o número do cartão saiu do navegador para ${paraTerceiros.join(', ')}`,
+      ).toHaveLength(0);
+
+      // Nenhum PAN de volta na tela — nem inteiro, nem em grupos de quatro.
+      await expect(page.getByText(new RegExp(digitos))).toHaveCount(0);
+
+      // E nada guardado: o pedido mais recente desta conta não contém o cartão.
+      const pedido = await ultimoPedidoDe(PERSONA.ARTISTA_COMPRA.email);
+      expect(pedido, 'a compra precisa ter deixado um pedido').not.toBeNull();
+      expect(
+        JSON.stringify(pedido),
+        'nenhum campo de `pedido_clave` pode conter o número do cartão',
+      ).not.toContain(digitos);
+      expect(
+        (pedido as { provedor_cobranca_id?: string } | null)?.provedor_cobranca_id,
+        'o que se guarda é a referência da cobrança no gateway, não o cartão',
+      ).toBeTruthy();
+    },
+  );
+
+  /**
+   * RF-046 · o estado **processando**, que faltava entre o aprovado e o recusado.
+   *
+   * Segurar a resposta da Server Action com `page.route` é o que torna o estado
+   * observável: sem isso ele dura o tempo de um ida e volta ao gateway e o teste
+   * viraria uma corrida. O que se afirma é o que o requisito promete — a pessoa
+   * vê que está em curso, e o botão não aceita um segundo clique que criaria
+   * uma segunda cobrança.
+   */
+  test(
+    'cartão: enquanto o gateway não responde, a tela fica em processando',
+    { tag: ['@RF-046'] },
+    async ({ page }) => {
+      await entrarComo(page, PERSONA.ARTISTA_COMPRA);
+      await abrirCheckout(page);
+      await preencherCartao(page, CARTAO_RECUSADO);
+      await simularSePreciso(page, 'recusado');
+
+      // Segura o POST da Server Action por tempo suficiente para observar o
+      // estado, e então deixa seguir — o desfecho é o recusado, que não credita.
+      await page.route(
+        (url) => url.href.startsWith(new URL(page.url()).origin),
+        async (rota, requisicao) => {
+          if (requisicao.method() !== 'POST') return rota.continue();
+          await new Promise((resolva) => setTimeout(resolva, 3_000));
+          return rota.continue();
+        },
+      );
+
+      const confirmar = page.getByRole('button', { name: CHECKOUT.confirmar });
+      await confirmar.click();
+
+      await expect(page.getByText(CHECKOUT.processando)).toBeVisible();
+      await expect(confirmar.or(page.getByText(CHECKOUT.processando))).toBeDisabled();
+
+      // Enquanto processa, nenhum desfecho aparece: mostrar os dois estados ao
+      // mesmo tempo seria pior que não mostrar nenhum.
+      await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toHaveCount(0);
+      await expect(page.getByText(CHECKOUT.recusadoTitulo)).toHaveCount(0);
+
+      await page.unroute((url) => url.href.startsWith(new URL(page.url()).origin));
+    },
+  );
 
   /**
    * Pix de ponta a ponta, com o Asaas real e o **nosso** webhook.
@@ -226,57 +357,61 @@ test.describe('B2 · Comprar Claves', () => {
    * **Duas vezes**: o gate da R2 pede que a entrega repetida não credite de
    * novo.
    */
-  test('Pix: o QR code aparece e o webhook credita uma única vez', async ({ page, request }) => {
-    test.skip(!ASAAS, 'só com o Asaas ligado (PAGAMENTO_SIMULADO=false)');
+  test(
+    'Pix: o QR code aparece e o webhook credita uma única vez',
+    { tag: ['@RF-044', '@RF-047'] },
+    async ({ page, request }) => {
+      test.skip(!ASAAS, 'só com o Asaas ligado (PAGAMENTO_SIMULADO=false)');
 
-    await entrarComo(page, PERSONA.ARTISTA);
-    const antes = await lerSaldo(page);
+      await entrarComo(page, PERSONA.ARTISTA_COMPRA);
+      const antes = await lerSaldo(page);
 
-    await abrirCheckout(page);
+      await abrirCheckout(page);
 
-    // Quantas Claves o pacote dá, lido do resumo ("20 Claves") — o seed de
-    // pacotes muda, e o teste não pode fixá-lo.
-    const linhaDoPacote = await page
-      .getByRole('region', { name: CHECKOUT.resumoTitulo })
-      .getByText(/^[\d.,]+ Claves$/)
-      .first()
-      .innerText();
-    const pacote = Number(
-      linhaDoPacote.replace(' Claves', '').replace(/\./g, '').replace(',', '.'),
-    );
+      // Quantas Claves o pacote dá, lido do resumo ("20 Claves") — o seed de
+      // pacotes muda, e o teste não pode fixá-lo.
+      const linhaDoPacote = await page
+        .getByRole('region', { name: CHECKOUT.resumoTitulo })
+        .getByText(/^[\d.,]+ Claves$/)
+        .first()
+        .innerText();
+      const pacote = Number(
+        linhaDoPacote.replace(' Claves', '').replace(/\./g, '').replace(',', '.'),
+      );
 
-    await page.getByRole('radio', { name: CHECKOUT.meios.pix }).click();
-    await page.getByLabel(CHECKOUT.cpf).fill(CPF);
-    await page.getByRole('button', { name: CHECKOUT.confirmar }).click();
+      await page.getByRole('radio', { name: CHECKOUT.meios.pix }).click();
+      await page.getByLabel(CHECKOUT.cpf).fill(CPF);
+      await page.getByRole('button', { name: CHECKOUT.confirmar }).click();
 
-    await expect(page.getByText(CHECKOUT.pixAguardandoTitulo)).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByRole('img', { name: CHECKOUT.pixQrAlt })).toBeVisible();
-    await expect(page.getByLabel(CHECKOUT.pixCodigoRotulo)).toHaveValue(/^0002/);
+      await expect(page.getByText(CHECKOUT.pixAguardandoTitulo)).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByRole('img', { name: CHECKOUT.pixQrAlt })).toBeVisible();
+      await expect(page.getByLabel(CHECKOUT.pixCodigoRotulo)).toHaveValue(/^0002/);
 
-    const cobranca = await ultimaCobrancaPix();
+      const cobranca = await ultimaCobrancaPix();
 
-    for (const entrega of [1, 2]) {
-      const resposta = await request.post('/api/webhooks/asaas', {
-        headers: { 'asaas-access-token': process.env['ASAAS_WEBHOOK_TOKEN'] ?? '' },
-        data: {
-          id: `evt_e2e_${cobranca.id}`,
-          event: 'PAYMENT_RECEIVED',
-          payment: { id: cobranca.id, externalReference: cobranca.externalReference },
-        },
-      });
-      expect(resposta.status(), `entrega ${entrega}`).toBe(200);
-    }
+      for (const entrega of [1, 2]) {
+        const resposta = await request.post('/api/webhooks/asaas', {
+          headers: { 'asaas-access-token': process.env['ASAAS_WEBHOOK_TOKEN'] ?? '' },
+          data: {
+            id: `evt_e2e_${cobranca.id}`,
+            event: 'PAYMENT_RECEIVED',
+            payment: { id: cobranca.id, externalReference: cobranca.externalReference },
+          },
+        });
+        expect(resposta.status(), `entrega ${entrega}`).toBe(200);
+      }
 
-    // A tela percebe sozinha, sem recarregar.
-    await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toBeVisible({ timeout: 20_000 });
+      // A tela percebe sozinha, sem recarregar.
+      await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toBeVisible({ timeout: 20_000 });
 
-    // Creditou uma vez só: o saldo cresce exatamente um pacote.
-    expect((await lerSaldo(page)) - antes).toBe(pacote);
+      // Creditou uma vez só: o saldo cresce exatamente um pacote.
+      expect((await lerSaldo(page)) - antes).toBe(pacote);
 
-    await chamarAsaas('DELETE', `/payments/${cobranca.id}`);
-  });
+      await chamarAsaas('DELETE', `/payments/${cobranca.id}`);
+    },
+  );
 
-  test('o webhook recusa quem não tem o token', async ({ request }) => {
+  test('o webhook recusa quem não tem o token', { tag: ['@RF-047'] }, async ({ request }) => {
     const resposta = await request.post('/api/webhooks/asaas', {
       headers: { 'asaas-access-token': 'errado' },
       data: { id: 'evt_x', event: 'PAYMENT_RECEIVED', payment: { id: 'pay_x' } },
@@ -286,17 +421,21 @@ test.describe('B2 · Comprar Claves', () => {
 
   // Cobrança que não nasceu deste checkout: 200, ou o Asaas reenvia até pausar
   // a fila inteira do webhook.
-  test('o webhook ignora pagamento de pedido que não existe', async ({ request }) => {
-    test.skip(!process.env['ASAAS_WEBHOOK_TOKEN'], 'exige ASAAS_WEBHOOK_TOKEN');
+  test(
+    'o webhook ignora pagamento de pedido que não existe',
+    { tag: ['@RF-047'] },
+    async ({ request }) => {
+      test.skip(!process.env['ASAAS_WEBHOOK_TOKEN'], 'exige ASAAS_WEBHOOK_TOKEN');
 
-    const resposta = await request.post('/api/webhooks/asaas', {
-      headers: { 'asaas-access-token': process.env['ASAAS_WEBHOOK_TOKEN'] ?? '' },
-      data: {
-        id: `evt_e2e_inexistente_${Date.now()}`,
-        event: 'PAYMENT_CONFIRMED',
-        payment: { id: 'pay_e2e_inexistente', externalReference: crypto.randomUUID() },
-      },
-    });
-    expect(resposta.status()).toBe(200);
-  });
+      const resposta = await request.post('/api/webhooks/asaas', {
+        headers: { 'asaas-access-token': process.env['ASAAS_WEBHOOK_TOKEN'] ?? '' },
+        data: {
+          id: `evt_e2e_inexistente_${Date.now()}`,
+          event: 'PAYMENT_CONFIRMED',
+          payment: { id: 'pay_e2e_inexistente', externalReference: crypto.randomUUID() },
+        },
+      });
+      expect(resposta.status()).toBe(200);
+    },
+  );
 });

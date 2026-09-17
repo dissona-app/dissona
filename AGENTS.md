@@ -30,6 +30,7 @@ Este arquivo é **curto de propósito**. A especificação vive em [`docs/`](doc
 | **A fonte (Inter)** — os 7 woff2 e as regras `@font-face`, também embutidos | `pnpm prototipo:fontes`, e [`scripts/extrair-fontes-prototipo.mjs`](scripts/extrair-fontes-prototipo.mjs) |
 | **Paridade visual com o protótipo** — abre as duas telas e compara a tipografia | [`e2e/prototipo/`](e2e/prototipo/) e [`e2e/apoio/prototipo.ts`](e2e/apoio/prototipo.ts) |
 | **Evidência de RLS por migration** | [`supabase/testes/README.md`](supabase/testes/README.md) |
+| **Qual teste prova qual critério de aceite** | [`docs/R2/matriz-rf-e2e.md`](docs/R2/matriz-rf-e2e.md) — gerada, nunca editada à mão (`pnpm rastreabilidade`) |
 
 **Precedência de fontes:** protótipo da R2 > board de discovery > derivação. Quando divergirem, siga o protótipo e registre a divergência em [`docs/prd/07-pendencias-e-divergencias.md`](docs/prd/07-pendencias-e-divergencias.md).
 
@@ -58,12 +59,16 @@ Estas já estão implícitas na arquitetura, mas ficam explícitas porque são o
 - **Sem criar tabela de release futura.** A numeração `0001`–`0010` está amarrada à release; nada de R3+ antecipado.
 - **Sem "Submissões"** na interface — o termo é **"Envios"**.
 - **Sem recriar imagem ou ícone.** O protótipo embute os assets — logotipo, favicon — e traz os ícones como SVG inline no markup. Extraia (`pnpm prototipo:imagens`) ou copie o `<path>`; não redesenhe em CSS nem deduza a arte.
+- **Sem spec de e2e sem tag de RF.** Todo teste novo nasce com `{ tag: ['@RF-0NN'] }`, e a tag é do requisito que ele **prova** — não do módulo em que esbarra, nem no `describe` inteiro por conveniência. É o que alimenta [`docs/R2/matriz-rf-e2e.md`](docs/R2/matriz-rf-e2e.md), e o CI recusa RF de R1/R2 sem prova. Requisito que não deve ter e2e vira exceção com motivo escrito em `scripts/matriz-rastreabilidade.mjs`.
+- **Sem formulário sem superfície de erro geral.** Toda tela com `useActionState` mostra alguma coisa quando a ação falha e nenhum campo foi pintado — `erroGeralDe()` em [`src/textos/erros.ts`](src/textos/erros.ts) é o atalho. `falha(codigo, campo)` grava `campo` e `falhaDeCampos()` grava `campos`; quem lê só um dos dois engole o outro, e o resultado é um botão que não faz nada. **Falha sem mensagem é bug, não detalhe** — e lint não alcança isso, só a revisão.
+- **Sem chave de serviço no navegador.** `SUPABASE_SERVICE_ROLE_KEY` vive só no processo do Node da suíte, via [`e2e/apoio/banco.ts`](e2e/apoio/banco.ts) — nunca em `page.evaluate`, `addInitScript` ou `fill()`. E toda mutação dali recebe **id**, jamais predicado aberto: o banco também serve produção.
 
 ## Convenções que importam
 
 - **Idioma:** domínio em **português** (`avaliacao`, `saldo_carteira`, `calcularRemuneracao`); termos de framework em inglês (`useState`, `middleware`). Banco em `snake_case` singular.
 - **Camadas:** `app/` → `modulos/*/acoes|consultas` → `servico` → `repositorio` → Supabase. Nenhuma camada pula a seguinte, e `servico` não importa nada de React.
 - **Erros:** códigos tipados em `lib/erros.ts`; a tradução para texto acontece **na View**, nunca no serviço.
+- **Live region por tom:** `Aviso` dá `role="alert"` a `erro` e `alerta`, e `role="status"` a `info` e `sucesso`. No E2E, sucesso se localiza por `getByRole('status')` — `getByRole('alert')` só acha erro.
 - **Autorização em três camadas, todas obrigatórias:** RLS no banco, guarda de rota no middleware, checagem no serviço.
 
 ---

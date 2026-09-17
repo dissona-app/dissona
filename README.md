@@ -101,14 +101,56 @@ banco — e por isso precisa de contas de teste que existam de verdade.
    está no `.gitignore`; a senha **não** é versionada, porque seria a
    credencial de uma conta com papel `admin` num projeto que também serve
    produção.
-2. Rode [`supabase/testes/dados-e2e.sql`](supabase/testes/dados-e2e.sql) com a
-   mesma senha, como o cabeçalho do arquivo explica. Ele cria três contas no
-   namespace `@e2e.dissona.local` e o catálogo de pacotes do protótipo. É
-   idempotente: rodar de novo só troca as senhas.
+2. Garanta que `SUPABASE_SERVICE_ROLE_KEY` está em `.env.local`. A suíte
+   precisa dela para montar o estado que nenhuma tela monta: adiantar o relógio
+   de um envio e chamar as RPCs de SLA, que a migration `0010` **revoga de
+   `authenticated`** justamente para que um curador não dispare a devolução da
+   própria fila. A chave vive só no processo do Playwright e nunca chega ao
+   navegador — a regra está no cabeçalho de
+   [`e2e/apoio/banco.ts`](e2e/apoio/banco.ts).
+3. Rode [`supabase/testes/dados-e2e.sql`](supabase/testes/dados-e2e.sql) com a
+   mesma senha, como o cabeçalho do arquivo explica. Ele cria as contas no
+   namespace `@e2e.dissona.local`, o catálogo de pacotes do protótipo e a
+   carteira encenada do artista. É idempotente: rodar de novo troca as senhas.
+
+**Antes de cada execução:** `pnpm e2e:semear`. Sete cenários **consomem** a
+faixa deles — concluir uma avaliação e devolver por SLA são estados terminais,
+e é assim que tem de ser, senão o teste não provaria nada. O script repõe o que
+foi consumido, é idempotente e **não pede senha nenhuma**: ele lê o `.env.local`
+e entra como a própria persona, chamando a mesma RPC que a tela chama. Sem esse
+passo, a falha é sempre a mesma — *"a fila precisa listar …"*.
 
 **Depois:** `pnpm e2e`, que faz o build e sobe o app na porta 3100. Para iterar
 sem rebuildar a cada vez, deixe um `pnpm start --port 3100` rodando e use
 `BASE_URL=http://localhost:3100 pnpm e2e`.
+
+Resumindo o ciclo do dia a dia:
+
+```sh
+pnpm e2e:semear && pnpm e2e
+```
+
+### Contra produção
+
+Há um só projeto Supabase e um só projeto Vercel enquanto o produto está em
+desenvolvimento, então apontar a suíte para produção não arrisca dado de
+ninguém — e prova o que o servidor local **não** prova:
+
+```sh
+npx vercel --prod --yes --scope fraktal      # publica o que está no diretório
+BASE_URL=https://dissona.com.br pnpm e2e
+```
+
+O que só produção pega é o teto de **~4,5 MB de corpo de request** das funções
+serverless da Vercel, que nenhuma opção de `next.config.ts` levanta. É a razão
+de o áudio da faixa (RF-036) e o anexo de credencial do curador subirem do
+navegador **direto ao Storage**, com a Server Action recebendo só o caminho — e
+`b5-enviar-por-arquivo` e `e3-credenciais-e-bio` são os cenários que o exercitam,
+com 6 MB cada.
+
+⚠️ Use o **domínio**, nunca a URL crua de um deployment ou de um Preview: elas
+estão atrás da Deployment Protection da Vercel e redirecionam para
+`vercel.com/login`, então o Playwright não as alcança.
 
 O Playwright lê `E2E_SENHA` de `.env.local` por
 [`e2e/setup/ambiente.ts`](e2e/setup/ambiente.ts) — o Next carrega esse arquivo

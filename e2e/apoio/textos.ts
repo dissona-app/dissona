@@ -11,3 +11,13 @@
  * porque não há string nenhuma aqui para atualizar.
  */
 export * from '../../src/textos/prototipo';
+
+/**
+ * Os blocos que `prototipo.ts` **não** reexporta.
+ *
+ * Ele reexporta `CONTA`, e não `PREFERENCIAS` nem `CURADOR_PERFIL` — os três
+ * moram em `src/textos/conta.ts`. Sem estas duas linhas, os cenários de
+ * preferências e do perfil do curador teriam de escrever copy literal, que é
+ * exatamente o que este arquivo existe para evitar.
+ */
+export { CURADOR_PERFIL, PREFERENCIAS } from '../../src/textos/conta';

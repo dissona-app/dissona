@@ -23,7 +23,7 @@ import { CARTEIRA } from '../apoio/textos';
 const EXTRATO = '/artista/carteira/extrato';
 
 test.describe('B3 · Extrato', () => {
-  test('a tabela traz as cinco colunas', async ({ page }) => {
+  test('a tabela traz as cinco colunas', { tag: ['@RF-048'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.ARTISTA);
     await page.goto(EXTRATO);
 
@@ -37,7 +37,7 @@ test.describe('B3 · Extrato', () => {
     }
   });
 
-  test('lista os três tipos que o guia exige', async ({ page }) => {
+  test('lista os três tipos que o guia exige', { tag: ['@RF-048'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.ARTISTA);
     await page.goto(EXTRATO);
 
@@ -53,7 +53,7 @@ test.describe('B3 · Extrato', () => {
     }
   });
 
-  test('cada linha tem data e origem', async ({ page }) => {
+  test('cada linha tem data e origem', { tag: ['@RF-048'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.ARTISTA);
     await page.goto(EXTRATO);
 
@@ -71,7 +71,7 @@ test.describe('B3 · Extrato', () => {
     await expect(origem).not.toBeEmpty();
   });
 
-  test('o filtro recorta por tipo e mantém o endereço', async ({ page }) => {
+  test('o filtro recorta por tipo e mantém o endereço', { tag: ['@RF-048'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.ARTISTA);
     await page.goto(EXTRATO);
 

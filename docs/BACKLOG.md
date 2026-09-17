@@ -265,7 +265,7 @@ código pode contornar:
 - [ ] YouTube — metadados de faixa por link
 - [ ] Asaas — cobrança Pix
 - [ ] Asaas — cobrança com cartão tokenizado
-- [ ] Asaas — checkout real (Pix com QR code e acompanhamento; cartão com CPF, telefone e CEP, autorizado na hora) e webhook idempotente em `/api/webhooks/asaas`, registrado no sandbox para `dissona.com.br` com 8 eventos. Ligado por `PAGAMENTO_SIMULADO=false`. **Falta**: a `SUPABASE_SERVICE_ROLE_KEY` correta (a do `.env.local` é um token pessoal `sbp_`, que o PostgREST recusa) e o deploy do endpoint. No `.env.local`, a chave do Asaas vai como `\$aact_…` — o Next expande `$`
+- [ ] Asaas — checkout real (Pix com QR code e acompanhamento; cartão com CPF, telefone e CEP, autorizado na hora) e webhook idempotente em `/api/webhooks/asaas`, registrado no sandbox para `dissona.com.br` com 8 eventos. Ligado por `PAGAMENTO_SIMULADO=false`. **Falta**: o deploy do endpoint. *(A `SUPABASE_SERVICE_ROLE_KEY` deixou de faltar: em 2026-09-16 a chave do `.env.local` foi conferida contra o PostgREST e o Auth admin e passou nos dois — é do formato novo `sb_secret_`, e não o token pessoal `sbp_` que esta nota registrava.)* No `.env.local`, a chave do Asaas vai como `\$aact_…` — o Next expande `$`
 - [ ] Asaas — implementar o modelo de repasse definido (transferência, subcontas ou split diferido) — *bloqueado por [#6](open-questions.md#6-modelo-de-split-no-asaas)*
 - [ ] Asaas — criação de subconta do curador no cadastro, guardando a carteira
 - [ ] Asaas — webhook de situação de KYC liberando o saque

@@ -11,8 +11,17 @@ carregarEnvLocal();
 /**
  * Playwright — os 16 cenários do Guia de Testes da R2 (docs/R2/guia-de-testes-r2.md).
  *
- * `BASE_URL` aponta para o Preview do PR no CI (architecture.md §9); sem ela,
- * a suíte sobe o servidor local.
+ * Sem `BASE_URL`, a suíte sobe o servidor local (`build` + `start`). Com ela, o
+ * `webServer` se desliga sozinho e a suíte roda contra o que estiver na URL.
+ *
+ * Contra produção: `BASE_URL=https://dissona.com.br pnpm e2e`. É o único jeito
+ * de exercitar o que o runtime serverless impõe e o `next start` não impõe — o
+ * teto de ~4,5 MB de corpo de request por função, que é a razão de o áudio da
+ * faixa e o anexo do curador subirem do navegador direto ao Storage.
+ *
+ * ⚠️ **Não** aponte para a URL crua de um deployment ou de um Preview: elas
+ * estão atrás da Deployment Protection da Vercel e redirecionam para
+ * `vercel.com/login`. Só o domínio aliasado é público.
  */
 /**
  * Porta propria, e nao a 3000: a suite tem de ser hermetica. Se outro projeto

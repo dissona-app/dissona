@@ -28,7 +28,9 @@
     "db:push": "supabase db push",
     "db:tipos": "node scripts/gerar-tipos-bd.mjs",
     "e2e:navegadores": "playwright install --with-deps chromium",
-    "e2e:relatorio": "playwright show-report"
+    "e2e:relatorio": "playwright show-report",
+    "e2e:semear": "node scripts/repor-cenarios-e2e.mjs",
+    "rastreabilidade": "node scripts/matriz-rastreabilidade.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

@@ -41,7 +41,7 @@ import { AVALIAR } from '../apoio/textos';
 test.describe.configure({ mode: 'serial' });
 
 test.describe('C3 · Notas objetivas', () => {
-  test('os onze critérios aparecem, agrupados', async ({ page }) => {
+  test('os onze critérios aparecem, agrupados', { tag: ['@RF-059'] }, async ({ page }) => {
     await abrirAvaliacao(page, FAIXA_DO_C3);
 
     for (const grupo of Object.values(AVALIAR.grupos)) {
@@ -52,7 +52,7 @@ test.describe('C3 · Notas objetivas', () => {
     await expect(page.getByRole('slider')).toHaveCount(11);
   });
 
-  test('os cinco obrigatórios são marcados como tal', async ({ page }) => {
+  test('os cinco obrigatórios são marcados como tal', { tag: ['@RF-059'] }, async ({ page }) => {
     await abrirAvaliacao(page, FAIXA_DO_C3);
 
     for (const criterio of CRITERIOS_OBRIGATORIOS) {
@@ -70,31 +70,39 @@ test.describe('C3 · Notas objetivas', () => {
    * execuções — o último teste deste arquivo grava cinco notas. O que importa
    * não é o número de partida; é que dar uma nota incrementa a conta.
    */
-  test('a nota aceita casa decimal e o resumo reconta', async ({ page }) => {
-    await abrirAvaliacao(page, FAIXA_DO_C3);
+  test(
+    'a nota aceita casa decimal e o resumo reconta',
+    { tag: ['@RF-059', '@RF-061'] },
+    async ({ page }) => {
+      await abrirAvaliacao(page, FAIXA_DO_C3);
 
-    const resumo = page.getByText(/\d+ de 11 respondidos/);
-    const antes = Number(/(\d+) de 11/.exec((await resumo.innerText()) ?? '')?.[1] ?? '0');
+      const resumo = page.getByText(/\d+ de 11 respondidos/);
+      const antes = Number(/(\d+) de 11/.exec((await resumo.innerText()) ?? '')?.[1] ?? '0');
 
-    // "Letra" é opcional, e nenhum outro teste a preenche.
-    const letra = page.getByLabel('Letra', { exact: true });
-    await letra.fill('4.3');
+      // "Letra" é opcional, e nenhum outro teste a preenche.
+      const letra = page.getByLabel('Letra', { exact: true });
+      await letra.fill('4.3');
 
-    // O valor anunciado é o número, e não a porcentagem que o navegador leria.
-    await expect(letra).toHaveAttribute('aria-valuetext', '4,3');
-    await expect(page.getByText('4,3', { exact: true })).toBeVisible();
-    await expect(resumo).toContainText(`${antes + 1} de 11 respondidos`);
-  });
+      // O valor anunciado é o número, e não a porcentagem que o navegador leria.
+      await expect(letra).toHaveAttribute('aria-valuetext', '4,3');
+      await expect(page.getByText('4,3', { exact: true })).toBeVisible();
+      await expect(resumo).toContainText(`${antes + 1} de 11 respondidos`);
+    },
+  );
 
-  test('a justificativa conta os caracteres até o piso do acréscimo', async ({ page }) => {
-    await abrirAvaliacao(page, FAIXA_DO_C3);
+  test(
+    'a justificativa conta os caracteres até o piso do acréscimo',
+    { tag: ['@RF-060'] },
+    async ({ page }) => {
+      await abrirAvaliacao(page, FAIXA_DO_C3);
 
-    const campo = page.getByLabel(AVALIAR.justificativaDe('Afinação'), { exact: true });
-    await campo.fill('a'.repeat(250));
+      const campo = page.getByLabel(AVALIAR.justificativaDe('Afinação'), { exact: true });
+      await campo.fill('a'.repeat(250));
 
-    await expect(page.getByText(AVALIAR.justificativaValida).first()).toBeVisible();
-    await expect(page.getByText('250 / 250', { exact: true })).toBeVisible();
-  });
+      await expect(page.getByText(AVALIAR.justificativaValida).first()).toBeVisible();
+      await expect(page.getByText('250 / 250', { exact: true })).toBeVisible();
+    },
+  );
 
   test('a tela diz qual é a escuta mínima exigida', async ({ page }) => {
     await abrirAvaliacao(page, FAIXA_DO_C3);

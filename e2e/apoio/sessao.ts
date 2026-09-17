@@ -60,9 +60,21 @@ export async function abrirPacotes(page: Page, persona: Persona = PERSONA.ADMIN)
  * O que se espera é apenas **sair** do login; para onde, é o cenário que sabe.
  */
 export async function entrarComo(page: Page, persona: Persona) {
+  await entrarComCredenciais(page, persona.email);
+}
+
+/**
+ * O mesmo login, por e-mail solto.
+ *
+ * Existe para as contas descartáveis (`apoio/contas.ts`), que nascem em tempo
+ * de execução e por isso não são `Persona`. A senha padrão é a mesma
+ * `E2E_SENHA` — quem precisa de outra, como o cenário que troca a própria
+ * senha, passa a que quer conferir.
+ */
+export async function entrarComCredenciais(page: Page, email: string, senha?: string) {
   await page.goto('/entrar');
-  await page.getByLabel(ENTRAR.rotuloEmail, { exact: true }).fill(persona.email);
-  await page.getByLabel(ENTRAR.rotuloSenha, { exact: true }).fill(senhaDeTeste());
+  await page.getByLabel(ENTRAR.rotuloEmail, { exact: true }).fill(email);
+  await page.getByLabel(ENTRAR.rotuloSenha, { exact: true }).fill(senha ?? senhaDeTeste());
   await page.getByRole('button', { name: ENTRAR.enviar, exact: true }).click();
   await page.waitForURL((url) => !url.pathname.endsWith('/entrar'));
 }

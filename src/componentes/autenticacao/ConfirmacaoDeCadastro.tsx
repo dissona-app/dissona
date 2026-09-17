@@ -10,6 +10,7 @@ import { Checkbox } from '@/componentes/base/Checkbox';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
+import { erroGeralDe } from '@/textos/erros';
 import { CONFIRMAR_SOCIAL } from '@/textos/prototipo';
 
 import estilos from './ConfirmacaoDeCadastro.module.css';
@@ -77,6 +78,16 @@ export function ConfirmacaoDeCadastro({
     return motivo === undefined ? undefined : TEXTO_DO_MOTIVO[motivo];
   };
 
+  // O banner de e-mail em uso já fala por `EMAIL_JA_CADASTRADO`; a superfície
+  // geral cobre o resto — `EMAIL_INVALIDO` e `LIMITE_DE_ENVIO` chegam por
+  // `campo` ou sem campo nenhum, e sumiam.
+  const emailEmUso = falhou && resultado.codigo === CodigoErro.EMAIL_JA_CADASTRADO;
+  const erroGeral = erroGeralDe(
+    falhou ? resultado : null,
+    [erroDeCampo('nome'), erroDeCampo('email'), erroDeCampo('aceite')],
+    emailEmUso,
+  );
+
   return (
     <>
       <div className={estilos.cabecalho}>
@@ -87,7 +98,7 @@ export function ConfirmacaoDeCadastro({
         </p>
       </div>
 
-      {falhou && resultado.codigo === CodigoErro.EMAIL_JA_CADASTRADO ? (
+      {emailEmUso ? (
         <Aviso
           tom="erro"
           titulo={CONFIRMAR_SOCIAL.bannerEmailEmUso.titulo}
@@ -102,6 +113,8 @@ export function ConfirmacaoDeCadastro({
       ) : null}
 
       <form action={confirmar} className={estilos.campos} noValidate>
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
         <Campo
           name="nome"
           type="text"

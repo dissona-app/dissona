@@ -2,12 +2,14 @@
 
 import { useActionState, useEffect } from 'react';
 
+import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
 import { Campo } from '@/componentes/base/Campo';
 import { Modal } from '@/componentes/base/Modal';
 import { Selecao } from '@/componentes/base/Selecao';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import type { CanalDoCurador } from '@/modulos/curador/tipos';
+import { erroGeralDe } from '@/textos/erros';
 import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@/textos/curador';
 
 import estilos from './ModalDeMidia.module.css';
@@ -71,6 +73,14 @@ export function ModalDeMidia({ alvo, onFechar, acao, onSucesso }: PropsModalDeMi
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // `NAO_ENCONTRADO` ao editar mídia de outra pessoa e `NAO_AUTORIZADO` vêm
+  // sem campo: o modal ficava aberto, intacto, sem dizer o que houve.
+  const erroGeral = erroGeralDe(falhou ? resultado : null, [
+    erroDe('nome'),
+    erroDe('tipo'),
+    erroDe('link'),
+  ]);
+
   return (
     <Modal
       aberto={alvo !== null}
@@ -91,6 +101,8 @@ export function ModalDeMidia({ alvo, onFechar, acao, onSucesso }: PropsModalDeMi
     >
       <form key={midia?.id ?? 'nova'} action={enviar} className={estilos.formulario} noValidate>
         {midia === undefined ? null : <input type="hidden" name="midiaId" value={midia.id} />}
+
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
         <Campo
           name="nome"

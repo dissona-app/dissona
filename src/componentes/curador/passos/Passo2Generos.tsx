@@ -1,8 +1,9 @@
 'use client';
 
-import { Chips } from '@/componentes/base';
+import { Aviso, Chips } from '@/componentes/base';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';
@@ -29,17 +30,22 @@ export function Passo2Generos({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo } = usePasso(acao);
+  const { enviar, motivo, falha } = usePasso(acao);
+
+  const erro = motivo === undefined ? undefined : MOTIVOS[motivo];
+  const erroGeral = erroGeralDe(falha, [erro]);
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
+      {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
       <Chips
         name="genero"
         opcoes={CURADOR_CADASTRO.generos}
         selecionados={estado.generos}
         rotulo={CURADOR_CADASTRO.titulos[1]}
         contador={CURADOR_CADASTRO.contagemGeneros}
-        erro={motivo === undefined ? undefined : MOTIVOS[motivo]}
+        erro={erro}
       />
 
       <AcoesDoPasso

@@ -54,6 +54,85 @@ export const PERSONA = {
   CURADOR_BRONZE: { email: `e2e_bronze@${DOMINIO_E2E}`, nome: 'E2E Bronze' },
   /** Candidato a Prata em análise: fora do painel, na tela de espera (12.5). */
   CURADOR_PRATA: { email: `e2e_prata@${DOMINIO_E2E}`, nome: 'E2E Prata' },
+
+  /*
+   * As três abaixo existem para **isolar estado**. `ARTISTA` tem saldo e
+   * movimentações, e é disso que B1, B2 e B3 dependem: qualquer cenário que
+   * precise do oposto (carteira nunca usada, saldo que não cobre a seleção)
+   * teria de destruir o que os outros afirmam.
+   */
+
+  /**
+   * Artista sem lançamento nenhum — o estado vazio da Carteira (RF-042).
+   *
+   * ⚠️ **Nunca compra.** Comprar com esta conta apaga o único estado que ela
+   * existe para provar, e o teste de estado vazio passa a falhar de um jeito
+   * que parece flakiness.
+   */
+  ARTISTA_NOVO: { email: `e2e_artista_novo@${DOMINIO_E2E}`, nome: 'E2E Artista Novo' },
+  /** Artista com saldo abaixo do preço de um serviço — o bloqueio do RF-049. */
+  ARTISTA_SEM_SALDO: { email: `e2e_sem_saldo@${DOMINIO_E2E}`, nome: 'E2E Sem Saldo' },
+  /**
+   * A carteira do B2, que ninguém mais movimenta.
+   *
+   * B2 é o único cenário que afirma **aritmética exata** de saldo — "creditou
+   * uma vez só: o saldo cresce exatamente um pacote". Em `e2e_artista` isso é
+   * indefensável: B7 confirma seleção de curadores e gasta 2 Claves, e basta
+   * cair dentro da janela de medição para o teste acusar crédito em dobro que
+   * não houve. Já aconteceu (`Expected: 20, Received: 18`), e o `serial` do
+   * arquivo não protege — a disputa é **entre** arquivos.
+   *
+   * Não precisa de carteira semeada: B2 compra a própria.
+   */
+  ARTISTA_COMPRA: { email: `e2e_compra@${DOMINIO_E2E}`, nome: 'E2E Compra' },
+  /*
+   * As duas abaixo são estados de conta que a autenticação precisa distinguir,
+   * e que nenhuma outra persona pode ter ao mesmo tempo.
+   */
+
+  /*
+   * As quatro do módulo 12. O wizard é o recurso mais disputado da suíte: os
+   * oito passos escrevem no **mesmo** `perfil_curador`, e `fullyParallel` faria
+   * um arquivo salvar o passo 5 enquanto outro afirma o passo 1. Uma persona
+   * por arquivo é o mesmo remédio que o seed já dá às faixas C3–C6.
+   */
+
+  /** Rascunho no passo 1 — retomada, pular e voltar (`e1`). */
+  WIZARD_NAV: { email: `e2e_wizard_nav@${DOMINIO_E2E}`, nome: 'E2E Wizard Navegação' },
+  /** Rascunho no passo 1 — canais, serviços e preços (`e2`). */
+  WIZARD_MIDIAS: { email: `e2e_wizard_midias@${DOMINIO_E2E}`, nome: 'E2E Wizard Mídias' },
+  /** Rascunho no passo 1 — credenciais e anexos (`e3`). */
+  WIZARD_CREDENCIAIS: { email: `e2e_wizard_cred@${DOMINIO_E2E}`, nome: 'E2E Wizard Credenciais' },
+  /**
+   * Bronze aprovado, com mídias e serviços — a manutenção do 12.6 (`e5`).
+   *
+   * Separada de `CURADOR_BRONZE` porque editar e excluir mídia mexe no que a
+   * fila e a avaliação leem indiretamente, e porque a regra que o cenário prova
+   * é "alterar mídia **não** altera a classe" — precisa de uma classe que só ele
+   * observe.
+   */
+  CURADOR_MANUTENCAO: { email: `e2e_manutencao@${DOMINIO_E2E}`, nome: 'E2E Manutenção' },
+
+  /** `perfil.situacao = 'bloqueada'` — a guarda expulsa com `?motivo=bloqueada`. */
+  BLOQUEADA: { email: `e2e_bloqueada@${DOMINIO_E2E}`, nome: 'E2E Bloqueada' },
+  /**
+   * Artista **e** curador, com `ultimo_ambiente` gravado.
+   *
+   * É a única forma de exercer RF-008: papéis acumuláveis, entrada no último
+   * ambiente usado e troca de papel pelo cabeçalho. Separada de `ARTISTA` e de
+   * `CURADOR_BRONZE` porque acumular papel muda para onde o login leva, e as
+   * duas são usadas por cenários que dependem do destino atual.
+   */
+  DOIS_PAPEIS: { email: `e2e_dois_papeis@${DOMINIO_E2E}`, nome: 'E2E Dois Papéis' },
+
+  /**
+   * Bronze que recebe as faixas dos cenários de SLA e atomicidade.
+   *
+   * Separado de `CURADOR_BRONZE` porque os testes de SLA mexem no relógio dos
+   * envios e disparam a devolução: com a mesma conta, a fila que C1 conta
+   * mudaria no meio da asserção.
+   */
+  CURADOR_SLA: { email: `e2e_curador_sla@${DOMINIO_E2E}`, nome: 'E2E Curador SLA' },
 } as const satisfies Record<string, Persona>;
 
 export function senhaDeTeste(): string {

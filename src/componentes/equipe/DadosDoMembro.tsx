@@ -11,6 +11,7 @@ import type { ResultadoDeAcao } from '@/lib/acoes';
 import { formatarDataLonga } from '@/lib/formato';
 import { rotuloDoPapel } from '@/modulos/equipe/tipos';
 import type { PapelAdmin } from '@/modulos/equipe/tipos';
+import { erroGeralDe } from '@/textos/erros';
 import { CONTA, EQUIPE } from '@/textos/prototipo';
 
 import estilos from './DadosDoMembro.module.css';
@@ -86,6 +87,9 @@ export function DadosDoMembro({
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // "Salvar" recusado por papel ou por sessão não pintava campo nenhum.
+  const erroGeral = erroGeralDe(falhou ? resultado : null, [erroDe('nome'), erroDe('cargo')]);
+
   const notaDaSenha =
     senhaAlteradaEm === null
       ? TEXTOS.senhaNotaSemData
@@ -94,6 +98,8 @@ export function DadosDoMembro({
   return (
     <section className={estilos.base} aria-label={EQUIPE.abas.dados}>
       <form action={enviar} className={estilos.corpo} noValidate>
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
         <div className={estilos.identidade}>
           <span className={estilos.avatar} aria-hidden="true">
             {iniciaisDe(nome)}

@@ -9,7 +9,9 @@ import { Campo } from '@/componentes/base/Campo';
 import { Grupo } from '@/componentes/base/Grupo';
 import { Painel } from '@/componentes/base/Painel';
 import type { FalhaDeAcao, ResultadoDeAcao } from '@/lib/acoes';
+import { criarClienteNavegador } from '@/lib/supabase/cliente';
 import type { FaixaEmEdicao, LimitesDeUpload, MetadadosDetectados } from '@/modulos/faixa/tipos';
+import { erroGeralDe } from '@/textos/erros';
 import { ENVIAR as TEXTOS } from '@/textos/prototipo';
 
 import estilos from './FormularioDaFaixa.module.css';
@@ -43,8 +45,10 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   const [lancada, setLancada] = useState<'sim' | 'nao' | ''>(
     faixa?.lancada === true ? 'sim' : faixa?.lancada === false ? 'nao' : '',
   );
-  const [nomeDoArquivo, setNomeDoArquivo] = useState<string | null>(null);
-  const [nomeDaCapa, setNomeDaCapa] = useState<string | null>(null);
+  const [arquivoDeAudio, setArquivoDeAudio] = useState<File | null>(null);
+  const [arquivoDaCapa, setArquivoDaCapa] = useState<File | null>(null);
+  const [subindo, setSubindo] = useState(false);
+  const [falhaDoUpload, setFalhaDoUpload] = useState<string | null>(null);
 
   const [titulo, setTitulo] = useState(faixa?.titulo ?? '');
   const [urlSpotify, setUrlSpotify] = useState(faixa?.urlSpotify ?? '');
@@ -83,6 +87,18 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // Superfície geral: `salvarFaixa` recusa por situação da faixa, por envio já
+  // pago e por autorização — nenhum deles é de campo, e sem isto o "Continuar"
+  // não faz nada e não diz nada.
+  const erroGeral = erroGeralDe(falha, [
+    erroDe('audio'),
+    erroDe('urlSpotify'),
+    erroDe('urlYoutube'),
+    erroDe('titulo'),
+    erroDe('estilo'),
+    erroDe('dataLancamento'),
+  ]);
+
   // A detecção lê o Spotify primeiro; o erro dela aparece no campo que ela leu.
   const linkLido: 'urlSpotify' | 'urlYoutube' =
     urlSpotify.trim() !== '' ? 'urlSpotify' : 'urlYoutube';
@@ -118,14 +134,113 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
 
   const aceitos = limites.formatos.map((f) => `.${f}`).join(',');
 
+  /**
+   * RF-036 · o arquivo vai do navegador **direto** ao Storage.
+   *
+   * O motivo é um teto que nenhuma configuração levanta: uma função serverless
+   * da Vercel aceita ~4,5 MB de corpo de request, e `upload.tamanho_max_mb` é
+   * 50. Enquanto o mp3 viajava dentro da Server Action, o envio por arquivo
+   * simplesmente não sobrevivia ao deploy.
+   *
+   * Nada de policy nova: `"faixas: dono gerencia a propria pasta"` já exige
+   * `(storage.foldername(name))[1] = auth.uid()`, e é exatamente a convenção de
+   * caminho que `subirAudio` sempre usou. O que a ação recebe agora é o
+   * **caminho**; quem lhe conta tamanho e MIME é o Storage.
+   *
+   * O `<input type="file">` continua no formulário, e com `name`: sem
+   * JavaScript esta função não roda, o arquivo viaja no `multipart` como antes
+   * e `salvarFaixa` valida pelo `File`. Os dois caminhos existem, e o de baixo
+   * é o que garante que a tela funcione sem hidratação.
+   */
+  const enviarComUpload = async (dados: FormData) => {
+    setFalhaDoUpload(null);
+    if (arquivoDeAudio === null && arquivoDaCapa === null) {
+      enviar(dados);
+      return;
+    }
+
+    setSubindo(true);
+    try {
+      const supabase = criarClienteNavegador();
+      const { data: sessao } = await supabase.auth.getUser();
+      const usuarioId = sessao.user?.id;
+      // Sem sessão legível daqui, deixa a ação recusar: ela tem a resposta
+      // certa para isso, e adivinhá-la no cliente daria duas versões da regra.
+      if (usuarioId === undefined) {
+        enviar(dados);
+        return;
+      }
+
+      const referencia = faixa?.id ?? crypto.randomUUID();
+
+      if (arquivoDeAudio !== null) {
+        // Sem pré-checagem de tamanho ou de tipo aqui, de propósito: quem
+        // recusa é o bucket, por `file_size_limit` e `allowed_mime_types`
+        // (`0000_storage.sql`). Uma guarda no cliente seria um segundo lugar
+        // decidindo o que é um arquivo válido, e o primeiro a divergir do banco.
+        const extensao = arquivoDeAudio.type.includes('wav') ? '.wav' : '.mp3';
+        const { data, error } = await supabase.storage
+          .from('faixas')
+          .upload(`${usuarioId}/${referencia}${extensao}`, arquivoDeAudio, {
+            upsert: true,
+            contentType: arquivoDeAudio.type,
+          });
+
+        if (error !== null || data === null) {
+          setFalhaDoUpload(mensagemDoStorage(error?.message ?? ''));
+          return;
+        }
+
+        // O caminho é o que a ação vai gravar; o arquivo não precisa mais ir.
+        dados.set('audioCaminho', data.path);
+        dados.delete('audio');
+      }
+
+      if (arquivoDaCapa !== null) {
+        const extensao = arquivoDaCapa.type === 'image/png' ? '.png' : '.jpg';
+        const { data, error } = await supabase.storage
+          .from('capas')
+          .upload(`${usuarioId}/${referencia}${extensao}`, arquivoDaCapa, {
+            upsert: true,
+            contentType: arquivoDaCapa.type,
+          });
+
+        // A capa é opcional: falhar em subi-la não pode impedir o envio da
+        // faixa. O arquivo sai do corpo nos dois casos — mandá-lo junto depois
+        // de o bucket o ter recusado por tamanho só faria a ação inteira bater
+        // no teto de transporte, e a faixa se perderia por causa da capa.
+        dados.delete('capa');
+        if (error === null && data !== null) dados.set('capaCaminho', data.path);
+      }
+    } finally {
+      setSubindo(false);
+    }
+
+    enviar(dados);
+  };
+
+  /** O Storage recusa por tamanho e por MIME — e as mensagens já existem. */
+  function mensagemDoStorage(mensagem: string): string {
+    const texto = mensagem.toLowerCase();
+    if (texto.includes('size') || texto.includes('large')) {
+      return MOTIVOS['tamanho'] ?? TEXTOS.erroArquivoAusente;
+    }
+    if (texto.includes('mime') || texto.includes('type')) {
+      return MOTIVOS['formato'] ?? TEXTOS.erroArquivoAusente;
+    }
+    return TEXTOS.erroArquivoAusente;
+  }
+
   return (
-    <form ref={formulario} action={enviar} className={estilos.base} noValidate>
+    <form ref={formulario} action={enviarComUpload} className={estilos.base} noValidate>
       {faixa !== null ? <input type="hidden" name="faixaId" value={faixa.id} /> : null}
       <input
         type="hidden"
         name="metadados"
         value={detectado === null ? '' : JSON.stringify(detectado)}
       />
+
+      {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
       <Painel titulo={TEXTOS.enviarArquivo} sublegenda={TEXTOS.enviarArquivoApoio}>
         <label className={estilos.dropzone}>
@@ -134,11 +249,11 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
             name="audio"
             accept={aceitos}
             className={estilos.entradaDeArquivo}
-            onChange={(e) => setNomeDoArquivo(e.target.files?.[0]?.name ?? null)}
+            onChange={(e) => setArquivoDeAudio(e.target.files?.[0] ?? null)}
           />
           <span className={estilos.dropzoneTitulo}>
-            {nomeDoArquivo !== null
-              ? TEXTOS.arquivoEscolhido(nomeDoArquivo)
+            {arquivoDeAudio !== null
+              ? TEXTOS.arquivoEscolhido(arquivoDeAudio.name)
               : faixa?.arquivoCaminho != null
                 ? TEXTOS.arquivoEscolhido(faixa.arquivoCaminho.split('/').pop() ?? '')
                 : TEXTOS.dropzoneVazia}
@@ -146,7 +261,9 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
           <span className={estilos.dropzoneApoio}>{TEXTOS.dropzone(limites.tamanhoMaxMb)}</span>
         </label>
 
-        {erroDe('audio') !== undefined ? <Aviso tom="erro">{erroDe('audio')}</Aviso> : null}
+        {(falhaDoUpload ?? erroDe('audio')) !== undefined ? (
+          <Aviso tom="erro">{falhaDoUpload ?? erroDe('audio')}</Aviso>
+        ) : null}
 
         <Aviso tom="info" estatico>
           {TEXTOS.arquivoSempreNecessario}
@@ -233,10 +350,11 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
             name="capa"
             accept="image/jpeg,image/png"
             className={estilos.entradaDeArquivo}
-            onChange={(e) => setNomeDaCapa(e.target.files?.[0]?.name ?? null)}
+            onChange={(e) => setArquivoDaCapa(e.target.files?.[0] ?? null)}
           />
           <span className={estilos.capaTitulo}>
-            {nomeDaCapa ?? (faixa?.capaCaminho != null ? TEXTOS.capaTrocar : TEXTOS.capaEnviar)}
+            {arquivoDaCapa?.name ??
+              (faixa?.capaCaminho != null ? TEXTOS.capaTrocar : TEXTOS.capaEnviar)}
           </span>
         </label>
 
@@ -269,7 +387,7 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
       </Painel>
 
       <div className={estilos.acoes}>
-        <Botao type="submit" carregando={pendente}>
+        <Botao type="submit" carregando={pendente || subindo}>
           {TEXTOS.continuar}
         </Botao>
       </div>

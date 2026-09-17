@@ -2,10 +2,22 @@ import { expect, test } from '@playwright/test';
 
 import {
   abrirAvaliacao,
+  abrirPelaFila,
+  FAIXA_DA_ATOMICIDADE,
   FAIXA_DO_C6,
   FAIXA_PARA_CONCLUIR,
   irAteARemuneracao,
 } from '../apoio/avaliacao';
+import {
+  envioDaFaixa,
+  ganhosDoEnvio,
+  lancamentosDoEnvio,
+  recuarPrazos,
+  rodarDevolucaoPorSLA,
+  situacaoDaAvaliacao,
+} from '../apoio/banco';
+import { PERSONA } from '../apoio/personas';
+import { entrarComo } from '../apoio/sessao';
 import { AVALIAR } from '../apoio/textos';
 
 /**
@@ -46,34 +58,38 @@ import { AVALIAR } from '../apoio/textos';
 test.describe.configure({ mode: 'serial' });
 
 test.describe('C6 · Remuneração por classe', () => {
-  test('a composição do valor aparece: piso, acréscimos e teto', async ({ page }) => {
-    const envioId = await abrirAvaliacao(page, FAIXA_DO_C6);
-    await irAteARemuneracao(page, envioId);
+  test(
+    'a composição do valor aparece: piso, acréscimos e teto',
+    { tag: ['@RF-066'] },
+    async ({ page }) => {
+      const envioId = await abrirAvaliacao(page, FAIXA_DO_C6);
+      await irAteARemuneracao(page, envioId);
 
-    await expect(page.getByRole('heading', { name: AVALIAR.tituloRemuneracao })).toBeVisible();
+      await expect(page.getByRole('heading', { name: AVALIAR.tituloRemuneracao })).toBeVisible();
 
-    // A classe do curador, pelo selo — a persona é Bronze.
-    await expect(page.getByText(AVALIAR.suaClasse, { exact: true })).toBeVisible();
-    await expect(page.getByText(AVALIAR.classes.bronze, { exact: true })).toBeVisible();
+      // A classe do curador, pelo selo — a persona é Bronze.
+      await expect(page.getByText(AVALIAR.suaClasse, { exact: true })).toBeVisible();
+      await expect(page.getByText(AVALIAR.classes.bronze, { exact: true })).toBeVisible();
 
-    // O piso, com a legenda de dentro do prazo — e o número que o cliente
-    // decidiu: Bronze no prazo é 38%, pela tabela do board (open-questions #5).
-    await expect(page.getByText(AVALIAR.pisoNoPrazo)).toBeVisible();
-    await expect(page.getByText('38%', { exact: true })).toBeVisible();
+      // O piso, com a legenda de dentro do prazo — e o número que o cliente
+      // decidiu: Bronze no prazo é 38%, pela tabela do board (open-questions #5).
+      await expect(page.getByText(AVALIAR.pisoNoPrazo)).toBeVisible();
+      await expect(page.getByText('38%', { exact: true })).toBeVisible();
 
-    // Os quatro acréscimos do catálogo.
-    await expect(page.getByText(AVALIAR.acrescimos.onze_criterios(11))).toBeVisible();
-    await expect(page.getByText(/Justificativa de \d+ caracteres/)).toBeVisible();
-    await expect(page.getByText(/Feedback com \d+ caracteres/)).toBeVisible();
-    await expect(page.getByText(AVALIAR.acrescimos.compartilhou)).toBeVisible();
+      // Os quatro acréscimos do catálogo.
+      await expect(page.getByText(AVALIAR.acrescimos.onze_criterios(11))).toBeVisible();
+      await expect(page.getByText(/Justificativa de \d+ caracteres/)).toBeVisible();
+      await expect(page.getByText(/Feedback com \d+ caracteres/)).toBeVisible();
+      await expect(page.getByText(AVALIAR.acrescimos.compartilhou)).toBeVisible();
 
-    // Um teto só desde a `0009b` — o degrau "na avaliação / com
-    // compartilhamento" do protótipo não existe na tabela do board.
-    await expect(page.getByText(AVALIAR.tetoNota(AVALIAR.classes.bronze, 50))).toBeVisible();
-    await expect(page.getByText(/na avaliação e \d+% com/)).toHaveCount(0);
-  });
+      // Um teto só desde a `0009b` — o degrau "na avaliação / com
+      // compartilhamento" do protótipo não existe na tabela do board.
+      await expect(page.getByText(AVALIAR.tetoNota(AVALIAR.classes.bronze, 50))).toBeVisible();
+      await expect(page.getByText(/na avaliação e \d+% com/)).toHaveCount(0);
+    },
+  );
 
-  test('distingue acréscimo cumprido de não cumprido', async ({ page }) => {
+  test('distingue acréscimo cumprido de não cumprido', { tag: ['@RF-066'] }, async ({ page }) => {
     const envioId = await abrirAvaliacao(page, FAIXA_DO_C6);
     await irAteARemuneracao(page, envioId);
 
@@ -90,23 +106,27 @@ test.describe('C6 · Remuneração por classe', () => {
     await expect(page.getByText(/^\+\d+%$/).first()).toBeVisible();
   });
 
-  test('"Você recebe" traz o valor e a base paga pelo artista', async ({ page }) => {
-    const envioId = await abrirAvaliacao(page, FAIXA_DO_C6);
-    await irAteARemuneracao(page, envioId);
+  test(
+    '"Você recebe" traz o valor e a base paga pelo artista',
+    { tag: ['@RF-066'] },
+    async ({ page }) => {
+      const envioId = await abrirAvaliacao(page, FAIXA_DO_C6);
+      await irAteARemuneracao(page, envioId);
 
-    await expect(page.getByRole('heading', { name: AVALIAR.voceRecebe })).toBeVisible();
-    await expect(page.getByText(/^R\$\s?[\d.,]+$/).first()).toBeVisible();
-    await expect(page.getByText(/\d+% de R\$\s?[\d.,]+ pagos pelo artista/)).toBeVisible();
+      await expect(page.getByRole('heading', { name: AVALIAR.voceRecebe })).toBeVisible();
+      await expect(page.getByText(/^R\$\s?[\d.,]+$/).first()).toBeVisible();
+      await expect(page.getByText(/\d+% de R\$\s?[\d.,]+ pagos pelo artista/)).toBeVisible();
 
-    await expect(page.getByRole('button', { name: AVALIAR.concluir })).toBeVisible();
-  });
+      await expect(page.getByRole('button', { name: AVALIAR.concluir })).toBeVisible();
+    },
+  );
 
   /**
    * Consome a faixa reservada: concluída, ela sai da fila para sempre —
    * `ganho_curador` não é reescrito nem apagado, e o envio vira `pronto`.
    * `dados-e2e.sql` cria outra sempre que não houver nenhuma pendente.
    */
-  test('concluir libera o crédito e fecha a avaliação', async ({ page }) => {
+  test('concluir libera o crédito e fecha a avaliação', { tag: ['@RF-067'] }, async ({ page }) => {
     const envioId = await abrirAvaliacao(page, FAIXA_PARA_CONCLUIR);
     await irAteARemuneracao(page, envioId);
 
@@ -122,5 +142,63 @@ test.describe('C6 · Remuneração por classe', () => {
     await page.getByRole('link', { name: AVALIAR.voltarParaFila }).click();
     await page.waitForURL('**/curador/fila');
     await expect(page.getByRole('row').filter({ hasText: FAIXA_PARA_CONCLUIR })).toHaveCount(0);
+  });
+
+  /**
+   * A segunda metade do RF-067: *"se qualquer etapa falha, nada é gravado
+   * parcialmente"*.
+   *
+   * ## A falha é do próprio produto, e não injetada
+   *
+   * Não há mock a montar nem erro a forçar: existe uma corrida real, e ela é a
+   * mais plausível de todas. O curador está na tela da remuneração quando o job
+   * de 7 dias devolve o envio. `enviar_avaliacao` recusa com `DS004` — "envio
+   * nao esta em avaliacao" —, e o wizard traduz para `AVALIAR.erroSituacao`.
+   *
+   * Um erro fabricado provaria que a transação aborta quando **aquele** erro
+   * acontece. Este prova o que interessa: que a invariante vale contra o
+   * concorrente que o sistema de fato tem.
+   *
+   * ## O que se afirma é o que **não** aconteceu
+   *
+   * Um "nada foi gravado pela metade" não tem tela. É ausência de linha, e por
+   * isso a prova é de banco. O rascunho permanecer não é gravação parcial — ele
+   * já existia antes, e é justamente o que o curador esperaria reencontrar.
+   */
+  test('falha na conclusão não grava nada pela metade', { tag: ['@RF-067'] }, async ({ page }) => {
+    const envio = await envioDaFaixa(FAIXA_DA_ATOMICIDADE);
+    expect(
+      envio,
+      `rode supabase/testes/dados-e2e.sql — "${FAIXA_DA_ATOMICIDADE}" sem envio ativo`,
+    ).not.toBeNull();
+
+    await entrarComo(page, PERSONA.CURADOR_SLA);
+    const envioId = await abrirPelaFila(page, FAIXA_DA_ATOMICIDADE);
+    await irAteARemuneracao(page, envioId);
+
+    // O sétimo dia chega enquanto a tela está aberta.
+    await recuarPrazos(envioId, { prazo: -24 * 4, devolucao: -1 });
+    expect(await rodarDevolucaoPorSLA()).toBeGreaterThanOrEqual(1);
+
+    await page.getByRole('button', { name: AVALIAR.concluir }).click();
+    await expect(page.getByText(AVALIAR.erroSituacao)).toBeVisible();
+
+    // Nada de ganho: é o que a transação teria criado se tivesse seguido.
+    expect(
+      await ganhosDoEnvio(envioId),
+      'a conclusão recusada não pode ter criado ganho para o curador',
+    ).toHaveLength(0);
+
+    // Nada de crédito no ledger — só a devolução que o job fez.
+    const lancamentos = await lancamentosDoEnvio(envioId);
+    expect(lancamentos.filter((l) => l.tipo === 'devolucao')).toHaveLength(1);
+    expect(
+      lancamentos.filter((l) => l.tipo !== 'devolucao' && l.tipo !== 'consumo'),
+      'nenhum lançamento além do consumo original e da devolução',
+    ).toHaveLength(0);
+
+    // E a avaliação segue em rascunho: o trabalho do curador não sumiu, e
+    // também não foi promovido a concluído pela metade.
+    expect(await situacaoDaAvaliacao(envioId)).toBe('rascunho');
   });
 });

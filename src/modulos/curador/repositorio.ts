@@ -15,6 +15,7 @@ import 'server-only';
  */
 
 import { lerConfiguracao } from '@/lib/configuracao';
+import { metadadosDoObjeto, type ObjetoNoStorage } from '@/lib/supabase/armazenamento';
 import { criarClienteServidor } from '@/lib/supabase/servidor';
 import { estourarSeErro } from '@/lib/supabase/erros';
 
@@ -28,6 +29,7 @@ import type {
   TipoDeMidia,
   TipoDeServico,
 } from './tipos';
+import { extensaoDoMime } from './esquemas';
 import { ehPasso, TIPOS_DE_CREDENCIAL } from './tipos';
 
 /**
@@ -373,7 +375,7 @@ export async function subirArquivo(
 ): Promise<string> {
   const supabase = await criarClienteServidor();
 
-  const extensao = extensaoDe(arquivo);
+  const extensao = extensaoDoMime(arquivo.type);
   const caminho = `${usuarioId}/${nomeBase}${extensao}`;
 
   const { error } = await supabase.storage
@@ -384,11 +386,18 @@ export async function subirArquivo(
   return caminho;
 }
 
-/** Extensão a partir do MIME, e não do nome — o nome vem do cliente. */
-function extensaoDe(arquivo: File): string {
-  if (arquivo.type === 'application/pdf') return '.pdf';
-  if (arquivo.type === 'image/png') return '.png';
-  return '.jpg';
+/**
+ * Tamanho e MIME de um objeto dos baldes deste módulo.
+ *
+ * Delegação estreita para `lib/supabase/armazenamento`: a leitura é a mesma
+ * para todo bucket, mas a união de baldes fica por módulo — assim nenhum passo
+ * do wizard consegue pedir metadado de `faixas` por engano.
+ */
+export async function metadadosDoArquivo(
+  balde: 'avatares' | 'materiais',
+  caminho: string,
+): Promise<ObjetoNoStorage | null> {
+  return metadadosDoObjeto(balde, caminho);
 }
 
 export async function salvarFotoDoPerfil(usuarioId: string, caminho: string): Promise<void> {

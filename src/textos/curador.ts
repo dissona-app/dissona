@@ -62,6 +62,8 @@ export const CURADOR_CADASTRO = {
   // ------------------------------------------------------- passo 1 --------
   adicionarFoto: 'Adicionar foto',
   fotoHint: 'JPG ou PNG, até 2 MB.',
+  fotoEnviada: 'Foto enviada',
+  fotoEnviando: 'Enviando a foto…',
   herdado: 'Nome e e-mail vêm da conta em que você já está. A senha segue a mesma.',
   rotuloNome: 'Nome completo',
   rotuloEmail: 'E-mail',
@@ -213,6 +215,7 @@ export const CURADOR_CADASTRO = {
   erroCredencial: 'Comprove com link válido ou anexo o que você marcou.',
   erroAnexoTipo: 'A comprovação precisa ser PDF, JPG ou PNG.',
   erroAnexoTamanho: 'A comprovação passa de 5 MB.',
+  anexoEnviando: 'Enviando a comprovação…',
 
   // ------------------------------------------------------- passo 7 --------
   rotuloBio: 'Bio',

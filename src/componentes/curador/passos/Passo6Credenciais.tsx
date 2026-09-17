@@ -3,19 +3,35 @@
 import { useState } from 'react';
 
 import { Aviso } from '@/componentes/base/Aviso';
+import { CodigoErro } from '@/lib/erros';
+import { ANEXO_MAX_BYTES, ANEXO_TIPOS } from '@/modulos/curador/esquemas';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CREDENCIAL_POR_ANEXO } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';
+import { useUploadDireto } from '../useUploadDireto';
 import estilos from './Passos.module.css';
 import type { PropsDoPasso } from './tipos';
 
 const MOTIVOS: Readonly<Record<string, string>> = {
   credencial_sem_prova: CURADOR_CADASTRO.erroCredencial,
-  formato_nao_suportado: CURADOR_CADASTRO.erroAnexoTipo,
-  arquivo_muito_grande: CURADOR_CADASTRO.erroAnexoTamanho,
+};
+
+/**
+ * O anexo recusado não vem por motivo, vem por **código**.
+ *
+ * `concluir()` em `curador/acoes.ts` devolve `falha(FORMATO_NAO_SUPORTADO |
+ * ARQUIVO_MUITO_GRANDE, 'arquivo')` — sem `detalhes`, que é de onde `usePasso`
+ * tira `motivo`. Enquanto isto não existiu, `erroAnexoTipo` e
+ * `erroAnexoTamanho` estavam escritos e eram inalcançáveis: PDF errado ou
+ * arquivo grande demais não avançavam o passo e não diziam nada.
+ */
+const MENSAGEM_DO_ANEXO: Readonly<Partial<Record<CodigoErro, string>>> = {
+  [CodigoErro.FORMATO_NAO_SUPORTADO]: CURADOR_CADASTRO.erroAnexoTipo,
+  [CodigoErro.ARQUIVO_MUITO_GRANDE]: CURADOR_CADASTRO.erroAnexoTamanho,
 };
 
 /**
@@ -44,7 +60,18 @@ export function Passo6Credenciais({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo } = usePasso(acao);
+  const { enviar, motivo, falha } = usePasso(acao);
+
+  const anexo = useUploadDireto({
+    balde: 'materiais',
+    nomeBase: 'formacao',
+    tipos: ANEXO_TIPOS,
+    maxBytes: ANEXO_MAX_BYTES,
+    mensagens: {
+      tipo: CURADOR_CADASTRO.erroAnexoTipo,
+      tamanho: CURADOR_CADASTRO.erroAnexoTamanho,
+    },
+  });
 
   const salva = (tipo: string) => estado.credenciais.find((cada) => cada.tipo === tipo);
   const anexoGravado = salva(CREDENCIAL_POR_ANEXO)?.anexoCaminho ?? null;
@@ -65,23 +92,28 @@ export function Passo6Credenciais({
       ]),
     ),
   );
-  const [anexoNovo, setAnexoNovo] = useState<string | null>(null);
 
   const comprovadas = CURADOR_CADASTRO.credenciais.filter((credencial) => {
     if (marcadas[credencial.valor] !== true) return false;
     if (credencial.valor === CREDENCIAL_POR_ANEXO) {
-      return anexoNovo !== null || anexoGravado !== null;
+      return anexo.caminho !== '' || anexo.nome !== null || anexoGravado !== null;
     }
     return (links[credencial.valor] ?? '').trim() !== '';
   }).length;
 
   const candidato = comprovadas >= estado.minimoParaPrata;
-  const erro = motivo === undefined ? undefined : MOTIVOS[motivo];
+  const erro =
+    (falha === null ? undefined : MENSAGEM_DO_ANEXO[falha.codigo]) ??
+    (motivo === undefined ? undefined : MOTIVOS[motivo]);
+  // `anexo.erro` entra na lista de pintados: sem isso a pessoa veria a mensagem
+  // do upload **e** o aviso geral, dizendo duas coisas para um evento só.
+  const erroGeral = erroGeralDe(falha, [erro, anexo.erro]);
+  const aviso = anexo.erro ?? erro ?? erroGeral;
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
-      {erro !== undefined ? (
-        <Aviso tom="erro" titulo={erro}>
+      {aviso !== undefined ? (
+        <Aviso tom="erro" titulo={aviso}>
           {CURADOR_CADASTRO.subtitulos[5]}
         </Aviso>
       ) : null}
@@ -91,6 +123,10 @@ export function Passo6Credenciais({
       {anexoGravado === null ? null : (
         <input type="hidden" name="anexo_formacao_existente" value="1" />
       )}
+
+      {/* O caminho do que subiu agora. A ação o prefere ao que já estava
+          gravado, e é ele que faz `temAnexoNovo` enxergar o upload direto. */}
+      <input type="hidden" name="anexo_formacao_caminho" value={anexo.caminho} />
 
       <ul className={estilos.cartoes}>
         {CURADOR_CADASTRO.credenciais.map((credencial) => {
@@ -136,16 +172,23 @@ export function Passo6Credenciais({
                 porAnexo ? (
                   <label className={estilos.anexo}>
                     <span className={estilos.anexoBotao}>{CURADOR_CADASTRO.anexarComprovacao}</span>
+                    {/* O `name` fica: sem JavaScript o `onChange` não roda, e o
+                        arquivo volta a viajar no `multipart` para `salvarPasso6`
+                        validar. */}
                     <input
                       type="file"
                       name="anexo_formacao"
                       accept="application/pdf,image/jpeg,image/png"
                       className={estilos.arquivo}
-                      onChange={(evento) => setAnexoNovo(evento.target.files?.[0]?.name ?? null)}
+                      onChange={anexo.aoEscolher}
                     />
-                    <span className={estilos.anexoNome}>
-                      {anexoNovo ??
-                        (anexoGravado === null ? credencial.dica : CURADOR_CADASTRO.anexoEnviado)}
+                    <span className={estilos.anexoNome} aria-live="polite">
+                      {anexo.subindo
+                        ? CURADOR_CADASTRO.anexoEnviando
+                        : (anexo.nome ??
+                          (anexoGravado === null
+                            ? credencial.dica
+                            : CURADOR_CADASTRO.anexoEnviado))}
                     </span>
                   </label>
                 ) : (
@@ -183,6 +226,7 @@ export function Passo6Credenciais({
       </p>
 
       <AcoesDoPasso
+        ocupado={anexo.subindo}
         passo={passo}
         ultimo={false}
         podePular

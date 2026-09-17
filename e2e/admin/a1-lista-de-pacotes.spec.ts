@@ -47,7 +47,7 @@ function linhasInativas(page: Page) {
  * em vez de um navegador.
  */
 test.describe('A1 · Lista de pacotes', () => {
-  test('a tabela traz as seis colunas e as três ações', async ({ page }) => {
+  test('a tabela traz as seis colunas e as três ações', { tag: ['@RF-050'] }, async ({ page }) => {
     await abrirPacotes(page);
 
     const tabela = page.getByRole('table', { name: ADMIN_PACOTES.titulo });
@@ -77,35 +77,43 @@ test.describe('A1 · Lista de pacotes', () => {
     ).toBeVisible();
   });
 
-  test('cada linha diz se o pacote está na Carteira do artista', async ({ page }) => {
-    await abrirPacotes(page);
+  test(
+    'cada linha diz se o pacote está na Carteira do artista',
+    { tag: ['@RF-050'] },
+    async ({ page }) => {
+      await abrirPacotes(page);
 
-    // A promessa da nota de rodapé — "Só os pacotes ativos aparecem na
-    // Carteira do artista" — só é verificável se a linha disser em qual dos
-    // dois estados ela está. Status e sublinha têm de concordar: um pacote
-    // "Ativo" marcado como "Fora da Carteira" seria a tela mentindo.
-    await expect(linhasAtivas(page).first()).toContainText(ADMIN_PACOTES.subNaCarteira);
+      // A promessa da nota de rodapé — "Só os pacotes ativos aparecem na
+      // Carteira do artista" — só é verificável se a linha disser em qual dos
+      // dois estados ela está. Status e sublinha têm de concordar: um pacote
+      // "Ativo" marcado como "Fora da Carteira" seria a tela mentindo.
+      await expect(linhasAtivas(page).first()).toContainText(ADMIN_PACOTES.subNaCarteira);
 
-    const inativas = linhasInativas(page);
-    if ((await inativas.count()) > 0) {
-      await expect(inativas.first()).toContainText(ADMIN_PACOTES.subForaDaCarteira);
-    }
+      const inativas = linhasInativas(page);
+      if ((await inativas.count()) > 0) {
+        await expect(inativas.first()).toContainText(ADMIN_PACOTES.subForaDaCarteira);
+      }
 
-    await expect(page.getByText(ADMIN_PACOTES.nota)).toBeVisible();
-  });
+      await expect(page.getByText(ADMIN_PACOTES.nota)).toBeVisible();
+    },
+  );
 
-  test('o resumo do topo conta os visíveis para o artista', async ({ page }) => {
-    await abrirPacotes(page);
+  test(
+    'o resumo do topo conta os visíveis para o artista',
+    { tag: ['@RF-050'] },
+    async ({ page }) => {
+      await abrirPacotes(page);
 
-    const tabela = page.getByRole('table', { name: ADMIN_PACOTES.titulo });
-    const total = (await tabela.getByRole('row').count()) - 1;
-    const ativos = await linhasAtivas(page).count();
+      const tabela = page.getByRole('table', { name: ADMIN_PACOTES.titulo });
+      const total = (await tabela.getByRole('row').count()) - 1;
+      const ativos = await linhasAtivas(page).count();
 
-    // O texto é recomposto pela mesma função que a tela usa, e os números
-    // vêm da própria tabela. Assim o teste afirma a **coerência** entre o
-    // resumo e a lista, sem literal nenhum de negócio.
-    await expect(page.getByText(ADMIN_PACOTES.resumo(ativos, total))).toBeVisible();
-  });
+      // O texto é recomposto pela mesma função que a tela usa, e os números
+      // vêm da própria tabela. Assim o teste afirma a **coerência** entre o
+      // resumo e a lista, sem literal nenhum de negócio.
+      await expect(page.getByText(ADMIN_PACOTES.resumo(ativos, total))).toBeVisible();
+    },
+  );
 
   /**
    * A terceira camada de autorização (architecture.md §5.2), do lado da tela.

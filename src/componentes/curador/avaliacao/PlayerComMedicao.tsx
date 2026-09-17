@@ -74,17 +74,28 @@ export function PlayerComMedicao({
 
       const agora = Date.now();
       const cresceu = estado.percentual - ultimoGravado.current;
-      const completou = estado.percentual >= 100;
 
-      if (cresceu < PASSO_PARA_GRAVAR && !completou) return;
-      if (agora - ultimaGravacaoEm.current < INTERVALO_MINIMO_MS && !completou) return;
+      // Dois momentos furam a economia de escritas, e pelo mesmo motivo: o que
+      // acontece neles não pode depender de a pessoa continuar na página.
+      //
+      // `completou` é o fim da faixa. `cruzouOMinimo` é o instante em que
+      // `registrarEscutaMedida` carimba o envio como `ouviu` (RF-071) — adiar
+      // isso por até dez segundos faria o estado depender de quem espera, e quem
+      // ouve o suficiente e fecha a aba perderia o carimbo.
+      const completou = estado.percentual >= 100;
+      const cruzouOMinimo =
+        estado.percentual >= minimoPercentual && ultimoGravado.current < minimoPercentual;
+      const urgente = completou || cruzouOMinimo;
+
+      if (cresceu < PASSO_PARA_GRAVAR && !urgente) return;
+      if (agora - ultimaGravacaoEm.current < INTERVALO_MINIMO_MS && !urgente) return;
       if (cresceu <= 0) return;
 
       ultimoGravado.current = estado.percentual;
       ultimaGravacaoEm.current = agora;
       void registrarEscutaMedida(envioId, estado.percentual);
     },
-    [envioId],
+    [envioId, minimoPercentual],
   );
 
   const atingiu = medido >= minimoPercentual;

@@ -12,6 +12,7 @@ import 'server-only';
  * `0002` recusa, e o único caminho é `concluir_cadastro_curador` (0002c).
  */
 
+import { caminhoEhDoUsuario } from '@/lib/armazenamento';
 import { ROTA } from '@/lib/guarda-rota';
 import { usuarioAtual } from '@/lib/supabase/servidor';
 import { CURADOR_CADASTRO } from '@/textos/curador';
@@ -22,6 +23,7 @@ import {
   FOTO_MAX_BYTES,
   FOTO_TIPOS,
   conferirArquivo,
+  conferirObjeto,
 } from './esquemas';
 import {
   atualizarCanal,
@@ -29,6 +31,7 @@ import {
   concluirCadastro,
   inserirCanal,
   lerEstadoDoCadastro,
+  metadadosDoArquivo,
   removerCanal,
   salvarAtuacaoDoCurador,
   salvarBioDoCurador,
@@ -43,10 +46,26 @@ import type { CanalParaSalvar, CredencialParaSalvar, ServicoParaSalvar } from '.
 import type { EstadoDoCadastro, PassoDoCadastro, TipoDeCredencial } from './tipos';
 import { CREDENCIAL_POR_ANEXO, TOTAL_DE_PASSOS } from './tipos';
 
+/**
+ * Por que a recusa de arquivo tem quatro motivos e não dois.
+ *
+ * `tipo` e `tamanho` são a validação de sempre. Os outros dois nasceram com o
+ * upload direto ao Storage, e respondem a perguntas diferentes:
+ *
+ * - `alheio` — o caminho informado não está sob a pasta da pessoa. É checagem
+ *   determinística e local: ninguém digita isso por engano, então é fraude, e a
+ *   resposta é `NAO_AUTORIZADO`.
+ * - `ausente` — o caminho tem a forma certa, mas o Storage não devolve objeto.
+ *   Pode ser upload que falhou em silêncio, corrida entre abas, ou objeto de
+ *   outra pessoa escondido pela RLS. É ambíguo por construção, e o remédio de
+ *   quem é honesto é recarregar.
+ */
+export type MotivoDeArquivo = 'tipo' | 'tamanho' | 'ausente' | 'alheio';
+
 export type ResultadoDoPasso =
   | { readonly estado: 'ok'; readonly destino: string }
   | { readonly estado: 'sem_cadastro' }
-  | { readonly estado: 'arquivo_invalido'; readonly motivo: 'tipo' | 'tamanho' };
+  | { readonly estado: 'arquivo_invalido'; readonly motivo: MotivoDeArquivo };
 
 /** A rota de um passo. Um lugar só monta a URL do wizard. */
 export function rotaDoPasso(passo: PassoDoCadastro): string {
@@ -85,6 +104,52 @@ async function estadoOuFalha(): Promise<EstadoDoCadastro | null> {
   return lerEstadoDoCadastro();
 }
 
+type ArquivoResolvido =
+  | { readonly ok: true; readonly caminho: string | null }
+  | { readonly ok: false; readonly motivo: MotivoDeArquivo };
+
+/**
+ * As duas origens possíveis de um arquivo do wizard, resolvidas num caminho.
+ *
+ * **Caminho** é o navegador tendo subido direto ao bucket — o normal desde que
+ * o anexo de 5 MB deixou de caber no corpo de uma Server Action na Vercel.
+ * **Arquivo** é o `multipart` de sempre, que continua existindo para quem está
+ * sem JavaScript.
+ *
+ * A ordem interna importa. `caminhoEhDoUsuario` vem **antes** da leitura do
+ * Storage: sem isso o servidor iria ao bucket por causa de uma string arbitrária
+ * vinda do formulário, e o próprio pedido já contaria se o objeto existe.
+ *
+ * No sucesso devolve o caminho **que o cliente mandou**, e não um recalculado. É
+ * o `data.path` que o Storage respondeu; remontá-lo aqui reintroduziria a chance
+ * de cliente e servidor discordarem sobre a extensão.
+ */
+async function resolverArquivo(
+  usuarioId: string,
+  balde: 'avatares' | 'materiais',
+  nomeBase: 'perfil' | 'formacao',
+  caminhoEnviado: string | null,
+  arquivoBruto: unknown,
+  tiposAceitos: readonly string[],
+  maxBytes: number,
+): Promise<ArquivoResolvido> {
+  if (caminhoEnviado !== null && caminhoEnviado !== '') {
+    if (!caminhoEhDoUsuario(caminhoEnviado, usuarioId)) return { ok: false, motivo: 'alheio' };
+
+    const objeto = await metadadosDoArquivo(balde, caminhoEnviado);
+    const conferido = conferirObjeto(objeto, tiposAceitos, maxBytes);
+    if (!conferido.ok) return { ok: false, motivo: conferido.motivo };
+
+    return { ok: true, caminho: caminhoEnviado };
+  }
+
+  const conferido = conferirArquivo(arquivoBruto, tiposAceitos, maxBytes);
+  if (!conferido.ok) return { ok: false, motivo: conferido.motivo };
+  if (conferido.arquivo === null) return { ok: true, caminho: null };
+
+  return { ok: true, caminho: await subirArquivo(balde, usuarioId, nomeBase, conferido.arquivo) };
+}
+
 /* ---------------------------------------------------------- passo 1 ------- */
 
 /**
@@ -100,20 +165,28 @@ async function estadoOuFalha(): Promise<EstadoDoCadastro | null> {
  * onde a pessoa confirma que está na conta certa antes de responder oito
  * perguntas.
  */
-export async function salvarDadosBasicos(foto: unknown): Promise<ResultadoDoPasso> {
+export async function salvarDadosBasicos(
+  foto: unknown,
+  fotoCaminho: string | null,
+): Promise<ResultadoDoPasso> {
   const estado = await estadoOuFalha();
   if (estado === null) return { estado: 'sem_cadastro' };
 
   const usuario = await usuarioAtual();
   if (usuario === null) return { estado: 'sem_cadastro' };
 
-  const conferida = conferirArquivo(foto, FOTO_TIPOS, FOTO_MAX_BYTES);
-  if (!conferida.ok) return { estado: 'arquivo_invalido', motivo: conferida.motivo };
+  const resolvida = await resolverArquivo(
+    usuario.id,
+    'avatares',
+    'perfil',
+    fotoCaminho,
+    foto,
+    FOTO_TIPOS,
+    FOTO_MAX_BYTES,
+  );
+  if (!resolvida.ok) return { estado: 'arquivo_invalido', motivo: resolvida.motivo };
 
-  if (conferida.arquivo !== null) {
-    const caminho = await subirArquivo('avatares', usuario.id, 'perfil', conferida.arquivo);
-    await salvarFotoDoPerfil(usuario.id, caminho);
-  }
+  if (resolvida.caminho !== null) await salvarFotoDoPerfil(usuario.id, resolvida.caminho);
 
   return avancarDe(estado, 1);
 }
@@ -184,6 +257,7 @@ export type CredencialMarcada = {
 export async function salvarCredenciais(
   marcadas: readonly CredencialMarcada[],
   anexoNovo: unknown,
+  anexoCaminho: string | null,
 ): Promise<ResultadoDoPasso> {
   const estado = await estadoOuFalha();
   if (estado === null) return { estado: 'sem_cadastro' };
@@ -191,17 +265,25 @@ export async function salvarCredenciais(
   const usuario = await usuarioAtual();
   if (usuario === null) return { estado: 'sem_cadastro' };
 
-  const conferido = conferirArquivo(anexoNovo, ANEXO_TIPOS, ANEXO_MAX_BYTES);
-  if (!conferido.ok) return { estado: 'arquivo_invalido', motivo: conferido.motivo };
+  const resolvido = await resolverArquivo(
+    usuario.id,
+    'materiais',
+    'formacao',
+    anexoCaminho,
+    anexoNovo,
+    ANEXO_TIPOS,
+    ANEXO_MAX_BYTES,
+  );
+  if (!resolvido.ok) return { estado: 'arquivo_invalido', motivo: resolvido.motivo };
 
   const anexoAnterior =
     estado.credenciais.find((credencial) => credencial.tipo === CREDENCIAL_POR_ANEXO)
       ?.anexoCaminho ?? null;
 
-  const caminhoDoAnexo =
-    conferido.arquivo === null
-      ? anexoAnterior
-      : await subirArquivo('materiais', usuario.id, 'formacao', conferido.arquivo);
+  // Três fontes, nesta ordem: o que subiu agora (por caminho ou por arquivo) e,
+  // só então, o que já estava gravado. Inverter faria quem trocou o certificado
+  // gravar o antigo.
+  const caminhoDoAnexo = resolvido.caminho ?? anexoAnterior;
 
   const paraSalvar: readonly CredencialParaSalvar[] = marcadas.map((marcada) => ({
     tipo: marcada.tipo,

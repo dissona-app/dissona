@@ -3,6 +3,7 @@
 import { Aviso } from '@/componentes/base/Aviso';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { ListaDeServicos } from '../ListaDeServicos';
@@ -30,14 +31,15 @@ export function Passo5Servicos({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo } = usePasso(acao);
+  const { enviar, motivo, falha } = usePasso(acao);
 
   const erro = motivo === undefined ? undefined : MOTIVOS[motivo];
+  const erroGeral = erroGeralDe(falha, [erro]);
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
-      {erro !== undefined ? (
-        <Aviso tom="erro" titulo={erro}>
+      {(erro ?? erroGeral) !== undefined ? (
+        <Aviso tom="erro" titulo={erro ?? erroGeral}>
           {CURADOR_CADASTRO.notaClaves}
         </Aviso>
       ) : null}

@@ -8,6 +8,7 @@ import { Campo } from '@/componentes/base/Campo';
 import { Selecao } from '@/componentes/base/Selecao';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';
@@ -49,7 +50,7 @@ export function Passo4Canais({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo } = usePasso(acao);
+  const { enviar, motivo, falha } = usePasso(acao);
 
   const [linhas, setLinhas] = useState<readonly Linha[]>(() =>
     estado.canais.length > 0
@@ -76,11 +77,12 @@ export function Passo4Canais({
   }
 
   const erro = motivo === undefined ? undefined : MOTIVOS[motivo];
+  const erroGeral = erroGeralDe(falha, [erro]);
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
-      {erro !== undefined ? (
-        <Aviso tom="erro" titulo={erro}>
+      {(erro ?? erroGeral) !== undefined ? (
+        <Aviso tom="erro" titulo={erro ?? erroGeral}>
           {CURADOR_CADASTRO.subtitulos[3]}
         </Aviso>
       ) : null}

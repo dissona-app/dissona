@@ -41,6 +41,18 @@ jobs:
       - name: Testes unitários
         run: pnpm test
 
+      # Fica no job de qualidade, e não no de E2E: é checagem estática —
+      # `playwright test --list` não sobe servidor nem navegador e não toca no
+      # banco. Barra o PR que muda uma tag sem regerar a matriz, e relata os RFs
+      # de R1/R2 ainda sem prova.
+      #
+      # `--exigir-cobertura` ligado em 2026-09-17, quando a R1 fechou: a partir
+      # daqui, requisito de R1 ou R2 sem prova **reprova o PR**. As exceções
+      # legítimas moram em `SEM_E2E`, no próprio script, com o motivo escrito e
+      # revisável.
+      - name: Matriz de rastreabilidade
+        run: node scripts/matriz-rastreabilidade.mjs --conferir --exigir-cobertura
+
       - name: Build
         run: pnpm build
 
@@ -51,9 +63,16 @@ jobs:
     # nem compila.
     needs: qualidade
     # A suite sobe o proprio servidor (build + start), porque BASE_URL nao
-    # esta definida. Quando a Vercel estiver conectada, apontar BASE_URL para
-    # a URL do Preview do PR e o `webServer` do Playwright se desliga sozinho
-    # (ver playwright.config.ts e architecture.md secao 9).
+    # esta definida — e por ora e o que da para fazer aqui.
+    #
+    # Apontar BASE_URL para o Preview do PR **nao funciona como esta**: as URLs
+    # de deployment da Vercel estao atras da Deployment Protection (SSO) e
+    # redirecionam para vercel.com/login, entao o Playwright nao as alcanca. Ou
+    # se desliga a protecao para Preview, ou se passa o header de bypass
+    # (VERCEL_AUTOMATION_BYPASS_SECRET). So o dominio aliasado de producao
+    # (dissona.com.br) e publico — conferido em 2026-09-17.
+    #
+    # Local, contra producao: BASE_URL=https://dissona.com.br pnpm e2e.
     steps:
       - uses: actions/checkout@v4
 
@@ -69,8 +88,27 @@ jobs:
       - name: Instalar navegador
         run: pnpm e2e:navegadores
 
+      # Sete cenários consomem a faixa deles — concluir e devolver por SLA são
+      # terminais. Sem repor antes, a execução falha com "a fila precisa listar
+      # …", que parece flakiness e não é.
+      - name: Repor os cenários consumíveis
+        run: pnpm e2e:semear
+        env:
+          E2E_SENHA: ${{ secrets.E2E_SENHA }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       - name: Cenários do Guia de Testes da R2
         run: pnpm e2e
+        env:
+          # Sem estas duas a suíte não passa do login. `E2E_SENHA` é a senha das
+          # personas `e2e_` e precisa ser a mesma com que `dados-e2e.sql` foi
+          # rodado (`set dissona.e2e_senha`), senão o seed e o teste discordam.
+          E2E_SENHA: ${{ secrets.E2E_SENHA }}
+          # A service role monta estado que nenhuma tela monta — recuar prazos e
+          # chamar as RPCs de SLA, que a `0010` revoga de `authenticated`. Vive
+          # só no processo do Playwright e nunca chega ao navegador; a regra
+          # está no cabeçalho de `e2e/apoio/banco.ts`.
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

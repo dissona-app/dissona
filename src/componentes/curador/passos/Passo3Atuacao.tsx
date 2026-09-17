@@ -1,9 +1,10 @@
 'use client';
 
-import { Chips } from '@/componentes/base';
+import { Aviso, Chips } from '@/componentes/base';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { TEMPO_DE_ATUACAO } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { Segmentado } from '../Segmentado';
@@ -39,15 +40,19 @@ export function Passo3Atuacao({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo, motivos } = usePasso(acao);
+  const { enviar, motivo, motivos, falha } = usePasso(acao);
 
   const erroDe = (campo: string): string | undefined => {
     const codigo = motivos[campo] ?? (campo === 'frentes' ? motivo : undefined);
     return codigo === undefined ? undefined : MOTIVOS[codigo];
   };
 
+  const erroGeral = erroGeralDe(falha, [erroDe('frentes'), erroDe('tempo')]);
+
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
+      {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
       <Chips
         name="frente"
         opcoes={CURADOR_CADASTRO.frentes}

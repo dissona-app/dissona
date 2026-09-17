@@ -3,13 +3,12 @@
 import { useState } from 'react';
 
 import { AreaTexto } from '@/componentes/base/AreaTexto';
+import { Aviso } from '@/componentes/base/Aviso';
 import { Campo } from '@/componentes/base/Campo';
-import {
-  BIO_MAX_CARACTERES,
-  BIO_MIN_CARACTERES,
-} from '@/modulos/curador/esquemas';
+import { BIO_MAX_CARACTERES, BIO_MIN_CARACTERES } from '@/modulos/curador/esquemas';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';
@@ -40,7 +39,7 @@ export function Passo7Bio({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo, motivos } = usePasso(acao);
+  const { enviar, motivo, motivos, falha } = usePasso(acao);
   const [bio, setBio] = useState(estado.bio ?? '');
 
   const codigoDaBio = motivos['bio'] ?? motivo;
@@ -51,8 +50,14 @@ export function Passo7Bio({
   // depois de enviar.
   const faltam = bio.trim() === '' ? 0 : Math.max(0, BIO_MIN_CARACTERES - bio.trim().length);
 
+  const erroDaEspecialidade =
+    motivos['especialidade'] === undefined ? undefined : MOTIVOS[motivos['especialidade']];
+  const erroGeral = erroGeralDe(falha, [erroDaBio, erroDaEspecialidade]);
+
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
+      {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
       <div className={estilos.blocoBio}>
         <AreaTexto
           name="bio"
@@ -78,6 +83,7 @@ export function Passo7Bio({
         rotulo={CURADOR_CADASTRO.rotuloEspecialidade}
         placeholder={CURADOR_CADASTRO.placeholderEspecialidade}
         defaultValue={estado.especialidade ?? ''}
+        erro={erroDaEspecialidade}
       />
 
       <AcoesDoPasso

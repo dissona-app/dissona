@@ -50,7 +50,7 @@ async function abrirCompartilhamento(page: Page): Promise<string> {
 test.describe.configure({ mode: 'serial' });
 
 test.describe('C5 · Compartilhamento', () => {
-  test('as quatro modalidades e a recusa aparecem', async ({ page }) => {
+  test('as quatro modalidades e a recusa aparecem', { tag: ['@RF-064'] }, async ({ page }) => {
     await abrirCompartilhamento(page);
 
     for (const modalidade of Object.values(AVALIAR.modalidades)) {
@@ -63,7 +63,7 @@ test.describe('C5 · Compartilhamento', () => {
     await expect(page.getByText(AVALIAR.compartilhamentoNota)).toBeVisible();
   });
 
-  test('a escolha é exclusiva', async ({ page }) => {
+  test('a escolha é exclusiva', { tag: ['@RF-064'] }, async ({ page }) => {
     await abrirCompartilhamento(page);
 
     await escolherModalidade(page, AVALIAR.modalidades.playlist.rotulo);
@@ -79,7 +79,7 @@ test.describe('C5 · Compartilhamento', () => {
    * libera nos dois caminhos, e o registro precisa ser auditável. O avanço
    * pula 14.3 e vai direto à remuneração.
    */
-  test('recusar leva à remuneração, pulando 14.3', async ({ page }) => {
+  test('recusar leva à remuneração, pulando 14.3', { tag: ['@RF-064'] }, async ({ page }) => {
     const envioId = await abrirCompartilhamento(page);
 
     await escolherModalidade(page, AVALIAR.modalidades.nao_compartilhou.rotulo);
@@ -89,39 +89,47 @@ test.describe('C5 · Compartilhamento', () => {
     await expect(page.getByText(AVALIAR.compartilhamentoRecusado)).toBeVisible();
   });
 
-  test('"Outros" abre a etapa 14.3, que exige dizer onde', async ({ page }) => {
-    const envioId = await abrirCompartilhamento(page);
+  test(
+    '"Outros" abre a etapa 14.3, que exige dizer onde',
+    { tag: ['@RF-065'] },
+    async ({ page }) => {
+      const envioId = await abrirCompartilhamento(page);
 
-    await escolherModalidade(page, AVALIAR.modalidades.outros.rotulo);
-    await avancar(page);
+      await escolherModalidade(page, AVALIAR.modalidades.outros.rotulo);
+      await avancar(page);
 
-    await expect(page).toHaveURL(new RegExp(`/curador/avaliar/${envioId}/outras$`));
-    await expect(page.getByText(AVALIAR.outrasNota)).toBeVisible();
+      await expect(page).toHaveURL(new RegExp(`/curador/avaliar/${envioId}/outras$`));
+      await expect(page.getByText(AVALIAR.outrasNota)).toBeVisible();
 
-    // O `check` `compartilhamento_outros_exige_descricao` é a regra; o
-    // `required` aqui é o aviso que chega antes dela.
-    await avancar(page);
-    await expect(page).toHaveURL(new RegExp(`/curador/avaliar/${envioId}/outras$`));
-    await expect(page.getByLabel(AVALIAR.outrasRotulo)).toHaveJSProperty(
-      'validity.valueMissing',
-      true,
-    );
-  });
+      // O `check` `compartilhamento_outros_exige_descricao` é a regra; o
+      // `required` aqui é o aviso que chega antes dela.
+      await avancar(page);
+      await expect(page).toHaveURL(new RegExp(`/curador/avaliar/${envioId}/outras$`));
+      await expect(page.getByLabel(AVALIAR.outrasRotulo)).toHaveJSProperty(
+        'validity.valueMissing',
+        true,
+      );
+    },
+  );
 
-  test('uma sugestão preenche o campo, e a descrição chega ao resumo', async ({ page }) => {
-    const envioId = await abrirCompartilhamento(page);
+  test(
+    'uma sugestão preenche o campo, e a descrição chega ao resumo',
+    { tag: ['@RF-065'] },
+    async ({ page }) => {
+      const envioId = await abrirCompartilhamento(page);
 
-    await escolherModalidade(page, AVALIAR.modalidades.outros.rotulo);
-    await avancar(page);
-    await page.waitForURL(`**/curador/avaliar/${envioId}/outras`);
+      await escolherModalidade(page, AVALIAR.modalidades.outros.rotulo);
+      await avancar(page);
+      await page.waitForURL(`**/curador/avaliar/${envioId}/outras`);
 
-    await page.getByRole('button', { name: AVALIAR.outrasSugestoes[2] }).click();
-    await expect(page.getByLabel(AVALIAR.outrasRotulo)).toHaveValue(AVALIAR.outrasSugestoes[2]);
+      await page.getByRole('button', { name: AVALIAR.outrasSugestoes[2] }).click();
+      await expect(page.getByLabel(AVALIAR.outrasRotulo)).toHaveValue(AVALIAR.outrasSugestoes[2]);
 
-    await avancar(page);
-    await expect(page).toHaveURL(new RegExp(`/curador/avaliar/${envioId}/remuneracao$`));
-    await expect(page.getByText(AVALIAR.outrasSugestoes[2], { exact: true })).toBeVisible();
-  });
+      await avancar(page);
+      await expect(page).toHaveURL(new RegExp(`/curador/avaliar/${envioId}/remuneracao$`));
+      await expect(page.getByText(AVALIAR.outrasSugestoes[2], { exact: true })).toBeVisible();
+    },
+  );
 
   /**
    * Voltar de 14.4 tem de cair em 14.3 quando a modalidade é `outros`, e em

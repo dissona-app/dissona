@@ -49,7 +49,7 @@ test.describe('B6 · Contexto e revisão', () => {
     await expect(page.getByText(ENVIAR.passoDe(2, 3))).toBeVisible();
   });
 
-  test('o contexto é obrigatório', async ({ page }, info) => {
+  test('o contexto é obrigatório', { tag: ['@RF-038'] }, async ({ page }, info) => {
     await ateOContexto(page, info);
 
     // RF-038. O protótipo o chama de opcional; a divergência está registrada.
@@ -57,7 +57,7 @@ test.describe('B6 · Contexto e revisão', () => {
     await expect(page.getByText(ENVIAR.erroContextoVazio)).toBeVisible();
   });
 
-  test('a revisão traz faixa, gênero e contexto', async ({ page }, info) => {
+  test('a revisão traz faixa, gênero e contexto', { tag: ['@RF-039'] }, async ({ page }, info) => {
     const titulo = await ateOContexto(page, info);
     const contexto = 'Quero saber se a base compete com a voz no refrão.';
 
@@ -79,13 +79,17 @@ test.describe('B6 · Contexto e revisão', () => {
     await expect(page.getByRole('link', { name: ENVIAR.enviarParaCuradoria })).toBeVisible();
   });
 
-  test('não dá para pular para a revisão sem contexto', async ({ page }, info) => {
-    await ateOContexto(page, info);
+  test(
+    'não dá para pular para a revisão sem contexto',
+    { tag: ['@RF-038'] },
+    async ({ page }, info) => {
+      await ateOContexto(page, info);
 
-    const url = new URL(page.url());
-    await page.goto(url.pathname.replace('/contexto', '/revisao'));
+      const url = new URL(page.url());
+      await page.goto(url.pathname.replace('/contexto', '/revisao'));
 
-    // `podeAbrir` devolve a pessoa ao passo que ela de fato alcançou.
-    await page.waitForURL(/\/contexto$/);
-  });
+      // `podeAbrir` devolve a pessoa ao passo que ela de fato alcançou.
+      await page.waitForURL(/\/contexto$/);
+    },
+  );
 });

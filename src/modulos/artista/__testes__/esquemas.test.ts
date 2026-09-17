@@ -74,8 +74,11 @@ describe('esquemaDadosDoPerfil', () => {
       );
     });
 
-    it('recusa gênero fora do catálogo', () => {
-      expect(motivoDe({ ...VAZIO, generos: ['Forró'] }, 'generos')).toBeDefined();
+    it('recusa gênero fora do catálogo com o motivo que a tela traduz', () => {
+      // `toBeDefined()` escondia o bug: a mensagem estava no `z.array` e o que
+      // chegava era a padrão do Zod, que `MOTIVOS` não conhece — erro que a
+      // View não pinta em lugar nenhum.
+      expect(motivoDe({ ...VAZIO, generos: ['Forró'] }, 'generos')).toBe('genero_desconhecido');
     });
 
     it('usa o mesmo catálogo do curador — o matching da R3 depende disso', () => {

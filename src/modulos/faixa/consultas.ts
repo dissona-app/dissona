@@ -10,7 +10,19 @@ import type { FaixaEmEdicao, LimitesDeUpload, PassoDoEnvio } from './tipos';
 
 export type { FaixaEmEdicao, LimitesDeUpload } from './tipos';
 
-/** Os limites de upload, de `configuracao`. Nunca constantes do código. */
+/**
+ * Os limites de upload, de `configuracao`. Nunca constantes do código.
+ *
+ * ⚠️ **O mesmo número mora em dois lugares, e eles têm de concordar.**
+ * `upload.tamanho_max_mb` é 50 no seed da `0004`; o bucket `faixas` declara
+ * `file_size_limit = 52428800` em `0000_storage.sql`, junto com a lista de MIME
+ * aceitos. Desde que o navegador sobe o arquivo direto (RF-036), **quem aplica
+ * o limite é o bucket** — a validação daqui é o que produz a mensagem que a
+ * tela mostra, lendo do Storage o tamanho e o MIME do objeto já gravado.
+ *
+ * Mudar um sem o outro não dá erro: dá uma recusa com a mensagem errada, ou um
+ * arquivo aceito acima do que a tela prometeu. Quem mexer em um, mexe nos dois.
+ */
 export async function lerLimitesDeUpload(): Promise<LimitesDeUpload> {
   const config = await lerConfiguracoes(['upload.tamanho_max_mb', 'upload.formatos']);
   return {

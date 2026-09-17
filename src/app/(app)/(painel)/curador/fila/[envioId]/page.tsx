@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { BotaoLink } from '@/componentes/base/BotaoLink';
 import { IniciarAvaliacao } from '@/componentes/curador/IniciarAvaliacao';
+import { PlayerComMedicao } from '@/componentes/curador/avaliacao/PlayerComMedicao';
 import { Etiqueta } from '@/componentes/base/Etiqueta';
 import { Painel } from '@/componentes/base/Painel';
 import * as claves from '@/lib/claves';
@@ -46,7 +47,16 @@ export default async function PaginaDoDetalhe({
   // distinguir os dois casos revelaria que ele existe.
   if (detalhe === null) notFound();
 
-  const { item, servicos, status, prazoDeDevolucaoDias, agora } = detalhe;
+  const {
+    item,
+    servicos,
+    status,
+    prazoDeDevolucaoDias,
+    audioUrl,
+    escutaMinimaPercentual,
+    escutaSalva,
+    agora,
+  } = detalhe;
   const horas = horasRestantes(item, agora);
   const atrasado = horas < 0;
 
@@ -90,6 +100,20 @@ export default async function PaginaDoDetalhe({
           </div>
         </dl>
       </Painel>
+
+      {/* RF-071 · a escuta acontece aqui, **antes** de "Iniciar avaliação".
+          Entrar no wizard grava `avaliando`, e enquanto o player só existia lá
+          dentro o estado `ouviu` nunca acendia — o nome do estado sempre disse
+          que ele vem antes de assumir a avaliação. O componente é o mesmo da
+          etapa 14; o que muda é onde ele é montado. */}
+      <PlayerComMedicao
+        envioId={item.envioId}
+        src={audioUrl}
+        titulo={item.titulo}
+        artista={item.artista}
+        minimoPercentual={escutaMinimaPercentual}
+        escutaSalva={escutaSalva}
+      />
 
       <Painel titulo={TEXTOS.oQueOArtistaQuerSaber} nivel={3}>
         <p className={item.contextoCurador === null ? estilos.vazio : estilos.contexto}>

@@ -53,44 +53,48 @@ async function ateARevisao(page: Page, info: TestInfo): Promise<string> {
 }
 
 test.describe('B7 · Confirmação e status', () => {
-  test('confirmar a seleção leva à confirmação e ao status', async ({ page }, info) => {
-    const titulo = await ateARevisao(page, info);
+  test(
+    'confirmar a seleção leva à confirmação e ao status',
+    { tag: ['@RF-040', '@RF-041'] },
+    async ({ page }, info) => {
+      const titulo = await ateARevisao(page, info);
 
-    await page.getByRole('link', { name: ENVIAR.enviarParaCuradoria }).click();
-    await page.waitForURL(/\/curadores$/);
+      await page.getByRole('link', { name: ENVIAR.enviarParaCuradoria }).click();
+      await page.waitForURL(/\/curadores$/);
 
-    // O placeholder lista curadores **reais**: a RPC recusa quem não está
-    // aprovado (DS011) ou não tem `feedback` ativo (DS012).
-    // A caixa é visualmente escondida (`clip-path`) e quem recebe o clique é o
-    // rótulo — é assim que o Design System monta checkbox acessível, e é o que
-    // uma pessoa de fato clica.
-    const primeiro = page.getByRole('checkbox').first();
-    await expect(primeiro).toBeAttached();
-    await primeiro.check({ force: true });
+      // O placeholder lista curadores **reais**: a RPC recusa quem não está
+      // aprovado (DS011) ou não tem `feedback` ativo (DS012).
+      // A caixa é visualmente escondida (`clip-path`) e quem recebe o clique é o
+      // rótulo — é assim que o Design System monta checkbox acessível, e é o que
+      // uma pessoa de fato clica.
+      const primeiro = page.getByRole('checkbox').first();
+      await expect(primeiro).toBeAttached();
+      await primeiro.check({ force: true });
 
-    await page.getByRole('button', { name: SELECAO.confirmar }).click();
-    await page.waitForURL(/\/confirmacao$/);
+      await page.getByRole('button', { name: SELECAO.confirmar }).click();
+      await page.waitForURL(/\/confirmacao$/);
 
-    // "Seu envio", nunca "Sua submissão".
-    await expect(page.getByText(ENVIAR.confirmacaoTitulo)).toBeVisible();
-    await expect(page.getByText(/submiss/i)).toHaveCount(0);
-    await expect(page.getByText(titulo)).toBeVisible();
+      // "Seu envio", nunca "Sua submissão".
+      await expect(page.getByText(ENVIAR.confirmacaoTitulo)).toBeVisible();
+      await expect(page.getByText(/submiss/i)).toHaveCount(0);
+      await expect(page.getByText(titulo)).toBeVisible();
 
-    await page.getByRole('link', { name: ENVIAR.acompanharStatus }).click();
-    await page.waitForURL(/\/status$/);
+      await page.getByRole('link', { name: ENVIAR.acompanharStatus }).click();
+      await page.waitForURL(/\/status$/);
 
-    const tabela = page.getByRole('table', { name: STATUS_DO_ENVIO.titulo });
-    for (const coluna of Object.values(STATUS_DO_ENVIO.colunas)) {
-      await expect(
-        tabela.getByRole('columnheader', { name: coluna, exact: true }),
-        `coluna "${coluna}"`,
-      ).toBeVisible();
-    }
+      const tabela = page.getByRole('table', { name: STATUS_DO_ENVIO.titulo });
+      for (const coluna of Object.values(STATUS_DO_ENVIO.colunas)) {
+        await expect(
+          tabela.getByRole('columnheader', { name: coluna, exact: true }),
+          `coluna "${coluna}"`,
+        ).toBeVisible();
+      }
 
-    // Um envio recém-criado nasce em `recebeu` — a primeira das quatro etapas.
-    await expect(tabela.getByText(STATUS_DO_ENVIO.etapas.recebeu).first()).toBeVisible();
-    await expect(page.getByText(STATUS_DO_ENVIO.nota)).toBeVisible();
-  });
+      // Um envio recém-criado nasce em `recebeu` — a primeira das quatro etapas.
+      await expect(tabela.getByText(STATUS_DO_ENVIO.etapas.recebeu).first()).toBeVisible();
+      await expect(page.getByText(STATUS_DO_ENVIO.nota)).toBeVisible();
+    },
+  );
 
   test('a seleção exige ao menos um curador', async ({ page }, info) => {
     await ateARevisao(page, info);

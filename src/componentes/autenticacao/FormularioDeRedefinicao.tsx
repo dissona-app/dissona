@@ -2,12 +2,14 @@
 
 import { useActionState, useState } from 'react';
 
+import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
 import { BotaoLink } from '@/componentes/base/BotaoLink';
 import { Campo } from '@/componentes/base/Campo';
 import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
+import { erroGeralDe } from '@/textos/erros';
 import { SENHA } from '@/textos/prototipo';
 
 import estilos from './FormularioDeRedefinicao.module.css';
@@ -115,6 +117,14 @@ export function FormularioDeRedefinicao({
     return undefined;
   };
 
+  // `TOKEN_INVALIDO` já virou tela própria acima. O que resta sem campo —
+  // `LIMITE_DE_ENVIO`, `NAO_AUTENTICADO` — precisa de superfície, ou o botão
+  // "Redefinir" não faz nada visível.
+  const erroGeral = erroGeralDe(falhou ? resultado : null, [
+    erroDeCampo('senha'),
+    erroDeCampo('confirmar'),
+  ]);
+
   return (
     <>
       <div className={estilos.cabecalho}>
@@ -124,6 +134,8 @@ export function FormularioDeRedefinicao({
       </div>
 
       <form action={enviar} className={estilos.campos} noValidate>
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
         <div className={estilos.blocoSenha}>
           <Campo
             name="senha"

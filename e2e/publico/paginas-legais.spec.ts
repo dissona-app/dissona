@@ -17,38 +17,50 @@ test.describe('páginas legais', () => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 
-  test('os termos de uso abrem e avisam que o texto está pendente', async ({ page }) => {
-    await page.goto('/termos');
-    await expect(page.getByRole('heading', { level: 1, name: 'Termos de uso' })).toBeVisible();
-    // O aviso de pendência é deliberado: documento vinculante não vai ao ar
-    // com texto de rascunho passando por definitivo.
-    //
-    // Sem live region: o aviso já nasce na página. `role="alert"` aqui
-    // interromperia a leitura para anunciar algo permanente, que o leitor
-    // encontra sozinho ao percorrer o conteúdo.
-    await expect(page.getByText('Documento pendente de redação')).toBeVisible();
-    // Escopado ao `<article>`: o Next injeta um `next-route-announcer` com
-    // `role="alert"` em toda página, inclusive em produção, para anunciar
-    // navegação no cliente. Um seletor global sempre acharia esse.
-    await expect(page.locator('article [role="alert"]')).toHaveCount(0);
-  });
+  test(
+    'os termos de uso abrem e avisam que o texto está pendente',
+    { tag: ['@RF-010'] },
+    async ({ page }) => {
+      await page.goto('/termos');
+      await expect(page.getByRole('heading', { level: 1, name: 'Termos de uso' })).toBeVisible();
+      // O aviso de pendência é deliberado: documento vinculante não vai ao ar
+      // com texto de rascunho passando por definitivo.
+      //
+      // Sem live region: o aviso já nasce na página. `role="alert"` aqui
+      // interromperia a leitura para anunciar algo permanente, que o leitor
+      // encontra sozinho ao percorrer o conteúdo.
+      await expect(page.getByText('Documento pendente de redação')).toBeVisible();
+      // Escopado ao `<article>`: o Next injeta um `next-route-announcer` com
+      // `role="alert"` em toda página, inclusive em produção, para anunciar
+      // navegação no cliente. Um seletor global sempre acharia esse.
+      await expect(page.locator('article [role="alert"]')).toHaveCount(0);
+    },
+  );
 
-  test('a política de privacidade abre e lista os dados coletados', async ({ page }) => {
-    await page.goto('/privacidade');
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Política de privacidade' }),
-    ).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: /Dados coletados/ })).toBeVisible();
-    await expect(
-      page.getByRole('heading', { level: 2, name: /Direitos do titular/ }),
-    ).toBeVisible();
-  });
+  test(
+    'a política de privacidade abre e lista os dados coletados',
+    { tag: ['@RF-010'] },
+    async ({ page }) => {
+      await page.goto('/privacidade');
+      await expect(
+        page.getByRole('heading', { level: 1, name: 'Política de privacidade' }),
+      ).toBeVisible();
+      await expect(page.getByRole('heading', { level: 2, name: /Dados coletados/ })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { level: 2, name: /Direitos do titular/ }),
+      ).toBeVisible();
+    },
+  );
 
-  test('os termos linkam para a política de privacidade', async ({ page }) => {
-    await page.goto('/termos');
-    await page.getByRole('link', { name: 'política de privacidade' }).click();
-    await expect(page).toHaveURL(/\/privacidade$/);
-  });
+  test(
+    'os termos linkam para a política de privacidade',
+    { tag: ['@RF-010'] },
+    async ({ page }) => {
+      await page.goto('/termos');
+      await page.getByRole('link', { name: 'política de privacidade' }).click();
+      await expect(page).toHaveURL(/\/privacidade$/);
+    },
+  );
 
   test('documento pendente não é indexável', async ({ page }) => {
     const resposta = await page.goto('/termos');

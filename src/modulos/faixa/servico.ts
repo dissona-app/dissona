@@ -40,11 +40,37 @@ export function validarAudio(
   limites: LimitesDeUpload,
 ): FalhaDoArquivo | null {
   if (arquivo === null || arquivo.size === 0) return 'ausente';
+  return conferir(arquivo.size, arquivo.type, limites);
+}
 
+/**
+ * A mesma regra, sobre o que o **Storage** diz de um objeto já gravado.
+ *
+ * É o caminho do upload direto do navegador (RF-036): o arquivo nunca passa
+ * pelo servidor Next, e o que a ação recebe é um caminho. Quem responde tamanho
+ * e MIME é o Storage, não o formulário — a validação continua fora do alcance
+ * de quem monta o POST à mão.
+ *
+ * `null` como objeto significa "não existe, ou não é seu": a RLS de `0000_storage`
+ * esconde a pasta alheia, e os dois casos pedem a mesma resposta.
+ */
+export function validarAudioNoStorage(
+  objeto: { readonly tamanhoBytes: number; readonly mime: string } | null,
+  limites: LimitesDeUpload,
+): FalhaDoArquivo | null {
+  if (objeto === null || objeto.tamanhoBytes === 0) return 'ausente';
+  return conferir(objeto.tamanhoBytes, objeto.mime, limites);
+}
+
+function conferir(
+  tamanhoBytes: number,
+  mime: string,
+  limites: LimitesDeUpload,
+): FalhaDoArquivo | null {
   const aceitos = limites.formatos.flatMap((formato) => MIME_POR_FORMATO[formato] ?? []);
-  if (!aceitos.includes(arquivo.type)) return 'formato';
+  if (!aceitos.includes(mime)) return 'formato';
 
-  if (arquivo.size > limites.tamanhoMaxMb * 1024 * 1024) return 'tamanho';
+  if (tamanhoBytes > limites.tamanhoMaxMb * 1024 * 1024) return 'tamanho';
 
   return null;
 }

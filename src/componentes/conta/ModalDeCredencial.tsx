@@ -9,6 +9,7 @@ import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
 import { Modal } from '@/componentes/base/Modal';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
+import { erroGeralDe } from '@/textos/erros';
 import { CADASTRAR, CONTA } from '@/textos/prototipo';
 
 import { IconeOlho } from '@/componentes/autenticacao/IconeOlho';
@@ -93,6 +94,18 @@ export function ModalDeCredencial({
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // Só os campos que este modo desenha contam como "pintado": em modo e-mail o
+  // erro de `senha` não está em lugar nenhum da tela, e tratá-lo como pintado
+  // devolveria a recusa silenciosa pela porta dos fundos.
+  const limiteDeEnvio = falhou && resultado.codigo === CodigoErro.LIMITE_DE_ENVIO;
+  const erroGeral = erroGeralDe(
+    falhou ? resultado : null,
+    tipo === 'senha'
+      ? [erroDe('senhaAtual'), erroDe('senha'), erroDe('confirmar')]
+      : [erroDe('senhaAtual'), erroDe('email')],
+    limiteDeEnvio,
+  );
+
   const olho = (
     <button
       type="button"
@@ -117,11 +130,13 @@ export function ModalDeCredencial({
       persistente
     >
       <form action={enviar} className={estilos.formulario} noValidate>
-        {falhou && resultado.codigo === CodigoErro.LIMITE_DE_ENVIO ? (
+        {limiteDeEnvio ? (
           <Aviso tom="alerta" titulo={CONTA.erroLimite}>
             {textos.texto}
           </Aviso>
         ) : null}
+
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
         <Campo
           name="senhaAtual"

@@ -23,7 +23,7 @@ import { FILA } from '../apoio/textos';
  * **vazia**, porque `perfil` é privado e o embed virava inner join com nada.
  */
 test.describe('C1 · Fila de avaliações', () => {
-  test('a tabela traz as cinco colunas', async ({ page }) => {
+  test('a tabela traz as cinco colunas', { tag: ['@RF-054'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
@@ -37,7 +37,7 @@ test.describe('C1 · Fila de avaliações', () => {
     }
   });
 
-  test('lista a faixa com artista e prazo', async ({ page }) => {
+  test('lista a faixa com artista e prazo', { tag: ['@RF-054'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
@@ -52,7 +52,7 @@ test.describe('C1 · Fila de avaliações', () => {
     await expect(primeira).toContainText(/\d+h|\d+d|Vencido/);
   });
 
-  test('as três colunas ordenáveis expõem aria-sort', async ({ page }) => {
+  test('as três colunas ordenáveis expõem aria-sort', { tag: ['@RF-054'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
@@ -65,34 +65,65 @@ test.describe('C1 · Fila de avaliações', () => {
     ).toHaveAttribute('aria-sort', 'ascending');
   });
 
-  test('ordenar por prazo inverte e o recorte fica na URL', async ({ page }) => {
+  test(
+    'ordenar por prazo inverte e o recorte fica na URL',
+    { tag: ['@RF-054'] },
+    async ({ page }) => {
+      await entrarComo(page, PERSONA.CURADOR_BRONZE);
+      await page.goto('/curador/fila');
+
+      const tabela = page.getByRole('table', { name: FILA.titulo });
+      await tabela
+        .getByRole('columnheader', { name: new RegExp(FILA.colunas.prazo) })
+        .getByRole('button')
+        .click();
+
+      await page.waitForURL(/ordem=prazo&dir=desc|dir=desc/);
+      await expect(
+        tabela.getByRole('columnheader', { name: new RegExp(FILA.colunas.prazo) }),
+      ).toHaveAttribute('aria-sort', 'descending');
+    },
+  );
+
+  test('o filtro por status recorta a lista', { tag: ['@RF-055'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
-    const tabela = page.getByRole('table', { name: FILA.titulo });
-    await tabela
-      .getByRole('columnheader', { name: new RegExp(FILA.colunas.prazo) })
-      .getByRole('button')
-      .click();
+    const antes = await page.getByRole('row').count();
 
-    await page.waitForURL(/ordem=prazo&dir=desc|dir=desc/);
-    await expect(
-      tabela.getByRole('columnheader', { name: new RegExp(FILA.colunas.prazo) }),
-    ).toHaveAttribute('aria-sort', 'descending');
-  });
-
-  test('o filtro por status recorta, e o vazio explica o recorte', async ({ page }) => {
-    await entrarComo(page, PERSONA.CURADOR_BRONZE);
-    await page.goto('/curador/fila');
-
-    // "Atrasada" não é valor do enum: é prazo vencido. A faixa semeada está no
-    // prazo, então este recorte fica vazio — e o vazio tem de falar do filtro,
-    // não da fila.
     await page.getByRole('link', { name: FILA.filtros.atrasada, exact: true }).click();
     await page.waitForURL(/status=atrasada/);
 
+    // O recorte não pode **crescer**. Quantas linhas ele tem depende de quanto
+    // tempo as faixas semeadas passaram na fila, e afirmar um número aqui seria
+    // amarrar o teste ao relógio — ver a nota do teste seguinte.
+    await expect(page.getByRole('row')).not.toHaveCount(antes + 1);
+  });
+
+  /**
+   * O estado vazio **por recorte**, e por que ele é alcançado pela URL.
+   *
+   * A versão anterior deste teste filtrava por "Atrasada" contando que a faixa
+   * semeada estivesse no prazo. Isso era verdade perto do momento da semeadura
+   * e deixou de ser: `prazo_em` é 72 h depois da criação, e as faixas do seed
+   * sobrevivem entre execuções. Em 2026-09-17 o recorte "Atrasada" passou a ter
+   * linhas, e o teste falhou sem que nada no produto tivesse mudado — uma
+   * bomba-relógio, do tipo que se atribui a flakiness.
+   *
+   * O gênero resolve porque não envelhece: tudo o que o seed cria é `Indie`.
+   * O filtro da tela só oferece os gêneros que **existem** na fila, então um
+   * recorte vazio só se alcança pela URL — que é exatamente o que acontece com
+   * quem guardou o endereço de um filtro e voltou depois de a fila mudar.
+   */
+  test('o recorte vazio explica o filtro, e não a fila', { tag: ['@RF-055'] }, async ({ page }) => {
+    await entrarComo(page, PERSONA.CURADOR_BRONZE);
+    await page.goto('/curador/fila?genero=Jazz');
+
     await expect(page.getByText(FILA.vazioTitulo)).toBeVisible();
     await expect(page.getByText(FILA.vazioDescricao)).toBeVisible();
+
+    // E não o vazio da fila inteira: são mensagens diferentes de propósito.
+    await expect(page.getByText(FILA.vazioFilaTitulo)).toHaveCount(0);
   });
 
   test('o resumo conta a fila inteira, e não o recorte', async ({ page }) => {

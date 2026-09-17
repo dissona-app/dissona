@@ -12,6 +12,7 @@ import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
+import { erroGeralDe } from '@/textos/erros';
 import { CADASTRAR } from '@/textos/prototipo';
 
 import estilos from './FormularioDeCadastro.module.css';
@@ -100,6 +101,20 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
         ? CADASTRAR.bannerLimite
         : null;
 
+  // O que não virou banner nem campo tem de aparecer em algum lugar: sem isto,
+  // um `CONFLITO` ou um `NAO_AUTORIZADO` deixa o botão "Criar conta" mudo.
+  const erroGeral = erroGeralDe(
+    falhou ? resultado : null,
+    [
+      erroDeCampo('nome'),
+      erroDeCampo('email'),
+      erroDeCampo('senha'),
+      erroDeCampo('confirmar'),
+      erroDeCampo('aceite'),
+    ],
+    banner !== null,
+  );
+
   return (
     <>
       <div className={estilos.cabecalho}>
@@ -115,6 +130,8 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
       ) : null}
 
       <form action={enviar} className={estilos.campos} noValidate>
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
         <Campo
           name="nome"
           type="text"

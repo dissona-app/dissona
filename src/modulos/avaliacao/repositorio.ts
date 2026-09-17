@@ -158,6 +158,35 @@ export async function registrarEscuta(avaliacaoId: string, percentual: number): 
   await atualizarRascunho(avaliacaoId, { escuta_percentual: percentual });
 }
 
+/**
+ * Marca o envio como `ouviu`, quando a escuta cruza o mínimo.
+ *
+ * É a segunda das três transições que o cliente pode escrever — a lista está
+ * em `fila/repositorio.ts`, e `ouviu` estava na lista sem que ninguém a
+ * gravasse: em `src/` o valor só aparecia em leitura e filtro. O ciclo que o
+ * artista via em `3.3` era `Recebeu → Avaliando → Pronto`, e o "Ouviu" do
+ * RF-071 nunca acendia.
+ *
+ * `.eq('situacao', 'recebeu')` é o que torna isto idempotente e barato: a cada
+ * tique do medidor a condição é falsa depois da primeira vez, e o update afeta
+ * zero linhas. Não sobrescreve `avaliando` — quem já começou a avaliar não
+ * volta para `ouviu` por causa de um F5 que faça o player remedir.
+ *
+ * Sem `estourarSeErro`: quem chama é o medidor, e a regra dele é não
+ * interromper quem está ouvindo. Um erro aqui custa o carimbo de estado, não a
+ * escuta — que já foi gravada por `registrarEscuta`, e é ela que o gate
+ * `DS001` de `enviar_avaliacao` lê.
+ */
+export async function marcarEnvioComoOuvido(envioId: string): Promise<void> {
+  const supabase = await criarClienteServidor();
+
+  await supabase
+    .from('envio')
+    .update({ situacao: 'ouviu' })
+    .eq('id', envioId)
+    .eq('situacao', 'recebeu');
+}
+
 export async function salvarPasso(avaliacaoId: string, passo: number): Promise<void> {
   await atualizarRascunho(avaliacaoId, { passo_atual: passo });
 }

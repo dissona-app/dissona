@@ -43,6 +43,7 @@ import {
   concluir,
   garantirRascunho,
   listarCriterios,
+  marcarEnvioComoOuvido,
   registrarEscuta,
   removerCompartilhamento,
   removerNota,
@@ -349,6 +350,11 @@ function codigoDoImpedimento(tipo: string) {
  * Silenciosa por desenho: falhar em gravar a medição não pode interromper quem
  * está ouvindo. O gate real é `enviar_avaliacao` (`DS001`), e o que está no
  * banco é sempre o **máximo** já medido — `avaliacao_escuta_so_cresce`.
+ *
+ * Ao cruzar `escuta_minima_percentual`, carimba o envio como `ouviu` (RF-071).
+ * O mínimo vem de `configuracao`, nunca daqui — é a mesma leitura que
+ * `enviar_avaliacao` faz para decidir o `DS001`, então o estado que o artista
+ * vê em `3.3` e o gate do curador não podem divergir.
  */
 export async function registrarEscutaMedida(
   envioId: string,
@@ -358,8 +364,13 @@ export async function registrarEscutaMedida(
     const analise = esquemaEscuta.safeParse(percentual);
     if (!analise.success) return falha(CodigoErro.ENTRADA_INVALIDA, 'escuta');
 
-    const avaliacaoId = await garantirRascunho(envioId);
+    const [avaliacaoId, regras] = await Promise.all([garantirRascunho(envioId), lerRegras()]);
     await registrarEscuta(avaliacaoId, analise.data);
+
+    if (analise.data >= regras.escutaMinimaPercentual) {
+      await marcarEnvioComoOuvido(envioId);
+    }
+
     return sucesso(undefined);
   });
 }

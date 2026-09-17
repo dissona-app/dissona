@@ -13,6 +13,15 @@ export type PropsAcoesDoPasso = {
   readonly podePular: boolean;
   readonly acaoDeVoltar: (dados: FormData) => void | Promise<void>;
   readonly acaoDePular: (dados: FormData) => void | Promise<void>;
+  /**
+   * Trava os três por algo que **não** é o envio do formulário.
+   *
+   * Hoje é o upload direto ao Storage, que acontece na escolha do arquivo:
+   * `useFormStatus` não o enxerga, e sem isto dá para clicar em "Continuar" com
+   * o upload no meio — o caminho ainda não está no campo escondido e o arquivo
+   * já saiu, então o anexo se perderia em silêncio.
+   */
+  readonly ocupado?: boolean;
 };
 
 /**
@@ -40,8 +49,10 @@ export function AcoesDoPasso({
   podePular,
   acaoDeVoltar,
   acaoDePular,
+  ocupado = false,
 }: PropsAcoesDoPasso) {
   const { pending } = useFormStatus();
+  const travado = pending || ocupado;
 
   return (
     <div className={estilos.rodape}>
@@ -57,7 +68,7 @@ export function AcoesDoPasso({
         tamanho="sm"
         formAction={acaoDeVoltar}
         formNoValidate
-        disabled={pending}
+        disabled={travado}
       >
         {passo <= 1 ? CURADOR_CADASTRO.voltarAoLogin : CURADOR_CADASTRO.voltar}
       </Botao>
@@ -72,13 +83,13 @@ export function AcoesDoPasso({
             tamanho="sm"
             formAction={acaoDePular}
             formNoValidate
-            disabled={pending}
+            disabled={travado}
           >
             {CURADOR_CADASTRO.pular}
           </Botao>
         ) : null}
 
-        <Botao type="submit" tamanho="denso" carregando={pending}>
+        <Botao type="submit" tamanho="denso" carregando={travado}>
           {ultimo ? CURADOR_CADASTRO.enviarCadastro : CURADOR_CADASTRO.continuar}
         </Botao>
       </div>

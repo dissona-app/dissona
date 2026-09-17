@@ -8,6 +8,7 @@ import { Campo } from '@/componentes/base/Campo';
 import { Modal } from '@/componentes/base/Modal';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
+import { erroGeralDe } from '@/textos/erros';
 import { CONTA } from '@/textos/prototipo';
 
 import estilos from './ExclusaoDeConta.module.css';
@@ -79,6 +80,13 @@ export function ExclusaoDeConta({
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // A exclusão recusa por papel, por sessão e por conflito sem tocar em campo —
+  // e o botão vermelho ficava mudo, que é o pior lugar possível para ficar.
+  const erroGeral = erroGeralDe(falhou ? exclusao : null, [
+    erroDe('senhaAtual'),
+    erroDe('confirmacao'),
+  ]);
+
   function fechar() {
     // Volta ao passo 1 ao fechar: reabrir direto no passo 2 apresentaria o
     // campo `EXCLUIR` a quem só quis reler o que a exclusão faz.
@@ -142,6 +150,8 @@ export function ExclusaoDeConta({
         </div>
       ) : (
         <form action={excluir} className={estilos.corpo} noValidate>
+          {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
           <Campo
             name="senhaAtual"
             type="password"

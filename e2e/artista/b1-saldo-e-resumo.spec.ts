@@ -90,3 +90,43 @@ test.describe('B1 · Saldo e resumo', () => {
     await expect(page.getByRole('table')).toBeVisible();
   });
 });
+
+/**
+ * O terceiro critério do RF-042 — *"sou artista novo … vejo o estado vazio com
+ * CTA de compra"* —, que só existe numa conta que nunca comprou.
+ *
+ * Por isso `ARTISTA_NOVO`, e não `ARTISTA`: o estado vazio e os três tipos de
+ * lançamento são mutuamente exclusivos na mesma carteira. Encenar um zerando a
+ * outra destruiria o que os quatro testes acima afirmam.
+ *
+ * ⚠️ **Nada aqui pode comprar.** Uma compra com esta persona apaga o único
+ * estado que ela existe para provar, e a falha apareceria neste arquivo como se
+ * fosse intermitência.
+ */
+test.describe('B1 · Carteira do artista novo', { tag: ['@RF-042'] }, () => {
+  test('sem movimentação, a carteira mostra o vazio e o caminho da compra', async ({ page }) => {
+    await entrarComo(page, PERSONA.ARTISTA_NOVO);
+    await page.goto('/artista/carteira');
+
+    await expect(
+      page.getByText(CARTEIRA.vazioTitulo),
+      'a conta sem lançamento precisa cair no estado vazio — se falhar, alguém comprou com ela',
+    ).toBeVisible();
+    await expect(page.getByText(CARTEIRA.vazioDescricao)).toBeVisible();
+
+    // O vazio não é uma tela morta: o requisito pede CTA de compra, e ele tem
+    // de levar aos pacotes de verdade.
+    await page.getByRole('link', { name: CARTEIRA.comprar }).first().click();
+    await page.waitForURL(/\/artista\/pacotes/);
+  });
+
+  test('o saldo do artista novo é zero, e a tela diz isso sem erro', async ({ page }) => {
+    await entrarComo(page, PERSONA.ARTISTA_NOVO);
+    await page.goto('/artista/carteira');
+
+    // Sem literal de saldo: o que se afirma é que o painel renderiza, com a
+    // unidade, em vez de quebrar por ausência de linha em `saldo_carteira`.
+    await expect(page.getByText(CARTEIRA.saldoTitulo)).toBeVisible();
+    await expect(page.getByText(CARTEIRA.saldoUnidade, { exact: true })).toBeVisible();
+  });
+});

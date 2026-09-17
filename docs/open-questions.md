@@ -311,11 +311,67 @@ ele promete mais do que o sistema pode cumprir.
 
 ---
 
----
-
 ## 4. Resolvidas
 
 Registradas aqui para que ninguém as reabra por engano.
+
+### Resolvidas na correção do alinhamento dos e2e · 2026-09-17
+
+#### 28. Upload de faixa não sobrevive à Vercel — **resolvida**
+
+**A saída escolhida foi a que o item previa: upload direto ao Storage.**
+`FormularioDaFaixa` sobe o arquivo pelo cliente Supabase do navegador e manda à
+Server Action apenas o **caminho**; `salvarFaixa` confere que ele está sob a
+pasta da própria pessoa e lê tamanho e MIME do metadado do objeto
+(`metadadosDoObjeto` → `validarAudioNoStorage`), mantendo as mensagens que a
+tela já traduzia.
+
+Três coisas fizeram a mudança ser barata:
+
+- **Nenhuma policy nova.** `"faixas: dono gerencia a propria pasta"` já exige
+  `(storage.foldername(name))[1] = auth.uid()::text`, e `subirAudio` sempre
+  gravou em `${usuarioId}/${ref}.ext` — a convenção de caminho já era a certa.
+- **O limite passou a ser aplicado por quem o declara.** O bucket `faixas` tem
+  `file_size_limit` de 50 MB e a lista de MIME desde a `0000_storage`. Era
+  redundância; virou a defesa real.
+- **O corpo da ação virou um path.** `bodySizeLimit` e `proxyClientMaxBodySize`
+  voltaram de `64mb` a `8mb`, folga suficiente para o que ainda viaja por
+  Server Action.
+
+O `<input type="file">` continua com `name`: **sem JavaScript** o arquivo volta
+ao `multipart` e `validarAudio` o valida como antes. Os dois caminhos existem.
+
+⚠️ **O que sobrou:** o anexo de credencial do curador (5 MB) continua indo por
+Server Action e continua acima do teto de ~4,5 MB da Vercel. Não é RF-036 e não
+foi movido nesta rodada; quando for, é o mesmo desenho.
+
+⚠️ **Duplicação registrada:** `configuracao.upload.tamanho_max_mb` (50) e o
+`file_size_limit` do bucket (52428800) são o mesmo número em dois lugares. O
+bucket é a aplicação; a `configuracao` é o que a tela mostra. Comentário em
+`src/modulos/faixa/consultas.ts`; o lado SQL já o trazia desde a `0000_storage`
+(a migration não foi editada — o que está aplicado tem de bater byte a byte).
+
+**Falta provar em produção.** Nenhum teste local alcança o motivo da mudança:
+só subir um arquivo acima de 4,5 MB no **Preview da Vercel** prova que o teto
+deixou de importar.
+
+#### 29. O estado `ouviu` é inalcançável na interface da R2 — **resolvida**
+
+**Das duas saídas, a escolhida foi o player na 13.1** (decisão do usuário,
+2026-09-17): o curador ouve **antes** de assumir a avaliação, que é o que o nome
+do estado sempre disse. RF-071 e a tela 3.3 ficam como estão, com quatro
+estados.
+
+Sem componente novo: `PlayerComMedicao` e `registrarEscutaMedida` funcionam como
+estavam, e o que mudou é **onde** o player é montado. `lerDetalhe` passou a
+trazer a URL assinada do áudio, o mínimo de escuta e o percentual já medido,
+pelas mesmas funções que `lerAvaliacao` usa.
+
+`iniciarAvaliacao` continua gravando `avaliando`, e `marcarEnvioComoOuvido`
+continua agindo só sobre `recebeu` — nada disso mudou, e é o que impede o estado
+de andar para trás. `e2e/sla/s3-estados-do-envio.spec.ts` afirma os **quatro**
+estados, cada um pelo gesto que o produz, e a ressalva saiu de
+`scripts/matriz-rastreabilidade.mjs`.
 
 ### Resolvidas pelo protótipo da R2 · 2026-09-08
 

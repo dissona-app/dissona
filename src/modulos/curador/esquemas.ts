@@ -231,3 +231,49 @@ export function conferirArquivo(
   if (valor.size > maxBytes) return { ok: false, motivo: 'tamanho' };
   return { ok: true, arquivo: valor };
 }
+
+/**
+ * Extensão a partir do MIME — uma definição só, cliente e servidor.
+ *
+ * O nome do arquivo vem do cliente e renomear `.exe` para `.jpg` é trivial, por
+ * isso a extensão sai do tipo. E por isso ela precisa ser **a mesma** dos dois
+ * lados desde que o navegador passou a subir direto: quem nomeia o objeto é o
+ * cliente, e quem valida é o servidor — se divergirem, o servidor procura um
+ * objeto que não existe.
+ *
+ * `image/webp` está aqui e **não** está em `FOTO_TIPOS`, de propósito. O bucket
+ * `avatares` aceita webp e a aplicação não; mapear webp para `.jpg` faria um
+ * upload recusado sobrescrever a foto válida que já estava lá.
+ */
+export function extensaoDoMime(mime: string): string {
+  if (mime === 'application/pdf') return '.pdf';
+  if (mime === 'image/png') return '.png';
+  if (mime === 'image/webp') return '.webp';
+  return '.jpg';
+}
+
+export type ResultadoDoObjeto =
+  { readonly ok: true } | { readonly ok: false; readonly motivo: 'tipo' | 'tamanho' | 'ausente' };
+
+/**
+ * A mesma regra de `conferirArquivo`, sobre o metadado do objeto já gravado.
+ *
+ * É o caminho do upload direto do navegador: a ação recebe um caminho, e quem
+ * conta tamanho e MIME é o Storage. `objeto === null` cobre dois casos
+ * indistinguíveis por desenho — o objeto não existe, ou é de outra pessoa e a
+ * RLS o esconde. Separá-los contaria que ele existe.
+ *
+ * Ao contrário de `conferirArquivo`, ausência **é** erro aqui: um caminho foi
+ * informado, então alguém acredita que há um arquivo. "Não anexou" se diz não
+ * mandando caminho nenhum.
+ */
+export function conferirObjeto(
+  objeto: { readonly tamanhoBytes: number; readonly mime: string } | null,
+  tiposAceitos: readonly string[],
+  maxBytes: number,
+): ResultadoDoObjeto {
+  if (objeto === null || objeto.tamanhoBytes === 0) return { ok: false, motivo: 'ausente' };
+  if (!tiposAceitos.includes(objeto.mime)) return { ok: false, motivo: 'tipo' };
+  if (objeto.tamanhoBytes > maxBytes) return { ok: false, motivo: 'tamanho' };
+  return { ok: true };
+}

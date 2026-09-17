@@ -58,6 +58,16 @@ export const FAIXA_DO_C6 = 'e2e_Faixa do C6';
 export const FAIXA_PARA_CONCLUIR = 'e2e_Faixa para concluir';
 
 /**
+ * A faixa do cenário de atomicidade, do **curador de SLA**.
+ *
+ * Não é do Bronze porque o cenário devolve o envio no meio da conclusão, e
+ * devolver tira faixa da fila: na conta do Bronze isso mudaria a contagem que
+ * C1 afirma. Também é consumida — o envio termina em `devolvido` — e reposta
+ * por `dados-e2e.sql`.
+ */
+export const FAIXA_DA_ATOMICIDADE = 'e2e_Faixa da atomicidade';
+
+/**
  * Entra como o curador Bronze e abre a avaliação da faixa, pela fila.
  *
  * Passa pelo detalhe (13.1) e pelo botão "Iniciar avaliação" de propósito: é o

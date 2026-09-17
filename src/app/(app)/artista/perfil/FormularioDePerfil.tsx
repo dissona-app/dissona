@@ -6,6 +6,7 @@ import { AreaTexto, Aviso, Botao, Campo, Chips, Painel } from '@/componentes/bas
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { MAXIMO_DA_BIO, MAXIMO_DE_GENEROS } from '@/modulos/artista/tipos';
 import type { PerfilDoArtista } from '@/modulos/artista/tipos';
+import { erroGeralDe } from '@/textos/erros';
 import { ARTISTA_PERFIL as TEXTOS, GENEROS_DO_ARTISTA } from '@/textos/prototipo';
 
 import estilos from './FormularioDePerfil.module.css';
@@ -57,9 +58,25 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // RF-019: `PAPEL_AUSENTE` e o `NAO_AUTORIZADO` de um update que afetou zero
+  // linhas chegam sem campo. A tela só desenhava o aviso de sucesso, então
+  // "Salvar" não fazia nada — nem salvava, nem dizia por quê.
+  const erroGeral = erroGeralDe(falha, [
+    erroDe('nomeExibicao'),
+    erroDe('cidade'),
+    erroDe('handle'),
+    erroDe('bio'),
+    erroDe('generos'),
+    erroDe('linkInstagram'),
+    erroDe('linkSpotify'),
+    erroDe('linkYoutube'),
+    erroDe('linkSite'),
+  ]);
+
   return (
     <form action={enviar} className={estilos.base} noValidate>
       {resultado !== null && resultado.ok ? <Aviso tom="sucesso">{TEXTOS.salvo}</Aviso> : null}
+      {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
       <Painel titulo={TEXTOS.titulo} sublegenda={TEXTOS.subtitulo}>
         <div className={estilos.par}>

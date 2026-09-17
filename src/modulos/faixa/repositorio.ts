@@ -10,6 +10,10 @@ import 'server-only';
  */
 
 import { CodigoErro, falhar } from '@/lib/erros';
+import {
+  metadadosDoObjeto as lerMetadadosDoObjeto,
+  type ObjetoNoStorage,
+} from '@/lib/supabase/armazenamento';
 import { estourarSeErro } from '@/lib/supabase/erros';
 import { criarClienteServidor } from '@/lib/supabase/servidor';
 import type { Database } from '@/lib/supabase/tipos-bd';
@@ -225,4 +229,18 @@ export async function meuPerfilArtista(): Promise<string | null> {
 
   estourarSeErro(error);
   return data?.id ?? null;
+}
+
+/**
+ * Tamanho e MIME de um objeto dos baldes deste modulo.
+ *
+ * Delegacao estreita para `lib/supabase/armazenamento`: a leitura e a mesma
+ * para todo bucket, mas a uniao de baldes fica por modulo — assim nenhuma acao
+ * do envio consegue pedir metadado de `materiais` por engano.
+ */
+export async function metadadosDoObjeto(
+  balde: 'faixas' | 'capas',
+  caminho: string,
+): Promise<ObjetoNoStorage | null> {
+  return lerMetadadosDoObjeto(balde, caminho);
 }

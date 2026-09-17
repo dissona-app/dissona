@@ -11,6 +11,7 @@ import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 import type { DadosDoConvite } from '@/modulos/equipe/acoes';
 import { PAPEIS_ADMIN } from '@/modulos/equipe/tipos';
+import { erroGeralDe } from '@/textos/erros';
 import { EQUIPE } from '@/textos/prototipo';
 
 import estilos from './ConviteDeMembro.module.css';
@@ -69,6 +70,16 @@ export function ConviteDeMembro({ acao }: PropsConviteDeMembro) {
     return motivo === undefined ? undefined : MOTIVOS[motivo];
   };
 
+  // Os dois códigos com banner próprio saem da conta; o resto — `CONFLITO` de
+  // convite repetido, `NAO_AUTENTICADO` — cai na superfície geral.
+  const limiteDeEnvio = falhou && resultado.codigo === CodigoErro.LIMITE_DE_ENVIO;
+  const semPermissao = falhou && resultado.codigo === CodigoErro.NAO_AUTORIZADO;
+  const erroGeral = erroGeralDe(
+    falhou ? resultado : null,
+    [erroDe('email'), erroDe('papel')],
+    limiteDeEnvio || semPermissao,
+  );
+
   return (
     <>
       <Botao tamanho="denso" onClick={() => setAberto(true)}>
@@ -85,13 +96,11 @@ export function ConviteDeMembro({ acao }: PropsConviteDeMembro) {
       >
         {enviado === undefined ? (
           <form action={enviar} className={estilos.formulario} noValidate>
-            {falhou && resultado.codigo === CodigoErro.LIMITE_DE_ENVIO ? (
-              <Aviso tom="alerta">{TEXTOS.erroLimite}</Aviso>
-            ) : null}
+            {limiteDeEnvio ? <Aviso tom="alerta">{TEXTOS.erroLimite}</Aviso> : null}
 
-            {falhou && resultado.codigo === CodigoErro.NAO_AUTORIZADO ? (
-              <Aviso tom="erro">{TEXTOS.erroSemPermissao}</Aviso>
-            ) : null}
+            {semPermissao ? <Aviso tom="erro">{TEXTOS.erroSemPermissao}</Aviso> : null}
+
+            {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
             <Campo
               name="email"

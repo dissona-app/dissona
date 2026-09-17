@@ -1,19 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-
 import { Aviso } from '@/componentes/base/Aviso';
+import { CodigoErro } from '@/lib/erros';
+import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/modulos/curador/esquemas';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
+import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import estilos from './Passos.module.css';
 import type { PropsDoPasso } from './tipos';
 import { usePasso } from '../usePasso';
+import { useUploadDireto } from '../useUploadDireto';
 
-const MOTIVOS: Readonly<Record<string, string>> = {
-  formato_nao_suportado: CURADOR_CADASTRO.erroFotoTipo,
-  arquivo_muito_grande: CURADOR_CADASTRO.erroFotoTamanho,
+/**
+ * A recusa da foto vem por **código**, e não por motivo.
+ *
+ * `concluir()` em `curador/acoes.ts` devolve `falha(codigo, 'arquivo')` sem
+ * `detalhes`, e é de `detalhes.motivo` que `usePasso` tira `motivo`. Enquanto
+ * este mapa foi lido por motivo, `erroFotoTipo` e `erroFotoTamanho` estavam
+ * escritos e eram inalcançáveis: a pessoa via o texto genérico da superfície de
+ * erro. É o mesmo defeito que o passo 6 já corrigiu.
+ */
+const MENSAGEM_DA_FOTO: Readonly<Partial<Record<CodigoErro, string>>> = {
+  [CodigoErro.FORMATO_NAO_SUPORTADO]: CURADOR_CADASTRO.erroFotoTipo,
+  [CodigoErro.ARQUIVO_MUITO_GRANDE]: CURADOR_CADASTRO.erroFotoTamanho,
 };
 
 export type PropsPasso1 = PropsDoPasso & {
@@ -32,24 +43,30 @@ export type PropsPasso1 = PropsDoPasso & {
  * ainda vale existir: é onde a pessoa confirma que está na conta certa antes de
  * responder oito perguntas.
  */
-export function Passo1Dados({
-  estado,
-  passo,
-  acao,
-  acaoDeVoltar,
-  acaoDePular,
-}: PropsPasso1) {
+export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: PropsPasso1) {
   // Sem `pendente`: quem desabilita os botões é o `useFormStatus` dentro de
   // `AcoesDoPasso`, que lê o estado do formulário em que ele está.
-  const { enviar, motivo } = usePasso(acao);
-  const [nomeDoArquivo, setNomeDoArquivo] = useState<string | null>(null);
+  const { enviar, falha } = usePasso(acao);
 
-  const erro = motivo === undefined ? undefined : MOTIVOS[motivo];
+  const foto = useUploadDireto({
+    balde: 'avatares',
+    nomeBase: 'perfil',
+    tipos: FOTO_TIPOS,
+    maxBytes: FOTO_MAX_BYTES,
+    mensagens: {
+      tipo: CURADOR_CADASTRO.erroFotoTipo,
+      tamanho: CURADOR_CADASTRO.erroFotoTamanho,
+    },
+  });
+
+  const erro = falha === null ? undefined : MENSAGEM_DA_FOTO[falha.codigo];
+  const erroGeral = erroGeralDe(falha, [erro]);
+  const aviso = foto.erro ?? erro ?? erroGeral;
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
-      {erro !== undefined ? (
-        <Aviso tom="erro" titulo={erro}>
+      {aviso !== undefined ? (
+        <Aviso tom="erro" titulo={aviso}>
           {CURADOR_CADASTRO.fotoHint}
         </Aviso>
       ) : null}
@@ -67,16 +84,26 @@ export function Passo1Dados({
           */}
           <label className={estilos.fotoBotao}>
             {CURADOR_CADASTRO.adicionarFoto}
+            {/* O `name` fica: sem JavaScript o `onChange` não roda, e o arquivo
+                volta a viajar no `multipart` para `salvarPasso1` validar. */}
             <input
               type="file"
               name="foto"
               accept="image/jpeg,image/png"
               className={estilos.arquivo}
-              onChange={(evento) => setNomeDoArquivo(evento.target.files?.[0]?.name ?? null)}
+              onChange={foto.aoEscolher}
             />
           </label>
-          <span className={estilos.fotoHint}>
-            {nomeDoArquivo ?? (estado.fotoCaminho === null ? CURADOR_CADASTRO.fotoHint : 'Foto enviada')}
+          {/* O caminho é o que a ação grava; o arquivo já não viaja no corpo. */}
+          <input type="hidden" name="foto_caminho" value={foto.caminho} />
+
+          <span className={estilos.fotoHint} aria-live="polite">
+            {foto.subindo
+              ? CURADOR_CADASTRO.fotoEnviando
+              : (foto.nome ??
+                (estado.fotoCaminho === null
+                  ? CURADOR_CADASTRO.fotoHint
+                  : CURADOR_CADASTRO.fotoEnviada))}
           </span>
         </div>
       </div>
@@ -95,6 +122,7 @@ export function Passo1Dados({
       </div>
 
       <AcoesDoPasso
+        ocupado={foto.subindo}
         passo={passo}
         ultimo={false}
         podePular={false}

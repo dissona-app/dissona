@@ -33,20 +33,24 @@ async function abrirSubjetiva(page: Page): Promise<string> {
 test.describe.configure({ mode: 'serial' });
 
 test.describe('C4 · Nota subjetiva e feedback', () => {
-  test('o resumo das objetivas traz média geral e por grupo', async ({ page }) => {
-    await abrirSubjetiva(page);
+  test(
+    'o resumo das objetivas traz média geral e por grupo',
+    { tag: ['@RF-061'] },
+    async ({ page }) => {
+      await abrirSubjetiva(page);
 
-    await expect(page.getByRole('heading', { name: AVALIAR.resumoObjetivo })).toBeVisible();
-    // Cinco obrigatórios com 4,0 — a média dos respondidos, e não dos onze.
-    await expect(page.getByText('4,0', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText(AVALIAR.mediaDeCriterios(5))).toBeVisible();
+      await expect(page.getByRole('heading', { name: AVALIAR.resumoObjetivo })).toBeVisible();
+      // Cinco obrigatórios com 4,0 — a média dos respondidos, e não dos onze.
+      await expect(page.getByText('4,0', { exact: true }).first()).toBeVisible();
+      await expect(page.getByText(AVALIAR.mediaDeCriterios(5))).toBeVisible();
 
-    for (const grupo of Object.values(AVALIAR.grupos)) {
-      await expect(page.getByRole('progressbar', { name: grupo }), grupo).toBeVisible();
-    }
-  });
+      for (const grupo of Object.values(AVALIAR.grupos)) {
+        await expect(page.getByRole('progressbar', { name: grupo }), grupo).toBeVisible();
+      }
+    },
+  );
 
-  test('a nota subjetiva é um slider de 0,0 a 5,0', async ({ page }) => {
+  test('a nota subjetiva é um slider de 0,0 a 5,0', { tag: ['@RF-062'] }, async ({ page }) => {
     await abrirSubjetiva(page);
 
     const slider = page.getByLabel(AVALIAR.notaSubjetivaCampo, { exact: true });
@@ -58,20 +62,24 @@ test.describe('C4 · Nota subjetiva e feedback', () => {
     await expect(slider).toHaveAttribute('aria-valuetext', '4,2');
   });
 
-  test('o contador do feedback muda ao passar do piso do acréscimo', async ({ page }) => {
-    await abrirSubjetiva(page);
+  test(
+    'o contador do feedback muda ao passar do piso do acréscimo',
+    { tag: ['@RF-063'] },
+    async ({ page }) => {
+      await abrirSubjetiva(page);
 
-    const campo = page.getByLabel(AVALIAR.feedback);
+      const campo = page.getByLabel(AVALIAR.feedback);
 
-    await campo.fill('curto');
-    await expect(page.getByText(/A partir de \d+ caracteres o acréscimo entra/)).toBeVisible();
+      await campo.fill('curto');
+      await expect(page.getByText(/A partir de \d+ caracteres o acréscimo entra/)).toBeVisible();
 
-    await campo.fill('a'.repeat(150));
-    await expect(page.getByText(AVALIAR.feedbackValido)).toBeVisible();
-    await expect(page.getByText('150 / 150', { exact: true })).toBeVisible();
-  });
+      await campo.fill('a'.repeat(150));
+      await expect(page.getByText(AVALIAR.feedbackValido)).toBeVisible();
+      await expect(page.getByText('150 / 150', { exact: true })).toBeVisible();
+    },
+  );
 
-  test('o feedback é obrigatório para avançar', async ({ page }) => {
+  test('o feedback é obrigatório para avançar', { tag: ['@RF-063'] }, async ({ page }) => {
     const envioId = await abrirSubjetiva(page);
 
     await page.getByLabel(AVALIAR.feedback).fill('');

@@ -61,7 +61,25 @@ begin
       ('e2e_tour@e2e.dissona.local',      'E2E Tour'),
       ('e2e_wizard@e2e.dissona.local',    'E2E Wizard'),
       ('e2e_bronze@e2e.dissona.local',    'E2E Bronze'),
-      ('e2e_prata@e2e.dissona.local',     'E2E Prata')
+      ('e2e_prata@e2e.dissona.local',     'E2E Prata'),
+      -- As três abaixo isolam estado que as outras não podem ter ao mesmo
+      -- tempo: carteira nunca usada, saldo que não cobre a seleção, e um
+      -- curador cuja fila pode ser mexida sem afetar a que o C1 conta.
+      ('e2e_artista_novo@e2e.dissona.local', 'E2E Artista Novo'),
+      ('e2e_sem_saldo@e2e.dissona.local',    'E2E Sem Saldo'),
+      ('e2e_compra@e2e.dissona.local',       'E2E Compra'),
+      ('e2e_curador_sla@e2e.dissona.local',  'E2E Curador SLA'),
+      -- Estados de conta que a autenticação precisa distinguir, e que nenhuma
+      -- outra persona pode ter ao mesmo tempo: bloqueada, e com dois papéis.
+      ('e2e_bloqueada@e2e.dissona.local',    'E2E Bloqueada'),
+      ('e2e_dois_papeis@e2e.dissona.local',  'E2E Dois Papéis'),
+      -- As quatro do módulo 12. O wizard escreve tudo no mesmo
+      -- `perfil_curador`, e `fullyParallel` faria um arquivo salvar o passo 5
+      -- enquanto outro afirma o passo 1 — uma persona por arquivo de spec.
+      ('e2e_wizard_nav@e2e.dissona.local',    'E2E Wizard Navegação'),
+      ('e2e_wizard_midias@e2e.dissona.local', 'E2E Wizard Mídias'),
+      ('e2e_wizard_cred@e2e.dissona.local',   'E2E Wizard Credenciais'),
+      ('e2e_manutencao@e2e.dissona.local',    'E2E Manutenção')
     ) as t(email, nome)
   loop
     -- Existência conferida com `select`, e não com `on conflict`.
@@ -144,6 +162,16 @@ select u.id from auth.users u
  where u.email = 'e2e_artista@e2e.dissona.local'
 on conflict (perfil_id) do nothing;
 
+-- O artista principal é uma conta **assentada**: onboarding já visto, ambiente
+-- gravado. Sem isto o login dele cai em `/onboarding` (RF-007 funcionando), e
+-- todo cenário que afirma o destino do login precisaria tratar o desvio. Quem
+-- existe para o tour pendente é `e2e_tour`, logo abaixo — é para isso que ela
+-- tem conta própria.
+update perfil set
+  onboarding_visto_em = coalesce(onboarding_visto_em, now()),
+  ultimo_ambiente = coalesce(ultimo_ambiente, 'artista')
+ where id in (select u.id from auth.users u where u.email = 'e2e_artista@e2e.dissona.local');
+
 -- ------------------------------------------- os estados da paridade visual
 
 -- `e2e_sem_papel` fica **sem** `papel_usuario` de propósito: é a única forma de
@@ -189,6 +217,19 @@ on conflict (perfil_id) do update set
   passo_cadastro = 8, situacao = 'bronze_aprovado', classe = 'bronze',
   cadastro_concluido_em = now(), classificado_em = now();
 
+-- Os curadores que **trabalham** nos cenários são contas assentadas: onboarding
+-- já visto e ambiente gravado. Sem isso o login deles cai em `/onboarding`
+-- (RF-007 funcionando) e todo cenário que afirma o destino do login teria de
+-- tratar o desvio. O wizard e o Prata ficam de fora de propósito: a guarda os
+-- desvia antes, para o cadastro e para a análise.
+update perfil set
+  onboarding_visto_em = coalesce(onboarding_visto_em, now()),
+  ultimo_ambiente = coalesce(ultimo_ambiente, 'curador')
+ where id in (
+   select u.id from auth.users u
+    where u.email in ('e2e_bronze@e2e.dissona.local', 'e2e_curador_sla@e2e.dissona.local')
+ );
+
 -- Candidato a Prata em análise (12.5) — a guarda o mantém fora do painel, e é
 -- justamente a tela que precisa ser reencontrável.
 insert into perfil_curador (perfil_id, passo_cadastro, situacao, classe, bio, cadastro_concluido_em)
@@ -197,6 +238,164 @@ select u.id, 8, 'prata_em_analise'::situacao_curador, 'bronze'::classe_curador,
   from auth.users u where u.email = 'e2e_prata@e2e.dissona.local'
 on conflict (perfil_id) do update set
   passo_cadastro = 8, situacao = 'prata_em_analise', cadastro_concluido_em = now();
+
+-- ----------------------------------------- os estados isolados dos cenários
+
+-- `e2e_artista_novo` e `e2e_sem_saldo` são artistas **sem carteira encenada**:
+-- ganham papel e `perfil_artista`, e nada mais. É o estado natural de quem
+-- nunca comprou, e é justamente o que `e2e_artista` não pode ter — ele tem
+-- saldo e movimentações porque B1, B2 e B3 dependem disso.
+--
+--  * `e2e_artista_novo` abre a Carteira vazia (RF-042). **Nunca compra**: uma
+--    compra apaga o único estado que a conta existe para provar.
+--  * `e2e_sem_saldo` chega à seleção sem Claves que cubram o serviço, e é aí
+--    que o bloqueio do RF-049 aparece.
+--  * `e2e_compra` é a carteira do B2, que afirma **aritmética exata** de saldo.
+--    Ela não é semeada com saldo porque o próprio B2 compra; o que ela precisa
+--    é que ninguém mais gaste dali. Em `e2e_artista` isso era impossível: o B7
+--    confirma seleção e consome 2 Claves, e caindo na janela de medição do Pix
+--    o teste acusava crédito em dobro que não houve.
+insert into papel_usuario (perfil_id, papel)
+select u.id, 'artista'::papel from auth.users u
+ where u.email in (
+   'e2e_artista_novo@e2e.dissona.local',
+   'e2e_sem_saldo@e2e.dissona.local',
+   'e2e_compra@e2e.dissona.local'
+ )
+on conflict (perfil_id, papel) do nothing;
+
+insert into perfil_artista (perfil_id)
+select u.id from auth.users u
+ where u.email in (
+   'e2e_artista_novo@e2e.dissona.local',
+   'e2e_sem_saldo@e2e.dissona.local',
+   'e2e_compra@e2e.dissona.local'
+ )
+on conflict (perfil_id) do nothing;
+
+-- `e2e_curador_sla` recebe as faixas cujo relógio os testes adiantam. Separado
+-- do `e2e_bronze` porque a devolução por SLA **tira faixa da fila**: com a
+-- mesma conta, a contagem que o C1 afirma mudaria no meio da asserção.
+insert into papel_usuario (perfil_id, papel)
+select u.id, 'curador'::papel from auth.users u
+ where u.email = 'e2e_curador_sla@e2e.dissona.local'
+on conflict (perfil_id, papel) do nothing;
+
+insert into perfil_curador (perfil_id, passo_cadastro, situacao, classe, bio, cadastro_concluido_em, classificado_em)
+select u.id, 8, 'bronze_aprovado'::situacao_curador, 'bronze'::classe_curador,
+       'Conta de teste dos cenarios de SLA e atomicidade.', now(), now()
+  from auth.users u where u.email = 'e2e_curador_sla@e2e.dissona.local'
+on conflict (perfil_id) do update set
+  passo_cadastro = 8, situacao = 'bronze_aprovado', classe = 'bronze',
+  cadastro_concluido_em = now(), classificado_em = now();
+
+-- Sem serviço ativo o curador não é selecionável, e `confirmar_selecao_curadores`
+-- recusa a montagem das faixas abaixo. Os preços espelham os do `e2e_bronze`.
+insert into servico_curador (perfil_curador_id, tipo, descricao, preco_claves, ativo)
+-- O cast é explícito porque o literal vem de um `values` correlacionado: ali o
+-- Postgres não infere `tipo_servico` do destino, como faria num insert direto.
+select pc.id, t.tipo::tipo_servico, t.descricao, t.preco, true
+  from public.perfil_curador pc
+  join auth.users u on u.id = pc.perfil_id
+ cross join (values
+   ('feedback', 'Parecer escrito com notas por critério', 2::numeric),
+   ('playlist', 'Inclusão na playlist pública',           3),
+   ('post',     'Publicação nas redes com comentário',    4)
+ ) as t(tipo, descricao, preco)
+ where u.email = 'e2e_curador_sla@e2e.dissona.local'
+on conflict (perfil_curador_id, tipo) do update
+  set preco_claves = excluded.preco_claves, ativo = true;
+
+-- ----------------------------------------------- os estados do módulo 12
+
+-- Três rascunhos no passo 1, um por arquivo de spec do wizard. O `do update`
+-- é o que **repõe** o passo: os cenários avançam e salvam, e sem a volta a
+-- segunda execução encontraria o wizard onde a primeira o deixou.
+insert into papel_usuario (perfil_id, papel)
+select u.id, 'curador'::papel from auth.users u
+ where u.email in ('e2e_wizard_nav@e2e.dissona.local', 'e2e_wizard_midias@e2e.dissona.local',
+                   'e2e_wizard_cred@e2e.dissona.local', 'e2e_manutencao@e2e.dissona.local')
+on conflict (perfil_id, papel) do nothing;
+
+insert into perfil_curador (perfil_id, passo_cadastro, situacao, classe)
+select u.id, 1, 'rascunho'::situacao_curador, 'bronze'::classe_curador
+  from auth.users u
+ where u.email in ('e2e_wizard_nav@e2e.dissona.local', 'e2e_wizard_midias@e2e.dissona.local',
+                   'e2e_wizard_cred@e2e.dissona.local')
+on conflict (perfil_id) do update set
+  passo_cadastro = 1, situacao = 'rascunho', cadastro_concluido_em = null, classificado_em = null;
+
+-- `e2e_manutencao` é Bronze aprovado com serviços — a tela 12.6 precisa de um
+-- cadastro concluído para ter o que manter, e de uma classe que só ela observe:
+-- a regra que o cenário prova é "alterar mídia **não** altera a classe".
+insert into perfil_curador (perfil_id, passo_cadastro, situacao, classe, bio, cadastro_concluido_em, classificado_em)
+select u.id, 8, 'bronze_aprovado'::situacao_curador, 'bronze'::classe_curador,
+       'Conta de teste da manutencao de cadastro, com bio suficientemente longa.', now(), now()
+  from auth.users u where u.email = 'e2e_manutencao@e2e.dissona.local'
+on conflict (perfil_id) do update set
+  passo_cadastro = 8, situacao = 'bronze_aprovado', classe = 'bronze',
+  cadastro_concluido_em = now(), classificado_em = now();
+
+insert into servico_curador (perfil_curador_id, tipo, descricao, preco_claves, ativo)
+select pc.id, t.tipo::tipo_servico, t.descricao, t.preco, true
+  from public.perfil_curador pc
+  join auth.users u on u.id = pc.perfil_id
+ cross join (values
+   ('feedback', 'Parecer escrito com notas por critério', 2::numeric),
+   ('playlist', 'Inclusão na playlist pública',           3)
+ ) as t(tipo, descricao, preco)
+ where u.email = 'e2e_manutencao@e2e.dissona.local'
+on conflict (perfil_curador_id, tipo) do update
+  set preco_claves = excluded.preco_claves, ativo = true;
+
+update perfil set onboarding_visto_em = coalesce(onboarding_visto_em, now()),
+                  ultimo_ambiente = coalesce(ultimo_ambiente, 'curador')
+ where id in (select u.id from auth.users u where u.email = 'e2e_manutencao@e2e.dissona.local');
+
+-- ------------------------------------------- os estados da autenticação
+
+-- `e2e_bloqueada` é artista com a conta bloqueada: a guarda de rota a expulsa
+-- para `/entrar?motivo=bloqueada` em qualquer caminho, e é o único jeito de ver
+-- esse banner (RF-001). Bloquear uma persona já usada por outro cenário
+-- quebraria todos eles de uma vez.
+insert into papel_usuario (perfil_id, papel)
+select u.id, 'artista'::papel from auth.users u
+ where u.email = 'e2e_bloqueada@e2e.dissona.local'
+on conflict (perfil_id, papel) do nothing;
+
+insert into perfil_artista (perfil_id)
+select u.id from auth.users u
+ where u.email = 'e2e_bloqueada@e2e.dissona.local'
+on conflict (perfil_id) do nothing;
+
+update perfil set situacao = 'bloqueada'
+ where id in (select u.id from auth.users u where u.email = 'e2e_bloqueada@e2e.dissona.local');
+
+-- `e2e_dois_papeis` acumula artista e curador, com `ultimo_ambiente` gravado e
+-- o onboarding já visto — é o estado que RF-008 descreve. O curador precisa
+-- estar aprovado, senão a guarda o devolve ao wizard e o teste de troca de
+-- papel nunca chega ao painel.
+insert into papel_usuario (perfil_id, papel)
+select u.id, t.papel::papel from auth.users u
+ cross join (values ('artista'), ('curador')) as t(papel)
+ where u.email = 'e2e_dois_papeis@e2e.dissona.local'
+on conflict (perfil_id, papel) do nothing;
+
+insert into perfil_artista (perfil_id)
+select u.id from auth.users u
+ where u.email = 'e2e_dois_papeis@e2e.dissona.local'
+on conflict (perfil_id) do nothing;
+
+insert into perfil_curador (perfil_id, passo_cadastro, situacao, classe, bio, cadastro_concluido_em, classificado_em)
+select u.id, 8, 'bronze_aprovado'::situacao_curador, 'bronze'::classe_curador,
+       'Conta de teste dos papeis acumulaveis.', now(), now()
+  from auth.users u where u.email = 'e2e_dois_papeis@e2e.dissona.local'
+on conflict (perfil_id) do update set
+  passo_cadastro = 8, situacao = 'bronze_aprovado', classe = 'bronze',
+  cadastro_concluido_em = now(), classificado_em = now();
+
+update perfil set ultimo_ambiente = 'curador', onboarding_visto_em = coalesce(onboarding_visto_em, now())
+ where id in (select u.id from auth.users u where u.email = 'e2e_dois_papeis@e2e.dissona.local');
 
 -- --------------------------------------------------------- a equipe do admin
 
@@ -369,111 +568,22 @@ begin
 end
 $seed$;
 
--- ------------------------------------------- uma faixa por cenário do C3 ao C6
+-- ------------------------------------------- as faixas dos cenários
 
--- `playwright.config.ts` roda `fullyParallel: true`, e C3, C4, C5 e C6 escrevem
--- todos no **mesmo** rascunho se compartilharem o envio: um worker salva cinco
--- notas enquanto o outro afirma que há uma só. É a mesma razão que fez A2 e A3
--- criarem pacotes com nome único — aqui o recurso disputado é o envio, e ele
--- não pode ser criado pelo navegador.
+-- **Não ficam mais aqui.** Elas são criadas e **repostas** por
+-- `scripts/repor-cenarios-e2e.mjs` (`pnpm e2e:semear`), por dois motivos:
 --
--- Então cada cenário ganha o seu. Dentro de um arquivo os testes seguem em
--- série (`test.describe.configure({ mode: 'serial' })`), que é o que a suíte
--- declara.
+--  * Sete cenários consomem a faixa deles — concluir e devolver são terminais.
+--    A reposição é necessária **antes de cada execução** da suíte, e este
+--    arquivo exige a senha das personas para rodar. Repor faixa não exige.
+--  * Criar a faixa e confirmar a seleção pela RPC é ato do **artista**, e o SQL
+--    só chegava lá forjando o JWT com `set_config('request.jwt.claims', …)`. O
+--    script entra com a senha da persona e chama a mesma RPC que a tela chama —
+--    é mais fiel, e não precisa de privilégio nenhum além do da própria conta.
 --
--- **A escuta já vem medida em 100%.** O Playwright não reproduz áudio de
--- verdade, e o arquivo destas faixas nem existe no Storage. Sem isto,
--- `enviar_avaliacao` recusaria a conclusão com `DS001` e o C6 testaria o gate
--- em vez da conclusão. O gate em si é provado em
--- `0009_remuneracao.testes.sql`, que é onde ele mora.
---
--- **O C6 consome o dele**: concluir é irreversível — o envio vira `pronto` e
--- `ganho_curador` não é reescrito nem apagado. Por isso a condição de criação
--- é "não há envio pendente com este título", e não "a faixa não existe": rodar
--- este arquivo antes da suíte repõe o cenário. As concluídas ficam, e ficam bem
--- — viram histórico de devolutiva do artista.
-do $cenarios$
-declare
-  v_artista_perfil uuid;
-  v_artista_id     uuid;
-  v_curador_id     uuid;
-  v_faixa_id       uuid;
-  v_envios         uuid[];
-  v_titulo         text;
-begin
-  select u.id into v_artista_perfil
-    from auth.users u where u.email = 'e2e_artista@e2e.dissona.local';
+-- Ordem numa máquina nova: este arquivo primeiro (contas, papéis, catálogo e a
+-- carteira encenada), depois `pnpm e2e:semear`.
 
-  select pa.id into v_artista_id
-    from public.perfil_artista pa where pa.perfil_id = v_artista_perfil;
-
-  select pc.id into v_curador_id
-    from public.perfil_curador pc
-    join auth.users u on u.id = pc.perfil_id
-   where u.email = 'e2e_bronze@e2e.dissona.local';
-
-  if v_artista_id is null or v_curador_id is null then
-    raise notice 'e2e: artista ou curador ausente, pulando as faixas dos cenarios';
-    return;
-  end if;
-
-  -- `confirmar_selecao_curadores` confere a propriedade contra `auth.uid()` no
-  -- corpo, e `security definer` não contorna isso.
-  perform set_config('request.jwt.claims',
-    json_build_object('sub', v_artista_perfil, 'role', 'authenticated')::text, true);
-
-  -- B7 confirma seleções a cada execução e consome Claves; sem recarga, a
-  -- carteira zera e este bloco (e o B7) passam a falhar com DS010. Recarrega
-  -- pelo caminho real — pedido e confirmação — quando o saldo fica baixo.
-  if coalesce((select s.disponivel from public.saldo_carteira s
-                where s.perfil_artista_id = v_artista_id), 0) < 20 then
-    perform public.confirmar_pedido_clave(public.criar_pedido_clave(
-      (select pc.id from public.pacote_clave pc
-        where pc.ativo and pc.excluido_em is null
-        order by pc.quantidade_claves desc limit 1),
-      'pix'));
-    raise notice 'e2e: carteira recarregada';
-  end if;
-
-  foreach v_titulo in array array[
-    'e2e_Faixa do C3', 'e2e_Faixa do C4', 'e2e_Faixa do C5', 'e2e_Faixa do C6',
-    'e2e_Faixa para concluir'
-  ] loop
-    continue when exists (
-      select 1 from public.envio e join public.faixa f on f.id = e.faixa_id
-       where e.perfil_curador_id = v_curador_id
-         and f.titulo = v_titulo
-         and e.situacao in ('recebeu', 'ouviu', 'avaliando')
-    );
-
-    insert into public.faixa (
-      perfil_artista_id, titulo, genero, origem, arquivo_caminho,
-      duracao_segundos, contexto_curador, situacao
-    )
-    values (
-      v_artista_id, v_titulo, 'Indie', 'arquivo',
-      v_artista_perfil || '/' || replace(lower(v_titulo), ' ', '-') || '.mp3',
-      201, 'Faixa da suite automatizada: um cenario de avaliacao por envio.',
-      'rascunho'
-    )
-    returning id into v_faixa_id;
-
-    select array_agg(e) into v_envios
-      from public.confirmar_selecao_curadores(
-        v_faixa_id,
-        json_build_array(
-          json_build_object('perfil_curador_id', v_curador_id,
-                            'servicos', json_build_array('feedback'))
-        )::jsonb
-      ) as e;
-
-    insert into public.avaliacao (envio_id, perfil_curador_id, escuta_percentual, passo_atual)
-    values (v_envios[1], v_curador_id, 100, 1);
-
-    raise notice 'e2e: % criada com escuta ja medida', v_titulo;
-  end loop;
-end
-$cenarios$;
 
 -- ----------------------------------------------------------------- conferência
 
