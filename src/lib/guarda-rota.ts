@@ -19,6 +19,11 @@ export const ROTA = {
   PRIVACIDADE: '/privacidade',
   ENTRAR: '/entrar',
   CADASTRAR: '/cadastrar',
+  /** Login e cadastro exclusivos por perfil — copy e branding próprios (docs/prd/02 e 03). */
+  ARTISTA_ENTRAR: '/artista/entrar',
+  ARTISTA_CADASTRAR: '/artista/cadastrar',
+  CURADOR_ENTRAR: '/curador/entrar',
+  CURADOR_CADASTRAR: '/curador/cadastrar',
   /** Confirmação de nome e aceite depois do OAuth — o social não pode "confirmar antes de criar". */
   CADASTRAR_CONFIRMAR: '/cadastrar/confirmar',
   RECUPERAR_SENHA: '/recuperar-senha',
@@ -115,8 +120,24 @@ const API_SEM_SESSAO: readonly string[] = [
   ROTA.API_WEBHOOK_ASAAS,
 ];
 
-/** `(auth)` — sem sessão; redireciona quem já está autenticado. */
-const AUTH_SEM_SESSAO: readonly string[] = [ROTA.ENTRAR, ROTA.CADASTRAR, ROTA.RECUPERAR_SENHA];
+/**
+ * `(auth)` — sem sessão; redireciona quem já está autenticado.
+ *
+ * As quatro rotas exclusivas por perfil entram **antes** dos blocos de
+ * `(app)/artista` e `(app)/curador` em `decidirAcesso`, mesmo compartilhando o
+ * prefixo `/artista` e `/curador` com eles: como a checagem aqui é por
+ * igualdade exata e roda primeiro, `/artista/entrar` nunca alcança o bloco que
+ * exige sessão e papel de artista.
+ */
+const AUTH_SEM_SESSAO: readonly string[] = [
+  ROTA.ENTRAR,
+  ROTA.CADASTRAR,
+  ROTA.RECUPERAR_SENHA,
+  ROTA.ARTISTA_ENTRAR,
+  ROTA.ARTISTA_CADASTRAR,
+  ROTA.CURADOR_ENTRAR,
+  ROTA.CURADOR_CADASTRAR,
+];
 
 /** `(admin)` — o login do admin é próprio e não exige sessão. */
 const ADMIN_SEM_SESSAO: readonly string[] = [ROTA.ADMIN_ENTRAR, ROTA.ADMIN_RECUPERAR_SENHA];

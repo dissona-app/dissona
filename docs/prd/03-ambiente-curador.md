@@ -26,14 +26,15 @@ Oito módulos, 22,5h. Todos web.
 
 **Release 1 · 2h · Origem: board + protótipo R2 (Curador)**
 
-> **Login compartilhado.** O curador entra pela **mesma tela** do artista. Não há mudança de escopo em relação ao módulo 1 — a arquitetura é a mesma. Ver a especificação completa em [02 — Ambiente Artista, módulo 1](02-ambiente-artista.md#1-autenticação).
+> **Rota exclusiva.** O curador entra e se cadastra por rotas próprias — `/curador/entrar` e `/curador/cadastrar` —, reversão de 2026-09-17 da decisão anterior de tela única (registrada em [07 — Pendências e divergências](07-pendencias-e-divergencias.md)). O que continua **compartilhado** com o artista é a recuperação/redefinição de senha e a arquitetura por trás do login (mesmos componentes e Server Actions, só copy e destino mudam). Ver a especificação completa em [02 — Ambiente Artista, módulo 1](02-ambiente-artista.md#1-autenticação).
 
 ### O que muda para o curador
 
 | Ponto | Comportamento |
 |---|---|
 | **Copy da tela** | *"Área do curador — Escute com método. Seja remunerado por isso. Sua leitura crítica vira feedback que o artista pode citar."* Rodapé: *"Você define seus serviços e preços · Remuneração por classe e prazo · Bronze, Prata e Ouro por mérito"* |
-| **Roteamento (1.4)** | Escolher "Sou curador" no **1º acesso** leva direto ao **Cadastro de curador (módulo 12)**, e só depois ao onboarding do curador |
+| **Cadastro por `/curador/cadastrar`** | O papel "curador" é gravado ao confirmar o e-mail — vai direto ao **Cadastro de curador (módulo 12)**, sem passar pela seleção de perfil (1.4) |
+| **Roteamento (1.4)** | Só alcança quem chega por login/cadastro **social** sem papel definido, ou por `/cadastrar`/`/entrar` sem prefixo. Escolher "Sou curador" leva direto ao **Cadastro de curador (módulo 12)**, e só depois ao onboarding do curador |
 | **Classificação** | **O login não classifica.** Perfil profissional e classe (Bronze/Prata) são definidos no módulo 12 |
 | **Onboarding** | Fila · avaliação · remuneração · classes |
 | **Verificação de e-mail** | *"Enviamos um link de verificação. Ele vale por 24 horas. Depois de confirmar, você escolhe seus papéis na plataforma."* |

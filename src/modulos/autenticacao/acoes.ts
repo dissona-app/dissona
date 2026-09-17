@@ -130,6 +130,7 @@ export async function cadastrar(dadosDoFormulario: FormData): Promise<ResultadoD
     senha: dadosDoFormulario.get('senha'),
     confirmar: dadosDoFormulario.get('confirmar'),
     aceite: dadosDoFormulario.get('aceite'),
+    papel: dadosDoFormulario.get('papel') ?? undefined,
   });
 
   if (!analise.success) {
@@ -138,8 +139,15 @@ export async function cadastrar(dadosDoFormulario: FormData): Promise<ResultadoD
     return falhaDeCampos(CodigoErro.ENTRADA_INVALIDA, motivosPorCampo(analise.error.issues));
   }
 
-  const { nome, email, senha } = analise.data;
-  const resultado = await cadastrarNoProduto(nome, email, senha, await urlDeRetornoDoEmail());
+  const { nome, email, senha, papel } = analise.data;
+  // O papel da rota exclusiva viaja com a confirmação de e-mail, do mesmo jeito
+  // que `pedirLinkDeRecuperacao` já faz com `proximo` — é o único canal que
+  // sobrevive até a sessão nascer no clique do link.
+  const urlDeRetorno =
+    papel === undefined
+      ? await urlDeRetornoDoEmail()
+      : `${await urlDeRetornoDoEmail()}?papel=${papel}`;
+  const resultado = await cadastrarNoProduto(nome, email, senha, urlDeRetorno, papel);
 
   if (resultado.estado === 'email_ja_cadastrado') {
     return falha(CodigoErro.EMAIL_JA_CADASTRADO, undefined, { email });

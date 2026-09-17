@@ -50,6 +50,13 @@ export type Credenciais = z.infer<typeof esquemaCredenciais>;
  * é obrigação de LGPD (RF-010), e o `perfil.aceite_termos_em` só é gravado
  * porque este campo passou.
  */
+/**
+ * O papel escolhido em 1.4 — ou, nas rotas exclusivas por perfil (`/artista/*`,
+ * `/curador/*`), já no cadastro. Compartilhado pelos dois schemas para não
+ * duplicar a lista de valores.
+ */
+export const esquemaPapel = z.enum(['artista', 'curador'], { message: 'papel_invalido' });
+
 export const esquemaCadastro = z
   .object({
     nome: z.string().trim().min(1, { message: 'nome_vazio' }),
@@ -57,6 +64,9 @@ export const esquemaCadastro = z
     senha: z.string().refine(senhaAtendePolitica, { message: 'senha_fraca' }),
     confirmar: z.string().min(1, { message: 'confirmar_vazio' }),
     aceite: z.literal('on', { message: 'aceite_obrigatorio' }).transform(() => true),
+    // Ausente em `/cadastrar`: o papel só é conhecido nas rotas exclusivas por
+    // perfil, e quem não o envia continua indo para `/selecao-de-perfil`.
+    papel: esquemaPapel.optional(),
   })
   // O `path` põe o erro no campo de confirmação, e não no de senha: quem digita
   // diferente errou a repetição, não a senha.
@@ -132,7 +142,7 @@ export function destinoSeguro(proximo: string | undefined, padrao: string): stri
  * autorização onde devia haver uma validação de entrada.
  */
 export const esquemaPapelEscolhivel = z.object({
-  papel: z.enum(['artista', 'curador'], { message: 'papel_invalido' }),
+  papel: esquemaPapel,
 });
 
 /** Os três provedores. O SoundCloud só chega aqui com a flag ligada. */

@@ -12,8 +12,8 @@ import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
+import type { TextosDeCadastro } from '@/textos/prototipo';
 import { erroGeralDe } from '@/textos/erros';
-import { CADASTRAR } from '@/textos/prototipo';
 
 import estilos from './FormularioDeCadastro.module.css';
 import type { Banner } from './FormularioDeLogin';
@@ -21,6 +21,17 @@ import { IconeOlho } from './IconeOlho';
 
 export type PropsFormularioDeCadastro = {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
+  readonly textos: TextosDeCadastro;
+  /** Para onde "Entrar" e "Já tem conta?" levam — muda por perfil. */
+  readonly hrefEntrar: string;
+  /**
+   * Papel da rota exclusiva (`/artista/cadastrar`, `/curador/cadastrar`).
+   *
+   * Vai como hidden input, e a Server Action grava o papel na conta assim que
+   * a sessão existir — sem passar por `/selecao-de-perfil`. Ausente em
+   * `/cadastrar`, que não sabe o papel de antemão.
+   */
+  readonly papel?: 'artista' | 'curador';
   /** Botões sociais e divisor — ficam **abaixo** do formulário nesta tela. */
   readonly social?: ReactNode;
 };
@@ -34,15 +45,17 @@ const ESTADO_INICIAL: ResultadoDeAcao | null = null;
  * traduz — architecture.md §8. É o que permite o i18n entrar sem tocar em ação
  * nenhuma, e o que garante que a mensagem seja a mesma com e sem JavaScript.
  */
-const TEXTO_DO_MOTIVO: Readonly<Record<string, string>> = {
-  nome_vazio: CADASTRAR.erroNomeVazio,
-  email_vazio: CADASTRAR.erroEmailVazio,
-  email_invalido: CADASTRAR.erroEmailInvalido,
-  senha_fraca: CADASTRAR.erroSenhaFraca,
-  confirmar_vazio: CADASTRAR.erroConfirmarVazio,
-  senhas_diferentes: CADASTRAR.erroSenhasDiferentes,
-  aceite_obrigatorio: CADASTRAR.erroAceite,
-};
+function textoDoMotivo(textos: TextosDeCadastro): Readonly<Record<string, string>> {
+  return {
+    nome_vazio: textos.erroNomeVazio,
+    email_vazio: textos.erroEmailVazio,
+    email_invalido: textos.erroEmailInvalido,
+    senha_fraca: textos.erroSenhaFraca,
+    confirmar_vazio: textos.erroConfirmarVazio,
+    senhas_diferentes: textos.erroSenhasDiferentes,
+    aceite_obrigatorio: textos.erroAceite,
+  };
+}
 
 /**
  * Tela 1.1 — criar conta.
@@ -56,7 +69,13 @@ const TEXTO_DO_MOTIVO: Readonly<Record<string, string>> = {
  * precisa dela a cada tecla. Os erros continuam vindo do servidor, inclusive o
  * de senha fraca — o medidor informa, ele não valida.
  */
-export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro) {
+export function FormularioDeCadastro({
+  acao,
+  textos,
+  hrefEntrar,
+  papel,
+  social,
+}: PropsFormularioDeCadastro) {
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
@@ -72,15 +91,15 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
 
     // `campos` é o caminho do formulário grande: todos os erros de uma vez.
     const motivo = resultado.campos?.[campo];
-    if (motivo !== undefined) return TEXTO_DO_MOTIVO[motivo] ?? CADASTRAR.erroEmailInvalido;
+    if (motivo !== undefined) return textoDoMotivo(textos)[motivo] ?? textos.erroEmailInvalido;
 
     // `campo` é o caminho de um erro único — é como o Auth devolve os dois
     // erros que ele julga por conta própria: senha fraca e endereço recusado.
     if (resultado.campo === campo && resultado.codigo === CodigoErro.SENHA_FRACA) {
-      return CADASTRAR.erroSenhaFraca;
+      return textos.erroSenhaFraca;
     }
     if (resultado.campo === campo && resultado.codigo === CodigoErro.EMAIL_INVALIDO) {
-      return CADASTRAR.erroEmailInvalido;
+      return textos.erroEmailInvalido;
     }
     return undefined;
   };
@@ -89,16 +108,16 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
     ? null
     : resultado.codigo === CodigoErro.EMAIL_JA_CADASTRADO
       ? {
-          titulo: CADASTRAR.bannerEmailExistente.titulo,
-          texto: CADASTRAR.bannerEmailExistente.texto,
+          titulo: textos.bannerEmailExistente.titulo,
+          texto: textos.bannerEmailExistente.texto,
           acao: (
-            <Link className={estilos.bannerLink} href={ROTA.ENTRAR}>
-              {CADASTRAR.bannerEmailExistente.acao}
+            <Link className={estilos.bannerLink} href={hrefEntrar}>
+              {textos.bannerEmailExistente.acao}
             </Link>
           ),
         }
       : resultado.codigo === CodigoErro.LIMITE_DE_ENVIO
-        ? CADASTRAR.bannerLimite
+        ? textos.bannerLimite
         : null;
 
   // O que não virou banner nem campo tem de aparecer em algum lugar: sem isto,
@@ -118,9 +137,9 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
   return (
     <>
       <div className={estilos.cabecalho}>
-        <span className={estilos.overline}>{CADASTRAR.overline}</span>
-        <h1 className={estilos.titulo}>{CADASTRAR.titulo}</h1>
-        <p className={estilos.subtitulo}>{CADASTRAR.subtitulo}</p>
+        <span className={estilos.overline}>{textos.overline}</span>
+        <h1 className={estilos.titulo}>{textos.titulo}</h1>
+        <p className={estilos.subtitulo}>{textos.subtitulo}</p>
       </div>
 
       {banner !== null ? (
@@ -132,11 +151,13 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
       <form action={enviar} className={estilos.campos} noValidate>
         {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
+        {papel === undefined ? null : <input type="hidden" name="papel" value={papel} />}
+
         <Campo
           name="nome"
           type="text"
-          rotulo={CADASTRAR.rotuloNome}
-          placeholder={CADASTRAR.placeholderNome}
+          rotulo={textos.rotuloNome}
+          placeholder={textos.placeholderNome}
           autoComplete="name"
           required
           erro={erroDeCampo('nome')}
@@ -145,8 +166,8 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
         <Campo
           name="email"
           type="email"
-          rotulo={CADASTRAR.rotuloEmail}
-          placeholder={CADASTRAR.placeholderEmail}
+          rotulo={textos.rotuloEmail}
+          placeholder={textos.placeholderEmail}
           autoComplete="email"
           required
           erro={erroDeCampo('email')}
@@ -156,8 +177,8 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
           <Campo
             name="senha"
             type={senhaVisivel ? 'text' : 'password'}
-            rotulo={CADASTRAR.rotuloSenha}
-            placeholder={CADASTRAR.placeholderSenha}
+            rotulo={textos.rotuloSenha}
+            placeholder={textos.placeholderSenha}
             autoComplete="new-password"
             required
             value={senha}
@@ -169,8 +190,8 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
                 className={estilos.olho}
                 onClick={() => setSenhaVisivel((visivel) => !visivel)}
                 aria-pressed={senhaVisivel}
-                aria-label={senhaVisivel ? CADASTRAR.ocultarSenha : CADASTRAR.mostrarSenha}
-                title={senhaVisivel ? CADASTRAR.ocultarSenha : CADASTRAR.mostrarSenha}
+                aria-label={senhaVisivel ? textos.ocultarSenha : textos.mostrarSenha}
+                title={senhaVisivel ? textos.ocultarSenha : textos.mostrarSenha}
               >
                 <IconeOlho riscado={senhaVisivel} />
               </button>
@@ -179,10 +200,10 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
 
           <MedidorDeSenha
             senha={senha}
-            rotulos={CADASTRAR.forcaDaSenha}
+            rotulos={textos.forcaDaSenha}
             requisitos={{
-              tamanho: CADASTRAR.requisitoTamanho,
-              numero: CADASTRAR.requisitoNumero,
+              tamanho: textos.requisitoTamanho,
+              numero: textos.requisitoNumero,
             }}
           />
         </div>
@@ -190,36 +211,36 @@ export function FormularioDeCadastro({ acao, social }: PropsFormularioDeCadastro
         <Campo
           name="confirmar"
           type={senhaVisivel ? 'text' : 'password'}
-          rotulo={CADASTRAR.rotuloConfirmar}
-          placeholder={CADASTRAR.placeholderConfirmar}
+          rotulo={textos.rotuloConfirmar}
+          placeholder={textos.placeholderConfirmar}
           autoComplete="new-password"
           required
           erro={erroDeCampo('confirmar')}
         />
 
         <Checkbox name="aceite" value="on" required erro={erroDeCampo('aceite')}>
-          {CADASTRAR.aceiteAntes}
+          {textos.aceiteAntes}
           <Link className={estilos.aceiteLink} href={ROTA.TERMOS}>
-            {CADASTRAR.aceiteTermos}
+            {textos.aceiteTermos}
           </Link>
-          {CADASTRAR.aceiteEntre}
+          {textos.aceiteEntre}
           <Link className={estilos.aceiteLink} href={ROTA.PRIVACIDADE}>
-            {CADASTRAR.aceitePrivacidade}
+            {textos.aceitePrivacidade}
           </Link>
-          {CADASTRAR.aceiteDepois}
+          {textos.aceiteDepois}
         </Checkbox>
 
         <Botao type="submit" carregando={pendente} blocoInteiro>
-          {pendente ? CADASTRAR.enviando : CADASTRAR.enviar}
+          {pendente ? textos.enviando : textos.enviar}
         </Botao>
       </form>
 
       {social}
 
       <p className={estilos.alternativa}>
-        {CADASTRAR.temConta}
-        <Link className={estilos.alternativaLink} href={ROTA.ENTRAR}>
-          {CADASTRAR.entrar}
+        {textos.temConta}
+        <Link className={estilos.alternativaLink} href={hrefEntrar}>
+          {textos.entrar}
         </Link>
       </p>
     </>

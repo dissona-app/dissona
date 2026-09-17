@@ -108,9 +108,21 @@ describe('(auth)', () => {
       ROTA.RECUPERAR_SENHA,
       ROTA.REDEFINIR_SENHA,
       ROTA.VERIFICAR_EMAIL,
+      ROTA.ARTISTA_ENTRAR,
+      ROTA.ARTISTA_CADASTRAR,
+      ROTA.CURADOR_ENTRAR,
+      ROTA.CURADOR_CADASTRAR,
     ]) {
       expect(decidir(caminho, semSessao)).toEqual({ tipo: 'seguir' });
     }
+  });
+
+  it('as rotas exclusivas por perfil não caem no ramo protegido do mesmo prefixo', () => {
+    // `/artista/entrar` e `/curador/cadastrar` compartilham prefixo com as
+    // áreas logadas `(app)/artista` e `(app)/curador`, que exigem sessão e
+    // papel — sem a checagem de `AUTH_SEM_SESSAO` vir primeiro, cairiam lá.
+    expect(decidir(ROTA.ARTISTA_ENTRAR, semSessao)).toEqual({ tipo: 'seguir' });
+    expect(decidir(ROTA.CURADOR_CADASTRAR, semSessao)).toEqual({ tipo: 'seguir' });
   });
 
   it('deixa a verificação de e-mail em paz, com sessão ou sem', () => {
@@ -134,6 +146,17 @@ describe('(auth)', () => {
     expect(decidir(ROTA.ENTRAR, semPapel)).toEqual({
       tipo: 'redirecionar',
       para: ROTA.SELECAO_DE_PERFIL,
+    });
+  });
+
+  it('as rotas exclusivas também redirecionam quem já está autenticado', () => {
+    expect(decidir(ROTA.ARTISTA_ENTRAR, comPapeis(Papel.ARTISTA))).toEqual({
+      tipo: 'redirecionar',
+      para: ROTA.ARTISTA,
+    });
+    expect(decidir(ROTA.CURADOR_CADASTRAR, comPapeis(Papel.CURADOR))).toEqual({
+      tipo: 'redirecionar',
+      para: ROTA.CURADOR,
     });
   });
 

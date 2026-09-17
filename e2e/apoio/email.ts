@@ -52,7 +52,12 @@ export type LinkDeEmail = {
 export async function gerarLinkDeEmail(
   tipo: TipoDeLink,
   email: string,
-  opcoes?: { readonly senha?: string; readonly proximo?: string },
+  opcoes?: {
+    readonly senha?: string;
+    readonly proximo?: string;
+    /** O papel que as rotas exclusivas por perfil anexam ao link de cadastro. */
+    readonly papel?: 'artista' | 'curador';
+  },
 ): Promise<LinkDeEmail> {
   const { data, error } = await clienteDeServico().auth.admin.generateLink(
     tipo === 'signup'
@@ -67,6 +72,7 @@ export async function gerarLinkDeEmail(
   const tokenHash = data.properties.hashed_token;
   const parametros = new URLSearchParams({ token_hash: tokenHash, type: tipo });
   if (opcoes?.proximo !== undefined) parametros.set('proximo', opcoes.proximo);
+  if (opcoes?.papel !== undefined) parametros.set('papel', opcoes.papel);
 
   return { tokenHash, caminho: `/api/auth/confirmar?${parametros.toString()}` };
 }

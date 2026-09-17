@@ -36,7 +36,12 @@ export default function Pagina() {
       ]}
       aside={<ComoFunciona />}
     >
-      <FormularioDeCadastro acao={cadastrar} social={<BlocoSocial />} />
+      <FormularioDeCadastro
+        acao={cadastrar}
+        textos={CADASTRAR}
+        hrefEntrar={ROTA.ENTRAR}
+        social={<BlocoSocial />}
+      />
     </MolduraDeAutenticacao>
   );
 }

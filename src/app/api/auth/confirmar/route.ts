@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { ROTA } from '@/lib/guarda-rota';
-import { destinoSeguro } from '@/modulos/autenticacao/esquemas';
+import { destinoSeguro, esquemaPapel } from '@/modulos/autenticacao/esquemas';
 import { marcarRecuperacaoEmCurso } from '@/modulos/autenticacao/marcador-de-recuperacao';
-import { concluirVerificacaoDeEmail } from '@/modulos/autenticacao/servico';
+import { concluirVerificacaoDeEmail, selecionarPapel } from '@/modulos/autenticacao/servico';
 import { confirmarPorToken, trocarCodigoPorSessao } from '@/modulos/autenticacao/repositorio';
 
 /**
@@ -34,6 +34,8 @@ export async function GET(requisicao: NextRequest) {
   const codigo = searchParams.get('code');
   const tipo = searchParams.get('type');
   const proximo = searchParams.get('proximo') ?? undefined;
+  // Só as rotas exclusivas por perfil mandam isto — ver `acoes.ts:cadastrar`.
+  const papel = esquemaPapel.safeParse(searchParams.get('papel')).data;
 
   const paraUrl = (destino: string) => NextResponse.redirect(new URL(destino, origin));
 
@@ -46,7 +48,14 @@ export async function GET(requisicao: NextRequest) {
       return paraUrl(`${ROTA.VERIFICAR_EMAIL}?erro=token`);
     }
 
-    return paraUrl(destinoSeguro(proximo, resultado.destino));
+    // A sessão acabou de nascer com `concluirVerificacaoDeEmail` — é o momento
+    // em que o papel da rota exclusiva pode ser gravado, sem passar pela
+    // seleção de perfil (1.4).
+    const resultadoDoPapel = papel === undefined ? undefined : await selecionarPapel(papel);
+    const destino =
+      resultadoDoPapel?.estado === 'ok' ? resultadoDoPapel.destino : resultado.destino;
+
+    return paraUrl(destinoSeguro(proximo, destino));
   }
 
   if (tokenHash !== null && tipo === 'recovery') {

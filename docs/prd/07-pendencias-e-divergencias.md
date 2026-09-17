@@ -733,3 +733,38 @@ cenários do curador são idempotentes.
 O CI ainda não roda o seed — ver o job `e2e` de [`ci.yml`](../../.github/workflows/ci.yml).
 Automatizá-lo depende de credencial de banco no job, que é a mesma pendência de
 `SUPABASE_SERVICE_ROLE_KEY`.
+
+---
+
+## Reversão de decisão · Login e cadastro por rota exclusiva · 2026-09-17
+
+O módulo 1 (Autenticação) havia registrado "login único para artista e curador,
+papel escolhido depois em 1.4" como correção de uma entrega anterior — ver a
+versão anterior da nota em [02 — Ambiente Artista, módulo 1](02-ambiente-artista.md#1-autenticação)
+e [03 — Ambiente Curador, módulo 11](03-ambiente-curador.md#11-autenticação).
+O dono do produto revisou essa decisão nesta data e pediu a reversão: o
+protótipo da R2 traz `/entrar` e `/cadastrar` com copy e branding próprios por
+ambiente (`docs/R2/Dissona - Ambiente Artista - Release 2.html` e
+`... - Ambiente Curador - Release 2.html`), e o produto volta a ter rotas
+exclusivas por perfil para essas duas telas.
+
+**O que mudou:**
+- Quatro rotas novas: `/artista/entrar`, `/artista/cadastrar`, `/curador/entrar`,
+  `/curador/cadastrar` — mesmos componentes e Server Actions de antes, só copy e
+  destino variam por prop.
+- Cadastro por e-mail numa rota exclusiva grava o papel **na hora** (ao
+  confirmar o e-mail), em vez de esperar a seleção de perfil.
+
+**O que continua igual:**
+- `/entrar` e `/cadastrar`, sem prefixo, seguem existindo exatamente como antes
+  — fallback neutro para quem chega sem contexto de perfil (ex.: link antigo).
+  Nenhuma tela nova de "escolha de perfil" foi criada para esse caso.
+- `/selecao-de-perfil` (1.4) continua existindo, com escopo mais restrito: só
+  login/cadastro **social** sem papel conhecido, e ativação de um segundo papel
+  depois, em Conta.
+- Recuperação e redefinição de senha continuam compartilhadas entre os dois
+  ambientes (`/recuperar-senha`, `/redefinir-senha`) — só o módulo 1/11
+  (login e cadastro) foi revertido.
+- `entrarComProvedor`/callback OAuth não ganharam parâmetro de papel nesta
+  entrega: login/cadastro social a partir de qualquer rota continua caindo em
+  `/selecao-de-perfil` quando não há papel, como antes.

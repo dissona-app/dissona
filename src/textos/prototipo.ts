@@ -147,6 +147,26 @@ export const ENTRAR = {
   provas: ['7 dias para a devolutiva', 'até 11 critérios com nota', 'escuta medida e registrada'],
 } as const;
 
+/** `/artista/entrar` — mesma copy de `ENTRAR`, que sempre foi a do artista. */
+export const ENTRAR_ARTISTA = ENTRAR;
+
+/**
+ * `/curador/entrar` — copy própria do ambiente curador.
+ *
+ * Fonte: `docs/R2/extraido/Curador.txt` linhas 1-23 (overline, título e as três
+ * provas do rodapé, palavra por palavra).
+ */
+export const ENTRAR_CURADOR = {
+  ...ENTRAR,
+  overline: 'Área do curador',
+  titulo: 'Escute com método. Seja remunerado por isso.',
+  provas: [
+    'Você define seus serviços e preços',
+    'Remuneração por classe e prazo',
+    'Bronze, Prata e Ouro por mérito',
+  ],
+} as const;
+
 /** Tela 1.1 — cadastro de artista e curador (`/cadastrar`). */
 export const CADASTRAR = {
   overline: 'Área do artista',
@@ -252,6 +272,36 @@ export const CADASTRAR = {
     ],
     nota: 'Seus dados servem só para operar a curadoria. Nada de venda de base ou publicidade dirigida.',
   },
+} as const;
+
+/**
+ * Mesmo shape de `CADASTRAR`, com literais alargados para `string` — sem isto
+ * `CADASTRAR_CURADOR` (overline diferente) não seria atribuível ao tipo de
+ * `CADASTRAR_ARTISTA` só porque os dois nascem de `as const`.
+ */
+type Alargado<T> = T extends object
+  ? { readonly [K in keyof T]: Alargado<T[K]> }
+  : T extends string
+    ? string
+    : T;
+
+export type TextosDeCadastro = Alargado<typeof CADASTRAR>;
+
+/** `/artista/cadastrar` — mesma copy de `CADASTRAR`, que sempre foi a do artista. */
+export const CADASTRAR_ARTISTA = CADASTRAR;
+
+/**
+ * `/curador/cadastrar` — copy própria do ambiente curador.
+ *
+ * O protótipo não tem uma tela de cadastro básico (nome/e-mail/senha) para o
+ * curador com copy própria — `docs/R2/extraido/Curador.txt` vai do rodapé do
+ * login direto para o wizard do módulo 12. Overline ajustado para o ambiente
+ * certo; o resto do formulário e o aside "Como funciona" são **derivados** da
+ * versão do artista, mesma estrutura de passos, até existir copy própria.
+ */
+export const CADASTRAR_CURADOR = {
+  ...CADASTRAR,
+  overline: 'Área do curador',
 } as const;
 
 /** Verificação de e-mail (`/verificar-email`) — tela que o protótipo acrescentou. */

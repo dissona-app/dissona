@@ -24,7 +24,7 @@ Nove módulos, 26,5h. Todos web.
 
 **Release 1 · 2h · Origem: board + protótipo R2 (Artista e Curador)**
 
-> ⚠️ Este módulo é **compartilhado com o ambiente Curador** (lá numerado como 11). Existe **uma única tela de login** — o papel é escolhido dentro do fluxo. Isso corrige a entrega anterior, que trazia dois logins separados.
+> ⚠️ Este módulo é **compartilhado com o ambiente Curador** (lá numerado como 11) na parte de recuperação e redefinição de senha. Login e cadastro, porém, têm **rotas exclusivas por perfil** (`/artista/entrar` + `/artista/cadastrar`, `/curador/entrar` + `/curador/cadastrar`) — reversão de 2026-09-17 da decisão anterior de tela única, registrada em [07 — Pendências e divergências](07-pendencias-e-divergencias.md). `/entrar` e `/cadastrar` sem prefixo continuam existindo, neutras, como fallback (ex.: links antigos).
 
 ### Objetivo
 
@@ -44,6 +44,8 @@ Dar a entrada única e segura na plataforma — cadastro, login (e-mail/social),
 
 ### 1 · Login
 
+> Rotas exclusivas por perfil: `/artista/entrar` usa a copy do Artista, `/curador/entrar` usa a copy do Curador (abaixo). `/entrar`, sem prefixo, continua existindo com a copy do Artista, como fallback neutro.
+
 **Campos:** E-mail · Senha (com mostrar/ocultar)
 
 **Login social:** Google · Facebook · SoundCloud (OAuth)
@@ -51,11 +53,11 @@ Dar a entrada única e segura na plataforma — cadastro, login (e-mail/social),
 **Ações:**
 - Botão **Entrar**
 - "Esqueci minha senha" → 1.2
-- "Criar conta" → 1.1
+- "Criar conta" → 1.1, na rota do mesmo perfil
 
 **Roteamento:**
 - Login OK **com papel já definido** → vai direto ao ambiente
-- **1º acesso (sem papel)** → 1.4 Seleção de perfil
+- **1º acesso (sem papel)** → 1.4 Seleção de perfil — só alcança quem chegou por login **social** sem papel ainda definido, já que o cadastro por e-mail nas rotas exclusivas grava o papel na hora (ver 1.1)
 
 **Validações:** e-mail em formato válido; senha obrigatória; erro genérico *"e-mail ou senha inválidos"* (não revela qual).
 
@@ -67,13 +69,17 @@ Dar a entrada única e segura na plataforma — cadastro, login (e-mail/social),
 
 ### 1.1 · Cadastro
 
+> Rotas exclusivas por perfil: `/artista/cadastrar` e `/curador/cadastrar`, cada uma com o papel já implícito na rota. `/cadastrar`, sem prefixo, continua existindo sem papel implícito, como fallback neutro — e é quem ainda passa por 1.4 depois de confirmar o e-mail.
+
 **Campos:** Nome completo · E-mail · Senha · Confirmar senha
 
 **Cadastro social:** mesmos 3 provedores, pré-preenchendo nome e e-mail. O usuário confirma antes de criar.
 
 **Aceite obrigatório:** checkbox de Termos de uso + Política de privacidade, com menção explícita ao tratamento de dados conforme a LGPD.
 
-**Ação:** "Criar conta" → e-mail de verificação → 1.4
+**Ação:** "Criar conta" → e-mail de verificação → destino conforme a rota:
+- `/artista/cadastrar` ou `/curador/cadastrar` → o papel é gravado ao confirmar o e-mail, e a pessoa vai direto ao ambiente (artista) ou ao wizard do módulo 12 (curador), **sem** passar por 1.4.
+- `/cadastrar` (sem prefixo) → 1.4, como antes.
 
 **Validações:** e-mail único (checar duplicidade) · força de senha (8+ caracteres, ao menos 1 número, com indicadores visuais) · senha = confirmação · nome obrigatório.
 

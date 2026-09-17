@@ -163,18 +163,34 @@ export async function cadastrar(
   email: string,
   senha: string,
   urlDeRetorno: string,
+  /**
+   * Só as rotas exclusivas por perfil (`/artista/cadastrar`,
+   * `/curador/cadastrar`) o enviam. `/cadastrar` não sabe o papel de antemão,
+   * e quem se cadastra por ali continua indo para a seleção de perfil (1.4).
+   */
+  papel?: PapelEscolhivel,
 ): Promise<ResultadoDeCadastro> {
   const resultado = await criarConta(nome, email, senha, urlDeRetorno);
 
   if (resultado.estado !== 'ok') return resultado;
 
+  // Sem confirmação de e-mail exigida ainda não há como gravar o papel: a
+  // linha existe, mas a sessão só nasce com `precisaVerificar === false`. Com
+  // confirmação exigida, o mesmo papel viaja no `urlDeRetorno` (query
+  // `papel=`) e é aplicado em `/api/auth/confirmar` assim que a sessão passa a
+  // existir.
   if (resultado.precisaVerificar) return { estado: 'verificacao_enviada' };
 
   await notificarCadastroConcluido(resultado.usuarioId);
 
-  // Conta nova não tem papel, então o destino é a seleção de perfil (1.4). Vem
-  // de `inicioDoUsuario` em vez de uma constante para que, no dia em que o
-  // cadastro passar a nascer com papel, este caminho acompanhe sozinho.
+  if (papel !== undefined) {
+    await ativarPapel(resultado.usuarioId, papel);
+    await registrarUltimoAmbiente(resultado.usuarioId, papel);
+  }
+
+  // Conta sem papel vai para a seleção de perfil (1.4). Vem de
+  // `inicioDoUsuario`, e não de uma constante, para que a conta já gravada com
+  // papel (rota exclusiva) siga direto ao destino certo sem passar por lá.
   const supabase = await criarClienteServidor();
   const contexto = await lerContextoSessao(supabase, resultado.usuarioId);
   return { estado: 'ok', destino: inicioDoUsuario(contexto) };
