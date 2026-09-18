@@ -53,37 +53,9 @@
 
 /* ------------------------------------------------------- passo 1 --------- */
 
-.foto {
-  display: flex;
-  align-items: center;
-  gap: var(--dsn-space-7);
-}
+/* O avatar e o botão de foto do passo 1 viraram `CampoDeFoto`, no Design
+   System. O que fica aqui é o do passo 6, que anexa comprovação. */
 
-.avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  flex: none;
-  border-radius: var(--dsn-radius-circle);
-  background: var(--dsn-grad-brand-diag);
-  color: var(--dsn-surface);
-  font-size: var(--dsn-text-md);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-badge);
-}
-
-.fotoTextos {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dsn-space-3);
-  align-items: flex-start;
-}
-
-/* O `<label>` é o alvo de clique; o input de arquivo dentro dele fica
-   escondido. Sem `onClick` e sem `ref`. */
-.fotoBotao,
 .anexoBotao {
   display: inline-flex;
   align-items: center;
@@ -98,11 +70,16 @@
   transition: border-color var(--dsn-duration-base);
 }
 
-.fotoBotao:hover,
 .anexoBotao:hover {
   border-color: var(--dsn-purple-600);
 }
 
+.anexoBotao:focus-within {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+/* `sr-only` à mão: `display:none` tiraria o campo da ordem de tabulação. */
 .arquivo {
   position: absolute;
   width: 1px;
@@ -113,17 +90,6 @@
   clip-path: inset(50%);
   overflow: hidden;
   white-space: nowrap;
-}
-
-.fotoBotao:focus-within,
-.anexoBotao:focus-within {
-  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
-  outline-offset: var(--dsn-focus-offset);
-}
-
-.fotoHint {
-  font-size: var(--dsn-text-2xs);
-  color: var(--dsn-ink-500);
 }
 
 .leituras {

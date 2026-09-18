@@ -261,11 +261,15 @@ export type ResultadoDosDados =
  * porque a policy de `membro_admin` exige permissão de equipe e quem é
  * `suporte` não a tem (ver o cabeçalho da `0003d`).
  */
-export async function salvarMeusDados(nome: string, cargo: string): Promise<ResultadoDosDados> {
+export async function salvarMeusDados(
+  nome: string,
+  cargo: string,
+  fotoCaminho: string | null = null,
+): Promise<ResultadoDosDados> {
   const usuario = await usuarioAtual();
   if (usuario === null) return { estado: 'sem_sessao' };
 
-  await salvarMeuNome(usuario.id, nome);
+  await salvarMeuNome(usuario.id, nome, fotoCaminho);
 
   try {
     await salvarMeuCargo(cargo);

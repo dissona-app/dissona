@@ -56,13 +56,10 @@ test.describe('F1 · Perfil e preferências', () => {
     async ({ page }, info) => {
       const conta = await artista(info.workerIndex);
       await entrarComCredenciais(page, conta.email);
-      await page.goto('/artista/perfil');
+      await page.goto('/artista/perfil/editar');
 
-      // `.first()`: o shell repete o título da rota no `<h1>`, e a tela o traz de
-      // novo no painel.
-      await expect(
-        page.getByRole('heading', { name: ARTISTA_PERFIL.titulo }).first(),
-      ).toBeVisible();
+      // O `<h1>` da rota é "Editar cadastro"; o painel de dentro é "Seus dados".
+      await expect(page.getByRole('heading', { name: ARTISTA_PERFIL.titulo })).toBeVisible();
 
       for (const rotulo of [
         ARTISTA_PERFIL.rotuloNomeExibicao,
@@ -95,7 +92,7 @@ test.describe('F1 · Perfil e preferências', () => {
   test('o perfil grava nome, cidade e bio', { tag: ['@RF-019'] }, async ({ page }, info) => {
     const conta = await artista(info.workerIndex);
     await entrarComCredenciais(page, conta.email);
-    await page.goto('/artista/perfil');
+    await page.goto('/artista/perfil/editar');
 
     const nome = `e2e_Artista ${info.workerIndex}`;
     const handle = `e2e_${Math.random().toString(36).slice(2, 10)}`.slice(0, 30);
@@ -120,7 +117,7 @@ test.describe('F1 · Perfil e preferências', () => {
   test('link inválido é recusado', { tag: ['@RF-019'] }, async ({ page }, info) => {
     const conta = await artista(info.workerIndex);
     await entrarComCredenciais(page, conta.email);
-    await page.goto('/artista/perfil');
+    await page.goto('/artista/perfil/editar');
 
     await page.getByLabel(ARTISTA_PERFIL.rotuloInstagram, { exact: true }).fill('não é link');
     await page.getByRole('button', { name: ARTISTA_PERFIL.salvar }).click();

@@ -8,6 +8,7 @@ import { DadosDoMembro } from '@/componentes/equipe/DadosDoMembro';
 import { ListaDaEquipe } from '@/componentes/equipe/ListaDaEquipe';
 import { MatrizDePermissoes } from '@/componentes/equipe/MatrizDePermissoes';
 import { ROTA } from '@/lib/guarda-rota';
+import { urlPublicaDoAvatar } from '@/lib/supabase/armazenamento';
 import { lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
 import { lerPermissao, ModuloAdmin } from '@/modulos/admin/permissoes';
 import { trocarEmail, trocarSenha } from '@/modulos/conta/acoes';
@@ -119,6 +120,8 @@ export default async function Pagina({
             email={identidade.email}
             papelAdmin={meusDados.papelAdmin}
             senhaAlteradaEm={meusDados.senhaAlteradaEm}
+            fotoCaminho={meusDados.fotoCaminho}
+            fotoUrl={await urlPublicaDoAvatar(meusDados.fotoCaminho, meusDados.atualizadoEm)}
             acao={salvarDadosPessoais}
             acaoDeSenha={trocarSenha}
             acaoDeEmail={trocarEmail}

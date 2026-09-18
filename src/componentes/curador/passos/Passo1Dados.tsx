@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Aviso } from '@/componentes/base/Aviso';
+import { CampoDeFoto } from '@/componentes/base/CampoDeFoto';
 import { CodigoErro } from '@/lib/erros';
-import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/modulos/curador/esquemas';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
 import { erroGeralDe } from '@/textos/erros';
@@ -11,7 +13,6 @@ import { AcoesDoPasso } from '../AcoesDoPasso';
 import estilos from './Passos.module.css';
 import type { PropsDoPasso } from './tipos';
 import { usePasso } from '../usePasso';
-import { useUploadDireto } from '../useUploadDireto';
 
 /**
  * A recusa da foto vem por **código**, e não por motivo.
@@ -48,20 +49,15 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
   // `AcoesDoPasso`, que lê o estado do formulário em que ele está.
   const { enviar, falha } = usePasso(acao);
 
-  const foto = useUploadDireto({
-    balde: 'avatares',
-    nomeBase: 'perfil',
-    tipos: FOTO_TIPOS,
-    maxBytes: FOTO_MAX_BYTES,
-    mensagens: {
-      tipo: CURADOR_CADASTRO.erroFotoTipo,
-      tamanho: CURADOR_CADASTRO.erroFotoTamanho,
-    },
-  });
+  // Enviar com a foto ainda subindo mandaria `foto_caminho` vazio, e a foto se
+  // perderia em silêncio — o `CampoDeFoto` avisa, e o passo trava os botões.
+  const [subindoFoto, setSubindoFoto] = useState(false);
 
+  // O erro do upload em si é mostrado pelo próprio `CampoDeFoto`, junto do
+  // campo; aqui fica o que volta da **ação**, que é o caminho sem JavaScript.
   const erro = falha === null ? undefined : MENSAGEM_DA_FOTO[falha.codigo];
   const erroGeral = erroGeralDe(falha, [erro]);
-  const aviso = foto.erro ?? erro ?? erroGeral;
+  const aviso = erro ?? erroGeral;
 
   return (
     <form action={enviar} className={estilos.formulario} noValidate>
@@ -71,42 +67,20 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
         </Aviso>
       ) : null}
 
-      <div className={estilos.foto}>
-        <span className={estilos.avatar} aria-hidden="true">
-          {iniciaisDe(estado.nome)}
-        </span>
-
-        <div className={estilos.fotoTextos}>
-          {/*
-            `<label>` envolvendo o input de arquivo: é o que dá um alvo de
-            clique do tamanho do botão sem precisar de `onClick` e de um input
-            escondido controlado por JavaScript.
-          */}
-          <label className={estilos.fotoBotao}>
-            {CURADOR_CADASTRO.adicionarFoto}
-            {/* O `name` fica: sem JavaScript o `onChange` não roda, e o arquivo
-                volta a viajar no `multipart` para `salvarPasso1` validar. */}
-            <input
-              type="file"
-              name="foto"
-              accept="image/jpeg,image/png"
-              className={estilos.arquivo}
-              onChange={foto.aoEscolher}
-            />
-          </label>
-          {/* O caminho é o que a ação grava; o arquivo já não viaja no corpo. */}
-          <input type="hidden" name="foto_caminho" value={foto.caminho} />
-
-          <span className={estilos.fotoHint} aria-live="polite">
-            {foto.subindo
-              ? CURADOR_CADASTRO.fotoEnviando
-              : (foto.nome ??
-                (estado.fotoCaminho === null
-                  ? CURADOR_CADASTRO.fotoHint
-                  : CURADOR_CADASTRO.fotoEnviada))}
-          </span>
-        </div>
-      </div>
+      <CampoDeFoto
+        nome={estado.nome}
+        aoMudarEnvio={setSubindoFoto}
+        tamanhoDoBotao="sm"
+        caminhoAtual={estado.fotoCaminho}
+        textos={{
+          botao: CURADOR_CADASTRO.adicionarFoto,
+          hint: CURADOR_CADASTRO.fotoHint,
+          enviando: CURADOR_CADASTRO.fotoEnviando,
+          enviada: CURADOR_CADASTRO.fotoEnviada,
+          erroTipo: CURADOR_CADASTRO.erroFotoTipo,
+          erroTamanho: CURADOR_CADASTRO.erroFotoTamanho,
+        }}
+      />
 
       <p className={estilos.nota}>{CURADOR_CADASTRO.herdado}</p>
 
@@ -122,7 +96,7 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
       </div>
 
       <AcoesDoPasso
-        ocupado={foto.subindo}
+        ocupado={subindoFoto}
         passo={passo}
         ultimo={false}
         podePular={false}
@@ -131,11 +105,4 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
       />
     </form>
   );
-}
-
-/** Duas iniciais, como o `initials` do protótipo. */
-function iniciaisDe(nome: string): string {
-  const partes = nome.split(/\s+/).filter((parte) => parte !== '');
-  const letras = partes.slice(0, 2).map((parte) => parte.charAt(0).toUpperCase());
-  return letras.join('') === '' ? 'DS' : letras.join('');
 }

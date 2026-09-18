@@ -34,7 +34,13 @@ export const EQUIPE = {
      * é o próprio protótipo declarando a pendência. Mantida como está.
      */
     trocarFoto: 'Trocar foto',
-    fotoPendente: 'Upload de imagem entra em uma próxima entrega.',
+    fotoHint: 'JPG ou PNG, a partir de 400×400.',
+    fotoEnviando: 'Enviando a foto…',
+    fotoEnviada: 'Foto enviada.',
+    erroFotoTipo: 'A foto precisa ser JPG ou PNG.',
+    erroFotoTamanho: 'A foto passa de 2 MB.',
+    erroFotoAusente: 'Não encontramos a foto enviada. Escolha de novo.',
+    erroFotoAlheia: 'Esse arquivo não é seu.',
     senhaTitulo: 'Senha de acesso',
     /**
      * A frase completa do protótipo é *"Alterada em 12 de março de 2026. Trocar

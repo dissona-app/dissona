@@ -1,0 +1,175 @@
+/* 7.1 · a vitrine do perfil — cabeçalho, três estatísticas e "Suas faixas". */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+}
+
+.identidade {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dsn-space-7);
+}
+
+.avatar,
+.avatarImagem {
+  width: 72px;
+  height: 72px;
+  flex: none;
+  border-radius: var(--dsn-radius-circle);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dsn-grad-brand-diag);
+  color: var(--dsn-surface);
+  font-size: var(--dsn-text-md);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-badge);
+}
+
+.avatarImagem {
+  object-fit: cover;
+}
+
+/* `flex: 1` com `min-width: 0` para o nome longo truncar em vez de empurrar o
+   botão "Editar cadastro" para fora. */
+.textos {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--dsn-space-2);
+}
+
+.nome {
+  margin: 0;
+  font-size: var(--dsn-text-lg);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-tight);
+  color: var(--dsn-ink);
+}
+
+.meta {
+  margin: 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsn-space-3);
+  margin: var(--dsn-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bio {
+  margin: var(--dsn-space-6) 0 0;
+  font-size: var(--dsn-text-sm);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink);
+  text-wrap: pretty;
+}
+
+.bioVazia {
+  composes: bio;
+  color: var(--dsn-ink-500);
+}
+
+/* Três colunas iguais, como o protótipo; empilham quando não cabem. */
+.estatisticas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--dsn-space-6);
+  margin: 0;
+}
+
+.estatistica {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--dsn-space-2);
+  padding: var(--dsn-space-7);
+  border: var(--dsn-border-width) solid var(--dsn-border-faint);
+  border-radius: var(--dsn-radius-xl);
+  background: var(--dsn-surface);
+}
+
+/* `column-reverse` no pai: o número aparece **acima** do rótulo, e a ordem do
+   DOM continua `<dt>` antes de `<dd>`, que é o que a lista de definição exige. */
+.estatisticaValor {
+  margin: 0;
+  font-size: var(--dsn-text-xl);
+  font-weight: var(--dsn-weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--dsn-tracking-tight);
+  color: var(--dsn-ink);
+}
+
+.estatisticaRotulo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink);
+}
+
+.estatisticaApoio {
+  font-size: var(--dsn-text-2xs);
+  font-weight: var(--dsn-weight-regular);
+  color: var(--dsn-ink-500);
+}
+
+/* "Ver todas" é um `<span>`, e não link: o catálogo é da R4. Mesmo tratamento
+   dos itens de release futura da sidebar. */
+.verTodas {
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink-400);
+  cursor: not-allowed;
+}
+
+.faixas {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.faixa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-6);
+  padding: var(--dsn-space-5) 0;
+  border-bottom: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+.faixa:last-child {
+  border-bottom: none;
+}
+
+.faixaTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.faixaTitulo {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink);
+}
+
+.faixaMeta {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

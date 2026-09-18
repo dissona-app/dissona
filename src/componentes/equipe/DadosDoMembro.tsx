@@ -5,6 +5,7 @@ import { useActionState, useCallback, useState } from 'react';
 import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
 import { Campo } from '@/componentes/base/Campo';
+import { CampoDeFoto } from '@/componentes/base/CampoDeFoto';
 import { Etiqueta } from '@/componentes/base/Etiqueta';
 import { ModalDeCredencial } from '@/componentes/conta/ModalDeCredencial';
 import type { ResultadoDeAcao } from '@/lib/acoes';
@@ -22,6 +23,10 @@ const MOTIVOS: Readonly<Record<string, string>> = {
   nome_vazio: TEXTOS.erroNomeVazio,
   nome_longo: TEXTOS.erroNomeLongo,
   cargo_longo: TEXTOS.erroCargoLongo,
+  foto_tipo: TEXTOS.erroFotoTipo,
+  foto_tamanho: TEXTOS.erroFotoTamanho,
+  foto_ausente: TEXTOS.erroFotoAusente,
+  foto_alheia: TEXTOS.erroFotoAlheia,
 };
 
 export type PropsDadosDoMembro = {
@@ -30,6 +35,9 @@ export type PropsDadosDoMembro = {
   readonly email: string;
   readonly papelAdmin: PapelAdmin;
   readonly senhaAlteradaEm: string | null;
+  /** Caminho da foto atual no bucket `avatares`, e a URL pública já montada. */
+  readonly fotoCaminho: string | null;
+  readonly fotoUrl: string | null;
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
   readonly acaoDeSenha: (dados: FormData) => Promise<ResultadoDeAcao>;
   readonly acaoDeEmail: (dados: FormData) => Promise<ResultadoDeAcao>;
@@ -52,12 +60,13 @@ export type PropsDadosDoMembro = {
  * `perfil.senha_alterada_em` existir (0001c). Quem nunca trocou vê a segunda
  * metade da frase sozinha, em vez de uma data inventada.
  *
- * ## A foto fica declarada como pendente
+ * ## A foto
  *
- * O protótipo tem "Trocar foto" e, ao clicar, ele mesmo diz *"Upload de imagem
- * entra no próximo release."* — é o protótipo declarando a pendência. O botão
- * fica desabilitado com a razão no `title`, em vez de sumir: a forma da tela
- * não muda a cada entrega.
+ * O protótipo declara a pendência — ao clicar em "Trocar foto" ele mesmo diz
+ * *"Upload de imagem entra no próximo release."* —, e o botão aqui ficou
+ * desabilitado por isso. Passou a funcionar quando o perfil do artista (7.1)
+ * ganhou foto: coluna, bucket e policy são os mesmos, e o `CampoDeFoto` é o
+ * mesmo componente das três telas.
  */
 export function DadosDoMembro({
   nome,
@@ -65,6 +74,8 @@ export function DadosDoMembro({
   email,
   papelAdmin,
   senhaAlteradaEm,
+  fotoCaminho,
+  fotoUrl,
   acao,
   acaoDeSenha,
   acaoDeEmail,
@@ -75,6 +86,8 @@ export function DadosDoMembro({
   );
 
   const [modal, setModal] = useState<'senha' | 'email' | null>(null);
+  // Salvar com a foto ainda subindo mandaria `foto_caminho` vazio.
+  const [subindoFoto, setSubindoFoto] = useState(false);
   const [avisoDeCredencial, setAvisoDeCredencial] = useState<string | null>(null);
 
   const fechar = useCallback(() => setModal(null), []);
@@ -88,7 +101,11 @@ export function DadosDoMembro({
   };
 
   // "Salvar" recusado por papel ou por sessão não pintava campo nenhum.
-  const erroGeral = erroGeralDe(falhou ? resultado : null, [erroDe('nome'), erroDe('cargo')]);
+  const erroGeral = erroGeralDe(falhou ? resultado : null, [
+    erroDe('nome'),
+    erroDe('cargo'),
+    erroDe('foto'),
+  ]);
 
   const notaDaSenha =
     senhaAlteradaEm === null
@@ -100,22 +117,23 @@ export function DadosDoMembro({
       <form action={enviar} className={estilos.corpo} noValidate>
         {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
+        {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
+
         <div className={estilos.identidade}>
-          <span className={estilos.avatar} aria-hidden="true">
-            {iniciaisDe(nome)}
-          </span>
-          <div className={estilos.foto}>
-            <Botao
-              type="button"
-              variante="secundario"
-              tamanho="sm"
-              disabled
-              title={TEXTOS.fotoPendente}
-            >
-              {TEXTOS.trocarFoto}
-            </Botao>
-            <span className={estilos.fotoNota}>{TEXTOS.fotoPendente}</span>
-          </div>
+          <CampoDeFoto
+            nome={nome}
+            fotoUrl={fotoUrl}
+            caminhoAtual={fotoCaminho}
+            aoMudarEnvio={setSubindoFoto}
+            textos={{
+              botao: TEXTOS.trocarFoto,
+              hint: TEXTOS.fotoHint,
+              enviando: TEXTOS.fotoEnviando,
+              enviada: TEXTOS.fotoEnviada,
+              erroTipo: TEXTOS.erroFotoTipo,
+              erroTamanho: TEXTOS.erroFotoTamanho,
+            }}
+          />
           <Etiqueta tom="info">{rotuloDoPapel(papelAdmin)}</Etiqueta>
         </div>
 
@@ -161,7 +179,7 @@ export function DadosDoMembro({
         {avisoDeCredencial === null ? null : <Aviso tom="sucesso">{avisoDeCredencial}</Aviso>}
 
         <div className={estilos.rodape}>
-          <Botao type="submit" tamanho="denso" carregando={pendente}>
+          <Botao type="submit" tamanho="denso" carregando={pendente} disabled={subindoFoto}>
             {pendente ? TEXTOS.salvando : TEXTOS.salvar}
           </Botao>
           {resultado !== null && resultado.ok ? <Aviso tom="sucesso">{TEXTOS.salvo}</Aviso> : null}
@@ -185,10 +203,4 @@ export function DadosDoMembro({
       />
     </section>
   );
-}
-
-function iniciaisDe(nome: string): string {
-  const partes = nome.split(/\s+/).filter((parte) => parte !== '');
-  const letras = partes.slice(0, 2).map((parte) => parte.charAt(0).toUpperCase());
-  return letras.join('') === '' ? 'DS' : letras.join('');
 }

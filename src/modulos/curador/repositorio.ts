@@ -15,7 +15,6 @@ import 'server-only';
  */
 
 import { lerConfiguracao } from '@/lib/configuracao';
-import { metadadosDoObjeto, type ObjetoNoStorage } from '@/lib/supabase/armazenamento';
 import { criarClienteServidor } from '@/lib/supabase/servidor';
 import { estourarSeErro } from '@/lib/supabase/erros';
 
@@ -29,7 +28,6 @@ import type {
   TipoDeMidia,
   TipoDeServico,
 } from './tipos';
-import { extensaoDoMime } from './esquemas';
 import { ehPasso, TIPOS_DE_CREDENCIAL } from './tipos';
 
 /**
@@ -355,49 +353,6 @@ export async function substituirCredenciais(
     })),
   );
   estourarSeErro(erroDoInsert);
-}
-
-/**
- * Sobe um arquivo e devolve o caminho.
- *
- * O caminho **tem** de começar com o `auth.uid()`: as policies dos buckets
- * comparam `(storage.foldername(name))[1]` com ele (`0000_storage`). Um caminho
- * fora dessa forma é recusado, e a mensagem não diz por quê.
- *
- * `upsert: true` porque trocar a foto é sobrescrever, não acumular — e sem ele
- * a segunda troca falharia com "arquivo já existe".
- */
-export async function subirArquivo(
-  balde: 'avatares' | 'materiais',
-  usuarioId: string,
-  nomeBase: string,
-  arquivo: File,
-): Promise<string> {
-  const supabase = await criarClienteServidor();
-
-  const extensao = extensaoDoMime(arquivo.type);
-  const caminho = `${usuarioId}/${nomeBase}${extensao}`;
-
-  const { error } = await supabase.storage
-    .from(balde)
-    .upload(caminho, arquivo, { upsert: true, contentType: arquivo.type });
-
-  estourarSeErro(error);
-  return caminho;
-}
-
-/**
- * Tamanho e MIME de um objeto dos baldes deste módulo.
- *
- * Delegação estreita para `lib/supabase/armazenamento`: a leitura é a mesma
- * para todo bucket, mas a união de baldes fica por módulo — assim nenhum passo
- * do wizard consegue pedir metadado de `faixas` por engano.
- */
-export async function metadadosDoArquivo(
-  balde: 'avatares' | 'materiais',
-  caminho: string,
-): Promise<ObjetoNoStorage | null> {
-  return metadadosDoObjeto(balde, caminho);
 }
 
 export async function salvarFotoDoPerfil(usuarioId: string, caminho: string): Promise<void> {

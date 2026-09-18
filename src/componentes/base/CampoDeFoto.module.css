@@ -1,0 +1,92 @@
+/* Avatar + "Trocar foto" — extraído do passo 1 do wizard do curador, onde os
+   mesmos estilos viviam em `Passos.module.css`. */
+
+.base {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-7);
+}
+
+.avatar,
+.avatarImagem {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: var(--dsn-radius-circle);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dsn-grad-brand-diag);
+  color: var(--dsn-surface);
+  font-size: var(--dsn-text-md);
+  font-weight: var(--dsn-weight-black);
+  letter-spacing: var(--dsn-tracking-badge);
+}
+
+.avatarImagem {
+  object-fit: cover;
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+  align-items: flex-start;
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  background: var(--dsn-surface);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  padding: 9px var(--dsn-space-7);
+  cursor: pointer;
+  transition: border-color var(--dsn-duration-base);
+}
+
+/* 13px — o tamanho do "Adicionar foto" do wizard do curador. */
+.botaoSm {
+  font-size: var(--dsn-text-xs);
+}
+
+.botao:hover {
+  border-color: var(--dsn-purple-600);
+}
+
+.botao:focus-within {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+/* `sr-only` à mão: `display:none` tiraria o campo da ordem de tabulação e do
+   leitor de tela. */
+.arquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hint {
+  font-size: var(--dsn-text-2xs);
+  color: var(--dsn-ink-500);
+}
+
+/* Envolve o aviso de recusa e a linha do avatar. */
+.envolvente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-5);
+}

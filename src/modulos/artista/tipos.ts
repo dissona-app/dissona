@@ -16,6 +16,9 @@ export type PerfilDoArtista = {
   readonly nomeExibicao: string | null;
   readonly handle: string | null;
   readonly cidade: string | null;
+  readonly fotoCaminho: string | null;
+  /** `perfil.atualizado_em` — só serve de cache-buster para a URL da foto. */
+  readonly atualizadoEm: string | null;
   readonly bio: string | null;
   readonly generos: readonly string[];
   readonly linkInstagram: string | null;

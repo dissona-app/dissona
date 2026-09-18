@@ -13,8 +13,12 @@ import { revalidatePath } from 'next/cache';
 
 import { executar, falhaDeCampos, sucesso } from '@/lib/acoes';
 import type { ResultadoDeAcao } from '@/lib/acoes';
+import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
+import { usuarioAtual } from '@/lib/supabase/servidor';
+import { resolverArquivoDoFormulario } from '@/lib/supabase/upload-de-perfil';
+import type { MotivoDeArquivo } from '@/lib/supabase/upload-de-perfil';
 
 import { esquemaDadosDoPerfil } from './esquemas';
 import { atualizarPerfil, lerMeuPerfil } from './repositorio';
@@ -31,6 +35,20 @@ function motivosPorCampo(
   }
   return motivos;
 }
+
+/**
+ * A recusa da foto é do **campo** `foto`, e não geral.
+ *
+ * `FormularioDePerfil` lê `falha.campos`, e não `falha.codigo`: uma falha
+ * gravada só no código sairia como erro geral, e o campo ficaria sem borda
+ * vermelha nenhuma — o defeito que o AGENTS.md chama de "falha sem mensagem".
+ */
+const MOTIVO_DA_FOTO: Readonly<Record<MotivoDeArquivo, string>> = {
+  tipo: 'foto_tipo',
+  tamanho: 'foto_tamanho',
+  ausente: 'foto_ausente',
+  alheio: 'foto_alheia',
+};
 
 function texto(dados: FormData, campo: string): string {
   const valor = dados.get(campo);
@@ -67,9 +85,33 @@ export async function salvarPerfilDoArtista(dados: FormData): Promise<ResultadoD
       return falhaDeCampos(CodigoErro.PAPEL_AUSENTE, {});
     }
 
-    await atualizarPerfil(perfil, analise.data);
+    // A foto vem por caminho (o navegador já subiu) ou no `multipart` (sem
+    // JavaScript). `caminho: null` é "não mandou foto" — e aí a atual fica.
+    const usuario = await usuarioAtual();
+    const foto =
+      usuario === null
+        ? ({ ok: true, caminho: null } as const)
+        : await resolverArquivoDoFormulario(
+            usuario.id,
+            'avatares',
+            'perfil',
+            texto(dados, 'foto_caminho'),
+            dados.get('foto'),
+            FOTO_TIPOS,
+            FOTO_MAX_BYTES,
+          );
 
+    if (!foto.ok) {
+      return falhaDeCampos(CodigoErro.ENTRADA_INVALIDA, { foto: MOTIVO_DA_FOTO[foto.motivo] });
+    }
+
+    await atualizarPerfil(perfil, analise.data, foto.caminho);
+
+    // As duas telas do módulo leem o mesmo perfil: a vitrine mostra o que o
+    // formulário acabou de gravar, e sem revalidar as duas a foto trocada
+    // continuaria a antiga na vitrine.
     revalidatePath(ROTA.ARTISTA_PERFIL);
+    revalidatePath(ROTA.ARTISTA_PERFIL_EDITAR);
     return sucesso();
   });
 }

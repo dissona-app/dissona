@@ -12,33 +12,25 @@ import 'server-only';
  * `0002` recusa, e o único caminho é `concluir_cadastro_curador` (0002c).
  */
 
-import { caminhoEhDoUsuario } from '@/lib/armazenamento';
 import { ROTA } from '@/lib/guarda-rota';
 import { usuarioAtual } from '@/lib/supabase/servidor';
+import { resolverArquivoDoFormulario } from '@/lib/supabase/upload-de-perfil';
+import type { MotivoDeArquivo } from '@/lib/supabase/upload-de-perfil';
 import { CURADOR_CADASTRO } from '@/textos/curador';
 
-import {
-  ANEXO_MAX_BYTES,
-  ANEXO_TIPOS,
-  FOTO_MAX_BYTES,
-  FOTO_TIPOS,
-  conferirArquivo,
-  conferirObjeto,
-} from './esquemas';
+import { ANEXO_MAX_BYTES, ANEXO_TIPOS, FOTO_MAX_BYTES, FOTO_TIPOS } from './esquemas';
 import {
   atualizarCanal,
   avancarPasso,
   concluirCadastro,
   inserirCanal,
   lerEstadoDoCadastro,
-  metadadosDoArquivo,
   removerCanal,
   salvarAtuacaoDoCurador,
   salvarBioDoCurador,
   salvarFotoDoPerfil,
   salvarGenerosDoCurador,
   salvarServicos,
-  subirArquivo,
   substituirCanais,
   substituirCredenciais,
 } from './repositorio';
@@ -60,7 +52,11 @@ import { CREDENCIAL_POR_ANEXO, TOTAL_DE_PASSOS } from './tipos';
  *   outra pessoa escondido pela RLS. É ambíguo por construção, e o remédio de
  *   quem é honesto é recarregar.
  */
-export type MotivoDeArquivo = 'tipo' | 'tamanho' | 'ausente' | 'alheio';
+/**
+ * Reexportado: a definição mora em `lib/supabase/upload-de-perfil`, junto da
+ * função que a produz, e `acoes.ts` continua importando daqui.
+ */
+export type { MotivoDeArquivo };
 
 export type ResultadoDoPasso =
   | { readonly estado: 'ok'; readonly destino: string }
@@ -104,52 +100,6 @@ async function estadoOuFalha(): Promise<EstadoDoCadastro | null> {
   return lerEstadoDoCadastro();
 }
 
-type ArquivoResolvido =
-  | { readonly ok: true; readonly caminho: string | null }
-  | { readonly ok: false; readonly motivo: MotivoDeArquivo };
-
-/**
- * As duas origens possíveis de um arquivo do wizard, resolvidas num caminho.
- *
- * **Caminho** é o navegador tendo subido direto ao bucket — o normal desde que
- * o anexo de 5 MB deixou de caber no corpo de uma Server Action na Vercel.
- * **Arquivo** é o `multipart` de sempre, que continua existindo para quem está
- * sem JavaScript.
- *
- * A ordem interna importa. `caminhoEhDoUsuario` vem **antes** da leitura do
- * Storage: sem isso o servidor iria ao bucket por causa de uma string arbitrária
- * vinda do formulário, e o próprio pedido já contaria se o objeto existe.
- *
- * No sucesso devolve o caminho **que o cliente mandou**, e não um recalculado. É
- * o `data.path` que o Storage respondeu; remontá-lo aqui reintroduziria a chance
- * de cliente e servidor discordarem sobre a extensão.
- */
-async function resolverArquivo(
-  usuarioId: string,
-  balde: 'avatares' | 'materiais',
-  nomeBase: 'perfil' | 'formacao',
-  caminhoEnviado: string | null,
-  arquivoBruto: unknown,
-  tiposAceitos: readonly string[],
-  maxBytes: number,
-): Promise<ArquivoResolvido> {
-  if (caminhoEnviado !== null && caminhoEnviado !== '') {
-    if (!caminhoEhDoUsuario(caminhoEnviado, usuarioId)) return { ok: false, motivo: 'alheio' };
-
-    const objeto = await metadadosDoArquivo(balde, caminhoEnviado);
-    const conferido = conferirObjeto(objeto, tiposAceitos, maxBytes);
-    if (!conferido.ok) return { ok: false, motivo: conferido.motivo };
-
-    return { ok: true, caminho: caminhoEnviado };
-  }
-
-  const conferido = conferirArquivo(arquivoBruto, tiposAceitos, maxBytes);
-  if (!conferido.ok) return { ok: false, motivo: conferido.motivo };
-  if (conferido.arquivo === null) return { ok: true, caminho: null };
-
-  return { ok: true, caminho: await subirArquivo(balde, usuarioId, nomeBase, conferido.arquivo) };
-}
-
 /* ---------------------------------------------------------- passo 1 ------- */
 
 /**
@@ -175,7 +125,7 @@ export async function salvarDadosBasicos(
   const usuario = await usuarioAtual();
   if (usuario === null) return { estado: 'sem_cadastro' };
 
-  const resolvida = await resolverArquivo(
+  const resolvida = await resolverArquivoDoFormulario(
     usuario.id,
     'avatares',
     'perfil',
@@ -265,7 +215,7 @@ export async function salvarCredenciais(
   const usuario = await usuarioAtual();
   if (usuario === null) return { estado: 'sem_cadastro' };
 
-  const resolvido = await resolverArquivo(
+  const resolvido = await resolverArquivoDoFormulario(
     usuario.id,
     'materiais',
     'formacao',

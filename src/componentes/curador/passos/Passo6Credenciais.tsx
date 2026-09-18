@@ -12,7 +12,7 @@ import { erroGeralDe } from '@/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';
-import { useUploadDireto } from '../useUploadDireto';
+import { useUploadDireto } from '@/componentes/base/useUploadDireto';
 import estilos from './Passos.module.css';
 import type { PropsDoPasso } from './tipos';
 

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { ROTA } from '@/lib/guarda-rota';
+import { PASSOS } from '@/modulos/avaliacao/tipos';
 import { CURADOR_MANUTENCAO } from '@/textos/curador';
-import { ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '@/textos/prototipo';
+import { ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES, PAINEIS } from '@/textos/prototipo';
 
 import { NOME_AMBIENTE } from '../navegacao-por-ambiente';
 import { tituloDoCaminho } from '../titulo-por-caminho';
@@ -65,6 +66,50 @@ describe('título do header por caminho', () => {
     const { titulo, sublegenda } = tituloDoCaminho(ROTA.CURADOR_MEU_CADASTRO, 'curador');
     expect(titulo).toBe(CURADOR_MANUTENCAO.titulo);
     expect(sublegenda).toBe(CURADOR_MANUTENCAO.subtitulo);
+  });
+
+  it('a raiz do curador é o painel, e não a fila', () => {
+    // Regressão: `/curador` mostrava "Fila de avaliações", o mesmo `<h1>` de
+    // `/curador/fila` — e a fila não é aquela tela. Dois títulos iguais em
+    // rotas diferentes também quebram a navegação por heading.
+    const raiz = tituloDoCaminho(ROTA.CURADOR, 'curador');
+    const fila = tituloDoCaminho(ROTA.CURADOR_FILA, 'curador');
+
+    expect(raiz.titulo).toBe(PAINEIS.curador.titulo);
+    expect(raiz.sublegenda).toBe(PAINEIS.curador.sublegenda);
+    expect(raiz.titulo).not.toBe(fila.titulo);
+  });
+
+  it('a raiz do artista é o painel do artista', () => {
+    expect(tituloDoCaminho(ROTA.ARTISTA, 'artista').titulo).toBe(PAINEIS.artista.titulo);
+  });
+
+  it('o detalhe da fila (13.1) tem cabeçalho próprio', () => {
+    const detalhe = tituloDoCaminho(
+      `${ROTA.CURADOR_FILA}/018f4a2e-0000-7000-8000-000000000000`,
+      'curador',
+    );
+    expect(detalhe.titulo).toBe('Detalhe da faixa');
+    expect(detalhe.titulo).not.toBe(tituloDoCaminho(ROTA.CURADOR_FILA, 'curador').titulo);
+  });
+
+  it('cada etapa da avaliação tem a sua sublegenda, com o mesmo título', () => {
+    // O protótipo indexa `appSub` por `s.avStep`: o título não muda — quem diz
+    // onde a pessoa está é o indicador de passo —, a sublegenda sim.
+    const envio = '018f4a2e-0000-7000-8000-000000000000';
+    const vistas = new Set<string>();
+
+    for (const passo of PASSOS) {
+      const { titulo, sublegenda } = tituloDoCaminho(
+        `${ROTA.CURADOR_AVALIAR}/${envio}/${passo}`,
+        'curador',
+      );
+      expect(titulo).toBe('Avaliação');
+      expect(sublegenda, passo).toBeDefined();
+      vistas.add(sublegenda as string);
+    }
+
+    expect(vistas.size).toBe(PASSOS.length);
   });
 
   it('rota sem entrada no mapa cai no nome do ambiente', () => {

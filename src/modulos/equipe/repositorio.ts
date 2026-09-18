@@ -224,6 +224,9 @@ export type MeusDadosDeMembro = {
   readonly cargo: string | null;
   readonly papelAdmin: PapelAdmin;
   readonly senhaAlteradaEm: string | null;
+  readonly fotoCaminho: string | null;
+  /** Cache-buster da URL pública: o nome do objeto é fixo. */
+  readonly atualizadoEm: string | null;
 };
 
 /**
@@ -239,7 +242,7 @@ export async function lerMeusDados(perfilId: string): Promise<MeusDadosDeMembro 
   const [perfil, membro] = await Promise.all([
     supabase
       .from('perfil')
-      .select('nome_completo, senha_alterada_em')
+      .select('nome_completo, senha_alterada_em, foto_caminho, atualizado_em')
       .eq('id', perfilId)
       .maybeSingle(),
     supabase
@@ -259,16 +262,27 @@ export async function lerMeusDados(perfilId: string): Promise<MeusDadosDeMembro 
     cargo: membro.data.cargo,
     papelAdmin: membro.data.papel_admin,
     senhaAlteradaEm: perfil.data.senha_alterada_em,
+    fotoCaminho: perfil.data.foto_caminho,
+    atualizadoEm: perfil.data.atualizado_em,
   };
 }
 
 /** O nome é do `perfil`, que o dono atualiza pela própria policy. */
-export async function salvarMeuNome(perfilId: string, nome: string): Promise<void> {
+export async function salvarMeuNome(
+  perfilId: string,
+  nome: string,
+  fotoCaminho: string | null = null,
+): Promise<void> {
   const supabase = await criarClienteServidor();
 
   const { error } = await supabase
     .from('perfil')
-    .update({ nome_completo: nome })
+    .update({
+      nome_completo: nome,
+      // Só quando veio foto nova: `null` é "não mandou nada", e gravá-lo
+      // apagaria a foto de quem só corrigiu o nome.
+      ...(fotoCaminho === null ? {} : { foto_caminho: fotoCaminho }),
+    })
     .eq('id', perfilId);
   estourarSeErro(error);
 }

@@ -13,9 +13,13 @@ import { revalidatePath } from 'next/cache';
 
 import { falha, falhaDeCampos, sucesso } from '@/lib/acoes';
 import type { FalhaDeAcao, ResultadoDeAcao } from '@/lib/acoes';
+import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
 import { origemDaRequisicao } from '@/lib/origem';
+import { usuarioAtual } from '@/lib/supabase/servidor';
+import { resolverArquivoDoFormulario } from '@/lib/supabase/upload-de-perfil';
+import type { MotivoDeArquivo } from '@/lib/supabase/upload-de-perfil';
 import { esquemaNovaSenha, motivosPorCampo } from '@/modulos/autenticacao/esquemas';
 
 import {
@@ -231,6 +235,19 @@ export async function salvarMatriz(dadosDoFormulario: FormData): Promise<Resulta
 
 /* ------------------------------------------------------ dados pessoais ---- */
 
+/**
+ * A recusa da foto é do campo `foto`, como no perfil do artista.
+ *
+ * `DadosDoMembro` lê `resultado.campos`; uma falha só no código sairia como
+ * erro geral e o campo ficaria sem aviso nenhum.
+ */
+const MOTIVO_DA_FOTO: Readonly<Record<MotivoDeArquivo, string>> = {
+  tipo: 'foto_tipo',
+  tamanho: 'foto_tamanho',
+  ausente: 'foto_ausente',
+  alheio: 'foto_alheia',
+};
+
 export async function salvarDadosPessoais(dadosDoFormulario: FormData): Promise<ResultadoDeAcao> {
   const analise = esquemaDadosPessoais.safeParse({
     nome: dadosDoFormulario.get('nome'),
@@ -241,7 +258,30 @@ export async function salvarDadosPessoais(dadosDoFormulario: FormData): Promise<
     return falhaDeCampos(CodigoErro.ENTRADA_INVALIDA, motivosPorCampo(analise.error.issues));
   }
 
-  const resultado = await salvarMeusDados(analise.data.nome, analise.data.cargo);
+  // A foto vem por caminho (o navegador subiu direto) ou no `multipart`, para
+  // quem está sem JavaScript — o mesmo caminho do wizard do curador e do
+  // perfil do artista.
+  const usuario = await usuarioAtual();
+  const foto =
+    usuario === null
+      ? ({ ok: true, caminho: null } as const)
+      : await resolverArquivoDoFormulario(
+          usuario.id,
+          'avatares',
+          'perfil',
+          typeof dadosDoFormulario.get('foto_caminho') === 'string'
+            ? (dadosDoFormulario.get('foto_caminho') as string)
+            : '',
+          dadosDoFormulario.get('foto'),
+          FOTO_TIPOS,
+          FOTO_MAX_BYTES,
+        );
+
+  if (!foto.ok) {
+    return falhaDeCampos(CodigoErro.ENTRADA_INVALIDA, { foto: MOTIVO_DA_FOTO[foto.motivo] });
+  }
+
+  const resultado = await salvarMeusDados(analise.data.nome, analise.data.cargo, foto.caminho);
 
   if (resultado.estado === 'sem_sessao') return falha(CodigoErro.NAO_AUTENTICADO);
   if (resultado.estado === 'sem_vinculo') return falha(CodigoErro.NAO_AUTORIZADO);

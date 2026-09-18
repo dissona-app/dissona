@@ -1,7 +1,8 @@
 import { ROTA } from '@/lib/guarda-rota';
 import type { Papel } from '@/lib/papeis';
+import { ehPassoDaAvaliacao, type PassoDaAvaliacao } from '@/modulos/avaliacao/tipos';
 import { CURADOR_MANUTENCAO } from '@/textos/curador';
-import { ARTISTA_PERFIL } from '@/textos/prototipo';
+import { ARTISTA_PERFIL, ARTISTA_VITRINE, PAINEIS } from '@/textos/prototipo';
 
 import { NOME_AMBIENTE } from './navegacao-por-ambiente';
 
@@ -73,12 +74,15 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
     sublegenda: 'Dados de recebimento, preferências e segurança.',
   },
 
-  // 7.1 — o protótipo chama a tela de "Editar cadastro" e põe a sublegenda
-  // dentro do card, não no cabeçalho. Aqui ela sobe para o cabeçalho, que é
-  // onde esta aplicação põe sublegenda de tela.
-  [ROTA.ARTISTA_PERFIL]: {
+  // 7.1 — **duas** telas, como no protótipo: a vitrine ("Perfil", sem
+  // sublegenda no cabeçalho — `appSub` é `false` ali) e o formulário ("Editar
+  // cadastro", com "Atualize o que os curadores veem."). A frase
+  // "Curadores veem essas informações…" é a primeira linha do corpo do
+  // formulário, e continua lá, no `Painel`.
+  [ROTA.ARTISTA_PERFIL]: { titulo: ARTISTA_VITRINE.titulo },
+  [ROTA.ARTISTA_PERFIL_EDITAR]: {
     titulo: ARTISTA_PERFIL.titulo,
-    sublegenda: ARTISTA_PERFIL.subtitulo,
+    sublegenda: 'Atualize o que os curadores veem.',
   },
 
   // 5 e 5.3. O extrato vem **antes** da carteira no objeto por clareza; a
@@ -86,24 +90,28 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   // por prefixo é o mapa de baixo.
   [ROTA.ARTISTA_EXTRATO]: {
     titulo: 'Extrato',
-    sublegenda: 'Tudo que entrou e saiu da sua carteira.',
+    sublegenda: 'O que entrou, o que saiu e o que voltou.',
   },
   [ROTA.ARTISTA_CARTEIRA]: {
     titulo: 'Carteira',
-    sublegenda: 'Seu saldo de Claves e o que já foi usado.',
+    sublegenda: 'Seu saldo e histórico de Claves.',
+  },
+  [ROTA.ARTISTA_PACOTES]: {
+    titulo: 'Comprar Claves',
+    sublegenda: 'Quanto maior o pacote, menor o preço por Clave.',
   },
 
   // 3 — o wizard de envio. As subrotas (`/<faixaId>/<passo>`) caem no mapa de
   // prefixo, logo abaixo, porque têm segmento dinâmico.
   [ROTA.ARTISTA_ENVIAR]: {
     titulo: 'Enviar música',
-    sublegenda: 'Uma faixa por envio. O teto é o seu saldo.',
+    sublegenda: 'Comece pelo link ou pelo arquivo da faixa.',
   },
 
   // 13 — a fila. O detalhe (13.1) tem segmento dinâmico e cai no prefixo.
   [ROTA.CURADOR_FILA]: {
     titulo: 'Fila de avaliações',
-    sublegenda: 'O que está esperando você.',
+    sublegenda: 'Faixas pendentes para avaliar.',
   },
 
   // 14 — a avaliação. As cinco etapas têm segmento dinâmico e caem no prefixo;
@@ -113,17 +121,37 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
     sublegenda: 'Ouça, dê as notas e escreva a devolutiva.',
   },
 
-  // 12.6 — derivada: o protótipo tem "Meu cadastro" na sidebar e o aponta para
-  // o wizard. Título e sublegenda vêm do PRD §12.6.
+  // 12.6 — derivada: a sidebar do protótipo **não** tem "Meu cadastro", e o
+  // acesso é pela aba Perfil de Conta, que leva a esta rota. Título e
+  // sublegenda vêm do PRD §12.6.
   [ROTA.CURADOR_MEU_CADASTRO]: {
     titulo: CURADOR_MANUTENCAO.titulo,
     sublegenda: CURADOR_MANUTENCAO.subtitulo,
   },
 
-  // Raiz dos outros dois ambientes. Sem entrada aqui elas cairiam no nome do
-  // ambiente ("Artista"), que como `<h1>` de uma tela não diz o que a tela é.
-  [ROTA.ARTISTA]: { titulo: 'Início', sublegenda: 'Sua música e sua carteira.' },
-  [ROTA.CURADOR]: { titulo: 'Fila de avaliações', sublegenda: 'O que está esperando você.' },
+  // Raiz dos outros dois ambientes — o "Início" de cada um. Sem entrada aqui
+  // elas cairiam no nome do ambiente ("Artista"), que como `<h1>` de uma tela
+  // não diz o que a tela é.
+  //
+  // ⚠️ `/curador` mostrava "Fila de avaliações", o **mesmo** título de
+  // `/curador/fila`: dois `<h1>` iguais em rotas diferentes, num deles falso.
+  [ROTA.ARTISTA]: { titulo: PAINEIS.artista.titulo, sublegenda: PAINEIS.artista.sublegenda },
+  [ROTA.CURADOR]: { titulo: PAINEIS.curador.titulo, sublegenda: PAINEIS.curador.sublegenda },
+};
+
+/**
+ * Sublegenda por etapa da avaliação (14 → 14.4).
+ *
+ * É o único caso em que o protótipo troca a sublegenda **dentro** da mesma
+ * rota: `appSub` indexa `s.avStep`. O título não muda — quem diz onde a pessoa
+ * está é o indicador de passo.
+ */
+const SUBLEGENDA_DA_AVALIACAO: Readonly<Record<PassoDaAvaliacao, string>> = {
+  notas: 'Escute e dê nota por critério.',
+  subjetiva: 'Sua leitura por inteiro, assinada.',
+  compartilhamento: 'Leve a faixa para fora da plataforma.',
+  outras: 'Diga onde a faixa vai circular.',
+  remuneracao: 'Como o repasse foi calculado.',
 };
 
 /**
@@ -141,9 +169,12 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
   // o mesmo do passo 1: o wizard é uma tela só, e quem diz onde a pessoa está
   // é o indicador de passo, não o cabeçalho.
   [`${ROTA.ARTISTA_ENVIAR}/`, EXATOS[ROTA.ARTISTA_ENVIAR] as TituloDeModulo],
-  // 13.1 — o detalhe herda o título da fila; quem diz onde a pessoa está é o
-  // "Voltar para a fila" e o próprio título da faixa no painel.
-  [`${ROTA.CURADOR_FILA}/`, EXATOS[ROTA.CURADOR_FILA] as TituloDeModulo],
+  // 13.1 — o detalhe tem cabeçalho próprio no protótipo (`naFila && s.filaSel`
+  // troca `appTitle` e `appSub`), e não o da fila.
+  [
+    `${ROTA.CURADOR_FILA}/`,
+    { titulo: 'Detalhe da faixa', sublegenda: 'Contexto do artista e serviço contratado.' },
+  ],
   // 14 · 14.1 · 14.2 · 14.3 · 14.4 — as cinco etapas, como no envio: o
   // cabeçalho não muda, e quem diz onde a pessoa está é o indicador de passo.
   [`${ROTA.CURADOR_AVALIAR}/`, EXATOS[ROTA.CURADOR_AVALIAR] as TituloDeModulo],
@@ -154,6 +185,16 @@ export function tituloDoCaminho(caminho: string, papel: Papel): TituloDeModulo {
 
   const exato = EXATOS[semBarraFinal];
   if (exato !== undefined) return exato;
+
+  // As cinco etapas da avaliação, antes do mapa de prefixo: é o mesmo título
+  // com sublegenda por passo, e o passo é o último segmento da rota
+  // (`/curador/avaliar/<envioId>/<passo>`).
+  if (semBarraFinal.startsWith(`${ROTA.CURADOR_AVALIAR}/`)) {
+    const ultimo = semBarraFinal.slice(semBarraFinal.lastIndexOf('/') + 1);
+    if (ehPassoDaAvaliacao(ultimo)) {
+      return { titulo: 'Avaliação', sublegenda: SUBLEGENDA_DA_AVALIACAO[ultimo] };
+    }
+  }
 
   for (const [prefixo, titulo] of POR_PREFIXO) {
     if (semBarraFinal.startsWith(prefixo)) return titulo;

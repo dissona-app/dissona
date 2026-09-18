@@ -64,3 +64,27 @@ export async function metadadosDoObjeto(
     mime: typeof mime === 'string' ? mime : '',
   };
 }
+
+/**
+ * URL pública de um objeto de bucket público — hoje só `avatares`.
+ *
+ * `avatares` é público desde a `0000_storage`, então não precisa de URL
+ * assinada: a foto de perfil é o que os curadores veem antes de ouvir alguém.
+ *
+ * O `?v=` **não é enfeite**: o upload usa `upsert` num nome fixo
+ * (`<uid>/perfil.jpg`), então trocar a foto não muda a URL, e sem o parâmetro o
+ * CDN continuaria servindo a antiga. A versão é qualquer coisa que mude junto
+ * com a foto — `perfil.atualizado_em` serve.
+ */
+export async function urlPublicaDoAvatar(
+  caminho: string | null,
+  versao?: string | null,
+): Promise<string | null> {
+  if (caminho === null || caminho === '') return null;
+
+  const supabase = await criarClienteServidor();
+  const { data } = supabase.storage.from('avatares').getPublicUrl(caminho);
+
+  if (versao === null || versao === undefined || versao === '') return data.publicUrl;
+  return `${data.publicUrl}?v=${encodeURIComponent(versao)}`;
+}

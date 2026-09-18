@@ -23,32 +23,8 @@
   gap: var(--dsn-space-8);
 }
 
-.avatar {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: clamp(56px, 7vh, 66px);
-  height: clamp(56px, 7vh, 66px);
-  border: 1px solid var(--dsn-purple-200);
-  border-radius: var(--dsn-radius-circle);
-  background: var(--dsn-purple-100);
-  font-size: var(--dsn-text-lg);
-  font-weight: var(--dsn-weight-bold);
-  color: var(--dsn-purple-600);
-}
-
-.foto {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.fotoNota {
-  font-size: var(--dsn-text-2xs);
-  color: var(--dsn-ink-500);
-}
+/* O avatar e o botão de foto agora são o `CampoDeFoto` do Design System,
+   que traz os próprios estilos. */
 
 .par {
   display: grid;

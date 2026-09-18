@@ -2,8 +2,18 @@
 
 import { useActionState, useState } from 'react';
 
-import { AreaTexto, Aviso, Botao, Campo, Chips, Painel } from '@/componentes/base';
+import {
+  AreaTexto,
+  Aviso,
+  Botao,
+  BotaoLink,
+  Campo,
+  CampoDeFoto,
+  Chips,
+  Painel,
+} from '@/componentes/base';
 import type { ResultadoDeAcao } from '@/lib/acoes';
+import { ROTA } from '@/lib/guarda-rota';
 import { MAXIMO_DA_BIO, MAXIMO_DE_GENEROS } from '@/modulos/artista/tipos';
 import type { PerfilDoArtista } from '@/modulos/artista/tipos';
 import { erroGeralDe } from '@/textos/erros';
@@ -13,6 +23,8 @@ import estilos from './FormularioDePerfil.module.css';
 
 export type PropsFormularioDePerfil = {
   readonly perfil: PerfilDoArtista;
+  /** URL pública da foto atual, já com o cache-buster. Montada no servidor. */
+  readonly fotoUrl: string | null;
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
 };
 
@@ -33,9 +45,13 @@ const MOTIVOS: Readonly<Record<string, string>> = {
   link_invalido: TEXTOS.erroLinkInvalido,
   link_com_espaco: TEXTOS.erroLinkComEspaco,
   link_vazio: TEXTOS.erroLinkInvalido,
+  foto_tipo: TEXTOS.erroFotoTipo,
+  foto_tamanho: TEXTOS.erroFotoTamanho,
+  foto_ausente: TEXTOS.erroFotoAusente,
+  foto_alheia: TEXTOS.erroFotoAlheia,
 };
 
-export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
+export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDePerfil) {
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => acao(dados),
     null,
@@ -44,6 +60,10 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
   // A bio é controlada porque o contador de `AreaTexto` lê `value`. Os demais
   // campos ficam não controlados — não têm contador, e `defaultValue` basta.
   const [bio, setBio] = useState(perfil.bio ?? '');
+
+  // Salvar com a foto ainda subindo mandaria `foto_caminho` vazio, e a troca se
+  // perderia sem erro nenhum.
+  const [subindoFoto, setSubindoFoto] = useState(false);
 
   const falha = resultado !== null && !resultado.ok ? resultado : null;
 
@@ -71,6 +91,7 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
     erroDe('linkSpotify'),
     erroDe('linkYoutube'),
     erroDe('linkSite'),
+    erroDe('foto'),
   ]);
 
   return (
@@ -78,7 +99,27 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
       {resultado !== null && resultado.ok ? <Aviso tom="sucesso">{TEXTOS.salvo}</Aviso> : null}
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
-      <Painel titulo={TEXTOS.titulo} sublegenda={TEXTOS.subtitulo}>
+      {/* O painel se chama "Seus dados", e não "Editar cadastro": este último
+          já é o `<h1>` da rota, e repeti-lo daria dois títulos iguais na mesma
+          tela. A sublegenda é a primeira linha do corpo no protótipo. */}
+      <Painel titulo={TEXTOS.tituloDoPainel} sublegenda={TEXTOS.subtitulo} nivel={2}>
+        {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
+
+        <CampoDeFoto
+          nome={perfil.nomeExibicao ?? perfil.nomeCompleto}
+          fotoUrl={fotoUrl}
+          caminhoAtual={perfil.fotoCaminho}
+          aoMudarEnvio={setSubindoFoto}
+          textos={{
+            botao: TEXTOS.trocarFoto,
+            hint: TEXTOS.fotoHint,
+            enviando: TEXTOS.fotoEnviando,
+            enviada: TEXTOS.fotoEnviada,
+            erroTipo: TEXTOS.erroFotoTipo,
+            erroTamanho: TEXTOS.erroFotoTamanho,
+          }}
+        />
+
         <div className={estilos.par}>
           <Campo
             name="nomeExibicao"
@@ -130,6 +171,7 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
         <div className={estilos.par}>
           <Campo
             name="linkInstagram"
+            placeholder={TEXTOS.exemploInstagram}
             rotulo={TEXTOS.rotuloInstagram}
             defaultValue={perfil.linkInstagram ?? ''}
             erro={erroDe('linkInstagram')}
@@ -137,6 +179,7 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
           />
           <Campo
             name="linkSpotify"
+            placeholder={TEXTOS.exemploSpotify}
             rotulo={TEXTOS.rotuloSpotify}
             defaultValue={perfil.linkSpotify ?? ''}
             erro={erroDe('linkSpotify')}
@@ -144,6 +187,7 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
           />
           <Campo
             name="linkYoutube"
+            placeholder={TEXTOS.exemploYoutube}
             rotulo={TEXTOS.rotuloYoutube}
             defaultValue={perfil.linkYoutube ?? ''}
             erro={erroDe('linkYoutube')}
@@ -151,6 +195,7 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
           />
           <Campo
             name="linkSite"
+            placeholder={TEXTOS.exemploSite}
             rotulo={TEXTOS.rotuloSite}
             defaultValue={perfil.linkSite ?? ''}
             erro={erroDe('linkSite')}
@@ -160,9 +205,14 @@ export function FormularioDePerfil({ perfil, acao }: PropsFormularioDePerfil) {
       </Painel>
 
       <div className={estilos.acoes}>
-        <Botao type="submit" carregando={pendente}>
+        <Botao type="submit" carregando={pendente} disabled={subindoFoto}>
           {TEXTOS.salvar}
         </Botao>
+        {/* "Cancelar" volta à vitrine — é o par do "Editar cadastro" de lá. O
+            texto existia em `prototipo.ts` desde a R1 e não era renderizado. */}
+        <BotaoLink href={ROTA.ARTISTA_PERFIL} variante="ghost">
+          {TEXTOS.cancelar}
+        </BotaoLink>
         <span className={estilos.nota}>{TEXTOS.nota}</span>
       </div>
     </form>

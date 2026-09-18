@@ -48,6 +48,8 @@ export const ROTA = {
    * pedido só nasce no "Confirmar compra".
    */
   ARTISTA_PACOTES: '/artista/pacotes',
+  /** 7.1 · o formulário. A vitrine fica em `ARTISTA_PERFIL`. */
+  ARTISTA_PERFIL_EDITAR: '/artista/perfil/editar',
   /**
    * Envio de música (3) — wizard de 3 passos.
    *

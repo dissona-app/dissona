@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { criarClienteNavegador } from '@/lib/supabase/cliente';
-import { conferirArquivo, extensaoDoMime } from '@/modulos/curador/esquemas';
+import { conferirArquivo, extensaoDoMime } from '@/lib/arquivos';
 import { ERRO_GERAL } from '@/textos/erros';
 
 export type MensagensDoUpload = {

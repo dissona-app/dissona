@@ -13,6 +13,8 @@ export { BotaoLink } from './BotaoLink';
 export type { PropsBotaoLink } from './BotaoLink';
 export { Campo } from './Campo';
 export type { PropsCampo } from './Campo';
+export { CampoDeFoto } from './CampoDeFoto';
+export type { PropsCampoDeFoto, TextosDoCampoDeFoto } from './CampoDeFoto';
 export { CampoNota, NOTA_MAXIMA, NOTA_MINIMA, NOTA_PASSO } from './CampoNota';
 export type { PropsCampoNota } from './CampoNota';
 export { Cartao, CartaoClicavel } from './Cartao';
