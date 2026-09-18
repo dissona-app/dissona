@@ -28,6 +28,25 @@ const MOTIVOS: Readonly<Record<string, string>> = {
 };
 
 /**
+ * "MPB contemporânea · inédita · sem data definida" — o `enFaixaInfo` do
+ * protótipo, montado do que o passo 1 gravou.
+ *
+ * A data vem como `YYYY-MM-DD` do `<input type="date">` e é invertida à mão,
+ * sem `Date`: `new Date('2026-03-14')` é meia-noite **UTC**, e no fuso de São
+ * Paulo isso vira 13/03.
+ */
+function descricaoDaFaixa(faixa: FaixaEmEdicao): string {
+  const data =
+    faixa.dataLancamento === null
+      ? TEXTOS.faixaSemData
+      : faixa.dataLancamento.split('-').reverse().join('/');
+
+  const situacao = faixa.lancada === true ? TEXTOS.faixaLancada(data) : TEXTOS.faixaInedita(data);
+
+  return [faixa.estilo, situacao].filter((parte) => parte !== null && parte !== '').join(' · ');
+}
+
+/**
  * Passo 2 do envio — gênero e contexto.
  *
  * O gênero é **um só** (`faixa.genero` é `text`), então os chips têm
@@ -57,6 +76,14 @@ export function FormularioDoContexto({ faixa, acao }: PropsFormularioDoContexto)
       <input type="hidden" name="faixaId" value={faixa.id} />
 
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
+      {/* O cartão "Faixa" do protótipo: o passo 2 pergunta sobre uma faixa, e
+          precisa dizer qual. `dl`, e não um parágrafo, porque são rótulo e
+          valor. */}
+      <Painel titulo={TEXTOS.rotuloFaixa} nivel={3}>
+        <p className={estilos.faixaTitulo}>{faixa.titulo}</p>
+        <p className={estilos.faixaInfo}>{descricaoDaFaixa(faixa)}</p>
+      </Painel>
 
       <Painel titulo={TEXTOS.rotuloGenero}>
         <Chips

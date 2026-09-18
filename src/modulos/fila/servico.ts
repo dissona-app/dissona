@@ -19,9 +19,19 @@ export function horasRestantes(item: ItemDaFila, agora: Date): number {
 /** Prazo curto é o que o resumo conta como urgente: menos de 24h. */
 export const HORAS_DE_PRAZO_CURTO = 24;
 
+/**
+ * Menos de 24 horas — **incluindo o que já venceu**.
+ *
+ * A versão anterior exigia `horas >= 0`, com o argumento de que "vencido é
+ * atrasada, não prazo curto". O efeito era o contrário do pretendido: uma fila
+ * com três faixas atrasadas anunciava "0 com prazo curto", e o contador
+ * silenciava exatamente as que mais precisavam de resposta. O protótipo conta
+ * `t.horas < 24` sem piso, e é o que faz sentido — o resumo mede urgência, não
+ * classifica estado. Quem classifica estado é `statusNaTela`, e lá "atrasada"
+ * segue sendo um recorte próprio.
+ */
 export function ehPrazoCurto(item: ItemDaFila, agora: Date): boolean {
-  const horas = horasRestantes(item, agora);
-  return horas >= 0 && horas < HORAS_DE_PRAZO_CURTO;
+  return horasRestantes(item, agora) < HORAS_DE_PRAZO_CURTO;
 }
 
 /**

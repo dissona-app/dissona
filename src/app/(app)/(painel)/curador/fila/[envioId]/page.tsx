@@ -12,6 +12,7 @@ import { ROTA } from '@/lib/guarda-rota';
 import { iniciarAvaliacaoDoEnvio } from '@/modulos/fila/acoes';
 import { lerDetalhe } from '@/modulos/fila/consultas';
 import { horasRestantes } from '@/modulos/fila/servico';
+import { CURADOR_CADASTRO } from '@/textos/curador';
 import { CARTEIRA, FILA as TEXTOS } from '@/textos/prototipo';
 
 import estilos from './pagina.module.css';
@@ -20,6 +21,11 @@ export const metadata: Metadata = {
   title: 'Detalhe do envio',
   robots: { index: false, follow: false },
 };
+
+/** A descrição do serviço, a mesma do passo 5 do cadastro do curador. */
+function descricaoDoServico(tipo: string): string | undefined {
+  return CURADOR_CADASTRO.servicos.find((servico) => servico.valor === tipo)?.descricao;
+}
 
 /** Duração em `m:ss`, que é como o protótipo a mostra. */
 function duracao(segundos: number | null): string {
@@ -85,10 +91,8 @@ export default async function PaginaDoDetalhe({
             <dd className={estilos.valor}>{duracao(item.duracaoSegundos)}</dd>
           </div>
           <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloFaixa}</dt>
-            <dd className={estilos.valor}>
-              {TEXTOS.enviadaEm(tempoRelativo(item.enviadoEm, 'pt-BR', agora))}
-            </dd>
+            <dt className={estilos.rotulo}>{TEXTOS.rotuloEnviada}</dt>
+            <dd className={estilos.valor}>{tempoRelativo(item.enviadoEm, 'pt-BR', agora)}</dd>
           </div>
           <div>
             <dt className={estilos.rotulo}>{TEXTOS.rotuloStatus}</dt>
@@ -139,7 +143,18 @@ export default async function PaginaDoDetalhe({
         <ul className={estilos.servicos}>
           {servicos.map((servico) => (
             <li key={servico.tipo} className={estilos.servico}>
-              <span>{TEXTOS.servicos[servico.tipo]}</span>
+              <span className={estilos.servicoNome}>
+                {TEXTOS.servicos[servico.tipo]}
+                {/* A descrição é a mesma que o curador leu ao definir o preço
+                    (passo 5 do cadastro) — o protótipo a mostra aqui como
+                    `sv.desc`, e duas descrições do mesmo serviço seriam duas
+                    promessas diferentes. */}
+                {descricaoDoServico(servico.tipo) !== undefined ? (
+                  <span className={estilos.servicoDescricao}>
+                    {descricaoDoServico(servico.tipo)}
+                  </span>
+                ) : null}
+              </span>
               <span className={estilos.preco}>
                 {claves.formatar(servico.precoClaves)} {CARTEIRA.saldoUnidade}
               </span>

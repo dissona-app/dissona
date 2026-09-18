@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { BotoesSociais } from '@/componentes/autenticacao/BotoesSociais';
 import { FormularioDeCadastro } from '@/componentes/autenticacao/FormularioDeCadastro';
+import { ComoFunciona } from '@/componentes/autenticacao/ComoFunciona';
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
 import { ROTA } from '@/lib/guarda-rota';
 import { cadastrar, entrarComProvedor } from '@/modulos/autenticacao/acoes';
@@ -34,7 +35,14 @@ export default function Pagina() {
         { rotulo: 'Termos', href: ROTA.TERMOS },
         { rotulo: 'Privacidade', href: ROTA.PRIVACIDADE },
       ]}
-      aside={<ComoFunciona />}
+      aside={
+        <ComoFunciona
+          overline={CADASTRAR.comoFunciona.overline}
+          titulo={CADASTRAR.comoFunciona.titulo}
+          passos={CADASTRAR.comoFunciona.passos}
+          nota={CADASTRAR.comoFunciona.nota}
+        />
+      }
     >
       <FormularioDeCadastro
         acao={cadastrar}
@@ -43,34 +51,6 @@ export default function Pagina() {
         social={<BlocoSocial />}
       />
     </MolduraDeAutenticacao>
-  );
-}
-
-function ComoFunciona() {
-  return (
-    <>
-      <div className={estilos.asideCabecalho}>
-        <span className={estilos.asideOverline}>{CADASTRAR.comoFunciona.overline}</span>
-        {/* `<h2>`: o `<h1>` da página é o "Criar conta" do card. */}
-        <h2 className={estilos.asideTitulo}>{CADASTRAR.comoFunciona.titulo}</h2>
-      </div>
-
-      <ol className={estilos.passos}>
-        {CADASTRAR.comoFunciona.passos.map((passo) => (
-          <li key={passo.numero} className={estilos.passo}>
-            <span className={estilos.passoNumero} aria-hidden="true">
-              {passo.numero}
-            </span>
-            <span className={estilos.passoTexto}>
-              <strong className={estilos.passoTitulo}>{passo.titulo}</strong>
-              {passo.texto}
-            </span>
-          </li>
-        ))}
-      </ol>
-
-      <p className={estilos.asideNota}>{CADASTRAR.comoFunciona.nota}</p>
-    </>
   );
 }
 

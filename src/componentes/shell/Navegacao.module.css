@@ -128,3 +128,23 @@
   font-variant-numeric: tabular-nums;
   color: var(--dsn-nav-fg);
 }
+
+/* "Comprar Claves": link discreto dentro do card, como no protótipo — sem
+   fundo e sem borda, sublinhando no hover. */
+.comprar {
+  width: fit-content;
+  color: var(--dsn-nav-fg-idle);
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  text-decoration: none;
+  transition: color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.comprar:hover {
+  color: var(--dsn-nav-fg);
+  text-decoration: underline;
+}
+
+.comprar:focus-visible {
+  outline-color: var(--dsn-focus-outline-color-dark);
+}

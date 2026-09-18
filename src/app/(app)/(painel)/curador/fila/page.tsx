@@ -13,6 +13,7 @@ import {
   ehOrdemDaFila,
   ehStatusDaFila,
   type ItemDaFila,
+  type TipoServico,
 } from '@/modulos/fila/tipos';
 import { FILA as TEXTOS } from '@/textos/prototipo';
 
@@ -47,6 +48,26 @@ function formatarPrazo(item: ItemDaFila, agora: Date): string {
   return TEXTOS.prazoDias(Math.floor(horas / 24), Math.floor(horas % 24));
 }
 
+/**
+ * A coluna "Serviço": os serviços contratados, juntos.
+ *
+ * A coluna mostrava sempre "Feedback escrito", porque o valor era literal — um
+ * envio com Feedback **e** Playlist aparecia como se tivesse só o primeiro, e
+ * é justamente o serviço extra que muda o que o curador tem de entregar. O
+ * protótipo junta com " + " (`servicoLabel`), e a ordem é a de `ORDEM_DOS_SERVICOS`,
+ * para que duas linhas com os mesmos serviços leiam igual.
+ */
+const ORDEM_DOS_SERVICOS: readonly TipoServico[] = ['feedback', 'playlist', 'post', 'materia'];
+
+function rotuloDosServicos(servicos: readonly TipoServico[]): string {
+  const rotulos = ORDEM_DOS_SERVICOS.filter((tipo) => servicos.includes(tipo)).map(
+    (tipo) => TEXTOS.servicos[tipo],
+  );
+  // Envio sem linha em `servico_envio` não existe — o feedback é obrigatório —,
+  // mas a tela não é lugar de descobrir isso por uma célula vazia.
+  return rotulos.length === 0 ? TEXTOS.servicos.feedback : rotulos.join(' + ');
+}
+
 /** 13 · Fila de avaliações. */
 export default async function PaginaDaFila({
   searchParams,
@@ -77,8 +98,7 @@ export default async function PaginaDaFila({
     titulo: item.titulo,
     artista: item.artista,
     genero: item.genero ?? '—',
-    // A fila mostra o serviço-base; o detalhe (13.1) lista todos com o total.
-    servico: TEXTOS.servicos.feedback,
+    servico: rotuloDosServicos(item.servicos),
     prazo: formatarPrazo(item, agora),
     status: statusNaTela(item, agora),
     urgente: horasRestantes(item, agora) < 24,

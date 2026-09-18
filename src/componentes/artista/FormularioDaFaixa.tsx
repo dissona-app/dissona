@@ -60,6 +60,28 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   const [detectando, iniciarDeteccao] = useTransition();
   const formulario = useRef<HTMLFormElement>(null);
 
+  // Arrastar e soltar. O `<label>` sozinho **não** aceita drop — quem aceita é
+  // o `<input type="file">`, e ele está reduzido a 1px por `sr-only`. Então o
+  // arquivo solto é escrito no input por `DataTransfer`, que é o que o põe no
+  // `FormData` do envio. Sem isso, "Arraste o arquivo aqui" era uma promessa
+  // que a tela não cumpria.
+  const entradaDeAudio = useRef<HTMLInputElement>(null);
+  const [arrastando, setArrastando] = useState(false);
+
+  function aoSoltarAudio(evento: React.DragEvent<HTMLLabelElement>) {
+    evento.preventDefault();
+    setArrastando(false);
+
+    const arquivo = evento.dataTransfer.files[0];
+    if (arquivo === undefined) return;
+
+    const transferencia = new DataTransfer();
+    transferencia.items.add(arquivo);
+    if (entradaDeAudio.current !== null) entradaDeAudio.current.files = transferencia.files;
+
+    setArquivoDeAudio(arquivo);
+  }
+
   const falha = resultado !== null && !resultado.ok ? resultado : null;
 
   const MOTIVOS: Readonly<Record<string, string>> = {
@@ -243,8 +265,19 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
       <Painel titulo={TEXTOS.enviarArquivo} sublegenda={TEXTOS.enviarArquivoApoio}>
-        <label className={estilos.dropzone}>
+        <label
+          className={[estilos.dropzone, arrastando ? estilos.dropzoneAtiva : undefined]
+            .filter(Boolean)
+            .join(' ')}
+          onDragOver={(evento) => {
+            evento.preventDefault();
+            setArrastando(true);
+          }}
+          onDragLeave={() => setArrastando(false)}
+          onDrop={aoSoltarAudio}
+        >
           <input
+            ref={entradaDeAudio}
             type="file"
             name="audio"
             accept={aceitos}
@@ -252,11 +285,13 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
             onChange={(e) => setArquivoDeAudio(e.target.files?.[0] ?? null)}
           />
           <span className={estilos.dropzoneTitulo}>
-            {arquivoDeAudio !== null
-              ? TEXTOS.arquivoEscolhido(arquivoDeAudio.name)
-              : faixa?.arquivoCaminho != null
-                ? TEXTOS.arquivoEscolhido(faixa.arquivoCaminho.split('/').pop() ?? '')
-                : TEXTOS.dropzoneVazia}
+            {arrastando
+              ? TEXTOS.dropzoneSoltar
+              : arquivoDeAudio !== null
+                ? TEXTOS.arquivoEscolhido(arquivoDeAudio.name)
+                : faixa?.arquivoCaminho != null
+                  ? TEXTOS.arquivoEscolhido(faixa.arquivoCaminho.split('/').pop() ?? '')
+                  : TEXTOS.dropzoneVazia}
           </span>
           <span className={estilos.dropzoneApoio}>{TEXTOS.dropzone(limites.tamanhoMaxMb)}</span>
         </label>

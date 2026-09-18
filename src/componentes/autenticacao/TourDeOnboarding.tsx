@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState } from 'react';
 
 import { Botao } from '@/componentes/base/Botao';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { ONBOARDING } from '@/textos/prototipo';
 
+import { useEstadoDoTour } from './estado-do-tour';
 import estilos from './TourDeOnboarding.module.css';
 
 export type PassoDoTour = {
@@ -33,11 +34,13 @@ const ESTADO_INICIAL: ResultadoDeAcao | null = null;
  * não vê o tour de novo no próximo login — que é a leitura óbvia de "pular", e
  * a que uma implementação com dois caminhos erraria.
  *
- * ## O passo é estado local, e não rota
+ * ## O passo é estado de cliente, e não rota
  *
  * `/onboarding?passo=3` seria alcançável, compartilhável e voltaria no
- * histórico — e nada disso serve a um tour de quatro telas. Com estado local, o
- * "Voltar" do navegador sai do tour, que é o que a pessoa espera dele.
+ * histórico — e nada disso serve a um tour de quatro telas. Com estado de
+ * cliente, o "Voltar" do navegador sai do tour, que é o que a pessoa espera
+ * dele. O estado fica em `estado-do-tour`, e não aqui, porque o painel lateral
+ * também o controla.
  *
  * Os dots são um `<ol>` com `aria-current`, e não `role="tablist"`: eles não
  * são controles, e não há o que selecionar. O protótipo os faz `<button>`; aqui
@@ -45,7 +48,10 @@ const ESTADO_INICIAL: ResultadoDeAcao | null = null;
  * alvos em vez de seis.
  */
 export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourDeOnboarding) {
-  const [indice, setIndice] = useState(0);
+  // O passo vive no contexto porque o painel lateral (`NavegadorDoTour`) o
+  // controla também — no protótipo as quatro linhas de lá são botões que saltam
+  // para o passo, e as duas colunas leem o mesmo `obStep`.
+  const { indice, irPara } = useEstadoDoTour();
   // `FormData` como carga, e ignorada: é o que `<form action>` entrega, e o
   // encerramento não tem campo nenhum. Tipar como `void` compilaria a chamada
   // e não o `<form>`.
@@ -107,7 +113,7 @@ export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourD
           <Botao
             type="button"
             variante="secundario"
-            onClick={() => setIndice((atual) => atual - 1)}
+            onClick={() => irPara(indice - 1)}
             disabled={pendente}
           >
             {ONBOARDING.voltar}
@@ -121,12 +127,7 @@ export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourD
             </Botao>
           </form>
         ) : (
-          <Botao
-            type="button"
-            onClick={() => setIndice((atual) => atual + 1)}
-            blocoInteiro
-            disabled={pendente}
-          >
+          <Botao type="button" onClick={() => irPara(indice + 1)} blocoInteiro disabled={pendente}>
             {ONBOARDING.avancar}
           </Botao>
         )}

@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
 
+import { CartaoDeSaldo } from '@/componentes/shell/CartaoDeSaldo';
 import { Shell } from '@/componentes/shell/Shell';
 import { Papel } from '@/lib/papeis';
 import { registrarAmbiente, sair } from '@/modulos/autenticacao/acoes';
 import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
+import { lerSaldoDisponivel } from '@/modulos/claves/consultas';
 
 /**
  * Shell do ambiente do artista.
@@ -29,6 +31,11 @@ export default async function LayoutArtista({ children }: { children: ReactNode 
   const papeis = contexto.estado === 'ok' ? contexto.papeis : [];
   const precisaRegistrar = contexto.estado === 'ok' && contexto.ultimoAmbiente !== Papel.ARTISTA;
 
+  // O card de saldo do protótipo. `null` para conta sem perfil de artista — é
+  // o mesmo instante em que a guarda de rota já está mandando a pessoa embora,
+  // e aí a sidebar simplesmente não tem rodapé.
+  const disponivel = await lerSaldoDisponivel();
+
   return (
     <Shell
       papelAtivo="artista"
@@ -36,6 +43,7 @@ export default async function LayoutArtista({ children }: { children: ReactNode 
       identidade={identidade ?? undefined}
       acaoDeSair={sair}
       registrarAmbiente={precisaRegistrar ? registrarAmbiente : undefined}
+      rodapeNavegacao={disponivel === null ? undefined : <CartaoDeSaldo disponivel={disponivel} />}
     >
       {children}
     </Shell>

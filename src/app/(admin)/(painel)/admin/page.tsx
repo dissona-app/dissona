@@ -1,4 +1,5 @@
 import { EstadoVazio } from '@/componentes/base/EstadoVazio';
+import { PAINEIS } from '@/textos/prototipo';
 
 /**
  * Dashboard administrativo — módulo 24, R4.
@@ -10,10 +11,5 @@ import { EstadoVazio } from '@/componentes/base/EstadoVazio';
  * só apareceu olhando a tela.
  */
 export default function Pagina() {
-  return (
-    <EstadoVazio
-      titulo="O painel entra na Release 4"
-      descricao="Enquanto isso, use a navegação: Pacotes de Claves já está no ar."
-    />
-  );
+  return <EstadoVazio titulo={PAINEIS.admin.vazio} descricao={PAINEIS.admin.descricao} />;
 }

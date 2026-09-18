@@ -77,7 +77,12 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
     await page.getByRole('button', { name: SELECAO.confirmar }).click();
 
     await expect(page.getByText(SELECAO.erroSaldo)).toBeVisible();
-    await expect(page.getByRole('link', { name: SELECAO.erroSaldoAcao })).toBeVisible();
+    // Dentro do conteúdo: o card de saldo no pé da sidebar tem um
+    // "Comprar Claves" com o mesmo nome acessível, e o que este cenário afirma
+    // é o CTA **do bloqueio** — o que diz para onde ir quando a compra falha.
+    await expect(
+      page.locator('#conteudo-principal').getByRole('link', { name: SELECAO.erroSaldoAcao }),
+    ).toBeVisible();
 
     // Continua na seleção: um bloqueio que avançasse de tela teria cobrado.
     await expect(page).toHaveURL(/\/curadores$/);

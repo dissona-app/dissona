@@ -26,6 +26,14 @@ export type ItemDaFila = {
   readonly duracaoSegundos: number | null;
   readonly contextoCurador: string | null;
   readonly arquivoCaminho: string | null;
+  /**
+   * Os serviços contratados naquele envio, na ordem do enum.
+   *
+   * A coluna "Serviço" da fila os lista — *"Feedback + Playlist"* —, e por isso
+   * eles vêm junto da lista, e não só no detalhe (13.1). Não estão em
+   * `fila_do_curador`: a view é uma linha por envio, e `servico_envio` é N.
+   */
+  readonly servicos: readonly TipoServico[];
 };
 
 export type ServicoContratado = {

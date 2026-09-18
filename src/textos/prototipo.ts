@@ -570,6 +570,41 @@ export const ONBOARDING = {
   nota: 'Você pode rever isso depois, pelo menu de ajuda.',
   rotuloDoPasso: (numero: number) => `Passo ${numero}`,
 
+  /**
+   * O painel lateral da tela 1.5.
+   *
+   * É o mesmo componente do aside da 1.1, com copy própria: aqui o título é
+   * "Como a Dissona funciona" (sem overline), os textos são os curtos, e não há
+   * a nota de LGPD — o painel termina no quarto passo. O onboarding abria sem
+   * aside nenhum, o que deixava metade da tela vazia num layout de duas
+   * colunas.
+   */
+  comoFunciona: {
+    titulo: 'Como a Dissona funciona',
+    passos: [
+      {
+        numero: '01',
+        titulo: 'Envie sua música',
+        texto: 'Uma faixa por envio. Quantos curadores couberem no saldo.',
+      },
+      {
+        numero: '02',
+        titulo: 'Receba leitura real',
+        texto: 'Até 11 critérios, nota decimal, texto assinado.',
+      },
+      {
+        numero: '03',
+        titulo: 'Acompanhe sua evolução',
+        texto: 'Relatórios que comparam faixa a faixa.',
+      },
+      {
+        numero: '04',
+        titulo: 'Circule mais longe',
+        texto: 'Playlist, post ou matéria, a partir do parecer.',
+      },
+    ],
+  },
+
   artista: [
     {
       titulo: 'Envie sua música',
@@ -767,6 +802,52 @@ export const ADMIN_PACOTE_FORMULARIO = {
   erroDescontoInvalido: 'O desconto tem de ficar entre 0% e 99,99%.',
 } as const;
 
+/**
+ * Navegação dos três ambientes, **literal** da sidebar de cada protótipo.
+ *
+ * Os grupos não são os mesmos nos três: o artista tem "Minha música" e
+ * "Curadoria"; o curador tem "Avaliações" e "Desempenho"; o admin tem "Gestão"
+ * e "Operação". O código aplicava os grupos do artista também ao curador, e
+ * trocava rótulos por sinônimos ("Minhas músicas" por "Minhas faixas",
+ * "Escolher curadores" por "Curadores"). Aqui eles voltam a ser o que o
+ * cliente validou.
+ *
+ * O que o protótipo **não** desenha também não aparece: "Notificações"
+ * (módulos 10 e 18, R5) e "Meu cadastro" saíram da sidebar. O 12.6 continua
+ * alcançável pela aba Perfil de Conta, que já leva a ele.
+ */
+export const NAVEGACAO_DO_ARTISTA = {
+  inicio: 'Início',
+  grupoMinhaMusica: 'Minha música',
+  enviar: 'Enviar faixa',
+  minhasFaixas: 'Minhas faixas',
+  devolutivas: 'Devolutivas',
+  grupoCuradoria: 'Curadoria',
+  curadores: 'Curadores',
+  grupoConta: 'Conta',
+  perfil: 'Perfil',
+  carteira: 'Carteira',
+  configuracoes: 'Configurações',
+} as const;
+
+export const NAVEGACAO_DO_CURADOR = {
+  inicio: 'Início',
+  grupoAvaliacoes: 'Avaliações',
+  fila: 'Fila',
+  notas: 'Notas e feedback',
+  /**
+   * "Notas e feedback" é item de sidebar no protótipo e lá abre um placeholder.
+   * Aqui a tela existe — o que não existe é um endereço para ela sem uma faixa
+   * escolhida, porque a avaliação é sempre de um envio.
+   */
+  motivoNotas: 'Abre a partir de uma faixa da fila',
+  grupoDesempenho: 'Desempenho',
+  metricas: 'Métricas',
+  financeiro: 'Financeiro',
+  grupoConta: 'Conta',
+  conta: 'Conta e configurações',
+} as const;
+
 /** Navegação do ambiente administrativo, como está na sidebar do protótipo. */
 export const ADMIN_NAVEGACAO = {
   inicio: 'Início',
@@ -814,9 +895,64 @@ export const GENEROS_DO_ARTISTA = [
   'Experimental',
 ] as const;
 
+/**
+ * 7.1 · a **vitrine** do perfil — a tela "Perfil" do protótipo.
+ *
+ * É a primeira das duas telas do módulo: avatar, nome, `@handle · cidade`,
+ * gêneros, bio, as três estatísticas e "Suas faixas". O botão leva à segunda,
+ * "Editar cadastro" (`ARTISTA_PERFIL`), que era a única implementada e ocupava
+ * o endereço desta.
+ */
+export const ARTISTA_VITRINE = {
+  titulo: 'Perfil',
+  editar: 'Editar cadastro',
+  bioVazia: 'Sem bio ainda. Duas linhas sobre o seu trabalho ajudam o curador a te ouvir melhor.',
+
+  estatisticas: {
+    faixas: 'Faixas',
+    faixasApoio: 'Enviadas para curadoria',
+    leituras: 'Leituras',
+    leiturasApoio: 'Curadorias concluídas',
+    indicacoes: 'Indicações',
+    indicacoesApoio: 'Compartilhadas por curadores',
+  },
+
+  suasFaixas: 'Suas faixas',
+  verTodas: 'Ver todas',
+  /** O catálogo é o módulo 6, da R4 — o botão existe e diz por que não abre. */
+  verTodasPendente: 'O catálogo completo entra na Release 4',
+
+  /** `trackData` do protótipo, mais o estado que só o produto tem. */
+  status: {
+    sem_envio: 'Sem envio',
+    em_analise: 'Em análise',
+    lida: 'Lida',
+    lida_por: (quantos: number) => `Lida por ${quantos}`,
+  },
+
+  vazioTitulo: 'Você ainda não enviou nenhuma faixa',
+  vazioDescricao: 'A primeira devolutiva começa com um envio.',
+  vazioAcao: 'Enviar música',
+} as const;
+
 export const ARTISTA_PERFIL = {
   titulo: 'Editar cadastro',
+  /** O nome do primeiro painel, para não repetir o `<h1>` da rota. */
+  tituloDoPainel: 'Seus dados',
   subtitulo: 'Curadores veem essas informações antes de ouvir você.',
+
+  /**
+   * Foto de perfil. Os textos são os do protótipo — "Trocar foto" e a dica com
+   * o tamanho mínimo, que é a única linha que declara o formato aceito.
+   */
+  trocarFoto: 'Trocar foto',
+  fotoHint: 'JPG ou PNG, a partir de 400×400. Aparece nas suas faixas e no perfil.',
+  fotoEnviando: 'Enviando a foto…',
+  fotoEnviada: 'Foto enviada.',
+  erroFotoTipo: 'A foto precisa ser JPG ou PNG.',
+  erroFotoTamanho: 'A foto passa de 2 MB.',
+  erroFotoAusente: 'Não encontramos a foto enviada. Escolha de novo.',
+  erroFotoAlheia: 'Esse arquivo não é seu.',
 
   rotuloNomeExibicao: 'Nome artístico',
   rotuloCidade: 'Cidade',
@@ -830,6 +966,18 @@ export const ARTISTA_PERFIL = {
   rotuloSpotify: 'Spotify',
   rotuloYoutube: 'YouTube',
   rotuloSite: 'Site',
+
+  /**
+   * Os exemplos que o protótipo põe em cada campo de link.
+   *
+   * Não são decoração: `esquemaLink` aceita `open.spotify.com/artist/…` sem
+   * `https://`, e é o exemplo que ensina isso — sem ele a pessoa descobre a
+   * forma aceita por tentativa e erro, com a mensagem de erro como professora.
+   */
+  exemploInstagram: '@seuperfil',
+  exemploSpotify: 'open.spotify.com/artist/…',
+  exemploYoutube: 'youtube.com/@seucanal',
+  exemploSite: 'seusite.com.br',
 
   salvar: 'Salvar alterações',
   cancelar: 'Cancelar',
@@ -859,6 +1007,17 @@ export const ARTISTA_PERFIL = {
 // ---------------------------------------------------------------------------
 // Carteira e Claves (5, 5.3) — protótipo do Artista
 // ---------------------------------------------------------------------------
+
+/**
+ * O card de saldo no pé da sidebar do artista.
+ *
+ * É overline de navegação, e não a coluna "Saldo" do extrato nem o título
+ * "Saldo disponível" da Carteira — três lugares onde a palavra aparece com
+ * pesos diferentes.
+ */
+export const SALDO_NA_NAVEGACAO = {
+  rotulo: 'Saldo',
+} as const;
 
 export const CARTEIRA = {
   saldoTitulo: 'Saldo disponível',
@@ -956,7 +1115,21 @@ export const ENVIAR = {
    * configuração diz 50, e a divergência está em 07-pendências.
    */
   dropzone: (tamanhoMaxMb: number) => `mp3 ou wav até ${tamanhoMaxMb} MB`,
+  /**
+   * O cartão "Faixa" do passo 2 — `enFaixaTitulo` e `enFaixaInfo`.
+   *
+   * O passo 2 pergunta sobre uma faixa que a pessoa preencheu no passo
+   * anterior, e não a mostrava: quem volta ao envio dias depois respondia "o
+   * que o curador precisa saber?" sem ver de qual faixa se trata.
+   */
+  rotuloFaixa: 'Faixa',
+  faixaInedita: (data: string) => `inédita · ${data}`,
+  faixaLancada: (data: string) => `lançada em ${data}`,
+  faixaSemData: 'sem data definida',
+
   dropzoneVazia: 'Arraste o arquivo aqui, ou clique para escolher',
+  /** O rótulo enquanto o arquivo está sobre a área — `enDropLabel` do protótipo. */
+  dropzoneSoltar: 'Solte para carregar',
   arquivoEscolhido: (nome: string) => `Arquivo escolhido: ${nome}`,
 
   /**
@@ -1122,6 +1295,47 @@ export const STATUS_DO_ENVIO = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// Início dos três ambientes (2, 24 e o "Painel do curador")
+// ---------------------------------------------------------------------------
+
+/**
+ * Os três "Início" são placeholder **no próprio protótipo**.
+ *
+ * O bloco `isModulo` desenha um card com o overline "Próximo release", e o
+ * título e o texto saem do mapa `modules`/`modulos` do view-model — não do
+ * markup. É de lá que vêm as strings abaixo, verbatim.
+ *
+ * `titulo` e `sublegenda` são do cabeçalho (`appTitle`/`appSub`); `vazio` e
+ * `descricao` são do card. O `vazio` nomeia a release porque é o padrão desta
+ * aplicação para tela de módulo futuro — o protótipo não numera releases.
+ *
+ * ⚠️ O texto do card **não** promete nada que já exista: a versão anterior
+ * dizia "a fila de avaliações entra na Release 2" numa tela publicada depois
+ * de a fila entrar no ar.
+ */
+export const PAINEIS = {
+  artista: {
+    titulo: 'Painel do artista',
+    sublegenda: 'Suas faixas, prazos e devolutivas.',
+    vazio: 'O painel do artista entra na Release 4',
+    descricao: 'Faixas em análise, devolutivas recentes, saldo de Claves e próximos prazos.',
+  },
+  curador: {
+    titulo: 'Painel do curador',
+    sublegenda: 'Suas leituras, prazos e ganhos do período.',
+    vazio: 'O painel do curador entra na Release 4',
+    descricao: 'Convites abertos, leituras em andamento, prazos e Claves do período.',
+  },
+  admin: {
+    titulo: 'Painel administrativo',
+    sublegenda: 'Visão geral da plataforma.',
+    vazio: 'O painel administrativo entra na Release 4',
+    descricao:
+      'Volume de envios, devolutivas em atraso, receita do período e alertas de moderação.',
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
 // Fila de avaliações (13, 13.1) — protótipo do Curador
 // ---------------------------------------------------------------------------
 
@@ -1136,9 +1350,16 @@ export const FILA = {
     status: 'Status',
   },
 
-  /** `filaResumo` do protótipo: "N faixas na fila · M com prazo curto". */
+  /**
+   * `filaResumo` do protótipo: "N faixas na fila · M com prazo curto".
+   *
+   * O segundo trecho só aparece quando há algum — é o `(urgentes ? … : '')` do
+   * protótipo. Concatenar sempre fazia uma fila tranquila anunciar "· 0 com
+   * prazo curto", que é ruído com cara de alerta.
+   */
   resumo: (naFila: number, curtos: number) =>
-    `${naFila} ${naFila === 1 ? 'faixa' : 'faixas'} na fila · ${curtos} com prazo curto`,
+    `${naFila} ${naFila === 1 ? 'faixa' : 'faixas'} na fila` +
+    (curtos > 0 ? ` · ${curtos} com prazo curto` : ''),
 
   filtros: {
     todas: 'Todas',
@@ -1165,10 +1386,17 @@ export const FILA = {
 
   // ------------------------------------------------------- 13.1 ------------
   voltarParaFila: 'Voltar para a fila',
-  enviadaEm: (quando: string) => `Enviada ${quando}`,
+  /**
+   * O rótulo do campo é "Enviada", e o valor é só o tempo — é o par
+   * `Enviada / {{ fdEnviado }}` do protótipo.
+   *
+   * Antes o rótulo era "Faixa" e a palavra "Enviada" vinha dentro do valor, o
+   * que ocupava o nome de um campo que o protótipo usa para outra coisa (o
+   * formato da faixa, "Single · master final" — dado que o produto não guarda).
+   */
+  rotuloEnviada: 'Enviada',
   rotuloDuracao: 'Duração',
   rotuloStatus: 'Status',
-  rotuloFaixa: 'Faixa',
   oQueOArtistaQuerSaber: 'O que o artista quer saber',
   semContexto: 'O artista não escreveu nada.',
   prazoRestante: 'Prazo restante',

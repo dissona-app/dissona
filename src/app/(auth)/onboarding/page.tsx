@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
+import { NavegadorDoTour } from '@/componentes/autenticacao/NavegadorDoTour';
+import { ProvedorDoTour } from '@/componentes/autenticacao/estado-do-tour';
 import { TourDeOnboarding } from '@/componentes/autenticacao/TourDeOnboarding';
 import type { PassoDoTour } from '@/componentes/autenticacao/TourDeOnboarding';
 import { ROTA } from '@/lib/guarda-rota';
@@ -40,18 +42,24 @@ export default async function Pagina({
   const passos = passosDoPapel(papeis);
 
   return (
-    <MolduraDeAutenticacao
-      linksDeRodape={[
-        { rotulo: 'Termos', href: ROTA.TERMOS },
-        { rotulo: 'Privacidade', href: ROTA.PRIVACIDADE },
-      ]}
-    >
-      <TourDeOnboarding
-        passos={passos}
-        acaoDeEncerrar={encerrarOnboarding}
-        revendo={rever === '1'}
-      />
-    </MolduraDeAutenticacao>
+    // O provedor envolve a moldura porque as **duas** colunas mexem no mesmo
+    // passo: o card à esquerda por "Avançar"/"Voltar", o painel à direita
+    // saltando direto. A moldura segue sendo componente de servidor.
+    <ProvedorDoTour total={passos.length}>
+      <MolduraDeAutenticacao
+        linksDeRodape={[
+          { rotulo: 'Termos', href: ROTA.TERMOS },
+          { rotulo: 'Privacidade', href: ROTA.PRIVACIDADE },
+        ]}
+        aside={<NavegadorDoTour />}
+      >
+        <TourDeOnboarding
+          passos={passos}
+          acaoDeEncerrar={encerrarOnboarding}
+          revendo={rever === '1'}
+        />
+      </MolduraDeAutenticacao>
+    </ProvedorDoTour>
   );
 }
 

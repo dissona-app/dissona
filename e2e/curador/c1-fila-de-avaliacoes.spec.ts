@@ -130,8 +130,10 @@ test.describe('C1 · Fila de avaliações', () => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila?status=atrasada');
 
-    // Mesmo com o filtro vazio, o resumo segue contando quantas faixas há.
-    await expect(page.getByText(/faixas? na fila · \d+ com prazo curto/)).toBeVisible();
+    // Mesmo com o filtro vazio, o resumo segue contando quantas faixas há. O
+    // "· N com prazo curto" é **opcional**: o protótipo só o mostra quando há
+    // urgente, e uma fila tranquila não anuncia "0 com prazo curto".
+    await expect(page.getByText(/[1-9]\d* faixas? na fila( · \d+ com prazo curto)?/)).toBeVisible();
   });
 
   test('a nota das 72h e dos 7 dias aparece', async ({ page }) => {

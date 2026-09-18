@@ -1,0 +1,121 @@
+/*
+ * Painel lateral da tela 1.5 — o navegador de passos do tour.
+ *
+ * Valores literais do protótipo (bloco `isOnboarding` do Artista): overline de
+ * 11px, cartão translúcido com blur, linha destacada no passo atual, e o badge
+ * de 30px trocando de cor junto. São as mesmas famílias de token das demais
+ * telas de auth; onde não há token (o blur, a sombra roxa), o valor é literal e
+ * está anotado.
+ */
+
+.overline {
+  flex: none;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-ink-500);
+  text-transform: uppercase;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-xl);
+  /* Translúcido sobre as ondas do fundo, como no protótipo. */
+  background: rgb(255 255 255 / 74%);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 1px 2px rgb(27 18 38 / 4%),
+    0 12px 32px rgb(27 18 38 / 6%);
+}
+
+.linha {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dsn-space-7);
+  width: 100%;
+  padding: clamp(11px, 1.7vh, 15px) 14px;
+  border: var(--dsn-border-width) solid transparent;
+  border-radius: var(--dsn-radius-lg);
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--dsn-duration-base),
+    border-color var(--dsn-duration-base),
+    box-shadow var(--dsn-duration-base);
+}
+
+.linha:hover {
+  border-color: var(--dsn-purple-200);
+}
+
+.linha:focus-visible {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.linhaAtual {
+  background: var(--dsn-purple-100);
+  border-color: var(--dsn-purple-200);
+  box-shadow:
+    0 1px 2px rgb(27 18 38 / 5%),
+    0 8px 20px rgb(91 46 143 / 10%);
+}
+
+.numero {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-top: -1px;
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: 9px;
+  background: var(--dsn-surface);
+  color: var(--dsn-ink-300);
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--dsn-tracking-snug);
+  transition:
+    background var(--dsn-duration-base),
+    color var(--dsn-duration-base);
+}
+
+.linhaAtual .numero {
+  background: var(--dsn-purple-600);
+  border-color: var(--dsn-purple-600);
+  color: var(--dsn-surface);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.titulo {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink-700);
+}
+
+.linhaAtual .titulo {
+  color: var(--dsn-ink);
+}
+
+.texto {
+  font-size: var(--dsn-text-xs);
+  /* 1.45 — o valor literal do protótipo nesta linha, e não o 1.5 do corpo. */
+  line-height: var(--dsn-leading-dense);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}

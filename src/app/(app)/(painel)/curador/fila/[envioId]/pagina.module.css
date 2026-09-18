@@ -71,6 +71,20 @@
   color: var(--dsn-ink);
 }
 
+/* Nome do serviço sobre a descrição, como o protótipo empilha `sv.nome` e
+   `sv.desc`; o preço continua alinhado à direita, na mesma linha do nome. */
+.servicoNome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.servicoDescricao {
+  font-size: var(--dsn-text-sm);
+  color: var(--dsn-ink-500);
+}
+
 .preco {
   font-variant-numeric: tabular-nums;
   color: var(--dsn-ink-500);

@@ -12,7 +12,7 @@ import { CodigoErro, falhar } from '@/lib/erros';
 import { estourarSeErro } from '@/lib/supabase/erros';
 import { criarClienteServidor } from '@/lib/supabase/servidor';
 
-import type { ItemDaFila, ServicoContratado, SituacaoEnvio } from './tipos';
+import type { ItemDaFila, ServicoContratado, SituacaoEnvio, TipoServico } from './tipos';
 
 /**
  * Uma linha de `fila_do_curador`, escrita à mão.
@@ -40,8 +40,9 @@ type LinhaDaFila = {
 const COLUNAS =
   'envio_id, faixa_id, titulo, artista, genero, situacao, prazo_em, devolucao_em, enviado_em, total_claves, duracao_segundos, contexto_curador, arquivo_caminho';
 
-function paraDominio(linha: LinhaDaFila): ItemDaFila {
+function paraDominio(linha: LinhaDaFila, servicos: readonly TipoServico[] = []): ItemDaFila {
   return {
+    servicos,
     envioId: linha.envio_id,
     faixaId: linha.faixa_id,
     titulo: linha.titulo,
@@ -84,7 +85,41 @@ export async function listarFila(): Promise<readonly ItemDaFila[]> {
   const { data, error } = await viewDaFila(supabase).from('fila_do_curador').select(COLUNAS);
 
   estourarSeErro(error);
-  return (data ?? []).map(paraDominio);
+
+  const linhas = data ?? [];
+  const servicos = await servicosPorEnvio(linhas.map((linha) => linha.envio_id));
+
+  return linhas.map((linha) => paraDominio(linha, servicos.get(linha.envio_id) ?? []));
+}
+
+/**
+ * Os serviços de vários envios, numa ida só.
+ *
+ * Uma consulta por linha da fila seria N+1 numa tela que já é uma lista. A
+ * policy de `servico_envio` decide o que volta: pedir por `in` não amplia
+ * acesso nenhum, e um envio que não é do curador simplesmente não vem.
+ */
+async function servicosPorEnvio(
+  envioIds: readonly string[],
+): Promise<ReadonlyMap<string, readonly TipoServico[]>> {
+  if (envioIds.length === 0) return new Map();
+
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('servico_envio')
+    .select('envio_id, tipo')
+    .in('envio_id', [...envioIds]);
+
+  estourarSeErro(error);
+
+  const porEnvio = new Map<string, TipoServico[]>();
+  for (const linha of data ?? []) {
+    const atuais = porEnvio.get(linha.envio_id) ?? [];
+    atuais.push(linha.tipo);
+    porEnvio.set(linha.envio_id, atuais);
+  }
+  return porEnvio;
 }
 
 /** Um item da fila. `null` quando não é do curador da sessão — a view o esconde. */
@@ -98,7 +133,13 @@ export async function buscarItem(envioId: string): Promise<ItemDaFila | null> {
 
   estourarSeErro(error);
   const linha = (data ?? [])[0];
-  return linha === undefined ? null : paraDominio(linha);
+  if (linha === undefined) return null;
+
+  // Também aqui, e não só na lista: um `ItemDaFila` com `servicos` vazio só
+  // porque veio pelo detalhe é a espécie de meia-verdade que alguém consome
+  // sem desconfiar.
+  const servicos = await servicosPorEnvio([linha.envio_id]);
+  return paraDominio(linha, servicos.get(linha.envio_id) ?? []);
 }
 
 /** Os serviços contratados naquele envio, com o preço **congelado**. */

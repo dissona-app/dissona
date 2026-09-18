@@ -2,6 +2,7 @@ import 'server-only';
 
 /** Leituras da Carteira (5) e do Extrato (5.3) para Server Components. */
 
+import type { Claves } from '@/lib/claves';
 import type { Centavos } from '@/lib/dinheiro';
 import { lerConfiguracao } from '@/lib/configuracao';
 
@@ -48,6 +49,20 @@ export async function lerCarteira(): Promise<TelaDaCarteira | null> {
     ultimas: ultimas(movimentacoes, ULTIMAS_NA_CARTEIRA),
     valorDaClave,
   };
+}
+
+/**
+ * Só o saldo disponível — o que o card da sidebar mostra.
+ *
+ * Separado de `lerCarteira` porque o layout do artista roda em **toda**
+ * navegação: puxar o ledger inteiro e a `configuracao` da Clave a cada página,
+ * para mostrar um número, seria pagar a tela 5 sem estar nela.
+ *
+ * `null` quando a conta não tem perfil de artista.
+ */
+export async function lerSaldoDisponivel(): Promise<Claves | null> {
+  const saldo = await lerSaldo();
+  return saldo === null ? null : saldo.disponivel;
 }
 
 export type TelaDoExtrato = {

@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { Aviso } from '@/componentes/base/Aviso';
 import { ROTA } from '@/lib/guarda-rota';
+import { esquemaLink } from '@/lib/link';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { credenciaisComprovadas, rotuloDoTempo } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO } from '@/textos/curador';
@@ -17,6 +18,18 @@ import type { PropsDoPasso } from './tipos';
 const MOTIVOS: Readonly<Record<string, string>> = {
   servico_feedback_obrigatorio: CURADOR_CADASTRO.erroPrecoFeedback,
 };
+
+/**
+ * Código do tipo de canal → rótulo.
+ *
+ * O resumo imprimia `canal.tipo`, que é o **código do enum**: a revisão dizia
+ * "playlist: Curadoria Dissona". No protótipo o `tipo` do canal já é o rótulo,
+ * porque lá o `select` guarda o texto; aqui ele guarda o código, e a tradução
+ * acontece na View — que é onde `lib/erros.ts` manda que aconteça.
+ */
+function rotuloDoCanal(codigo: string): string {
+  return CURADOR_CADASTRO.tiposDeCanal.find((tipo) => tipo.valor === codigo)?.rotulo ?? codigo;
+}
 
 type Bloco = {
   readonly rotulo: string;
@@ -50,6 +63,13 @@ export function Passo8Revisao({
   const { enviar, motivo, falha } = usePasso(acao);
 
   const comprovadas = credenciaisComprovadas(estado);
+  const anexos = estado.credenciais.filter(
+    (credencial) => (credencial.anexoCaminho ?? '') !== '',
+  ).length;
+  const canaisNomeados = estado.canais.filter((canal) => canal.nome.trim() !== '');
+  const canaisCompletos = canaisNomeados.filter(
+    (canal) => esquemaLink.safeParse(canal.url).success,
+  );
   const feedback = estado.servicos.find((servico) => servico.tipo === 'feedback');
   const opcionaisAtivos = estado.servicos.filter(
     (servico) => servico.tipo !== 'feedback' && servico.ativo,
@@ -85,11 +105,16 @@ export function Passo8Revisao({
     },
     {
       rotulo: CURADOR_CADASTRO.titulos[3],
+      // Só os canais com nome entram no resumo, e "Completo" exige nome **e**
+      // link válido — é o que o protótipo faz (`revMeta`, bloco "Canais"). Uma
+      // linha vazia que a pessoa abriu e não preencheu não é um canal.
       resumo:
-        estado.canais.length === 0
+        canaisNomeados.length === 0
           ? CURADOR_CADASTRO.resumoVazio.canais
-          : estado.canais.map((canal) => `${canal.tipo}: ${canal.nome}`).join(' · '),
-      completo: estado.canais.length > 0,
+          : canaisNomeados
+              .map((canal) => `${rotuloDoCanal(canal.tipo)}: ${canal.nome}`)
+              .join(' · '),
+      completo: canaisCompletos.length > 0,
       opcional: true,
       passo: 4,
     },
@@ -104,7 +129,7 @@ export function Passo8Revisao({
     },
     {
       rotulo: CURADOR_CADASTRO.titulos[5],
-      resumo: `${comprovadas} comprovadas`,
+      resumo: `${comprovadas} comprovadas · ${anexos} anexos`,
       completo: comprovadas > 0,
       opcional: true,
       passo: 6,

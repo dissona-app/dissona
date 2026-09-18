@@ -39,6 +39,21 @@ function formatarTempo(segundos: number): string {
 }
 
 /**
+ * O detalhe da barra: `avEscutaLabel` do protótipo.
+ *
+ * "62% ouvidos · escuta válida" quando passou do mínimo, "48% ouvidos · faltam
+ * 12%" quando não. O número sozinho — que era o que a barra mostrava — não diz
+ * o que falta, e "faltam 12%" é a única forma de a pessoa saber quanto ainda
+ * precisa ouvir sem fazer a conta de cabeça.
+ */
+function detalheDaEscuta(percentual: number, minimo: number | null): string {
+  if (minimo === null) return `${percentual}%`;
+  return percentual >= minimo
+    ? `${percentual}% ouvidos · escuta válida`
+    : `${percentual}% ouvidos · faltam ${minimo - percentual}%`;
+}
+
+/**
  * Player com medição de escuta confiável.
  *
  * A medição é do `MedidorDeEscuta` (`lib/escuta.ts`), que credita intervalos
@@ -179,7 +194,7 @@ export function Player({ src, titulo, artista, minimoPercentual, onEscutaMudar }
           percentual={escuta.percentual}
           rotulo="Escutado"
           tom={atingiu ? 'sucesso' : 'marca'}
-          detalhe={`${escuta.percentual}%`}
+          detalhe={detalheDaEscuta(escuta.percentual, minimoPercentual)}
         />
 
         {minimoPercentual !== null ? (

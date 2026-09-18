@@ -12,9 +12,10 @@
   gap: var(--dsn-space-4);
 }
 
-/* A dropzone é um `<label>` com o input escondido: arrastar e clicar
-   funcionam, `Tab` alcança e o leitor de tela anuncia o campo de arquivo —
-   sem `role` nem `aria-*` escritos à mão. */
+/* A dropzone é um `<label>` com o input escondido: clicar funciona, `Tab`
+   alcança e o leitor de tela anuncia o campo de arquivo — sem `role` nem
+   `aria-*` escritos à mão. Arrastar é tratado no componente: um `<label>` não
+   recebe drop, e o input que receberia tem 1px. */
 .dropzone {
   display: flex;
   flex-direction: column;
@@ -33,6 +34,13 @@
 
 .dropzone:hover {
   border-color: var(--dsn-purple-300);
+  background: var(--dsn-purple-050);
+}
+
+/* Com o arquivo sobre a área. Mesmo destaque do hover, mais forte na borda —
+   é o que diz que soltar ali vai funcionar. */
+.dropzoneAtiva {
+  border-color: var(--dsn-purple-600);
   background: var(--dsn-purple-050);
 }
 

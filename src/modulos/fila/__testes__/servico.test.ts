@@ -40,6 +40,7 @@ function item(
     duracaoSegundos: 200,
     contextoCurador: null,
     arquivoCaminho: 'uid/f.mp3',
+    servicos: ['feedback'],
     ...resto,
   };
 }
@@ -76,21 +77,22 @@ describe('naFila', () => {
 });
 
 describe('prazo curto', () => {
-  it('menos de 24h conta; vencido não', () => {
+  it('menos de 24h conta, e o vencido também', () => {
     expect(ehPrazoCurto(item({ artista: 'A', horasAtePrazo: 5 }), AGORA)).toBe(true);
     expect(ehPrazoCurto(item({ artista: 'A', horasAtePrazo: 30 }), AGORA)).toBe(false);
-    // Vencido é "atrasada", não "prazo curto" — são recortes diferentes, e
-    // somá-los inflaria o contador de urgência do resumo.
-    expect(ehPrazoCurto(item({ artista: 'A', horasAtePrazo: -2 }), AGORA)).toBe(false);
+    // O vencido é o caso mais urgente que existe. Excluí-lo fazia uma fila só
+    // de atrasadas anunciar "0 com prazo curto" — ver `ehPrazoCurto`.
+    expect(ehPrazoCurto(item({ artista: 'A', horasAtePrazo: -2 }), AGORA)).toBe(true);
   });
 
-  it('conta quantos estão curtos', () => {
+  it('conta quantos estão curtos, atrasados inclusive', () => {
     const fila = [
       item({ artista: 'A', horasAtePrazo: 5 }),
       item({ artista: 'B', horasAtePrazo: 40 }),
       item({ artista: 'C', horasAtePrazo: 2 }),
+      item({ artista: 'D', horasAtePrazo: -30 }),
     ];
-    expect(contarPrazoCurto(fila, AGORA)).toBe(2);
+    expect(contarPrazoCurto(fila, AGORA)).toBe(3);
   });
 });
 

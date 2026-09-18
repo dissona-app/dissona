@@ -17,3 +17,19 @@
   flex-wrap: wrap;
   gap: var(--dsn-space-3);
 }
+
+/* O cartão "Faixa": título em cima, a composição estilo · situação · data
+   embaixo, como o protótipo empilha `enFaixaTitulo` e `enFaixaInfo`. */
+.faixaTitulo {
+  margin: 0;
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  color: var(--dsn-ink);
+}
+
+.faixaInfo {
+  margin: var(--dsn-space-1) 0 0;
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
