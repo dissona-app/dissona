@@ -32,10 +32,12 @@ import {
   buscarClientePorCpf,
   criarCliente,
   criarCobrancaCartao,
+  criarCobrancaComToken,
   criarCobrancaPix,
   ehRecusaDoCartao,
   lerQrCodePix,
 } from './asaas';
+import { cartaoDaResposta } from './servico';
 import type { MeioPagamento, ResultadoSimulado } from './tipos';
 
 export const PROVEDOR_SIMULADO = 'simulado';
@@ -64,11 +66,28 @@ export type Cobranca = {
   readonly valorCentavos: bigint;
   readonly descricao: string;
   readonly comprador: Comprador;
-  /** Só no meio `cartao`. */
+  /** Só no meio `cartao`, e só quando o cartão é novo. */
   readonly cartao?: Cartao | undefined;
+  /**
+   * O token de um cartão já salvo. Quando vem, `cartao` não vem — e o número
+   * não trafega.
+   */
+  readonly cartaoToken?: string | undefined;
   readonly ipRemoto: string | null;
   /** Só o simulador lê. */
   readonly desfechoDesejado?: ResultadoSimulado | undefined;
+};
+
+/**
+ * O cartão que a cobrança aprovada deixou para guardar.
+ *
+ * Só vem quando o provedor tokeniza, e só numa cobrança com cartão **novo**:
+ * pagar com um token já salvo não gera outro.
+ */
+export type CartaoParaSalvar = {
+  readonly token: string;
+  readonly ultimosDigitos: string;
+  readonly bandeira: string | null;
 };
 
 export type RespostaDoProvedor =
@@ -83,6 +102,7 @@ export type RespostaDoProvedor =
       readonly idEvento: string;
       readonly tipo: string;
       readonly cobrancaId: string | null;
+      readonly cartaoParaSalvar?: CartaoParaSalvar | undefined;
     }
   | {
       readonly desfecho: 'pendente';
@@ -105,12 +125,27 @@ const simulador: ProvedorDePagamento = {
 
   cobrar(cobranca) {
     const aprovado = cobranca.desfechoDesejado !== 'recusado';
+
+    // O simulador tokeniza como o Asaas tokeniza: só no cartão novo, e só
+    // quando a cobrança passa. Sem isso, guardar o cartão seria um caminho que
+    // nenhum teste percorre — a suíte roda com `PAGAMENTO_SIMULADO=true`.
+    const tokenizou = aprovado && cobranca.meio === 'cartao' && cobranca.cartaoToken === undefined;
+
     return Promise.resolve({
       desfecho: aprovado ? 'aprovado' : 'recusado',
       provedor: PROVEDOR_SIMULADO,
       idEvento: `${PROVEDOR_SIMULADO}:${randomUUID()}`,
       tipo: aprovado ? 'PAYMENT_CONFIRMED' : 'PAYMENT_REFUSED',
       cobrancaId: null,
+      ...(tokenizou
+        ? {
+            cartaoParaSalvar: {
+              token: `${PROVEDOR_SIMULADO}:${randomUUID()}`,
+              ultimosDigitos: (cobranca.cartao?.numero ?? '0000').slice(-4),
+              bandeira: null,
+            },
+          }
+        : {}),
     });
   },
 };
@@ -155,25 +190,37 @@ const asaas: ProvedorDePagamento = {
     }
 
     const cartao = cobranca.cartao;
-    if (cartao === undefined) falhar(CodigoErro.ENTRADA_INVALIDA, { motivo: 'cartao_ausente' });
+    const token = cobranca.cartaoToken;
+    if (cartao === undefined && token === undefined) {
+      falhar(CodigoErro.ENTRADA_INVALIDA, { motivo: 'cartao_ausente' });
+    }
+
+    const base = {
+      clienteId: cliente.id,
+      valorCentavos: cobranca.valorCentavos,
+      pedidoId: cobranca.pedidoId,
+      descricao: cobranca.descricao,
+      vencimento: hojeNoBrasil(),
+      ipRemoto: cobranca.ipRemoto,
+    };
 
     try {
-      const cobrado = await criarCobrancaCartao({
-        clienteId: cliente.id,
-        valorCentavos: cobranca.valorCentavos,
-        pedidoId: cobranca.pedidoId,
-        descricao: cobranca.descricao,
-        vencimento: hojeNoBrasil(),
-        cartao,
-        titular: {
-          nome: cartao.titular,
-          email: comprador.email,
-          cpf: comprador.cpf,
-          cep: cartao.cep,
-          telefone: cartao.telefone,
-        },
-        ipRemoto: cobranca.ipRemoto,
-      });
+      const cobrado =
+        token !== undefined
+          ? await criarCobrancaComToken({ ...base, token })
+          : await criarCobrancaCartao({
+              ...base,
+              // `cartao` é definido aqui: o `falhar` acima já barrou o caso em
+              // que nenhum dos dois veio, e ele lança.
+              cartao: cartao as Cartao,
+              titular: {
+                nome: (cartao as Cartao).titular,
+                email: comprador.email,
+                cpf: comprador.cpf,
+                cep: (cartao as Cartao).cep,
+                telefone: (cartao as Cartao).telefone,
+              },
+            });
       const aprovado = cobrado.status === 'CONFIRMED' || cobrado.status === 'RECEIVED';
       return {
         desfecho: aprovado ? 'aprovado' : 'recusado',
@@ -181,6 +228,7 @@ const asaas: ProvedorDePagamento = {
         idEvento: `${PROVEDOR_ASAAS}:cobranca:${cobrado.id}`,
         tipo: aprovado ? 'PAYMENT_CONFIRMED' : `PAYMENT_${cobrado.status}`,
         cobrancaId: cobrado.id,
+        ...(aprovado ? { cartaoParaSalvar: cartaoDaResposta(cobrado) } : {}),
       };
     } catch (erro) {
       if (!ehRecusaDoCartao(erro)) throw erro;

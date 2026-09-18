@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { deClavesInteiras, paraClavesComSinal } from '@/lib/claves';
 
-import { adquiridas, comSaldoAcumulado, filtrar, ultimas, usadas } from '../servico';
+import {
+  adquiridas,
+  cartaoDaResposta,
+  comSaldoAcumulado,
+  filtrar,
+  ultimas,
+  usadas,
+} from '../servico';
 import type { Movimentacao, TipoLancamento } from '../tipos';
 
 /**
@@ -117,5 +124,57 @@ describe('ultimas', () => {
 
   it('pede mais do que existe e devolve o que existe', () => {
     expect(ultimas([mov('compra', '10', 1)], 3)).toHaveLength(1);
+  });
+});
+
+/**
+ * O cartão que a cobrança deixa para guardar.
+ *
+ * O que se prova aqui é quando **não** salvar. Salvar pela metade violaria o
+ * `check` da `0007e` e derrubaria uma compra já paga — e o dinheiro já entrou.
+ */
+describe('cartaoDaResposta', () => {
+  const COMPLETA = {
+    creditCard: {
+      creditCardNumber: '8829',
+      creditCardBrand: 'MASTERCARD',
+      creditCardToken: 'a75a1d98-c52d-4a6b-a413-71e00b193c99',
+    },
+  };
+
+  it('devolve token, quatro dígitos e bandeira', () => {
+    expect(cartaoDaResposta(COMPLETA)).toEqual({
+      token: 'a75a1d98-c52d-4a6b-a413-71e00b193c99',
+      ultimosDigitos: '8829',
+      bandeira: 'MASTERCARD',
+    });
+  });
+
+  it('sem `creditCard` não há o que guardar', () => {
+    // É o caso de pagar com um token que já tínhamos: a cobrança passa e
+    // nenhum cartão novo nasce.
+    expect(cartaoDaResposta({})).toBeUndefined();
+  });
+
+  it('sem token não guarda, mesmo com os dígitos', () => {
+    expect(cartaoDaResposta({ creditCard: { creditCardNumber: '8829' } })).toBeUndefined();
+  });
+
+  it('dígitos fora de formato não guardam', () => {
+    // `ultimos_digitos` tem `check (~ '^[0-9]{4}$')`: mandar "**29" ou o PAN
+    // inteiro faria o insert estourar depois de a compra já ter sido paga.
+    for (const numero of ['**29', '5162306219378829', '', '882']) {
+      expect(
+        cartaoDaResposta({ creditCard: { creditCardNumber: numero, creditCardToken: 'tok' } }),
+        numero,
+      ).toBeUndefined();
+    }
+  });
+
+  it('bandeira ausente vira null, e não string vazia', () => {
+    const cartao = cartaoDaResposta({
+      creditCard: { creditCardNumber: '8829', creditCardToken: 'tok' },
+    });
+    expect(cartao?.bandeira).toBeNull();
   });
 });

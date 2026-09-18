@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 import { ultimoPedidoDe } from '../apoio/banco';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
-import { CARTEIRA, CHECKOUT, PACOTES } from '../apoio/textos';
+import { CARTAO_SALVO, CARTEIRA, CHECKOUT, PACOTES } from '../apoio/textos';
 
 /**
  * B2 · Comprar Claves — módulo 5.1 · 5.2
@@ -86,6 +86,13 @@ async function abrirCheckout(page: Page) {
 }
 
 async function preencherCartao(page: Page, numero: string) {
+  // Escolhe "Cartão" antes de preencher: se a conta já tem um cartão salvo, a
+  // opção padrão passa a ser ele e os campos nem aparecem. Sem esta linha, o
+  // teste depende de o cartão salvo **não** existir — e a suíte deixaria de
+  // ser determinística na segunda execução.
+  const novo = page.getByRole('radio', { name: CHECKOUT.meios.cartao, exact: true });
+  if (await novo.isVisible()) await novo.click();
+
   await page.getByLabel(CHECKOUT.cpf).fill(CPF);
   await page.getByLabel(CHECKOUT.numero).fill(numero);
   await page.getByLabel(CHECKOUT.nome).fill('E2E Artista');
@@ -436,6 +443,64 @@ test.describe('B2 · Comprar Claves', () => {
         },
       });
       expect(resposta.status()).toBe(200);
+    },
+  );
+  /**
+   * RF-045 · o token guardado, e o que ele muda.
+   *
+   * A tokenização do Asaas é **posterior**: a primeira cobrança vai com o
+   * cartão e a resposta traz um `creditCardToken` para as próximas. Este
+   * cenário percorre o ciclo inteiro — a compra que salva, a compra que reusa,
+   * e a remoção — porque é o que prova o ganho: **na segunda compra nenhum
+   * dígito do cartão é digitado nem enviado**.
+   *
+   * Termina removendo o cartão, e não por educação: a conta é compartilhada
+   * pelos cenários deste arquivo, e deixá-lo salvo mudaria a opção padrão do
+   * checkout para os outros na próxima execução.
+   */
+  test(
+    'o cartão salvo é reusado na compra seguinte, e some quando removido',
+    { tag: ['@RF-045'] },
+    async ({ page }) => {
+      await entrarComo(page, PERSONA.ARTISTA_COMPRA);
+
+      // 1. A compra que gera o token.
+      await abrirCheckout(page);
+      await preencherCartao(page, CARTAO_APROVADO);
+      await simularSePreciso(page, 'aprovado');
+      await page.getByRole('button', { name: CHECKOUT.confirmar }).click();
+      await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toBeVisible({ timeout: 30_000 });
+
+      // 2. O checkout seguinte já oferece o cartão, e ele é o padrão.
+      const antes = await lerSaldo(page);
+      await abrirCheckout(page);
+
+      const salvo = page.getByRole('radio', { name: /···· \d{4}$/ });
+      await expect(salvo).toBeVisible();
+      await expect(salvo).toBeChecked();
+
+      // O número não é pedido: os campos do cartão nem estão na tela.
+      await expect(page.getByLabel(CHECKOUT.numero)).toBeHidden();
+      await expect(page.getByText(CARTAO_SALVO.notaNoCheckout)).toBeVisible();
+
+      await page.getByLabel(CHECKOUT.cpf).fill(CPF);
+      await simularSePreciso(page, 'aprovado');
+      await page.getByRole('button', { name: CHECKOUT.confirmar }).click();
+
+      await expect(page.getByText(CHECKOUT.aprovadoTitulo)).toBeVisible({ timeout: 30_000 });
+      expect(await lerSaldo(page)).toBeGreaterThan(antes);
+
+      // 3. Remover, em Dados da conta — guardar sem poder tirar seria guardar
+      // sem consentimento revogável.
+      await page.goto('/artista/conta?aba=dados');
+      await expect(page.getByText(/···· \d{4}$/)).toBeVisible();
+      await page.getByRole('button', { name: CARTAO_SALVO.remover }).click();
+      await expect(
+        page.getByRole('status').filter({ hasText: CARTAO_SALVO.removido }),
+      ).toBeVisible();
+
+      await page.reload();
+      await expect(page.getByText(CARTAO_SALVO.vazioEmConta)).toBeVisible();
     },
   );
 });

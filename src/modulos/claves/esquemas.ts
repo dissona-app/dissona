@@ -3,12 +3,17 @@
  *
  * ## Os dados do cartão atravessam o servidor, e não ficam nele
  *
- * O Asaas não tem SDK de navegador: a cobrança e a tokenização são chamadas de
- * API com a chave da conta, que não pode ir ao navegador. Então número,
- * titular, validade e código de segurança **passam** pela Server Action a
- * caminho do Asaas — e morrem ali. Nada disso é gravado no banco, entra em
- * log ou volta na resposta; o requisito "sem persistir dados do cartão" é
- * cumprido por esse caminho curto, e não por o dado não sair do navegador.
+ * A tokenização do Asaas é **posterior à cobrança**: não há como trocar o
+ * cartão por um token antes de cobrar, porque é a própria cobrança que devolve
+ * o `creditCardToken`. Então, na **primeira** compra, número, titular,
+ * validade e código de segurança passam pela Server Action a caminho do Asaas —
+ * e morrem ali. Nada disso é gravado no banco, entra em log ou volta na
+ * resposta; o requisito "sem persistir dados do cartão" é cumprido por esse
+ * caminho curto, e não por o dado não sair do navegador.
+ *
+ * Da **segunda** em diante existe a variante `cartao_salvo`, que leva só o id
+ * da linha em `cartao_salvo` e nenhum dado de cartão. O caminho em que o PAN
+ * nunca nos toca é outro — o checkout hospedado deles, em open-questions #28.
  *
  * As mensagens são **códigos**; a View traduz (architecture.md §8). Nenhuma
  * delas ecoa o valor recebido.
@@ -73,8 +78,21 @@ const comuns = {
   simulacao: z.enum(RESULTADOS_SIMULADOS).optional(),
 };
 
+/**
+ * Os três caminhos da compra.
+ *
+ * `cartao_salvo` é o cartão que o Asaas já tokenizou: leva o id da linha em
+ * `cartao_salvo`, e **nenhum dado de cartão** — é o ponto de guardar o token.
+ * Ele não é um valor de `meio_pagamento` no banco (o enum tem `pix` e
+ * `cartao`); é uma variante da tela, e o pedido nasce como `cartao`.
+ *
+ * União discriminada, e não campos opcionais com `superRefine`: acrescentar um
+ * caminho sem tratá-lo em quem consome deixa de compilar, que é exatamente a
+ * hora de descobrir.
+ */
 export const esquemaDeCompra = z.discriminatedUnion('meio', [
   z.object({ ...comuns, meio: z.literal('pix') }),
+  z.object({ ...comuns, meio: z.literal('cartao_salvo'), cartaoId: z.uuid() }),
   z.object({
     ...comuns,
     meio: z.literal('cartao'),

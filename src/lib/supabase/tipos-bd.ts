@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       avaliacao: {
@@ -100,11 +75,67 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "avaliacao_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: true
+            referencedRelation: "fila_do_curador"
+            referencedColumns: ["envio_id"]
+          },
+          {
+            foreignKeyName: "avaliacao_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "curador_publico"
+            referencedColumns: ["perfil_curador_id"]
+          },
+          {
             foreignKeyName: "avaliacao_perfil_curador_id_fkey"
             columns: ["perfil_curador_id"]
             isOneToOne: false
             referencedRelation: "perfil_curador"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      cartao_salvo: {
+        Row: {
+          bandeira: string | null
+          criado_em: string
+          id: string
+          perfil_artista_id: string
+          token: string
+          ultimos_digitos: string
+        }
+        Insert: {
+          bandeira?: string | null
+          criado_em?: string
+          id?: string
+          perfil_artista_id: string
+          token: string
+          ultimos_digitos: string
+        }
+        Update: {
+          bandeira?: string | null
+          criado_em?: string
+          id?: string
+          perfil_artista_id?: string
+          token?: string
+          ultimos_digitos?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cartao_salvo_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_artista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cartao_salvo_perfil_artista_id_fkey"
+            columns: ["perfil_artista_id"]
+            isOneToOne: false
+            referencedRelation: "saldo_carteira"
+            referencedColumns: ["perfil_artista_id"]
           },
         ]
       }
@@ -272,6 +303,13 @@ export type Database = {
             foreignKeyName: "credencial_curador_perfil_curador_id_fkey"
             columns: ["perfil_curador_id"]
             isOneToOne: false
+            referencedRelation: "curador_publico"
+            referencedColumns: ["perfil_curador_id"]
+          },
+          {
+            foreignKeyName: "credencial_curador_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
             referencedRelation: "perfil_curador"
             referencedColumns: ["id"]
           },
@@ -360,6 +398,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "faixa"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "envio_faixa_id_fkey"
+            columns: ["faixa_id"]
+            isOneToOne: false
+            referencedRelation: "fila_do_curador"
+            referencedColumns: ["faixa_id"]
+          },
+          {
+            foreignKeyName: "envio_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "curador_publico"
+            referencedColumns: ["perfil_curador_id"]
           },
           {
             foreignKeyName: "envio_perfil_curador_id_fkey"
@@ -579,6 +631,13 @@ export type Database = {
             foreignKeyName: "ganho_curador_perfil_curador_id_fkey"
             columns: ["perfil_curador_id"]
             isOneToOne: false
+            referencedRelation: "curador_publico"
+            referencedColumns: ["perfil_curador_id"]
+          },
+          {
+            foreignKeyName: "ganho_curador_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
             referencedRelation: "perfil_curador"
             referencedColumns: ["id"]
           },
@@ -622,6 +681,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "envio"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamento_clave_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: false
+            referencedRelation: "fila_do_curador"
+            referencedColumns: ["envio_id"]
           },
           {
             foreignKeyName: "lancamento_clave_pedido_clave_id_fkey"
@@ -763,6 +829,13 @@ export type Database = {
           url?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "midia_curador_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "curador_publico"
+            referencedColumns: ["perfil_curador_id"]
+          },
           {
             foreignKeyName: "midia_curador_perfil_curador_id_fkey"
             columns: ["perfil_curador_id"]
@@ -1317,6 +1390,13 @@ export type Database = {
             foreignKeyName: "servico_curador_perfil_curador_id_fkey"
             columns: ["perfil_curador_id"]
             isOneToOne: false
+            referencedRelation: "curador_publico"
+            referencedColumns: ["perfil_curador_id"]
+          },
+          {
+            foreignKeyName: "servico_curador_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
             referencedRelation: "perfil_curador"
             referencedColumns: ["id"]
           },
@@ -1353,6 +1433,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "servico_envio_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: false
+            referencedRelation: "fila_do_curador"
+            referencedColumns: ["envio_id"]
+          },
+          {
             foreignKeyName: "servico_envio_servico_curador_id_fkey"
             columns: ["servico_curador_id"]
             isOneToOne: false
@@ -1363,6 +1450,34 @@ export type Database = {
       }
     }
     Views: {
+      curador_publico: {
+        Row: {
+          classe: Database["public"]["Enums"]["classe_curador"] | null
+          nome: string | null
+          perfil_curador_id: string | null
+          situacao: Database["public"]["Enums"]["situacao_curador"] | null
+        }
+        Relationships: []
+      }
+      fila_do_curador: {
+        Row: {
+          arquivo_caminho: string | null
+          artista: string | null
+          capa_caminho: string | null
+          contexto_curador: string | null
+          devolucao_em: string | null
+          duracao_segundos: number | null
+          enviado_em: string | null
+          envio_id: string | null
+          faixa_id: string | null
+          genero: string | null
+          prazo_em: string | null
+          situacao: Database["public"]["Enums"]["situacao_envio"] | null
+          titulo: string | null
+          total_claves: number | null
+        }
+        Relationships: []
+      }
       nota_artista: {
         Row: {
           avaliacoes: number | null
@@ -1404,6 +1519,20 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "envio"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacao_envio_id_fkey"
+            columns: ["envio_id"]
+            isOneToOne: true
+            referencedRelation: "fila_do_curador"
+            referencedColumns: ["envio_id"]
+          },
+          {
+            foreignKeyName: "avaliacao_perfil_curador_id_fkey"
+            columns: ["perfil_curador_id"]
+            isOneToOne: false
+            referencedRelation: "curador_publico"
+            referencedColumns: ["perfil_curador_id"]
           },
           {
             foreignKeyName: "avaliacao_perfil_curador_id_fkey"
@@ -1530,6 +1659,7 @@ export type Database = {
         }
         Returns: string
       }
+      envio_e_meu: { Args: { p_envio_id: string }; Returns: boolean }
       expurgar_contas_excluidas: {
         Args: { p_limite?: number }
         Returns: number
@@ -1799,9 +1929,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       canal_notificacao: ["in_app", "email"],

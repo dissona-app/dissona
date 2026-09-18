@@ -41,7 +41,8 @@ import { buscarPacote } from '@/modulos/pacote/consultas';
 
 import { esquemaDeCompra } from './esquemas';
 import { provedorEmVigor } from './pagamento';
-import { lerSaldo } from './repositorio';
+import type { MeioPagamento } from './tipos';
+import { apagarCartao, lerSaldo, lerTokenDoCartao, salvarCartao } from './repositorio';
 import {
   confirmarPedido,
   criarPedido,
@@ -101,7 +102,21 @@ export async function comprarClaves(entrada: unknown): Promise<ResultadoDeAcao<D
     // Antes do pedido: sem provedor não há cobrança possível, e criar a linha
     // só para deixá-la pendente sujaria a conciliação com um erro nosso.
     const provedor = provedorEmVigor();
-    const pedidoId = await criarPedido(compra.pacoteId, compra.meio);
+
+    // `cartao_salvo` é variante de tela, e não de `meio_pagamento`: para o
+    // ledger e para a conciliação, pagar com o token guardado é um pagamento
+    // com cartão como outro qualquer.
+    const meio: MeioPagamento = compra.meio === 'pix' ? 'pix' : 'cartao';
+
+    // O token é lido **antes** de criar o pedido: um id que não é da pessoa
+    // não deve deixar um pedido pendente para trás.
+    const cartaoToken =
+      compra.meio === 'cartao_salvo' ? await lerTokenDoCartao(compra.cartaoId) : undefined;
+    if (compra.meio === 'cartao_salvo' && cartaoToken === null) {
+      return falhaDeCampos(CodigoErro.NAO_ENCONTRADO, { cartaoId: 'cartao_nao_encontrado' });
+    }
+
+    const pedidoId = await criarPedido(compra.pacoteId, meio);
     const pedido = await lerPedido(pedidoId);
     if (pedido === null) return falha(CodigoErro.NAO_ENCONTRADO);
 
@@ -109,7 +124,7 @@ export async function comprarClaves(entrada: unknown): Promise<ResultadoDeAcao<D
 
     const resposta = await provedor.cobrar({
       pedidoId,
-      meio: compra.meio,
+      meio,
       valorCentavos: pedido.valorTotalCentavos,
       descricao: `Dissona · ${pedido.quantidadeClaves} Claves`,
       comprador: { perfilId: usuario.id, nome, email: usuario.email ?? '', cpf: compra.cpf },
@@ -125,6 +140,7 @@ export async function comprarClaves(entrada: unknown): Promise<ResultadoDeAcao<D
               cep: compra.cep,
             }
           : undefined,
+      cartaoToken: cartaoToken ?? undefined,
       ipRemoto: await ipRemoto(),
       desfechoDesejado: compra.simulacao,
     });
@@ -154,7 +170,7 @@ export async function comprarClaves(entrada: unknown): Promise<ResultadoDeAcao<D
     // A carga não leva nada do cartão — só o que concilia.
     await registrarEvento(resposta.idEvento, resposta.provedor, resposta.tipo, {
       pedido_id: pedidoId,
-      meio: compra.meio,
+      meio,
       desfecho: resposta.desfecho,
       cobranca_id: resposta.cobrancaId,
     });
@@ -166,6 +182,14 @@ export async function comprarClaves(entrada: unknown): Promise<ResultadoDeAcao<D
     }
 
     await confirmarPedido(pedidoId);
+
+    // Depois de creditar, e nunca antes: o token só vale a pena guardar se a
+    // cobrança que o gerou passou. `salvarCartao` não estoura — ver o
+    // repositório.
+    if (resposta.cartaoParaSalvar !== undefined) {
+      await salvarCartao(resposta.cartaoParaSalvar);
+    }
+
     revalidar();
 
     return sucesso<DesfechoDaCompra>({
@@ -198,6 +222,30 @@ export async function acompanharPix(
       situacao: 'aprovado',
       ...(await clavesESaldo(null, pedido.quantidadeClaves)),
     });
+  });
+}
+
+/**
+ * Remove o cartão guardado (7.2).
+ *
+ * Guardar um meio de pagamento sem oferecer como tirá-lo seria guardar sem
+ * consentimento revogável — e a tela de Dados da conta é onde ele aparece.
+ *
+ * Id de outra pessoa e id já removido caem no mesmo `false`, de propósito:
+ * distinguir os dois contaria que a linha existe.
+ */
+export async function removerCartaoSalvo(dados: FormData): Promise<ResultadoDeAcao> {
+  return executar(async () => {
+    const cartaoId = dados.get('cartaoId');
+    if (typeof cartaoId !== 'string' || cartaoId === '') {
+      return falhaDeCampos(CodigoErro.ENTRADA_INVALIDA, { cartaoId: 'cartao_nao_encontrado' });
+    }
+
+    if (!(await apagarCartao(cartaoId))) return falha(CodigoErro.NAO_ENCONTRADO);
+
+    revalidatePath(ROTA.ARTISTA_CONTA);
+    revalidar();
+    return sucesso();
   });
 }
 

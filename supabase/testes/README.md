@@ -13,9 +13,11 @@ inteira numa chamada de `execute_sql` do MCP:
 cat supabase/testes/_ajuda.sql supabase/testes/0001_identidade.testes.sql
 ```
 
-Três exceções, que **não** se concatenam a `_ajuda.sql` porque montam os
+Quatro exceções, que **não** se concatenam a `_ajuda.sql` porque montam os
 próprios atores e abrem a própria transação: `0010_rpcs_sla.testes.sql` (precisa
-de dois curadores), `0007b_pacote_exclusao.testes.sql` e
+de dois curadores), `0007b_pacote_exclusao.testes.sql`,
+`0007e_cartao_salvo.testes.sql` (precisa de **dois artistas** — a pergunta que
+importa ali, "um alcança o cartão do outro?", só existe com dois) e
 `0002e_perfil_sem_email.testes.sql` — este último porque os atores de
 `_ajuda.sql` nascem **todos com e-mail**, e é a conta sem endereço que ele
 prova.

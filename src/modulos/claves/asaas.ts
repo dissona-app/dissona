@@ -93,7 +93,24 @@ export function criarCliente(dados: {
   });
 }
 
-export type CobrancaAsaas = { readonly id: string; readonly status: string };
+/**
+ * O que a cobrança devolve.
+ *
+ * `creditCard` só vem no cartão, e é **onde nasce o token**: o Asaas tokeniza
+ * *depois* de autorizar, e a resposta traz a referência que serve para as
+ * próximas cobranças. Não existe caminho em que o cartão não passe por aqui na
+ * primeira vez — ver open-questions #28.
+ */
+export type CobrancaAsaas = {
+  readonly id: string;
+  readonly status: string;
+  readonly creditCard?: {
+    /** Os quatro últimos dígitos, e nada além deles. */
+    readonly creditCardNumber?: string;
+    readonly creditCardBrand?: string;
+    readonly creditCardToken?: string;
+  };
+};
 
 /** Centavos inteiros para o valor em reais que a API recebe. */
 export function paraReais(centavos: bigint): number {
@@ -177,6 +194,34 @@ export function criarCobrancaCartao(
       addressNumber: 'S/N',
       phone: dados.titular.telefone,
     },
+    ...(dados.ipRemoto === null ? {} : { remoteIp: dados.ipRemoto }),
+  });
+}
+
+/**
+ * Cobrança com um cartão já tokenizado.
+ *
+ * É a razão de `cartao_salvo` existir: da segunda compra em diante o número, a
+ * validade e o CVV não saem do Asaas, e não há o que trafegar por nós.
+ *
+ * `creditCardHolderInfo` **não** vai junto, ao contrário da cobrança com o
+ * cartão aberto: o titular já foi verificado quando o token nasceu. `remoteIp`
+ * continua indo — a análise antifraude é por transação, e não por cartão.
+ */
+export function criarCobrancaComToken(
+  dados: DadosDaCobranca & {
+    readonly token: string;
+    readonly ipRemoto: string | null;
+  },
+): Promise<CobrancaAsaas> {
+  return chamar<CobrancaAsaas>('POST', '/payments', {
+    customer: dados.clienteId,
+    billingType: 'CREDIT_CARD',
+    value: paraReais(dados.valorCentavos),
+    dueDate: dados.vencimento,
+    description: dados.descricao,
+    externalReference: dados.pedidoId,
+    creditCardToken: dados.token,
     ...(dados.ipRemoto === null ? {} : { remoteIp: dados.ipRemoto }),
   });
 }

@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import { TelaDeConta, ehAbaDeConta } from '@/componentes/conta/TelaDeConta';
 import { ROTA } from '@/lib/guarda-rota';
 import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
+import { removerCartaoSalvo } from '@/modulos/claves/acoes';
+import { lerCartaoSalvo } from '@/modulos/claves/consultas';
 import { lerSessoesDaConta } from '@/modulos/conta/consultas';
 import { lerPreferencias } from '@/modulos/preferencias/consultas';
 
@@ -45,6 +47,8 @@ export default async function Pagina({
 
   const sessoes = aba === 'seguranca' ? await lerSessoesDaConta() : [];
   const preferencias = aba === 'preferencias' ? await lerPreferencias('artista') : null;
+  // Como as demais leituras desta tela: só na aba que a usa.
+  const cartaoSalvo = aba === 'dados' ? await lerCartaoSalvo() : null;
 
   return (
     <TelaDeConta
@@ -55,6 +59,8 @@ export default async function Pagina({
       papeis={contexto.papeis}
       sessoes={sessoes}
       preferencias={preferencias}
+      cartaoSalvo={cartaoSalvo}
+      acaoDeRemoverCartao={removerCartaoSalvo}
     />
   );
 }

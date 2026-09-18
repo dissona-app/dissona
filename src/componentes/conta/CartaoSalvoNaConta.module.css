@@ -1,0 +1,24 @@
+/* O cartão guardado em 7.2 — identificação à esquerda, "Remover" à direita. */
+
+.linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-6);
+}
+
+.identificacao {
+  font-size: var(--dsn-text-base);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-snug);
+  font-variant-numeric: tabular-nums;
+  color: var(--dsn-ink);
+}
+
+.vazio {
+  margin: 0;
+  font-size: var(--dsn-text-sm);
+  color: var(--dsn-ink-500);
+  text-wrap: pretty;
+}

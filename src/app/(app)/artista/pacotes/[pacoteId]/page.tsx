@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import * as dinheiro from '@/lib/dinheiro';
 import { acompanharPix, comprarClaves } from '@/modulos/claves/acoes';
+import { lerCartaoSalvo } from '@/modulos/claves/consultas';
 import { checkoutSimulado } from '@/modulos/claves/pagamento';
 import { resumoDoPedido } from '@/modulos/claves/servico';
 import { lerValorDaClave, buscarPacote } from '@/modulos/pacote/consultas';
@@ -35,7 +36,11 @@ export default async function PaginaDoCheckout({
 }) {
   const { pacoteId } = await params;
 
-  const [pacote, valorDaClave] = await Promise.all([buscarPacote(pacoteId), lerValorDaClave()]);
+  const [pacote, valorDaClave, cartaoSalvo] = await Promise.all([
+    buscarPacote(pacoteId),
+    lerValorDaClave(),
+    lerCartaoSalvo(),
+  ]);
   if (pacote === null) notFound();
 
   const resumo = resumoDoPedido(pacote.quantidade, pacote.valor, valorDaClave);
@@ -46,6 +51,7 @@ export default async function PaginaDoCheckout({
       simulado={checkoutSimulado()}
       acao={comprarClaves}
       acompanhar={acompanharPix}
+      cartaoSalvo={cartaoSalvo}
       resumo={{
         quantidade: TEXTOS.quantidade(formatarQuantidade(resumo.quantidade)),
         bruto: dinheiro.formatar(resumo.bruto),

@@ -1,6 +1,7 @@
 import { Abas } from '@/componentes/base/Abas';
 import { Aviso } from '@/componentes/base/Aviso';
 import { BotaoLink } from '@/componentes/base/BotaoLink';
+import type { ResultadoDeAcao } from '@/lib/acoes';
 import { ROTA } from '@/lib/guarda-rota';
 import { Papel } from '@/lib/papeis';
 import {
@@ -10,11 +11,14 @@ import {
   trocarEmail,
   trocarSenha,
 } from '@/modulos/conta/acoes';
+import type { CartaoSalvo } from '@/modulos/claves/consultas';
 import type { SessaoAtiva } from '@/modulos/conta/consultas';
 import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
 import { alternarCanalDeEvento, definirIdiomaDaConta } from '@/modulos/preferencias/acoes';
 import type { Preferencias } from '@/modulos/preferencias/consultas';
 import { CONTA } from '@/textos/prototipo';
+
+import { CartaoSalvoNaConta } from './CartaoSalvoNaConta';
 
 import { CartaoDeConta } from './CartaoDeConta';
 import { PainelDePreferencias } from './PainelDePreferencias';
@@ -76,6 +80,15 @@ export type PropsTelaDeConta = {
    * cadastro, e cobrá-lo delas seria uma consulta por navegação de aba.
    */
   readonly cadastroDoCurador?: EstadoDoCadastro | null;
+  /**
+   * O cartão guardado, para o bloco de cobrança do artista (7.2).
+   *
+   * `undefined` no curador, cujo bloco financeiro é de **recebimento** e não
+   * tem cartão nenhum.
+   */
+  readonly cartaoSalvo?: CartaoSalvo | null;
+  /** Remove o cartão. Vem junto com `cartaoSalvo`. */
+  readonly acaoDeRemoverCartao?: ((dados: FormData) => Promise<ResultadoDeAcao>) | undefined;
   /** Catálogo de avisos e idioma, para a aba Preferências (7.3 / 17.3). */
   readonly preferencias?: Preferencias | null;
 };
@@ -100,6 +113,8 @@ export function TelaDeConta({
   sessoes,
   cadastroDoCurador = null,
   preferencias = null,
+  cartaoSalvo = null,
+  acaoDeRemoverCartao,
 }: PropsTelaDeConta) {
   return (
     <div className={estilos.base}>
@@ -128,6 +143,13 @@ export function TelaDeConta({
           >
             <Aviso estatico>{CONTA.pendenteNestaRelease}</Aviso>
           </CartaoDeConta>
+
+          {/* O cartão guardado é do artista: o bloco do curador é de
+              recebimento, e não tem cartão. Aparece mesmo vazio — é onde a
+              pessoa procura, e o vazio explica quando um cartão aparece. */}
+          {ambiente === 'artista' && acaoDeRemoverCartao !== undefined ? (
+            <CartaoSalvoNaConta cartao={cartaoSalvo} acaoDeRemover={acaoDeRemoverCartao} />
+          ) : null}
 
           {/* O convite só aparece para quem ainda não é curador — e só no
               ambiente do artista, que é onde o protótipo o desenha. */}

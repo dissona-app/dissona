@@ -955,3 +955,31 @@ passaria pelo gateway.
 Enquanto ela não existir, o job **degrada para a anonimização da `0011`** em vez
 de falhar — trocar "objetos de Storage acumulando" por "nenhuma anonimização"
 seria piorar o que já funciona. Está na lista de pendências manuais do BACKLOG.
+
+### 11. O cartão salvo não está no protótipo, e existe assim mesmo
+
+O protótipo do checkout (5.2) desenha os quatro campos do cartão e nada mais;
+"cartões salvos" aparece só como **campo** de 7.2, sem tela. O que entrou em
+2026-09-18 é o mínimo para o `creditCardToken` do Asaas servir de alguma coisa:
+
+- no checkout, o cartão guardado vira a opção **padrão**, com "Cartão" e "Pix"
+  ao lado — e escolhendo-o os campos do cartão nem aparecem;
+- em 7.2, ele aparece com os quatro dígitos e um "Remover cartão".
+
+**O bloco de remoção não é enfeite.** Guardar um meio de pagamento sem oferecer
+como tirá-lo seria guardar sem consentimento revogável — e é por isso que ele
+aparece mesmo vazio, com o texto que explica quando um cartão passa a existir.
+
+Duas escolhas de desenho que vale registrar:
+
+- **Uma tabela, e não colunas em `perfil_artista`.** Um cartão tem ciclo
+  próprio: nasce numa cobrança aprovada, vence, é trocado, é removido. Como
+  colunas nuláveis, remover seria `update ... = null` em três lugares — o tipo
+  de escrita que se esquece pela metade.
+- **`cartao_salvo` é variante da tela, e não de `meio_pagamento`.** O enum do
+  banco tem `pix` e `cartao`; para o ledger e para a conciliação, pagar com
+  token é um pagamento com cartão como outro qualquer. A tradução é da ação.
+
+O que **não** se guarda: número, validade e CVV. O que se guarda é o token — uma
+referência opaca, inútil fora da conta do Asaas — mais quatro dígitos e a
+bandeira, que existem só para a tela dizer qual cartão é.

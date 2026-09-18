@@ -1459,6 +1459,29 @@ export const PACOTES = {
   vazioDescricao: 'Os pacotes voltam assim que a equipe reativar algum.',
 } as const;
 
+/**
+ * O cartão guardado — o `creditCardToken` que o Asaas devolve depois da
+ * primeira cobrança aprovada.
+ *
+ * **Não está no protótipo.** Ele desenha os quatro campos do cartão e nada
+ * mais; "cartões salvos" aparece só como campo de 7.2, sem tela. O que existe
+ * aqui é o mínimo para o token servir de alguma coisa: escolher o cartão no
+ * checkout e poder removê-lo. Registrado em 07-pendências.
+ */
+export const CARTAO_SALVO = {
+  /** "Mastercard ···· 4242", ou "Cartão ···· 4242" quando a bandeira não veio. */
+  opcao: (bandeira: string | null, ultimos: string) =>
+    `${bandeira === null || bandeira === '' ? 'Cartão' : bandeira} ···· ${ultimos}`,
+  notaNoCheckout: 'Pagando com este cartão, o número não é enviado de novo.',
+
+  tituloEmConta: 'Cartão salvo',
+  vazioEmConta: 'Nenhum cartão salvo. O primeiro pagamento com cartão guarda um.',
+  nota: 'Guardamos só a referência que o provedor devolve — nunca o número, a validade ou o código de segurança.',
+  remover: 'Remover cartão',
+  removido: 'Cartão removido.',
+  erroNaoEncontrado: 'Esse cartão não está mais salvo.',
+} as const;
+
 export const CHECKOUT = {
   titulo: 'Checkout',
   trocarDePacote: 'Trocar de pacote',

@@ -311,7 +311,7 @@ ele promete mais do que o sistema pode cumprir.
 
 ---
 
-### 28. Reusar o token do cartão, e o que fazer com a primeira cobrança
+### 28. O cartão: token guardado (feito) e a primeira cobrança (aberta)
 
 **Aberto, e é decisão de produto com consequência de conformidade.** O RF-045
 diz "cartão tokenizado, sem persistir dados do cartão". Hoje metade disso é
@@ -335,22 +335,29 @@ posterior** — a primeira cobrança vai com os dados do cartão e a resposta tr
 um `creditCardToken`, que serve para as **próximas**. Não existe caminho em que
 a primeira cobrança do cartão não passe por nós.
 
-**As duas saídas reais são, então:**
+**As duas saídas reais eram:**
 
-1. **Guardar e reusar o token.** A primeira compra manda o cartão; da segunda em
-   diante vai só o token, e o CVV deixa de ser pedido. Reduz a exposição sem
-   mudar o desenho da tela, e é o que sustenta os "cartões salvos" que o
-   protótipo desenha em 7.2. **É a melhoria disponível hoje.**
+1. ~~**Guardar e reusar o token.**~~ **Feito em 2026-09-18** (migration `0007e`,
+   tabela `cartao_salvo`). A primeira compra manda o cartão; da segunda em
+   diante vai só o token, e nem o número nem o CVV são pedidos. O cartão aparece
+   como opção padrão no checkout e pode ser removido em 7.2 — guardar um meio de
+   pagamento sem oferecer como tirá-lo seria guardar sem consentimento
+   revogável. O expurgo da LGPD o apaga (`0011c`).
 2. **Checkout hospedado do Asaas.** O formulário de cartão passa a viver no
    domínio deles e o PAN nunca toca em nós — o escopo de PCI cai ao mínimo. O
-   custo é abrir mão da tela de pagamento do protótipo, que é nossa.
+   custo é abrir mão da tela de pagamento do protótipo, que é nossa. **Segue em
+   aberto.**
 
-**Perguntas:** o produto quer "cartões salvos" na V1 — e, se quer, o token fica
-em que tabela, com que política de exclusão? E o checkout hospedado é aceitável
-do ponto de vista de experiência, ou a tela de pagamento é inegociável?
+**O que a #1 resolve, e o que não resolve:** ela reduz a exposição a **uma**
+cobrança por cartão, em vez de todas. A primeira continua passando por nós, e é
+só a saída #2 que muda isso.
 
-**Impacto:** `FormularioDeCheckout`, `modulos/claves/{acoes,pagamento,asaas}.ts`,
-`pedido_clave` (se o token for guardado) e o RF-045 na matriz de rastreabilidade.
+**Pergunta que fica:** o checkout hospedado é aceitável do ponto de vista de
+experiência, ou a tela de pagamento do protótipo é inegociável? A resposta
+decide se a plataforma sai do escopo de PCI ou convive com ele.
+
+**Impacto do que resta:** `FormularioDeCheckout` e `modulos/claves/pagamento.ts`
+— o checkout hospedado troca a tela, não o ledger.
 
 ---
 

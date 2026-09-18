@@ -11,6 +11,8 @@ import { adquiridas, comSaldoAcumulado, ultimas, usadas } from './servico';
 import type { Carteira, FiltroDoExtrato, LinhaDoExtrato, Movimentacao } from './tipos';
 
 export type { Carteira, LinhaDoExtrato, Movimentacao } from './tipos';
+export type { CartaoSalvo } from './repositorio';
+export { lerCartaoSalvo } from './repositorio';
 
 /** Quantas linhas o bloco "Últimas movimentações" da tela 5 mostra. */
 const ULTIMAS_NA_CARTEIRA = 3;

@@ -20,7 +20,8 @@ import type {
   MeioPagamento,
   ResultadoSimulado,
 } from '@/modulos/claves/tipos';
-import { CHECKOUT as TEXTOS } from '@/textos/prototipo';
+import type { CartaoSalvo } from '@/modulos/claves/consultas';
+import { CARTAO_SALVO, CHECKOUT as TEXTOS } from '@/textos/prototipo';
 
 import estilos from './FormularioDeCheckout.module.css';
 
@@ -38,9 +39,24 @@ export type PropsFormularioDeCheckout = {
   readonly resumo: ResumoNaTela;
   /** Mostra o seletor "Simular resultado" e a nota de que nada é cobrado. */
   readonly simulado: boolean;
+  /**
+   * O cartão que o Asaas já tokenizou numa compra anterior, se houver.
+   *
+   * Quando existe, ele é a opção **padrão**: é o caminho em que o número do
+   * cartão não trafega de novo.
+   */
+  readonly cartaoSalvo: CartaoSalvo | null;
   readonly acao: (entrada: unknown) => Promise<ResultadoDeAcao<DesfechoDaCompra>>;
   readonly acompanhar: (pedidoId: string) => Promise<ResultadoDeAcao<AcompanhamentoDoPix>>;
 };
+
+/**
+ * A forma de pagamento **como a tela a oferece**.
+ *
+ * `cartao_salvo` não é valor de `meio_pagamento` no banco: ali um pagamento com
+ * token é `cartao` como outro qualquer. A tradução é da ação.
+ */
+type MeioNaTela = MeioPagamento | 'cartao_salvo';
 
 type Campos = 'cpf' | 'numero' | 'titular' | 'validade' | 'cvv' | 'telefone' | 'cep';
 type Erros = Readonly<Partial<Record<Campos, string>>>;
@@ -76,7 +92,7 @@ function digitos(valor: string): string {
  * que é quem decide. Aqui ela só evita uma ida e volta para dizer "CPF
  * inválido".
  */
-function validar(meio: MeioPagamento, valores: Readonly<Record<Campos, string>>): Erros {
+function validar(meio: MeioNaTela, valores: Readonly<Record<Campos, string>>): Erros {
   const erros: Partial<Record<Campos, string>> = {};
   if (!cpfValido(valores.cpf)) erros.cpf = TEXTOS.erroCpf;
   if (meio !== 'cartao') return erros;
@@ -111,7 +127,9 @@ function mascararCep(valor: string): string {
  * ## Dados do cartão
  *
  * Os campos têm `name` e vão à Server Action, que os repassa ao Asaas e os
- * descarta. Não há SDK de navegador do Asaas; ver `modulos/claves/esquemas.ts`.
+ * descarta — e isso vale para a **primeira** compra com um cartão. Depois dela
+ * o Asaas devolve um token, que vira a opção padrão desta tela e dispensa os
+ * campos. Ver `modulos/claves/esquemas.ts`.
  */
 export function FormularioDeCheckout({
   pacoteId,
@@ -119,13 +137,16 @@ export function FormularioDeCheckout({
   simulado,
   acao,
   acompanhar,
+  cartaoSalvo,
 }: PropsFormularioDeCheckout) {
   const [resultado, enviar, pendente] = useActionState<
     ResultadoDeAcao<DesfechoDaCompra> | null,
     FormData
   >(async (_anterior, dados) => acao(Object.fromEntries(dados)), null);
 
-  const [meio, setMeio] = useState<MeioPagamento>('cartao');
+  // A escolha da tela tem três valores; `meio_pagamento` no banco tem dois. A
+  // ação traduz — ver `comprarClaves`.
+  const [meio, setMeio] = useState<MeioNaTela>(cartaoSalvo === null ? 'cartao' : 'cartao_salvo');
   const [simulacao, setSimulacao] = useState<ResultadoSimulado>('aprovado');
 
   const [valores, setValores] = useState<Record<Campos, string>>({
@@ -210,6 +231,9 @@ export function FormularioDeCheckout({
     <form action={enviar} onSubmit={aoEnviar} className={estilos.base} noValidate>
       <input type="hidden" name="pacoteId" value={pacoteId} />
       <input type="hidden" name="meio" value={meio} />
+      {meio === 'cartao_salvo' && cartaoSalvo !== null ? (
+        <input type="hidden" name="cartaoId" value={cartaoSalvo.id} />
+      ) : null}
       {simulado ? <input type="hidden" name="simulacao" value={simulacao} /> : null}
 
       <BotaoLink href={ROTA.ARTISTA_PACOTES} variante="ghost" tamanho="sm">
@@ -253,10 +277,23 @@ export function FormularioDeCheckout({
                   rotuloOculto
                   valor={meio}
                   onMudar={(valor) => {
-                    setMeio(valor);
+                    // `Grupo` devolve `string`; as opções são montadas logo
+                    // abaixo e só carregam os três valores de `MeioNaTela`.
+                    setMeio(valor as MeioNaTela);
                     setErros(SEM_ERRO);
                   }}
                   opcoes={[
+                    ...(cartaoSalvo === null
+                      ? []
+                      : [
+                          {
+                            valor: 'cartao_salvo',
+                            rotulo: CARTAO_SALVO.opcao(
+                              cartaoSalvo.bandeira,
+                              cartaoSalvo.ultimosDigitos,
+                            ),
+                          },
+                        ]),
                     { valor: 'cartao', rotulo: TEXTOS.meios.cartao },
                     { valor: 'pix', rotulo: TEXTOS.meios.pix },
                   ]}
@@ -272,6 +309,10 @@ export function FormularioDeCheckout({
                   erro={erroDe('cpf')}
                   onChange={(evento) => mudar('cpf', mascararCpf(evento.target.value))}
                 />
+
+                {meio === 'cartao_salvo' ? (
+                  <p className={estilos.nota}>{CARTAO_SALVO.notaNoCheckout}</p>
+                ) : null}
 
                 {meio === 'cartao' ? (
                   <div className={estilos.cartao}>

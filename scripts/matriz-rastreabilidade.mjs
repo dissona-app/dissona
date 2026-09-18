@@ -68,7 +68,7 @@ const RESSALVAS = {
   'RF-069':
     'a notificação é afirmada no banco: não há central de notificações até a R5 (módulos 10 e 18)',
   'RF-045':
-    'prova-se que o cartão não é persistido nem sai para terceiros; o PAN **transita** pelo nosso servidor, porque o Asaas não tem SDK de navegador — se "tokenizados" exigir tokenização no cliente, é lacuna de produto',
+    'prova-se que o cartão não é persistido, que não sai para terceiros e que da **segunda** compra em diante só o token trafega (`cartao_salvo`, migration 0007e); o PAN transita pelo nosso servidor na **primeira**, porque a tokenização do Asaas é posterior à cobrança — se "tokenizados" exigir que ele nunca nos toque, o caminho é o checkout hospedado deles ([open-questions #28](../open-questions.md))',
   'RF-004':
     'o token é gerado por `auth.admin.generateLink` e entregue ao mesmo route handler; que o e-mail **saia e chegue** depende de provedor transacional dedicado ([open-questions #10](../open-questions.md)) e não é observável da suíte',
   'RF-005': 'idem RF-004: o mecanismo do link é exercido de ponta a ponta, o transporte não',

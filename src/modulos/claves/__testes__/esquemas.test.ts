@@ -93,3 +93,42 @@ describe('esquemaDeCompra', () => {
     }
   });
 });
+
+/**
+ * O terceiro caminho do checkout: pagar com o cartão que o Asaas já tokenizou.
+ *
+ * O ponto de guardar o token é que, aqui, **nenhum dado de cartão trafega** —
+ * e o schema é o que garante isso. Aceitar o número junto do id faria a
+ * economia desaparecer sem ninguém notar.
+ */
+describe('compra com cartão salvo', () => {
+  const SALVO = {
+    pacoteId: PACOTE,
+    meio: 'cartao_salvo',
+    cpf: CPF,
+    cartaoId: '018f4a2e-0000-7000-8000-000000000000',
+  };
+
+  it('aceita só o id do cartão', () => {
+    const analise = esquemaDeCompra.safeParse(SALVO);
+    expect(analise.success).toBe(true);
+    expect(analise.success && analise.data.meio).toBe('cartao_salvo');
+  });
+
+  it('recusa id que não é uuid', () => {
+    expect(esquemaDeCompra.safeParse({ ...SALVO, cartaoId: 'nao-e-uuid' }).success).toBe(false);
+  });
+
+  it('exige o id — sem ele não há o que cobrar', () => {
+    const semId = { pacoteId: PACOTE, meio: 'cartao_salvo', cpf: CPF };
+    expect(esquemaDeCompra.safeParse(semId).success).toBe(false);
+  });
+
+  it('o número do cartão não entra nesta variante', () => {
+    // União discriminada com `strip`: campo a mais é descartado, não guardado.
+    // O que importa é que ele **não** chegue à saída — e daí ao provedor.
+    const analise = esquemaDeCompra.safeParse({ ...SALVO, numero: '5162306219378829' });
+    expect(analise.success).toBe(true);
+    expect(analise.success && 'numero' in analise.data).toBe(false);
+  });
+});

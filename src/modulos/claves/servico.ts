@@ -161,3 +161,35 @@ export function resumoDoPedido(
     descontoPercentual: descontoDerivado(valorDoPacote, bruto),
   };
 }
+
+/**
+ * O cartão a guardar, se a resposta da cobrança trouxe token.
+ *
+ * Vive aqui, e não em `pagamento.ts`, pela razão de sempre neste módulo: é
+ * regra pura, e regra pura precisa ser testável sem servidor.
+ *
+ * `undefined` quando não há o que salvar — e isso é **normal** em três
+ * situações: a cobrança foi paga com um token que já tínhamos, a conta do
+ * Asaas não tokeniza, ou a resposta veio sem os quatro dígitos. Na última,
+ * salvar mesmo assim violaria o `check` da `0007e` e derrubaria uma compra já
+ * paga por causa de um detalhe de vitrine.
+ */
+export function cartaoDaResposta(cobrado: {
+  readonly creditCard?: {
+    readonly creditCardNumber?: string;
+    readonly creditCardBrand?: string;
+    readonly creditCardToken?: string;
+  };
+}):
+  | { readonly token: string; readonly ultimosDigitos: string; readonly bandeira: string | null }
+  | undefined {
+  const cartao = cobrado.creditCard;
+  const token = cartao?.creditCardToken;
+  const ultimos = cartao?.creditCardNumber;
+
+  if (token === undefined || token === '' || ultimos === undefined || !/^[0-9]{4}$/.test(ultimos)) {
+    return undefined;
+  }
+
+  return { token, ultimosDigitos: ultimos, bandeira: cartao?.creditCardBrand ?? null };
+}

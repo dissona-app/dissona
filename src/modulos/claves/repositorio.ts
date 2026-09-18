@@ -91,3 +91,107 @@ export async function lerMovimentacoes(): Promise<readonly Movimentacao[]> {
     quantidade: claves(linha.quantidade),
   }));
 }
+
+/* ------------------------------------------------- cartão salvo (0007e) --- */
+
+export type CartaoSalvo = {
+  readonly id: string;
+  readonly ultimosDigitos: string;
+  readonly bandeira: string | null;
+};
+
+/**
+ * O cartão que a pessoa tem guardado, ou `null`.
+ *
+ * O mais recente, quando há mais de um: a tela usa **um**, e o último usado é o
+ * palpite certo. O `token` não sai daqui — a tela não tem o que fazer com ele,
+ * e um token que trafega até o navegador é um token a mais exposto.
+ */
+export async function lerCartaoSalvo(): Promise<CartaoSalvo | null> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('cartao_salvo')
+    .select('id, ultimos_digitos, bandeira')
+    .order('criado_em', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  estourarSeErro(error);
+  if (data === null) return null;
+
+  return { id: data.id, ultimosDigitos: data.ultimos_digitos, bandeira: data.bandeira };
+}
+
+/**
+ * O token de um cartão do artista da sessão, para cobrar com ele.
+ *
+ * Fica separado de `lerCartaoSalvo` de propósito: quem desenha a tela não
+ * precisa do token, e só o caminho da cobrança o pede. A RLS é a fronteira —
+ * um id de outra pessoa volta `null`, não o token dela.
+ */
+export async function lerTokenDoCartao(cartaoId: string): Promise<string | null> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('cartao_salvo')
+    .select('token')
+    .eq('id', cartaoId)
+    .maybeSingle();
+
+  estourarSeErro(error);
+  return data?.token ?? null;
+}
+
+/**
+ * Guarda o cartão que a cobrança aprovada deixou.
+ *
+ * `upsert` pela chave (`perfil_artista_id`, `token`): reusar a mesma cobrança
+ * não vira duas linhas. A falha é **engolida** — e é o único lugar deste módulo
+ * em que engolir é o certo: o dinheiro já entrou e as Claves já foram
+ * creditadas; derrubar a compra porque a conveniência da próxima não pôde ser
+ * salva seria punir a pessoa por um detalhe que ela nem pediu.
+ */
+export async function salvarCartao(cartao: {
+  readonly token: string;
+  readonly ultimosDigitos: string;
+  readonly bandeira: string | null;
+}): Promise<void> {
+  const supabase = await criarClienteServidor();
+
+  // O id do artista é resolvido aqui, e não recebido: a policy de insert exige
+  // `meu_perfil_artista_id()` de qualquer forma, e passá-lo de fora só criaria
+  // a chance de alguém passar o errado.
+  const { data: artista } = await supabase.from('perfil_artista').select('id').maybeSingle();
+  if (artista === null) return;
+
+  await supabase.from('cartao_salvo').upsert(
+    {
+      perfil_artista_id: artista.id,
+      token: cartao.token,
+      ultimos_digitos: cartao.ultimosDigitos,
+      bandeira: cartao.bandeira,
+    },
+    { onConflict: 'perfil_artista_id,token', ignoreDuplicates: true },
+  );
+}
+
+/**
+ * Remove o cartão. `false` quando nada saiu — id de outra pessoa, ou já
+ * removido.
+ *
+ * O `.select('id')` é o que distingue os dois: a policy de delete filtra pelo
+ * dono, e um `delete` fora dela afeta zero linhas **sem erro**.
+ */
+export async function apagarCartao(cartaoId: string): Promise<boolean> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('cartao_salvo')
+    .delete()
+    .eq('id', cartaoId)
+    .select('id');
+
+  estourarSeErro(error);
+  return (data ?? []).length > 0;
+}
