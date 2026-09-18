@@ -48,7 +48,9 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                   ? caminhoAtual === item.caminho
                   : caminhoAtual === item.caminho || caminhoAtual.startsWith(`${item.caminho}/`);
 
-                const disponivel = item.release <= releaseAtual;
+                // `motivo` desabilita o item mesmo quando a release já chegou:
+                // é o caso de uma tela que existe e não tem endereço próprio.
+                const disponivel = item.release <= releaseAtual && item.motivo === undefined;
 
                 return (
                   <li key={item.caminho}>
@@ -70,7 +72,7 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                       <span
                         className={estilos.item}
                         aria-disabled="true"
-                        title={`Disponível na Release ${item.release}`}
+                        title={item.motivo ?? `Disponível na Release ${item.release}`}
                       >
                         {item.rotulo}
                       </span>

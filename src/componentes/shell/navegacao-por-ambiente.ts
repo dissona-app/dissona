@@ -1,12 +1,15 @@
 import { ROTA } from '@/lib/guarda-rota';
 import type { Papel } from '@/lib/papeis';
+import { ADMIN_NAVEGACAO, NAVEGACAO_DO_ARTISTA, NAVEGACAO_DO_CURADOR } from '@/textos/prototipo';
 
 /**
  * Mapa de navegação por ambiente.
  *
- * Os grupos e rótulos vêm dos protótipos da R2 ("MINHA MÚSICA", "CURADORIA",
- * "CONTA" — design-system.md §1.1). Os caminhos usam a constante `ROTA`, e não
- * literais, para que exista um só lugar onde uma URL é definida.
+ * Os grupos e rótulos vêm dos protótipos da R2 e são **diferentes em cada
+ * ambiente** — ver `NAVEGACAO_DO_ARTISTA`, `NAVEGACAO_DO_CURADOR` e
+ * `ADMIN_NAVEGACAO` em `textos/prototipo`, onde cada lista está com a copy
+ * literal da sua sidebar. Os caminhos usam a constante `ROTA`, e não literais,
+ * para que exista um só lugar onde uma URL é definida.
  *
  * `release` marca em qual release a tela existe de verdade. Item de release
  * futura fica visível mas desabilitado: esconder faria a navegação mudar de
@@ -17,6 +20,12 @@ export type ItemNavegacao = {
   readonly rotulo: string;
   readonly caminho: string;
   readonly release: 1 | 2 | 3 | 4 | 5;
+  /**
+   * Por que o item não é clicável, quando "Disponível na Release N" não é a
+   * resposta certa. É o caso de "Notas e feedback": a tela **existe** na R2, e
+   * o que não existe é um endereço para ela sem uma faixa escolhida.
+   */
+  readonly motivo?: string;
 };
 
 export type GrupoNavegacao = {
@@ -28,30 +37,32 @@ export type GrupoNavegacao = {
 const ARTISTA: readonly GrupoNavegacao[] = [
   {
     titulo: null,
-    itens: [{ rotulo: 'Início', caminho: ROTA.ARTISTA, release: 4 }],
+    itens: [{ rotulo: NAVEGACAO_DO_ARTISTA.inicio, caminho: ROTA.ARTISTA, release: 4 }],
   },
   {
-    titulo: 'Minha música',
+    titulo: NAVEGACAO_DO_ARTISTA.grupoMinhaMusica,
     itens: [
-      { rotulo: 'Enviar música', caminho: ROTA.ARTISTA_ENVIAR, release: 2 },
-      { rotulo: 'Minhas músicas', caminho: `${ROTA.ARTISTA}/musicas`, release: 3 },
-      { rotulo: 'Catálogo', caminho: `${ROTA.ARTISTA}/catalogo`, release: 4 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.enviar, caminho: ROTA.ARTISTA_ENVIAR, release: 2 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.minhasFaixas, caminho: `${ROTA.ARTISTA}/faixas`, release: 3 },
+      {
+        rotulo: NAVEGACAO_DO_ARTISTA.devolutivas,
+        caminho: `${ROTA.ARTISTA}/devolutivas`,
+        release: 4,
+      },
     ],
   },
   {
-    titulo: 'Curadoria',
+    titulo: NAVEGACAO_DO_ARTISTA.grupoCuradoria,
     itens: [
-      { rotulo: 'Escolher curadores', caminho: `${ROTA.ARTISTA}/curadores`, release: 3 },
-      { rotulo: 'Relatórios', caminho: `${ROTA.ARTISTA}/relatorios`, release: 4 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.curadores, caminho: `${ROTA.ARTISTA}/curadores`, release: 3 },
     ],
   },
   {
-    titulo: 'Conta',
+    titulo: NAVEGACAO_DO_ARTISTA.grupoConta,
     itens: [
-      { rotulo: 'Perfil', caminho: ROTA.ARTISTA_PERFIL, release: 1 },
-      { rotulo: 'Carteira', caminho: ROTA.ARTISTA_CARTEIRA, release: 2 },
-      { rotulo: 'Notificações', caminho: `${ROTA.ARTISTA}/notificacoes`, release: 5 },
-      { rotulo: 'Configurações', caminho: ROTA.ARTISTA_CONTA, release: 1 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.perfil, caminho: ROTA.ARTISTA_PERFIL, release: 1 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.carteira, caminho: ROTA.ARTISTA_CARTEIRA, release: 2 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.configuracoes, caminho: ROTA.ARTISTA_CONTA, release: 1 },
     ],
   },
 ];
@@ -59,23 +70,36 @@ const ARTISTA: readonly GrupoNavegacao[] = [
 const CURADOR: readonly GrupoNavegacao[] = [
   {
     titulo: null,
-    itens: [{ rotulo: 'Início', caminho: ROTA.CURADOR, release: 4 }],
+    itens: [{ rotulo: NAVEGACAO_DO_CURADOR.inicio, caminho: ROTA.CURADOR, release: 4 }],
   },
   {
-    titulo: 'Curadoria',
+    titulo: NAVEGACAO_DO_CURADOR.grupoAvaliacoes,
     itens: [
-      { rotulo: 'Fila de avaliações', caminho: ROTA.CURADOR_FILA, release: 2 },
-      { rotulo: 'Métricas', caminho: `${ROTA.CURADOR}/metricas`, release: 3 },
+      { rotulo: NAVEGACAO_DO_CURADOR.fila, caminho: ROTA.CURADOR_FILA, release: 2 },
+      // A tela existe e é da R2 — o que não existe é endereço para ela sem uma
+      // faixa escolhida, e por isso o motivo não é uma release.
+      {
+        rotulo: NAVEGACAO_DO_CURADOR.notas,
+        caminho: ROTA.CURADOR_AVALIAR,
+        release: 2,
+        motivo: NAVEGACAO_DO_CURADOR.motivoNotas,
+      },
     ],
   },
   {
-    titulo: 'Conta',
+    titulo: NAVEGACAO_DO_CURADOR.grupoDesempenho,
     itens: [
-      { rotulo: 'Financeiro', caminho: `${ROTA.CURADOR}/financeiro`, release: 4 },
-      { rotulo: 'Notificações', caminho: `${ROTA.CURADOR}/notificacoes`, release: 5 },
-      { rotulo: 'Meu cadastro', caminho: ROTA.CURADOR_MEU_CADASTRO, release: 1 },
-      { rotulo: 'Configurações', caminho: ROTA.CURADOR_CONTA, release: 1 },
+      { rotulo: NAVEGACAO_DO_CURADOR.metricas, caminho: `${ROTA.CURADOR}/metricas`, release: 3 },
+      {
+        rotulo: NAVEGACAO_DO_CURADOR.financeiro,
+        caminho: `${ROTA.CURADOR}/financeiro`,
+        release: 4,
+      },
     ],
+  },
+  {
+    titulo: NAVEGACAO_DO_CURADOR.grupoConta,
+    itens: [{ rotulo: NAVEGACAO_DO_CURADOR.conta, caminho: ROTA.CURADOR_CONTA, release: 1 }],
   },
 ];
 
@@ -95,25 +119,29 @@ const CURADOR: readonly GrupoNavegacao[] = [
 const ADMIN: readonly GrupoNavegacao[] = [
   {
     titulo: null,
-    itens: [{ rotulo: 'Início', caminho: ROTA.ADMIN, release: 4 }],
+    itens: [{ rotulo: ADMIN_NAVEGACAO.inicio, caminho: ROTA.ADMIN, release: 4 }],
   },
   {
-    titulo: 'Gestão',
+    titulo: ADMIN_NAVEGACAO.grupoGestao,
     itens: [
-      { rotulo: 'Curadores e artistas', caminho: `${ROTA.ADMIN}/usuarios`, release: 3 },
-      { rotulo: 'Pacotes de Claves', caminho: `${ROTA.ADMIN}/pacotes`, release: 2 },
+      {
+        rotulo: ADMIN_NAVEGACAO.curadoresEArtistas,
+        caminho: `${ROTA.ADMIN}/usuarios`,
+        release: 3,
+      },
+      { rotulo: ADMIN_NAVEGACAO.pacotes, caminho: `${ROTA.ADMIN}/pacotes`, release: 2 },
     ],
   },
   {
-    titulo: 'Operação',
+    titulo: ADMIN_NAVEGACAO.grupoOperacao,
     itens: [
-      { rotulo: 'Financeiro da plataforma', caminho: `${ROTA.ADMIN}/financeiro`, release: 5 },
-      { rotulo: 'Moderação e antifraude', caminho: `${ROTA.ADMIN}/moderacao`, release: 3 },
+      { rotulo: ADMIN_NAVEGACAO.financeiro, caminho: `${ROTA.ADMIN}/financeiro`, release: 5 },
+      { rotulo: ADMIN_NAVEGACAO.moderacao, caminho: `${ROTA.ADMIN}/moderacao`, release: 3 },
     ],
   },
   {
-    titulo: 'Conta',
-    itens: [{ rotulo: 'Conta e equipe', caminho: ROTA.ADMIN_EQUIPE, release: 1 }],
+    titulo: ADMIN_NAVEGACAO.grupoConta,
+    itens: [{ rotulo: ADMIN_NAVEGACAO.contaEEquipe, caminho: ROTA.ADMIN_EQUIPE, release: 1 }],
   },
 ];
 
