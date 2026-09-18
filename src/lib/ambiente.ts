@@ -79,19 +79,22 @@ export function temChaveDeServico(): boolean {
  * O checkout (5.2) roda com o provedor **simulado**?
  *
  * Ligado por padrão, e desligado por `PAGAMENTO_SIMULADO=false` — a mesma
- * inversão de `soundcloudLigado`, e pela mesma razão: o simulador é a única
- * implementação que existe hoje. O Asaas está bloqueado por
- * [#6](../../docs/open-questions.md), que é uma decisão de contador, não de
- * código; até ela sair não há credencial a ler, e um opt-in deixaria a tela
- * morta em todo ambiente sem nenhum motivo visível.
+ * inversão de `soundcloudLigado`. O padrão é o simulador porque um ambiente
+ * sem credencial do Asaas é o caso comum (um clone recém-feito, um Preview),
+ * e um opt-in deixaria a tela morta sem motivo visível.
+ *
+ * **O Asaas existe e está implementado**: `modulos/claves/asaas.ts` faz Pix com
+ * QR code e cartão, e `/api/webhooks/asaas` confirma e recusa o pedido. Com
+ * `false` e `ASAAS_API_KEY` presente, é ele que roda; com `false` e sem chave,
+ * a ação falha com `PAGAMENTO_INDISPONIVEL` em vez de creditar de graça. O que
+ * segue bloqueado por [#6](../../docs/open-questions.md) é o **repasse ao
+ * curador** — split, subconta e KYC —, que é decisão de contador.
  *
  * ⚠️ **Enquanto isto devolver `true`, a compra credita Claves sem cobrança
  * nenhuma.** É o que o próprio protótipo da R2 desenha — ele tem o controle
  * "Simular resultado · Aprovado / Recusado" na tela, e a nota "Pagamento
  * simulado. Nenhuma cobrança é feita" —, e a tela repete essa nota para quem
- * está olhando. No dia em que o Asaas entrar, `false` é o que fecha a porta:
- * sem provedor real configurado a ação falha com `PAGAMENTO_INDISPONIVEL`, que
- * é melhor do que creditar de graça em produção.
+ * está olhando. **Em produção, `PAGAMENTO_SIMULADO=false` não é opcional.**
  */
 export function pagamentoSimulado(): boolean {
   return process.env.PAGAMENTO_SIMULADO !== 'false';

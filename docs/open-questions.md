@@ -311,6 +311,49 @@ ele promete mais do que o sistema pode cumprir.
 
 ---
 
+### 28. Reusar o token do cartão, e o que fazer com a primeira cobrança
+
+**Aberto, e é decisão de produto com consequência de conformidade.** O RF-045
+diz "cartão tokenizado, sem persistir dados do cartão". Hoje metade disso é
+verdade: **nada do cartão é gravado** — não há coluna, não há log —, mas o
+número, o titular, a validade e o CVV **atravessam a Server Action**, porque é
+assim que a API do Asaas os recebe.
+
+O desenho anterior mantinha os quatro campos sem `name`, de modo que o dado não
+saía do navegador. Ligar o Asaas o desfez, e o registro em
+[07-pendências](prd/07-pendencias-e-divergencias.md) ficou descrevendo o mundo
+antigo até 2026-09-18.
+
+**A consequência:** enquanto o PAN transitar pelo nosso servidor, a aplicação
+está no escopo de PCI-DSS — ainda que como SAQ-A-EP, e não SAQ-D, já que não
+armazenamos nada.
+
+⚠️ **Corrigido em 2026-09-18.** Esta pergunta nasceu dizendo que "o SDK do Asaas
+tokeniza no navegador, e bastaria mandar o token". **Não é verdade**, e a
+correção muda a pergunta: no Asaas a tokenização é **do lado do servidor e
+posterior** — a primeira cobrança vai com os dados do cartão e a resposta traz
+um `creditCardToken`, que serve para as **próximas**. Não existe caminho em que
+a primeira cobrança do cartão não passe por nós.
+
+**As duas saídas reais são, então:**
+
+1. **Guardar e reusar o token.** A primeira compra manda o cartão; da segunda em
+   diante vai só o token, e o CVV deixa de ser pedido. Reduz a exposição sem
+   mudar o desenho da tela, e é o que sustenta os "cartões salvos" que o
+   protótipo desenha em 7.2. **É a melhoria disponível hoje.**
+2. **Checkout hospedado do Asaas.** O formulário de cartão passa a viver no
+   domínio deles e o PAN nunca toca em nós — o escopo de PCI cai ao mínimo. O
+   custo é abrir mão da tela de pagamento do protótipo, que é nossa.
+
+**Perguntas:** o produto quer "cartões salvos" na V1 — e, se quer, o token fica
+em que tabela, com que política de exclusão? E o checkout hospedado é aceitável
+do ponto de vista de experiência, ou a tela de pagamento é inegociável?
+
+**Impacto:** `FormularioDeCheckout`, `modulos/claves/{acoes,pagamento,asaas}.ts`,
+`pedido_clave` (se o token for guardado) e o RF-045 na matriz de rastreabilidade.
+
+---
+
 ## 4. Resolvidas
 
 Registradas aqui para que ninguém as reabra por engano.

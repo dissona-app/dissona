@@ -78,7 +78,7 @@ pagamento:
 | 5.1 · selo | "Mais escolhido" no pacote de 60 | **ausente** | No mock ele é `p[0] === 60`, fixo. "Mais escolhido" é uma afirmação sobre vendas, e destacar um card porque o mock destacava seria inventar uma estatística que ninguém mediu. |
 | 5.1/5.2 · navegação | `caView` troca dentro da Carteira | duas rotas (`/artista/pacotes` e `/artista/pacotes/<id>`) | "Comprar Claves" é destino de **três** CTAs — Carteira, estado vazio da Carteira e o bloqueio por saldo na seleção de curadores. Um estado local não tem endereço para nenhum dos três, e não sobrevive a um F5 no meio de uma compra. |
 | 5.2 · cartão | `caConfirmar` **preenche** os campos inválidos com valores fictícios e segue | erro no campo, e a ação não roda | Mesma coerção silenciosa da tela 21.1, e mesma recusa — ver a primeira linha desta seção. Aqui é pior: o campo coagido seria um meio de pagamento. |
-| 5.2 · cartão | campos comuns de formulário | `<input>` **sem `name`** | O item da R2 é "sem persistir dados do cartão", e a forma mais forte de não persistir é o dado não sair do navegador: sem `name` ele não entra no `FormData`, não chega à Server Action e não aparece em log de servidor. Quando o Asaas entrar, quem ganha `name` é o **token**. O preço é que esta tela exige JavaScript, ao contrário do resto do produto — e um checkout de cartão sem JS teria de mandar o PAN ao servidor, que é o que não se quer. |
+| 5.2 · cartão | campos comuns de formulário | campos com `name`, **enviados ao servidor** | ⚠️ **Registro corrigido em 2026-09-18.** O desenho anterior era `<input>` sem `name`, para o dado não sair do navegador, e esta linha ainda o descrevia. Ligar o Asaas o desfez: a API dele recebe número, titular, validade e CVV no servidor, então os quatro campos ganharam `name` e o PAN atravessa a Server Action. Nada do cartão é **gravado** — não há coluna, não há log —, mas a aplicação passa a estar no escopo de PCI enquanto o dado transita. O RF-045 fala em "cartão tokenizado" — e a tokenização do Asaas é **posterior à primeira cobrança**: ela devolve um `creditCardToken` que serve para as próximas, não um jeito de a primeira não passar por nós. Guardar e reusar esse token é a melhoria disponível; o caminho em que o PAN nunca nos toca é o checkout hospedado deles. Ver [open-questions](../open-questions.md). |
 | 5.2 · Pix | QR e "Copiar código" funcionais no mock | meio selecionável, **código declarado pendente** | `pedido_clave.pix_payload` e `pix_qr` nascem no provedor, e não há provedor. Botão desabilitado com o motivo visível, como o bloco de cobrança em 7.2 — inventar um código copia e cola que ninguém pode pagar seria pior que declarar a ausência. |
 | 5.2 · simulação | "Pagamento simulado neste protótipo" | a nota aparece **só** quando o provedor é o simulado | Em produção com Asaas a frase passaria a ser falsa. Ela é condicional a `PAGAMENTO_SIMULADO`, que é a mesma chave que escolhe o provedor. |
 
@@ -768,3 +768,190 @@ exclusivas por perfil para essas duas telas.
 - `entrarComProvedor`/callback OAuth não ganharam parâmetro de papel nesta
   entrega: login/cadastro social a partir de qualquer rota continua caindo em
   `/selecao-de-perfil` quando não há papel, como antes.
+
+---
+
+## Auditoria de paridade R1 + R2 · 2026-09-18
+
+Cruzamento dos três protótipos navegáveis (`docs/R2/extraido/`) com a
+implementação, tela a tela. As telas de R1 e R2 estavam todas no ar; o que
+segue é o que **não** batia dentro delas, e o que se decidiu em cada caso.
+
+### 1. A navegação voltou a ser a de cada protótipo
+
+O mapa era o do **artista** aplicado também ao curador, com rótulos trocados por
+sinônimos. Pela precedência do [AGENTS.md](../../AGENTS.md), os três ambientes
+passam a ter os grupos e os nomes literais da sua própria sidebar:
+
+| Ambiente | Antes | Agora |
+|---|---|---|
+| Artista | Minha música (Enviar música · Minhas músicas · Catálogo) · Curadoria (Escolher curadores · Relatórios) · Conta (Perfil · Carteira · Notificações · Configurações) | Minha música (**Enviar faixa · Minhas faixas · Devolutivas**) · Curadoria (**Curadores**) · Conta (Perfil · Carteira · Configurações) |
+| Curador | Curadoria (Fila de avaliações · Métricas) · Conta (Financeiro · Notificações · Meu cadastro · Configurações) | **Avaliações** (Fila · **Notas e feedback**) · **Desempenho** (Métricas · Financeiro) · Conta (Conta e configurações) |
+| Admin | — | sem mudança; já era literal |
+
+Consequências, todas deliberadas:
+
+- **"Notificações" saiu das duas sidebars.** Os módulos 10 e 18 são da R5 e o
+  protótipo não os desenha. Quando a central chegar, o item entra com o nome que
+  a tela dela tiver.
+- **"Meu cadastro" saiu da sidebar do curador** e não perdeu acesso: a aba
+  Perfil de Conta tem o botão "Editar" que leva a `/curador/meu-cadastro` — ver
+  §3 da seção de 2026-09-14.
+- **"Notas e feedback" é item de primeiro nível e não é clicável.** No protótipo
+  ele abre o card "Próximo release"; aqui a tela **existe** e é da R2, e o que
+  não existe é um endereço para ela sem uma faixa escolhida. Por isso o item
+  ganhou `motivo` ("Abre a partir de uma faixa da fila") em vez de uma release —
+  dizer "Disponível na Release 4" seria mentira sobre uma tela entregue.
+
+### 2. Os três "Início" prometiam o que já estava entregue
+
+`/artista`, `/curador` e `/admin` são placeholder **no próprio protótipo** — o
+card "Próximo release", com título e texto vindos do mapa `modules` do
+view-model. A copy daqui dizia outra coisa: `/curador` anunciava que *"a fila de
+avaliações entra na Release 2"* numa tela publicada **depois** de a fila entrar
+no ar, e `/artista` fazia o mesmo com a Carteira. Agora os três usam o texto do
+protótipo (`PAINEIS`, em `textos/prototipo.ts`).
+
+No mesmo movimento, `/curador` deixou de ter o `<h1>` **"Fila de avaliações"** —
+o mesmo de `/curador/fila`, numa tela que não é a fila.
+
+### 3. `enMostraLancado` não se aplica, e o motivo é uma divergência anterior
+
+O protótipo esconde a pergunta *"A faixa já foi lançada?"* quando a fonte é mp3
+(`enMostraLancado: !fonteMp3`). Aqui o arquivo é **sempre** exigido, inclusive
+no caminho por link (divergência já registrada: sem áudio local o gate de escuta
+fica inverificável). Aplicar a condição esconderia o campo em 100% dos envios e
+apagaria a data de lançamento do produto. **Mantido como está, de propósito.**
+
+### 4. O contador de "prazo curto" não contava as atrasadas
+
+`ehPrazoCurto` exigia `horas >= 0`, com o argumento de que "vencido é atrasada,
+não prazo curto". O efeito era o oposto: uma fila só de faixas atrasadas
+anunciava *"0 com prazo curto"*. O protótipo conta `t.horas < 24` sem piso.
+Corrigido, com o teste unitário invertido junto.
+
+O mesmo resumo também passou a **omitir** o sufixo quando não há urgentes — é o
+`(urgentes ? … : '')` do protótipo; "· 0 com prazo curto" era ruído com cara de
+alerta.
+
+### 5. Detalhes que estavam fora do protótipo
+
+- **Coluna "Serviço" da fila** mostrava sempre "Feedback escrito", porque o
+  valor era literal. Agora lista os serviços contratados — *"Feedback escrito +
+  Playlist"* —, lidos de `servico_envio` numa ida só para toda a fila.
+- **Revisão do cadastro do curador** imprimia o código do enum
+  (*"playlist: Curadoria Dissona"*). Passou a usar o rótulo, e o bloco "Canais"
+  só conta linhas com nome, exigindo link válido para marcar "Completo".
+- **Detalhe do envio (13.1)**: o rótulo "Enviada" estava ocupado por "Faixa"; o
+  campo voltou ao nome certo. O outro campo do protótipo, "Faixa" com o formato
+  da obra (*"Single · master final"*), **não foi criado**: o produto não guarda
+  esse dado, e inventá-lo seria pior que não tê-lo.
+- **Player**: a barra mostrava só "62%". Agora diz *"62% ouvidos · escuta
+  válida"* / *"48% ouvidos · faltam 12%"*, como `avEscutaLabel`.
+- **Card de saldo no pé da sidebar do artista**: existia no CSS desde a R0 e o
+  `Shell` tinha a prop esperando por ele; nunca tinha sido ligado.
+- **Painel "Como a Dissona funciona" no onboarding**: o aside da 1.1 e o da 1.5
+  são o mesmo componente com copy diferente. O onboarding abria sem aside.
+- **Cartão "Faixa" no passo 2 do envio**: o passo pergunta sobre uma faixa e não
+  dizia qual.
+- **Arrastar e soltar na dropzone**: a copy prometia, e não funcionava — um
+  `<label>` não recebe drop, e o input que receberia tem 1px. O arquivo solto
+  passa a ser escrito no input por `DataTransfer`.
+- **Placeholders dos links do perfil** (`@seuperfil`, `open.spotify.com/artist/…`)
+  voltaram: são eles que ensinam que o `https://` não é exigido.
+
+### 6. Divergências de composição que ficam como estão
+
+- **O card "Próximo release" do admin** não virou tela: quem diz que o módulo é
+  de outra release é o item desabilitado na sidebar, com o motivo no `title`.
+- **O `flash` de 2,6 s** dos pacotes virou `Aviso` permanente — confirmação que
+  some sozinha é confirmação que alguém não leu.
+- **O login admin tem três banners**, e o protótipo tem dois: o terceiro é
+  "conta bloqueada", estado que o protótipo não desenha e o produto tem.
+
+### 7. O perfil do artista voltou a ser duas telas
+
+O protótipo tem **"Perfil"** (vitrine em leitura) e **"Editar cadastro"**
+(formulário). Só o segundo existia, e ocupava o endereço do primeiro — o item
+"Perfil" da sidebar abria o formulário.
+
+- `/artista/perfil` passa a ser a vitrine: avatar, nome, `@handle · cidade`,
+  gêneros, bio, as três estatísticas (**Faixas** · **Leituras** ·
+  **Indicações**) e "Suas faixas".
+- `/artista/perfil/editar` recebe o formulário, alcançado pelo botão de lá — e
+  o "Cancelar", que existia na copy desde a R1 e nunca era renderizado, volta
+  como o caminho de volta.
+
+Os três números saem de `faixa`, `envio` e `compartilhamento`, que já existem e
+que a RLS já restringe ao dono — **nenhuma view nova**. A derivação de status
+("Em análise", "Lida", "Lida por N") vive em `modulos/artista/servico.ts`,
+pura e com teste unitário.
+
+Fica declarado pendente, e não inventado: **"Ver todas"** leva ao catálogo, que
+é o módulo 6 (**R4**), então o botão aparece desabilitado com o motivo no
+`title`; e a linha da faixa não é clicável pelo mesmo motivo. Conta sem envio vê
+zero nas três estatísticas e um estado vazio com CTA para "Enviar música".
+
+### 8. A foto de perfil passou a funcionar nos três ambientes
+
+O caminho existia inteiro no wizard do curador — `useUploadDireto`, a coluna
+`perfil.foto_caminho` (`0001`), o bucket `avatares` (`0000_storage`) — e não
+estava ligado nem no artista (onde o campo simplesmente não existia) nem no
+admin (onde o botão ficava desabilitado, como o protótipo declara).
+
+O bloco virou `CampoDeFoto`, no Design System, e serve as três telas. Junto
+vieram as extrações que ele exigiu: `lib/arquivos.ts` (limites e conferência),
+`lib/iniciais.ts` e `lib/supabase/upload-de-perfil.ts` (o resolvedor
+caminho-ou-multipart). `modulos/curador/esquemas.ts` reexporta o que saiu, para
+nenhum ponto de uso mudar de import — o mesmo tratamento que `lib/link.ts` já
+tinha recebido.
+
+Dois detalhes que são regra, e não gosto:
+
+- **A URL leva `?v=`.** O upload é `upsert` num nome fixo (`<uid>/perfil.jpg`),
+  então trocar a foto não muda a URL — e sem o cache-buster o CDN continuaria
+  servindo a antiga.
+- **O botão trava o "Salvar".** Enviar com o upload em curso mandaria
+  `foto_caminho` vazio, e a foto se perderia sem erro nenhum.
+
+O corpo do botão difere de propósito: 14px em 7.1 e 27.1, 13px no passo 1 do
+wizard. São os valores do protótipo, e a suíte de paridade compara o computado.
+
+### 9. O painel lateral do onboarding **não** é o "Como funciona" do cadastro
+
+Eles se parecem — mesma coluna, mesmo overline, quatro passos numerados — e a
+primeira tentativa foi reusar o componente da 1.1. A suíte de paridade recusou,
+e estava certa: na 1.5 cada linha é um `<button>` que **salta para aquele passo
+do tour** (`obGo1`…`obGo4`), com a linha do passo atual destacada; o overline é
+"Como a Dissona funciona" e não há título grande nem nota de LGPD.
+
+São dois componentes, então: `ComoFunciona` (1.1, estático) e `NavegadorDoTour`
+(1.5, interativo). O passo passou a viver num contexto de cliente
+(`estado-do-tour`), porque as **duas** colunas o controlam — o card à esquerda
+por "Avançar"/"Voltar", o painel à direita saltando direto. Antes o onboarding
+abria sem painel nenhum, com metade da tela vazia.
+
+### 10. O expurgo ganhou a Edge Function que a `0011` previa
+
+`expurgar_contas_excluidas()` anonimiza, e a migration registrava que os
+**objetos de Storage** ficavam para uma Edge Function que não existia. Até aqui,
+a foto, os áudios e as exportações de uma conta excluída permaneciam no bucket
+indefinidamente.
+
+`supabase/functions/expurgar-contas` faz a metade que falta, e a ordem é o que
+importa: **lista → apaga os objetos → chama a RPC**. Inverter perderia o alvo —
+depois de anonimizar, `situacao` vira `excluida` e não há mais como saber de
+quem eram os objetos. Falhar no meio é seguro no sentido certo: a conta continua
+elegível e a próxima execução termina o serviço.
+
+A função está **publicada** e a `0011b` **aplicada** (2026-09-18). O job
+autentica pela service role key, que a própria função já tem no ambiente — usá-la
+como credencial evita um terceiro segredo que alguém esqueceria de configurar,
+e `verify_jwt` fica ligado como primeira peneira. A comparação dentro da função
+é o que importa: com `verify_jwt` sozinho, **qualquer sessão autenticada**
+passaria pelo gateway.
+
+⚠️ Falta uma linha, que não pode ser versionada: `service_role_key` no Vault.
+Enquanto ela não existir, o job **degrada para a anonimização da `0011`** em vez
+de falhar — trocar "objetos de Storage acumulando" por "nenhuma anonimização"
+seria piorar o que já funciona. Está na lista de pendências manuais do BACKLOG.
