@@ -38,7 +38,12 @@ export default async function Pagina({
 
   return (
     <MolduraDeAutenticacao
-      chamada={{ overline: ENTRAR_CURADOR.overline, titulo: ENTRAR_CURADOR.titulo }}
+      ambiente="curador"
+      chamada={{
+        overline: ENTRAR_CURADOR.overline,
+        titulo: ENTRAR_CURADOR.titulo,
+        subtitulo: ENTRAR_CURADOR.subtitulo,
+      }}
       provas={ENTRAR_CURADOR.provas}
       linksDeRodape={[
         { rotulo: 'Termos', href: ROTA.TERMOS },
@@ -69,8 +74,7 @@ export default async function Pagina({
           </div>
         }
         textos={{
-          titulo: ENTRAR_CURADOR.titulo,
-          tituloComoH1: false,
+          // Sem `titulo`: a moldura já mostrou o `<h1>` na chamada.
           rotuloEmail: ENTRAR_CURADOR.rotuloEmail,
           placeholderEmail: ENTRAR_CURADOR.placeholderEmail,
           rotuloSenha: ENTRAR_CURADOR.rotuloSenha,

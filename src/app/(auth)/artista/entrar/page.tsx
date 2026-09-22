@@ -39,6 +39,7 @@ export default async function Pagina({
 
   return (
     <MolduraDeAutenticacao
+      ambiente="artista"
       chamada={{ overline: ENTRAR_ARTISTA.overline, titulo: ENTRAR_ARTISTA.titulo }}
       provas={ENTRAR_ARTISTA.provas}
       linksDeRodape={[
@@ -70,8 +71,7 @@ export default async function Pagina({
           </div>
         }
         textos={{
-          titulo: ENTRAR_ARTISTA.titulo,
-          tituloComoH1: false,
+          // Sem `titulo`: a moldura já mostrou o `<h1>` na chamada.
           rotuloEmail: ENTRAR_ARTISTA.rotuloEmail,
           placeholderEmail: ENTRAR_ARTISTA.placeholderEmail,
           rotuloSenha: ENTRAR_ARTISTA.rotuloSenha,

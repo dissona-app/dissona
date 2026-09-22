@@ -1,11 +1,20 @@
 /*
  * Moldura das telas de autenticação — protótipos 1 (artista/curador) e 19
- * (admin), de `docs/R2/extraido/{Artista,Admin}.html`.
+ * (admin), de `docs/R2/extraido/{Artista,Admin,Curador}.html`.
  *
  * Os `clamp()` são os do protótipo, copiados como estão. Eles são a única
  * responsividade que o R2 tem — não existe um `@media` nos três arquivos
  * (pendência #24) — e reescrevê-los em breakpoints inventados quebraria a
  * fidelidade sem resolver o mobile, que ninguém desenhou ainda.
+ *
+ * Os três ambientes divergem em quatro pontos, cada um coberto por uma classe
+ * `.ambiente*` que sobrescreve a base: altura da marca (essa vem por `style`
+ * inline, na prop `altura` do componente `Marca`), `margin-bottom` da marca,
+ * `gap` do card e geometria da chamada (`gap`, `max-width`, corpo e
+ * entrelinha do título). Antes desta divisão os três usavam o valor do
+ * artista — foi a unificação que o comentário do TSX registrava como "sem
+ * nenhuma razão", e a decisão do cliente é a oposta: cada ambiente usa o
+ * literal do seu próprio protótipo.
  */
 
 .pagina {
@@ -66,26 +75,26 @@
 }
 
 /*
- * A marca é o logotipo do protótipo, e só ele — nada de texto ao lado. O
- * `margin-bottom` é o do protótipo do admin; o do artista é `clamp(4px,1vh,10px)`,
- * e vale aqui a mesma unificação que o comentário do TSX descreve.
+ * A marca é o logotipo do protótipo, e só ele — nada de texto ao lado. A
+ * altura vem por `style` inline (varia por ambiente — ver `MolduraDeAutenticacao.tsx`);
+ * o `margin-bottom` varia do mesmo jeito, nas classes `.ambiente*` abaixo.
  *
  * `inline-flex` para o link não esticar na largura do `.miolo` centrado, o que
  * daria uma área clicável do tamanho da tela.
  */
 .marca {
   display: inline-flex;
-  margin-bottom: clamp(6px, 1.2vh, 12px);
+  margin-bottom: clamp(4px, 1vh, 10px);
   border-radius: var(--dsn-radius-md);
   flex: none;
 }
 
-/* Chamada acima do card — só a tela 1 tem. */
+/* Chamada acima do card — só a tela 1 tem. Geometria varia por ambiente. */
 .chamada {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--dsn-space-4);
+  gap: 8px;
   max-width: 600px;
   text-align: center;
   flex: none;
@@ -103,29 +112,64 @@
 .chamadaTitulo {
   margin: 0;
   font-size: clamp(26px, 3.4vw, 38px);
-  line-height: var(--dsn-leading-hero);
+  line-height: 1.06;
   font-weight: var(--dsn-weight-black);
   letter-spacing: var(--dsn-tracking-hero);
   text-wrap: balance;
 }
 
+/* Subtítulo da chamada — só o curador tem (`Curador.html`). */
+.chamadaSubtitulo {
+  margin: 0;
+  font-size: 14px;
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+  max-width: 430px;
+  text-wrap: pretty;
+}
+
 /*
- * O card. 436px é o valor literal do protótipo, nos dois arquivos — e é
+ * O card. 436px é o valor literal do protótipo, nos três arquivos — e é
  * estreito de propósito: um formulário de duas linhas mais largo que isto
- * espalha rótulo e campo longe demais um do outro.
+ * espalha rótulo e campo longe demais um do outro. O `gap` interno varia por
+ * ambiente (16px no admin, 14px no artista e no curador).
  */
 .card {
   width: 100%;
   max-width: 436px;
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-8);
+  gap: 14px;
   background: var(--dsn-surface);
   border: var(--dsn-border-width) solid var(--dsn-border);
   border-radius: var(--dsn-radius-3xl);
   padding: clamp(18px, 2.4vw, 26px);
   box-shadow: var(--dsn-shadow-card);
   flex: none;
+}
+
+/* --- Ambiente admin — `Admin.html` --- */
+.ambienteAdmin .marca {
+  margin-bottom: clamp(6px, 1.2vh, 12px);
+}
+
+.ambienteAdmin .card {
+  gap: 16px;
+}
+
+/* --- Ambiente artista — `Artista.html`. É a base acima; sem sobrescrita. --- */
+.ambienteArtista {
+}
+
+/* --- Ambiente curador — `Curador.html` --- */
+.ambienteCurador .chamada {
+  gap: 7px;
+  max-width: 620px;
+}
+
+.ambienteCurador .chamadaTitulo {
+  font-size: clamp(24px, 2.9vw, 33px);
+  line-height: 1.08;
 }
 
 /* Provas sociais do pé da tela 1. */

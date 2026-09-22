@@ -12,9 +12,21 @@ export type LinkDeRodape = {
   readonly href: string;
 };
 
+/**
+ * Ambiente da tela — o eixo real da variação visual entre os três protótipos
+ * (`docs/R2/extraido/{Admin,Artista,Curador}.html`). Cada um tem sua própria
+ * altura de logotipo, `gap` de card e geometria de chamada; ver
+ * `MolduraDeAutenticacao.module.css`. `'artista'` é o padrão porque é a
+ * identidade das rotas neutras (`/entrar`, `/cadastrar`, `/recuperar-senha`…):
+ * `ENTRAR_ARTISTA` sempre foi um alias de `ENTRAR` (`textos/prototipo.ts`), e
+ * essas telas vêm de `Artista.html` no protótipo.
+ */
+export type AmbienteDeAutenticacao = 'artista' | 'curador' | 'admin';
+
 export type PropsMoldura = {
+  readonly ambiente?: AmbienteDeAutenticacao;
   /** Chamada acima do card — só a tela 1 (artista/curador) tem. */
-  readonly chamada?: { readonly overline: string; readonly titulo: string };
+  readonly chamada?: { readonly overline: string; readonly titulo: string; readonly subtitulo?: string };
   /** Provas sociais do pé — idem. */
   readonly provas?: readonly string[];
   readonly linksDeRodape: readonly LinkDeRodape[];
@@ -32,19 +44,43 @@ export type PropsMoldura = {
 
 const ANO = 2026;
 
+/** Altura da marca por ambiente — literal dos três protótipos (§ ver módulo). */
+const ALTURA_DA_MARCA: Record<AmbienteDeAutenticacao, string> = {
+  admin: 'clamp(44px, 5.6vh, 60px)',
+  artista: 'clamp(28px, 3vw, 36px)',
+  curador: '36px',
+};
+
+/**
+ * A variante split-screen (`aside` presente — tela 1.1) tem sua própria
+ * altura de marca, menor que a do login: `clamp(26px,2.6vw,32px)` em
+ * `Artista.html`, contra `clamp(28px,3vw,36px)` na tela sem `aside`. É o
+ * valor verificado; sem dado equivalente para o wizard do curador (módulo
+ * 12) ou para um split do admin — que hoje não existe —, o mesmo literal
+ * atende os dois enquanto não houver protótipo próprio para eles.
+ */
+const ALTURA_DA_MARCA_SPLIT = 'clamp(26px, 2.6vw, 32px)';
+
+const CLASSE_DO_AMBIENTE: Record<AmbienteDeAutenticacao, string | undefined> = {
+  admin: estilos.ambienteAdmin,
+  artista: estilos.ambienteArtista,
+  curador: estilos.ambienteCurador,
+};
+
 /**
  * Página das telas de autenticação: fundo, marca, card centralizado e rodapé.
  *
- * As telas 1 e 19 são a mesma composição com dois elementos opcionais, então
- * são um componente com dois `props` opcionais — não dois arquivos parecidos.
- * A alternativa apareceu no protótipo, que tem as duas telas escritas por
- * inteiro em arquivos diferentes, e é onde o card do admin ficou com `gap:16px`
- * e o do artista com `gap:14px` sem nenhuma razão.
- *
- * O `gap` unificado é 16px (`--dsn-space-8`), o do admin — o card do artista
- * tem mais elementos e o espaço maior o organiza melhor.
+ * As telas 1 (artista/curador) e 19 (admin) são a mesma composição com dois
+ * elementos opcionais, então são um componente com `props` — não três
+ * arquivos parecidos, que foi como o protótipo os desenhou e é como a
+ * divergência de `gap` entre eles passou despercebida por uma release. Cada
+ * protótipo (`docs/R2/extraido/{Admin,Artista,Curador}.html`) tem sua própria
+ * altura de logotipo, `gap` de card e geometria de chamada — a prop
+ * `ambiente` escolhe qual, e os valores são os literais de cada um, não uma
+ * média entre eles.
  */
 export function MolduraDeAutenticacao({
+  ambiente = 'artista',
   chamada,
   provas,
   linksDeRodape,
@@ -52,12 +88,15 @@ export function MolduraDeAutenticacao({
   children,
 }: PropsMoldura) {
   return (
-    <div className={estilos.pagina}>
+    <div className={[estilos.pagina, CLASSE_DO_AMBIENTE[ambiente]].filter(Boolean).join(' ')}>
       <OndasDeFundo />
 
       <main className={estilos.miolo}>
         <Link className={estilos.marca} href={ROTA.HOME}>
-          <Marca variante="colorida" altura="clamp(28px, 3vw, 36px)" />
+          <Marca
+            variante="colorida"
+            altura={aside === undefined ? ALTURA_DA_MARCA[ambiente] : ALTURA_DA_MARCA_SPLIT}
+          />
         </Link>
 
         {chamada !== undefined ? (
@@ -69,6 +108,9 @@ export function MolduraDeAutenticacao({
               sempre — dois quebra a estrutura para leitor de tela.
             */}
             <h1 className={estilos.chamadaTitulo}>{chamada.titulo}</h1>
+            {chamada.subtitulo !== undefined ? (
+              <p className={estilos.chamadaSubtitulo}>{chamada.subtitulo}</p>
+            ) : null}
           </div>
         ) : null}
 

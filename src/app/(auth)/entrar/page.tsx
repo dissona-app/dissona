@@ -77,11 +77,9 @@ export default async function Pagina({
           </div>
         }
         textos={{
-          titulo: ENTRAR.titulo,
-          // A moldura já renderizou o `<h1>` na chamada. Repetir o nível aqui
-          // daria dois `<h1>` na página, e o leitor de tela perderia a
-          // estrutura.
-          tituloComoH1: false,
+          // Sem `titulo` aqui: a moldura já renderizou o `<h1>` na chamada, e
+          // o protótipo não repete o título dentro do card (só o banner vem
+          // em seguida) — ver o comentário de `TextosDeLogin.titulo`.
           rotuloEmail: ENTRAR.rotuloEmail,
           placeholderEmail: ENTRAR.placeholderEmail,
           rotuloSenha: ENTRAR.rotuloSenha,

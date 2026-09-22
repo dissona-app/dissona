@@ -6,6 +6,59 @@ Tudo o que **não foi decidido** neste PRD, porque a decisão não é do time de
 
 ---
 
+## Precedência confirmada pelo cliente · 2026-09-22
+
+O protótipo manda em **tudo que é visual e em tudo que é navegação de
+frontend**, em todas as telas — reafirmação explícita da regra que o
+[AGENTS.md](../../AGENTS.md) já tinha ("protótipo da R2 > board de discovery >
+derivação"), motivada por três telas de login que tinham ficado visualmente
+idênticas entre os ambientes artista, curador e admin quando cada um tem sua
+própria composição no protótipo (`docs/R2/extraido/{Admin,Artista,Curador}.html`).
+
+A partir desta data, a Parte B.1 e a B.2 deste documento passam a distinguir
+três categorias de afastamento do protótipo, porque só uma delas continua
+sendo decisão válida:
+
+- **Divergência de aparência** — layout, tipografia, cor, geometria. **Não é
+  mais aceita** sem que o cliente tenha aprovado a exceção pontualmente; as
+  que existiam foram revertidas (ver a entrada de autenticação abaixo).
+- **Divergência de mecanismo** — o *elemento* muda (link em vez de estado
+  local, rota própria em vez de painel dentro de outra tela), mas a
+  *aparência* continua a do protótipo. Fica, porque dá endereço à tela e
+  sobrevive a um F5 — abas de Conta com `?aba=` e `/artista/pacotes` como
+  rota são os dois casos correntes.
+- **Divergência de comportamento** — a tela concorda em aparência e em
+  navegação, e diverge em o que a ação faz (recusar em vez de coagir em
+  silêncio, por exemplo). Não é o alvo desta precedência; continua regida
+  pelo Guia de Testes.
+
+### Autenticação — aparência revertida
+
+As telas de login (`/entrar`, `/artista/entrar`, `/curador/entrar`,
+`/admin/entrar`) usavam a mesma altura de logotipo, o mesmo `gap` de card e a
+mesma geometria de chamada para os três ambientes — unificação que o próprio
+comentário do componente registrava como feita "sem nenhuma razão"
+(`MolduraDeAutenticacao.tsx`, antes desta correção). Corrigido: cada ambiente
+usa o literal do seu próprio protótipo (prop `ambiente` do componente), o
+subtítulo do curador — *"Sua leitura crítica vira feedback que o artista pode
+citar."*, ausente até então — voltou a existir, e o título duplicado que
+`FormularioDeLogin` renderizava dentro do card nas telas com chamada externa
+(um `<h1>` na moldura, um `<h2>` idêntico dentro do card — o protótipo não
+repete) foi removido.
+
+`e2e/prototipo/telas-de-autenticacao.spec.ts` ganhou cenários próprios para
+`/artista/entrar` e `/curador/entrar` — nenhum dos dois tinha cenário, e é por
+aí que a divergência passou uma release inteira sem o CI acusar — e uma
+checagem de geometria do logotipo (`ancoras()` em `e2e/apoio/prototipo.ts`),
+além da tipografia que a suíte já comparava.
+
+**Pendente, fora desta correção:** a verificação de e-mail (1.3) continua
+divergindo — ver a entrada correspondente na Parte B.1, inalterada — e a
+auditoria das telas de painel (`(app)/*`, `(admin)/(painel)/*`) fica para uma
+entrega seguinte, dirigida por um inventário gerado tela a tela.
+
+---
+
 ## Parte A — Pendências bloqueantes
 
 Itens em que o produto **se comporta de forma diferente** conforme a resposta. Precisam de decisão antes da implementação do módulo correspondente.

@@ -33,6 +33,7 @@ export default async function Pagina({
 
   return (
     <MolduraDeAutenticacao
+      ambiente="admin"
       linksDeRodape={[
         { rotulo: 'Segurança', href: ROTA.PRIVACIDADE },
         { rotulo: 'Privacidade', href: ROTA.PRIVACIDADE },

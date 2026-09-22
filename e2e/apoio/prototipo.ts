@@ -94,7 +94,18 @@ export type PropsDoPrototipo = {
   readonly mostrarProvas?: boolean;
 };
 
-/** Tipografia de um texto — o que se compara entre protótipo e aplicação. */
+/**
+ * Tipografia de um texto — o que se compara entre protótipo e aplicação.
+ *
+ * Geometria (posição, largura, alinhamento, cor de fundo) foi tentada aqui,
+ * por texto, e descartada: um botão centralizado por `justify-content` numa
+ * flexbox e um botão centralizado por `text-align: center` são visualmente
+ * idênticos e computam `text-align` diferente, então a comparação por texto
+ * acusa "divergência" em coisa que ninguém vê. Geometria real de tela é
+ * `ancoras()` (altura, largura, `gap`, `max-width` de um elemento nomeado —
+ * logotipo, card, painel) e `composicao()` (presença e ordem dos blocos) —
+ * as duas medem a coisa, não um proxy dela.
+ */
 export type Digital = {
   readonly tag: string;
   readonly peso: string;
@@ -208,6 +219,126 @@ export async function digitaisDeTexto(page: Page): Promise<Record<string, Digita
     }
     return saida;
   });
+}
+
+/**
+ * A sequência, em ordem de documento, de todo texto visível e curto da tela.
+ *
+ * Ao contrário de `digitaisDeTexto`, aqui o texto repetido entra — o que
+ * importa é a **presença e a ordem** dos blocos, não pareá-los um a um. É o
+ * que pega o que a tipografia nunca pegaria porque não tem par para comparar:
+ * um bloco ausente (o subtítulo do curador que a aplicação não tinha), um
+ * bloco a mais, ou um bloco fora de ordem.
+ *
+ * O limite de 90 caracteres é maior que o de `digitaisDeTexto` (70) de
+ * propósito: aqui não se mede tipografia de um texto longo, só se registra
+ * que ele existe e onde. Textos maiores que isso costumam ser parágrafo de
+ * corpo com conteúdo dinâmico (extrato, fila), e comparar a composição deles
+ * é ruído — quem cobre esse caso é `digitaisDeTexto`, tela a tela, sobre o
+ * texto que os dois lados têm em comum.
+ */
+export async function composicao(page: Page): Promise<readonly string[]> {
+  return page.evaluate(() => {
+    const normalizar = (texto: string | null): string => (texto ?? '').replace(/\s+/g, ' ').trim();
+    const saida: string[] = [];
+
+    for (const elemento of document.querySelectorAll('body *')) {
+      if (elemento.tagName === 'SCRIPT' || elemento.tagName === 'STYLE') continue;
+      if (elemento.closest('svg') !== null) continue;
+
+      const caixa = elemento.getBoundingClientRect();
+      if (caixa.width === 0 || caixa.height === 0) continue;
+      if (getComputedStyle(elemento).visibility === 'hidden') continue;
+
+      const texto = normalizar(elemento.textContent);
+      if (texto.length < 2 || texto.length > 90) continue;
+
+      const embrulha = [...elemento.children].some(
+        (filho) => normalizar(filho.textContent) === texto,
+      );
+      if (embrulha) continue;
+
+      saida.push(texto);
+    }
+    return saida;
+  });
+}
+
+/**
+ * Diferença entre duas composições — o que existe de um lado e não do outro,
+ * e o que trocou de posição.
+ *
+ * Comparação por **conjunto** primeiro (ausente/a mais), e só depois por
+ * índice comum (fora de ordem): duas listas de tamanho diferente sempre têm
+ * índice "errado" a partir do primeiro ponto de divergência, e isso afogaria
+ * o que de fato importa — um bloco que não existe do outro lado.
+ */
+export type DivergenciaDeComposicao =
+  | { readonly tipo: 'ausente'; readonly texto: string; readonly lado: 'protótipo' | 'aplicação' }
+  | { readonly tipo: 'fora de ordem'; readonly texto: string; readonly indicePrototipo: number; readonly indiceAplicacao: number };
+
+export function divergenciasDeComposicao(
+  doPrototipo: readonly string[],
+  daAplicacao: readonly string[],
+): readonly DivergenciaDeComposicao[] {
+  const saida: DivergenciaDeComposicao[] = [];
+
+  const soAplicacao = daAplicacao.filter((texto) => !doPrototipo.includes(texto));
+  const soPrototipo = doPrototipo.filter((texto) => !daAplicacao.includes(texto));
+  for (const texto of soPrototipo) saida.push({ tipo: 'ausente', texto, lado: 'aplicação' });
+  for (const texto of soAplicacao) saida.push({ tipo: 'ausente', texto, lado: 'protótipo' });
+
+  const comuns = doPrototipo.filter((texto) => daAplicacao.includes(texto));
+  const comunsNaAplicacao = daAplicacao.filter((texto) => doPrototipo.includes(texto));
+  for (const [indicePrototipo, texto] of comuns.entries()) {
+    const indiceAplicacao = comunsNaAplicacao.indexOf(texto);
+    if (indiceAplicacao !== indicePrototipo) {
+      saida.push({ tipo: 'fora de ordem', texto, indicePrototipo, indiceAplicacao });
+    }
+  }
+
+  return saida;
+}
+
+/**
+ * Geometria de um punhado de elementos nomeados por `seletor` — o que
+ * `digitaisDeTexto` não fecha porque eles não têm texto próprio (o logotipo é
+ * uma `<img>`; o painel lateral não é um texto único). Cada valor é a altura e
+ * a largura em pixels, e o `gap` quando o elemento é um flex/grid container —
+ * os três números que o protótipo fixa por ambiente (altura do logotipo,
+ * `gap` do card) e que só um seletor explícito por tela consegue medir.
+ */
+export type Ancora = {
+  readonly altura: number;
+  readonly largura: number;
+  readonly gap: number | null;
+  readonly maxWidth: string;
+};
+
+export async function ancoras(
+  page: Page,
+  seletores: Readonly<Record<string, string>>,
+): Promise<Record<string, Ancora | null>> {
+  return page.evaluate((mapa) => {
+    const saida: Record<string, Ancora | null> = {};
+    for (const [nome, seletor] of Object.entries(mapa)) {
+      const elemento = document.querySelector(seletor);
+      if (elemento === null) {
+        saida[nome] = null;
+        continue;
+      }
+      const caixa = elemento.getBoundingClientRect();
+      const estilo = getComputedStyle(elemento);
+      const gap = Number.parseFloat(estilo.rowGap || estilo.gap);
+      saida[nome] = {
+        altura: Math.round(caixa.height),
+        largura: Math.round(caixa.width),
+        gap: Number.isNaN(gap) ? null : Math.round(gap),
+        maxWidth: estilo.maxWidth,
+      };
+    }
+    return saida;
+  }, seletores);
 }
 
 /**

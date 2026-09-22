@@ -17,9 +17,15 @@ export type Banner = { readonly titulo: string; readonly texto: string; readonly
 
 export type TextosDeLogin = {
   readonly overline?: string;
-  /** `<h1>` quando a moldura não tem chamada; `<h2>` quando tem. */
-  readonly titulo: string;
-  readonly tituloComoH1: boolean;
+  /**
+   * `<h1>` quando a moldura não tem chamada (tela 19); ausente quando tem
+   * (tela 1) — a chamada já traz o `<h1>` e as provas visíveis do protótipo,
+   * e repetir o título dentro do card duplicaria um texto que ele só mostra
+   * uma vez (`docs/R2/extraido/Artista.html`: depois do `<h1>` da chamada, o
+   * card vai direto para o banner condicional).
+   */
+  readonly titulo?: string;
+  readonly tituloComoH1?: boolean;
   readonly subtitulo?: string;
   readonly rotuloEmail: string;
   readonly placeholderEmail: string;
@@ -126,22 +132,28 @@ export function FormularioDeLogin({
           ? textos.bannerCredenciais
           : null;
 
-  const Titulo = textos.tituloComoH1 ? 'h1' : 'h2';
+  const Titulo = textos.tituloComoH1 === true ? 'h1' : 'h2';
+  const temCabecalho =
+    textos.overline !== undefined || textos.titulo !== undefined || textos.subtitulo !== undefined;
 
   return (
     <>
-      <div className={estilos.cabecalho}>
-        {textos.overline !== undefined ? (
-          <span className={estilos.overline}>
-            {icone}
-            {textos.overline}
-          </span>
-        ) : null}
-        <Titulo className={estilos.titulo}>{textos.titulo}</Titulo>
-        {textos.subtitulo !== undefined ? (
-          <p className={estilos.subtitulo}>{textos.subtitulo}</p>
-        ) : null}
-      </div>
+      {temCabecalho ? (
+        <div className={estilos.cabecalho}>
+          {textos.overline !== undefined ? (
+            <span className={estilos.overline}>
+              {icone}
+              {textos.overline}
+            </span>
+          ) : null}
+          {textos.titulo !== undefined ? (
+            <Titulo className={estilos.titulo}>{textos.titulo}</Titulo>
+          ) : null}
+          {textos.subtitulo !== undefined ? (
+            <p className={estilos.subtitulo}>{textos.subtitulo}</p>
+          ) : null}
+        </div>
+      ) : null}
 
       {banner !== null ? (
         <Aviso tom="erro" titulo={banner.titulo} acao={banner.acao}>

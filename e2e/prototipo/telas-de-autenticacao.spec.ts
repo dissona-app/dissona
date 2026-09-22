@@ -4,6 +4,7 @@ import type { Page } from '@playwright/test';
 import {
   PROTOTIPO,
   abrirPrototipo,
+  ancoras,
   digitaisDeTexto,
   divergencias,
   fonteRenderizada,
@@ -35,6 +36,13 @@ type Cenario = {
   /** Tela que o protótipo só mostra depois de um envio — ver `abrirPrototipo`. */
   readonly depois?: (pagina: Page) => Promise<void>;
   readonly excecoes?: readonly Excecao[];
+  /**
+   * Motivo para pular a checagem de geometria do logotipo — só a tela de
+   * verificação de e-mail usa: a composição inteira diverge do protótipo
+   * (ver a exceção de tipografia dela), e comparar só a altura do logotipo
+   * fora do contexto do resto da composição não diria nada de novo.
+   */
+  readonly semChecagemDeAncoras?: string;
 };
 
 /**
@@ -59,6 +67,25 @@ const CENARIOS: readonly Cenario[] = [
     // e a tela as tem — é o que `mostrarProvas` liga.
     props: { telaInicial: 'Login', mostrarProvas: true },
     rota: '/entrar',
+  },
+  {
+    // Rota exclusiva do artista — mesma composição da neutra acima
+    // (`ENTRAR_ARTISTA` é `ENTRAR`), verificada em separado porque tem CTA e
+    // `href` próprios (`/artista/cadastrar`).
+    nome: 'login exclusivo do artista',
+    prototipo: PROTOTIPO.ARTISTA,
+    props: { telaInicial: 'Login', mostrarProvas: true },
+    rota: '/artista/entrar',
+  },
+  {
+    // A tela que ficou idêntica à do artista por uma release — logotipo
+    // 36px fixo (não `clamp(28px,3vw,36px)`), `gap` de chamada 7px (não
+    // 8px), `max-width` de 620px (não 600px) e o subtítulo do curador, que
+    // simplesmente não existia. É este cenário que teria acusado.
+    nome: 'login exclusivo do curador',
+    prototipo: PROTOTIPO.CURADOR,
+    props: { telaInicial: 'Login', mostrarProvas: true },
+    rota: '/curador/entrar',
   },
   {
     nome: 'cadastro',
@@ -89,6 +116,9 @@ const CENARIOS: readonly Cenario[] = [
       TRACKING_DE_BOTAO('Já confirmei, continuar'),
       TRACKING_DE_BOTAO('Reenviar e-mail'),
     ],
+    semChecagemDeAncoras:
+      'Composição inteira diverge do protótipo (ver a exceção de tipografia acima); ' +
+      'pendente em docs/prd/07-pendencias-e-divergencias.md.',
   },
   {
     nome: 'recuperação de senha',
@@ -192,6 +222,40 @@ for (const cenario of CENARIOS) {
         expect.arrayContaining([expect.stringMatching(/^Inter/)]),
       );
       expect(naAplicacao).toEqual(noPrototipo);
+    });
+
+    /**
+     * Geometria do logotipo — o que a tipografia não fecha porque uma `<img>`
+     * não tem texto próprio. É esta medida, e não uma inspeção visual, que
+     * teria acusado o logotipo do admin em `clamp(28px,3vw,36px)` (a altura
+     * do artista) em vez do seu próprio `clamp(44px,5.6vh,60px)`.
+     */
+    test('altura do logotipo igual à do protótipo', async ({ page, context }) => {
+      test.skip(
+        cenario.semChecagemDeAncoras !== undefined,
+        cenario.semChecagemDeAncoras,
+      );
+
+      const doPrototipo = await context.newPage();
+      await abrirPrototipo(doPrototipo, cenario.prototipo, cenario.props);
+      if (cenario.depois !== undefined) await cenario.depois(doPrototipo);
+
+      await page.goto(cenario.rota);
+      await page.locator('h1').first().waitFor();
+
+      const seletores = { marca: 'img[alt="Dissona"]' };
+      const noPrototipo = await ancoras(doPrototipo, seletores);
+      const naAplicacao = await ancoras(page, seletores);
+
+      // 1px de folga: arredondamento de subpixel entre os dois motores de
+      // fonte/layout, não divergência de composição.
+      const alturaPrototipo = noPrototipo['marca']?.altura;
+      const alturaAplicacao = naAplicacao['marca']?.altura;
+      expect(alturaPrototipo, 'protótipo sem logotipo visível na tela').not.toBeNull();
+      expect(alturaAplicacao, 'aplicação sem logotipo visível na tela').not.toBeNull();
+      if (alturaPrototipo !== undefined && alturaAplicacao !== undefined) {
+        expect(Math.abs(alturaAplicacao - alturaPrototipo)).toBeLessThanOrEqual(1);
+      }
     });
   });
 }

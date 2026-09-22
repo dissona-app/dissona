@@ -160,6 +160,7 @@ export const ENTRAR_CURADOR = {
   ...ENTRAR,
   overline: 'Área do curador',
   titulo: 'Escute com método. Seja remunerado por isso.',
+  subtitulo: 'Sua leitura crítica vira feedback que o artista pode citar.',
   provas: [
     'Você define seus serviços e preços',
     'Remuneração por classe e prazo',
