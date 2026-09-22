@@ -94,6 +94,17 @@ const CENARIOS: readonly Cenario[] = [
     rota: '/cadastrar',
   },
   {
+    // O protótipo não tem uma tela de cadastro isolada para o curador — é a
+    // variante sem sessão do passo 1 do wizard (`curadorLogado: false`), com
+    // o campo de senha visível. `MolduraDoWizard`/`PainelDeMarca`, não a
+    // moldura de auth com o aside "Como funciona" do artista.
+    nome: 'cadastro do curador',
+    prototipo: PROTOTIPO.CURADOR,
+    props: { telaInicial: 'Cadastro', curadorLogado: false },
+    rota: '/curador/cadastrar',
+    excecoes: [TRACKING_DE_BOTAO('Continuar')],
+  },
+  {
     nome: 'verificação de e-mail',
     prototipo: PROTOTIPO.ARTISTA,
     props: { telaInicial: 'Cadastro' },

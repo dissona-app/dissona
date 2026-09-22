@@ -57,6 +57,43 @@ divergindo — ver a entrada correspondente na Parte B.1, inalterada — e a
 auditoria das telas de painel (`(app)/*`, `(admin)/(painel)/*`) fica para uma
 entrega seguinte, dirigida por um inventário gerado tela a tela.
 
+### Criar conta — artista e curador tinham a mesma tela · 2026-09-22
+
+`/artista/cadastrar` e `/curador/cadastrar` renderizavam a mesma composição —
+`MolduraDeAutenticacao` com o aside "Como funciona" do artista, com o
+`overline` trocado. O comentário do código já admitia isto: "**derivados** da
+versão do artista... até existir copy própria". Não é o caso: o protótipo tem
+copy própria para o curador, só que não onde essa tela procurava.
+
+Em `docs/R2/extraido/Curador.html`, "Criar conta" no login **não** abre uma
+tela de cadastro isolada — abre direto o **passo 1 do wizard de 8 passos**
+(módulo 12), na variante para quem ainda não tem sessão (`cHerdado: false`,
+campo de senha visível; `CURADOR_CADASTRO` em `textos/curador.ts` já
+documentava a variante `curadorLogado`, só não a implementava fora da
+guarda). `/curador/cadastrar` passou a usar a moldura do wizard
+(`MolduraDoWizard` + `PainelDeMarca`, extraído para ser o mesmo componente que
+o passo 1 pós-sessão usa) em vez da moldura de autenticação do artista —
+título "Dados básicos", aside "Sua escuta vira crédito e remuneração." / "São
+oito perguntas curtas...", botão "Continuar" e link "Voltar ao login", os
+literais do protótipo.
+
+Dois achados a mais no caminho, também corrigidos:
+
+- O aside do wizard não tinha o logotipo — o protótipo tem, 36px fixo, sem
+  link. `PainelDeMarca` ganhou a marca.
+- O botão "Continuar" e o link "Voltar ao login" desta tela usavam a
+  aparência do cadastro do artista (botão largo roxo, link roxo) em vez da do
+  rodapé do wizard (botão denso, link cinza — `AcoesDoPasso`). `FormularioDeCadastro`
+  ganhou `tamanhoDoBotao`/`blocoInteiro`/`corDoRodape` para o caso do curador
+  sem mudar o padrão do artista.
+
+**Mantido, por decisão consciente e não por falta de fidelidade:** os campos
+"Confirmar senha" e o aceite de Termos/LGPD, que o passo 1 do protótipo não
+tem ali (aparecem em outro ponto do wizard). Removê-los para bater 1:1 com o
+protótipo tiraria uma validação de conformidade já implementada e testada, e
+essa troca não foi pedida — a divergência reportada era a tela estar igual
+entre os dois perfis, não o formato exato de cada campo.
+
 ---
 
 ## Parte A — Pendências bloqueantes

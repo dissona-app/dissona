@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import { MolduraDoWizard } from '@/componentes/curador/MolduraDoWizard';
+import { PainelDeMarca } from '@/componentes/curador/PainelDeMarca';
 import { Passo1Dados } from '@/componentes/curador/passos/Passo1Dados';
 import { Passo2Generos } from '@/componentes/curador/passos/Passo2Generos';
 import { Passo3Atuacao } from '@/componentes/curador/passos/Passo3Atuacao';
@@ -26,9 +27,6 @@ import {
 import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
 import type { PassoDoCadastro } from '@/modulos/curador/tipos';
 import { ehPasso, TOTAL_DE_PASSOS } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-
-import estilos from './pagina.module.css';
 
 export const metadata: Metadata = {
   title: 'Cadastro de curador · Dissona',
@@ -89,16 +87,5 @@ export default async function Pagina({
       {passo === 7 ? <Passo7Bio {...comuns} acao={salvarPasso7} /> : null}
       {passo === 8 ? <Passo8Revisao {...comuns} acao={enviarCadastro} /> : null}
     </MolduraDoWizard>
-  );
-}
-
-/** O painel do split-screen, só no passo 1 — é o único `cCentrado: false`. */
-function PainelDeMarca() {
-  return (
-    <>
-      {/* `<h2>`: o `<h1>` da página é o título do passo, na moldura. */}
-      <h2 className={estilos.asideTitulo}>{CURADOR_CADASTRO.asideTitulo}</h2>
-      <p className={estilos.asideTexto}>{CURADOR_CADASTRO.asideTexto}</p>
-    </>
   );
 }

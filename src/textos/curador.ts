@@ -14,9 +14,13 @@
  * Duas notas de fidelidade:
  *
  *  - O passo 1 do protótipo tem variante para quem **não** está logado, com
- *    campo de senha. No produto o wizard só é alcançável com sessão — a guarda
- *    de `(app)/curador` exige o papel —, então só a variante `curadorLogado`
- *    existe, e é a que diz "Nome e e-mail vêm da conta em que você já está".
+ *    campo de senha. No produto o wizard (`(app)/(cadastro)/curador/cadastro`)
+ *    só é alcançável com sessão — a guarda exige o papel —, então dentro dele
+ *    só a variante `curadorLogado` existe (`Passo1Dados`, "Nome e e-mail vêm
+ *    da conta em que você já está"). A variante sem sessão é uma tela própria,
+ *    fora da guarda — `(auth)/curador/cadastrar/page.tsx` —, que reaproveita
+ *    `asideTitulo`/`asideTexto`/`titulos[0]`/`subtitulos[0]` mas usa
+ *    `FormularioDeCadastro` em vez de `Passo1Dados`.
  *  - Os limites da bio (40 a 400) são da tela e ficam aqui. O mínimo de
  *    credenciais **não** aparece neste arquivo: é
  *    `configuracao.classe.prata_min_credenciais`, threshold de negócio, e chega

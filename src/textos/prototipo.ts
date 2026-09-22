@@ -32,6 +32,8 @@
  * protótipo, sendo mock, não tem.
  */
 
+import { CURADOR_CADASTRO } from './curador';
+
 export { AVALIAR } from './avaliacao';
 export { CONTA } from './conta';
 export { CURADOR_CADASTRO, CURADOR_CLASSIFICACAO, CURADOR_MANUTENCAO } from './curador';
@@ -277,8 +279,8 @@ export const CADASTRAR = {
 
 /**
  * Mesmo shape de `CADASTRAR`, com literais alargados para `string` — sem isto
- * `CADASTRAR_CURADOR` (overline diferente) não seria atribuível ao tipo de
- * `CADASTRAR_ARTISTA` só porque os dois nascem de `as const`.
+ * `CADASTRAR_CURADOR` (`enviar`/`entrar` diferentes) não seria atribuível ao
+ * tipo de `CADASTRAR_ARTISTA` só porque os dois nascem de `as const`.
  */
 type Alargado<T> = T extends object
   ? { readonly [K in keyof T]: Alargado<T[K]> }
@@ -294,15 +296,25 @@ export const CADASTRAR_ARTISTA = CADASTRAR;
 /**
  * `/curador/cadastrar` — copy própria do ambiente curador.
  *
- * O protótipo não tem uma tela de cadastro básico (nome/e-mail/senha) para o
- * curador com copy própria — `docs/R2/extraido/Curador.txt` vai do rodapé do
- * login direto para o wizard do módulo 12. Overline ajustado para o ambiente
- * certo; o resto do formulário e o aside "Como funciona" são **derivados** da
- * versão do artista, mesma estrutura de passos, até existir copy própria.
+ * O protótipo não tem uma tela de cadastro **isolada** para o curador: em
+ * `docs/R2/extraido/Curador.html`, "Criar conta" no login leva direto ao
+ * passo 1 do wizard do módulo 12 (`CURADOR_CADASTRO`, em `textos/curador.ts`),
+ * que tem uma variante para quem não tem sessão ainda (`cHerdado: false`,
+ * campo de senha visível). No produto o wizard só é alcançável com sessão — a
+ * guarda de `(app)/curador` exige o papel —, então esta tela é essa variante,
+ * fora da guarda, com a moldura e a copy do próprio wizard
+ * (`MolduraDoWizard` + `PainelDeMarca`, não a `MolduraDeAutenticacao` do
+ * artista): `enviar` e `entrar` usam o texto literal do rodapé do passo 1
+ * ("Continuar" / "Voltar ao login"), e não o do cadastro do artista.
+ *
+ * `temConta` fica vazio de propósito: o protótipo não tem "Já tem conta?"
+ * aqui, só o botão "Voltar ao login" sozinho.
  */
 export const CADASTRAR_CURADOR = {
   ...CADASTRAR,
-  overline: 'Área do curador',
+  enviar: CURADOR_CADASTRO.continuar,
+  temConta: '',
+  entrar: CURADOR_CADASTRO.voltarAoLogin,
 } as const;
 
 /** Verificação de e-mail (`/verificar-email`) — tela que o protótipo acrescentou. */

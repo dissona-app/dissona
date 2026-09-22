@@ -1,4 +1,11 @@
-/* Painel de marca do passo 1 do wizard. */
+/* Painel de marca do passo 1 do wizard — Design System §3.3. */
+
+/* 36px fixo, o valor literal do protótipo — align-self para não esticar na
+   largura do painel em flex column. */
+.marca {
+  align-self: flex-start;
+  flex: none;
+}
 
 /*
  * Hero de 38 px, e não um título de card.
@@ -8,7 +15,7 @@
  * login. Em `--dsn-text-xl` (27 px) ela virava só um subtítulo do formulário
  * ao lado.
  */
-.asideTitulo {
+.titulo {
   margin: 0;
   font-size: clamp(26px, 3.4vw, 38px);
   line-height: var(--dsn-leading-title);
@@ -17,7 +24,7 @@
   text-wrap: balance;
 }
 
-.asideTexto {
+.texto {
   margin: 0;
   font-size: var(--dsn-text-sm);
   line-height: var(--dsn-leading-body);

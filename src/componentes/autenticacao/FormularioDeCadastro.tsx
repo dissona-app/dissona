@@ -6,6 +6,7 @@ import { useActionState, useState } from 'react';
 
 import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
+import type { TamanhoBotao } from '@/componentes/base/Botao';
 import { Campo } from '@/componentes/base/Campo';
 import { Checkbox } from '@/componentes/base/Checkbox';
 import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
@@ -34,6 +35,30 @@ export type PropsFormularioDeCadastro = {
   readonly papel?: 'artista' | 'curador';
   /** Botões sociais e divisor — ficam **abaixo** do formulário nesta tela. */
   readonly social?: ReactNode;
+  /**
+   * Quando `true`, não renderiza overline/título/subtítulo internos.
+   *
+   * A tela de criar conta do curador embrulha este formulário na moldura do
+   * wizard (`MolduraDoWizard`), que já é dona do `<h1>` e do subtítulo do
+   * passo 1 — repeti-los aqui duplicaria o título, o mesmo defeito que
+   * `FormularioDeLogin` tinha nas telas com chamada externa.
+   */
+  readonly semCabecalho?: boolean;
+  /**
+   * Tamanho e largura do botão de envio. `undefined`/`true` reproduz o padrão
+   * do cadastro do artista (`md`, bloco inteiro); a tela de criar conta do
+   * curador passa `denso`/`false` — é o "Continuar" de 15px do rodapé do
+   * wizard (`AcoesDoPasso`), não o botão largo do cartão de cadastro.
+   */
+  readonly tamanhoDoBotao?: TamanhoBotao;
+  readonly blocoInteiro?: boolean;
+  /**
+   * Cor do link "Já tem conta?" / "Voltar ao login". `'destaque'` (padrão) é
+   * o roxo do cadastro do artista; `'neutro'` é o cinza que o protótipo usa
+   * no "Voltar ao login" do wizard do curador — lá ele desfaz, e desfazer não
+   * é convite (mesma razão do `Botao variante="neutro"` de `AcoesDoPasso`).
+   */
+  readonly corDoRodape?: 'destaque' | 'neutro';
 };
 
 const ESTADO_INICIAL: ResultadoDeAcao | null = null;
@@ -75,6 +100,10 @@ export function FormularioDeCadastro({
   hrefEntrar,
   papel,
   social,
+  semCabecalho = false,
+  tamanhoDoBotao,
+  blocoInteiro = true,
+  corDoRodape = 'destaque',
 }: PropsFormularioDeCadastro) {
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => acao(dados),
@@ -136,11 +165,13 @@ export function FormularioDeCadastro({
 
   return (
     <>
-      <div className={estilos.cabecalho}>
-        <span className={estilos.overline}>{textos.overline}</span>
-        <h1 className={estilos.titulo}>{textos.titulo}</h1>
-        <p className={estilos.subtitulo}>{textos.subtitulo}</p>
-      </div>
+      {semCabecalho ? null : (
+        <div className={estilos.cabecalho}>
+          <span className={estilos.overline}>{textos.overline}</span>
+          <h1 className={estilos.titulo}>{textos.titulo}</h1>
+          <p className={estilos.subtitulo}>{textos.subtitulo}</p>
+        </div>
+      )}
 
       {banner !== null ? (
         <Aviso tom="erro" titulo={banner.titulo} acao={banner.acao}>
@@ -230,7 +261,12 @@ export function FormularioDeCadastro({
           {textos.aceiteDepois}
         </Checkbox>
 
-        <Botao type="submit" carregando={pendente} blocoInteiro>
+        <Botao
+          type="submit"
+          tamanho={tamanhoDoBotao}
+          carregando={pendente}
+          blocoInteiro={blocoInteiro}
+        >
           {pendente ? textos.enviando : textos.enviar}
         </Botao>
       </form>
@@ -239,7 +275,14 @@ export function FormularioDeCadastro({
 
       <p className={estilos.alternativa}>
         {textos.temConta}
-        <Link className={estilos.alternativaLink} href={hrefEntrar}>
+        <Link
+          className={
+            corDoRodape === 'neutro'
+              ? `${estilos.alternativaLink} ${estilos.alternativaLinkNeutro}`
+              : estilos.alternativaLink
+          }
+          href={hrefEntrar}
+        >
           {textos.entrar}
         </Link>
       </p>

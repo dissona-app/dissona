@@ -37,8 +37,11 @@ export type PropsPasso1 = PropsDoPasso & {
  *
  * Nome e e-mail em **leitura**: "Nome e e-mail vêm da conta em que você já
  * está. A senha segue a mesma." O protótipo tem uma variante com campo de
- * senha, para quem chega ao wizard sem estar logado; no produto isso não
- * acontece — a guarda de `(app)/curador` exige o papel, e o papel exige sessão.
+ * senha, para quem chega ao passo 1 sem estar logado — mas não é **este**
+ * componente: a guarda de `(app)/curador` exige o papel, e o papel exige
+ * sessão. Essa variante é `(auth)/curador/cadastrar/page.tsx`, fora da guarda,
+ * com a mesma moldura (`MolduraDoWizard` + `PainelDeMarca`) e um formulário
+ * de conta de verdade (`FormularioDeCadastro`) em vez deste.
  *
  * A foto é o único campo gravável, e é opcional. Um passo sem nada obrigatório
  * ainda vale existir: é onde a pessoa confirma que está na conta certa antes de
