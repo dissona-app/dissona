@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 
 import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
+import { EstadoVazio } from '@/componentes/base/EstadoVazio';
 import { Etiqueta } from '@/componentes/base/Etiqueta';
 import { Selecao } from '@/componentes/base/Selecao';
 import type { ResultadoDeAcao } from '@/lib/acoes';
@@ -90,28 +91,32 @@ export function ListaDaEquipe({
         </div>
       )}
 
-      <div className={estilos.rolagem}>
-        <div className={estilos.cabecalhoDaGrade} aria-hidden="true">
-          <span>{TEXTOS.colunaMembro}</span>
-          <span>{TEXTOS.colunaEmail}</span>
-          <span>{TEXTOS.colunaPapel}</span>
-          <span>{TEXTOS.colunaAcoes}</span>
-          <span className={estilos.alinhadoADireita}>{TEXTOS.colunaStatus}</span>
-        </div>
+      {linhas.length === 0 ? (
+        <EstadoVazio titulo={TEXTOS.vazio} descricao={TEXTOS.vazioNota} />
+      ) : (
+        <div className={estilos.rolagem}>
+          <div className={estilos.cabecalhoDaGrade} aria-hidden="true">
+            <span>{TEXTOS.colunaMembro}</span>
+            <span>{TEXTOS.colunaEmail}</span>
+            <span>{TEXTOS.colunaPapel}</span>
+            <span>{TEXTOS.colunaAcoes}</span>
+            <span className={estilos.alinhadoADireita}>{TEXTOS.colunaStatus}</span>
+          </div>
 
-        <ul className={estilos.linhas}>
-          {linhas.map((linha) => (
-            <LinhaDeMembro
-              key={linha.membroId ?? linha.conviteId ?? linha.email}
-              linha={linha}
-              acaoDePapel={acaoDePapel}
-              acaoDeAcesso={acaoDeAcesso}
-              acaoDeReenvio={acaoDeReenvio}
-              onAviso={setAviso}
-            />
-          ))}
-        </ul>
-      </div>
+          <ul className={estilos.linhas}>
+            {linhas.map((linha) => (
+              <LinhaDeMembro
+                key={linha.membroId ?? linha.conviteId ?? linha.email}
+                linha={linha}
+                acaoDePapel={acaoDePapel}
+                acaoDeAcesso={acaoDeAcesso}
+                acaoDeReenvio={acaoDeReenvio}
+                onAviso={setAviso}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
 
       <p className={estilos.nota}>{TEXTOS.nota}</p>
     </section>

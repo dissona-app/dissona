@@ -65,6 +65,17 @@ export const EQUIPE = {
       `${ativos} com acesso ativo · ${pendentes} aguardando aceite`,
     convidar: 'Convidar membro',
 
+    /**
+     * Lista sem linha nenhuma.
+     *
+     * Na prática não acontece — quem abre a tela é membro, e a própria linha
+     * está na lista. Mas o cabeçalho da grade renderiza mesmo com zero linhas,
+     * e uma tabela com cabeçalho e nada embaixo parece defeito, não vazio. O
+     * beta começa sem dados em toda lista, e esta não é exceção.
+     */
+    vazio: 'Nenhum integrante ainda.',
+    vazioNota: 'Convide alguém para a equipe — o convite vale 7 dias.',
+
     colunaMembro: 'Membro',
     colunaEmail: 'E-mail',
     colunaPapel: 'Papel',

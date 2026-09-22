@@ -983,3 +983,72 @@ Duas escolhas de desenho que vale registrar:
 O que **não** se guarda: número, validade e CVV. O que se guarda é o token — uma
 referência opaca, inútil fora da conta do Asaas — mais quatro dígitos e a
 bandeira, que existem só para a tela dizer qual cartão é.
+
+---
+
+## Auditoria dos transversais · 2026-09-21
+
+Os quatro itens de "Interface" e "Conformidade" do backlog que eram **auditorias**,
+e não implementações. Três passaram; dois deixaram achado.
+
+### 1. Números de negócio na copy, e não na lógica
+
+A lógica está limpa: as chaves que o app precisa vêm de `configuracao`, e o
+resto é decidido nas RPCs. Os números soltos em `src/` são de infraestrutura —
+TTL de marcador de recuperação, cooldown de reenvio, validade de URL assinada.
+
+**O achado é a copy.** Estas frases embutem valores que vivem em `configuracao`:
+
+| Texto | Número | Chave que o governa |
+|---|---|---|
+| "Você tem 72 horas para responder com repasse cheio" | 72 | `prazo_avaliacao_horas` |
+| "Sem resposta em 7 dias, a Clave volta" | 7 | `prazo_devolucao_dias` |
+| "A exclusão é definitiva depois de 30 dias" | 30 | `lgpd.dias_expurgo` |
+| "A escuta é medida… a partir de 60% da faixa" | 60 | `escuta_minima_percentual` |
+
+Mudar a chave faria a tela mentir, **sem sintoma nenhum** — nenhum teste
+compara as duas coisas, e nenhuma delas quebra.
+
+**Não foram convertidas em interpolação de propósito.** São strings literais do
+protótipo, validadas com o cliente; reescrevê-las é decisão de produto. O que
+fica registrado é a consequência: **mexer nessas quatro chaves exige revisar a
+copy junto**. Se o cliente quiser os números ajustáveis sem deploy, o caminho é
+interpolar as quatro — uma tarde de trabalho, e a copy deixa de ser literal.
+
+### 2. `musica_compartilhada` estava no catálogo e ninguém a emitia
+
+A matriz (06) promete ao artista **"Música compartilhada (playlist / post /
+matéria)"**, origem 14.2. A chave estava semeada desde a `0005` e nenhum código
+a emitia: `enviar_avaliacao` notificava `feedback_concluido` e
+`credito_liberado`, e parava aí.
+
+É o evento que mais justifica existir do módulo 14 — que a faixa **saiu da
+plataforma** é a notícia que o artista não tem outro jeito de saber. A `0009c` o
+liga por **trigger** na virada da avaliação para `concluida`, em vez de
+`create or replace` nas 194 linhas da RPC: cada cópia daquele corpo é uma chance
+de as duas versões divergirem.
+
+A auditoria virou teste. `eventos.test.ts` agora prova as **duas** direções —
+nenhuma chave inventada, e nenhum evento de R1/R2 órfão.
+
+### 3. Três eventos seguem sem emitir, e é decisão de produto
+
+Estão declarados em `AINDA_NAO_EMITIDOS`, com o motivo, e o teste falha se
+alguém os ligar sem mover a linha:
+
+- **`musica_recebida_pelo_curador`** (origem "3 / 13") — sem momento definido.
+  `recebeu` coincide com a criação do envio, e ali `selecao_confirmada` já avisa
+  o artista: seriam dois avisos para um fato. O momento honesto seria `ouviu`,
+  e isso muda o significado do evento.
+- **`saldo_claves_baixo`** (origem "5 / 2") — o bloqueio por saldo existe e é
+  testado (B8), mas o destino é a central, que é da R5. Notificar alguém sobre o
+  que ele acabou de ler na tela é ruído.
+- **`pacote_clave_alterado`** (origem 21) — o destinatário é a equipe
+  administrativa, e falta decidir se vai para todo `membro_admin` com permissão
+  em `pacotes` ou só para quem tem `financeiro`.
+
+### 4. A lista da equipe não tinha estado vazio
+
+Todas as outras listas tratavam o caso; a de integrantes (27.2) renderizava o
+cabeçalho da grade com nada embaixo. Na prática não acontece — quem abre a tela
+é membro e está na lista —, mas cabeçalho sem linha parece defeito, não vazio.

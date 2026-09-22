@@ -300,13 +300,13 @@ código pode contornar:
 - [x] E2E dos 16 cenários do Guia de Testes da Release 2 — **verdes**; a carteira de `e2e_artista` é semeada pelas **RPCs reais** (compra, seleção e devolução por SLA), nunca por `insert` no ledger, que é append-only. ⚠️ Sete cenários **consomem** a faixa deles (concluir e devolver por SLA são terminais) e [`dados-e2e.sql`](../supabase/testes/dados-e2e.sql) os repõe: o seed tem de rodar antes de cada rodada. O CI **roda** (`pnpm e2e:semear`, passo "Repor os cenários consumíveis"); rodando à mão, `pnpm e2e:semear` antes de `pnpm e2e` — sem isso a falha parece flakiness e não é
 
 ### Interface
-- [ ] Revisão de empty states em todas as listas — no beta tudo começa sem dados
+- [x] Revisão de empty states em todas as listas — auditado em 2026-09-21: fila, extrato, carteira, pacotes, status do envio, seleção de curadores, vitrine do perfil, mídias do curador, sessões ativas e as quatro listas do cadastro já tratavam o vazio. **Faltava a lista da equipe (27.2)**, que renderizava o cabeçalho da grade com nada embaixo — corrigido
 - [ ] Códigos de erro tipados, com tradução na camada de View
 - [ ] Revisão de acessibilidade: anel de foco, contraste AA, `aria-sort`, alvo de toque, foco preso em modal com ESC e clique-fora
 - [ ] Suporte a pt-BR, es e en na interface
 
 ### Conformidade e governança
 - [x] Job `expurgar_contas_excluidas` (LGPD, 30 dias) — **anonimiza** em vez de apagar, porque o ledger é append-only e há retenção fiscal. Decisão de jurídico a confirmar; ver o cabeçalho da `0011`
-- [ ] Auditoria de thresholds: nenhum número de negócio hardcoded — tudo vem de `configuracao`
-- [ ] Conferir que todo evento de R1 e R2 grava em `notificacao` (a central de leitura chega na R5)
-- [ ] Usar **"Envios"**, nunca "Submissões", na interface do admin
+- [x] Auditoria de thresholds: nenhum número de negócio hardcoded — auditado em 2026-09-21. A **lógica** está limpa: as 11 chaves que o app precisa vêm de `lerConfiguracao`/`lerConfiguracoes`, e as demais são lidas pelas RPCs, que é onde o dinheiro é decidido. Os números soltos que restam em `src/` são de infraestrutura (TTL de token, cooldown de reenvio, validade de URL assinada), não de negócio. ⚠️ **Achado:** a **copy** embute 72h, 7 dias, 30 dias e 60% — são strings literais do protótipo, e mudar `prazo_avaliacao_horas` ou `lgpd.dias_expurgo` em `configuracao` faria a tela mentir sem nenhum sintoma. Registrado em [07-pendências](prd/07-pendencias-e-divergencias.md); reescrever copy validada para interpolar número é decisão de produto, não de código
+- [x] Conferir que todo evento de R1 e R2 grava em `notificacao` — auditado em 2026-09-21, e a auditoria virou teste (`modulos/notificacao/__testes__/eventos.test.ts`): 19 eventos de R1/R2 têm quem os emita, e os não emitidos estão declarados com motivo escrito. **Um estava faltando de verdade**: `musica_compartilhada` (origem 14.2) estava no seed desde a `0005` e ninguém a emitia — a migration `0009c` a liga por trigger na conclusão da avaliação, com cinco asserções em `supabase/testes/`. Três seguem sem emitir, por decisão de produto pendente: `musica_recebida_pelo_curador`, `saldo_claves_baixo` e `pacote_clave_alterado`
+- [x] Usar **"Envios"**, nunca "Submissões", na interface do admin — auditado em 2026-09-21: a palavra só aparece em comentários que explicam por que não usá-la, e o E2E de B7 fixa a ausência dela na tela de confirmação
