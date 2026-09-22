@@ -20,6 +20,13 @@ export type TextosDoCampoDeFoto = {
   readonly erroTamanho: string;
 };
 
+/** `sm` é a base do módulo CSS, e por isso não tem classe própria. */
+const CLASSE_DO_TAMANHO: Record<'sm' | 'md' | 'lg', string | undefined> = {
+  sm: undefined,
+  md: estilos.avatarMd,
+  lg: estilos.avatarLg,
+};
+
 export type PropsCampoDeFoto = {
   /** Para as iniciais do avatar enquanto não há imagem. */
   readonly nome: string;
@@ -43,6 +50,12 @@ export type PropsCampoDeFoto = {
    * um número só.
    */
   readonly tamanhoDoBotao?: 'sm' | 'md';
+  /**
+   * Diâmetro do avatar e corpo das iniciais, um por tela do protótipo:
+   * `sm` é o passo 1 do curador (56px/17px), `md` os dados do membro admin
+   * (27.1) e `lg` o perfil do artista (7.1), que é o maior. Ver o módulo CSS.
+   */
+  readonly tamanho?: 'sm' | 'md' | 'lg';
   readonly textos: TextosDoCampoDeFoto;
 };
 
@@ -64,6 +77,7 @@ export function CampoDeFoto({
   caminhoAtual,
   aoMudarEnvio,
   tamanhoDoBotao = 'md',
+  tamanho = 'sm',
   textos,
 }: PropsCampoDeFoto) {
   const foto = useUploadDireto({
@@ -92,11 +106,18 @@ export function CampoDeFoto({
       <div className={estilos.base}>
         {fotoUrl != null && fotoUrl !== '' ? (
           // `<img>` e não `next/image`: a origem é o bucket público do Supabase,
-          // e passar por `remotePatterns` só para um avatar de 64px não paga.
+          // e passar por `remotePatterns` só para um avatar de 56px não paga.
           // eslint-disable-next-line @next/next/no-img-element
-          <img className={estilos.avatarImagem} src={fotoUrl} alt="" />
+          <img
+            className={[estilos.avatarImagem, CLASSE_DO_TAMANHO[tamanho]].filter(Boolean).join(' ')}
+            src={fotoUrl}
+            alt=""
+          />
         ) : (
-          <span className={estilos.avatar} aria-hidden="true">
+          <span
+            className={[estilos.avatar, CLASSE_DO_TAMANHO[tamanho]].filter(Boolean).join(' ')}
+            aria-hidden="true"
+          >
             {iniciaisDe(nome)}
           </span>
         )}

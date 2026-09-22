@@ -77,6 +77,30 @@ export const esquemaCadastro = z
 
 export type Cadastro = z.infer<typeof esquemaCadastro>;
 
+/**
+ * Cadastro do curador — `/curador/cadastrar`.
+ *
+ * Sem `confirmar` e sem `aceite`: o protótipo (`docs/R2/extraido/Curador.html`)
+ * não tem os dois no passo 1 do wizard — é "Nome completo", "E-mail" e
+ * "Senha", só. Decisão do cliente em 2026-09-22 de seguir o protótipo aqui,
+ * apesar do RF-003 ("preencho... senha e **confirmação**... e aceito
+ * Termos... quando não marco o aceite, sou barrado") — RF-003 continua
+ * valendo para `/cadastrar` e `/artista/cadastrar`, e passa a valer só para
+ * eles. Ver a nota em `docs/prd/07-pendencias-e-divergencias.md`.
+ *
+ * `criarConta()` (`repositorio.ts`) não muda: ela sempre grava
+ * `aceite_termos: 'true'` nos metadados do Auth, para o trigger que só
+ * conhece essas duas chaves — o que este schema tira é o **gate** da tela, não
+ * o campo que a LGPD exige gravado no perfil.
+ */
+export const esquemaCadastroCurador = z.object({
+  nome: z.string().trim().min(1, { message: 'nome_vazio' }),
+  email,
+  senha: z.string().refine(senhaAtendePolitica, { message: 'senha_fraca' }),
+});
+
+export type CadastroCurador = z.infer<typeof esquemaCadastroCurador>;
+
 /** Só o e-mail — recuperação de senha (1.2) e reenvio da verificação. */
 export const esquemaEmail = z.object({ email });
 

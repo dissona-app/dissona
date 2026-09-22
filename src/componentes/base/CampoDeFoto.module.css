@@ -7,10 +7,24 @@
   gap: var(--dsn-space-7);
 }
 
+/*
+ * O avatar das três telas que têm foto — 12 (passo 1 do curador), 7.1 (perfil
+ * do artista) e 27.1 (dados do membro admin).
+ *
+ * Os três protótipos desenham o mesmo avatar: lilás claro com o texto em roxo,
+ * peso 700 e **sem** tracking. Até esta correção ele era um círculo com o
+ * gradiente da marca e as iniciais em branco, peso 800 — uma derivação que
+ * nunca esteve em protótipo nenhum, e que só apareceu quando a tela de criar
+ * conta do curador ganhou cenário de paridade.
+ *
+ * O que muda de tela para tela é o diâmetro e o corpo das iniciais, e é o que
+ * a prop `tamanho` escolhe. O artista é o único com o lilás mais frio
+ * (`#F6F3FB` sobre `#E7E3EF`), e por isso tem as duas linhas a mais.
+ */
 .avatar,
 .avatarImagem {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   flex: none;
   border-radius: var(--dsn-radius-circle);
 }
@@ -19,11 +33,36 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--dsn-grad-brand-diag);
-  color: var(--dsn-surface);
-  font-size: var(--dsn-text-md);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-badge);
+  background: #f1eafb;
+  border: var(--dsn-border-width) solid #e2d6f5;
+  color: var(--dsn-purple-600);
+  font-size: 17px;
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: normal;
+}
+
+/* 27.1 — dados do membro admin. */
+.avatarMd,
+.avatarMd.avatarImagem {
+  width: clamp(56px, 7vh, 66px);
+  height: clamp(56px, 7vh, 66px);
+}
+
+.avatar.avatarMd {
+  font-size: 20px;
+}
+
+/* 7.1 — perfil do artista, o maior dos três e o único com o lilás frio. */
+.avatarLg,
+.avatarLg.avatarImagem {
+  width: clamp(60px, 8.4vh, 78px);
+  height: clamp(60px, 8.4vh, 78px);
+}
+
+.avatar.avatarLg {
+  font-size: 22px;
+  background: #f6f3fb;
+  border-color: var(--dsn-border);
 }
 
 .avatarImagem {

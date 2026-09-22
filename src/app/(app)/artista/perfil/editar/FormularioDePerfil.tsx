@@ -110,6 +110,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
           fotoUrl={fotoUrl}
           caminhoAtual={perfil.fotoCaminho}
           aoMudarEnvio={setSubindoFoto}
+          tamanho="lg"
           textos={{
             botao: TEXTOS.trocarFoto,
             hint: TEXTOS.fotoHint,

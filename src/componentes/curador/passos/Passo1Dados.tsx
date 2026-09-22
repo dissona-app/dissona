@@ -41,7 +41,9 @@ export type PropsPasso1 = PropsDoPasso & {
  * componente: a guarda de `(app)/curador` exige o papel, e o papel exige
  * sessão. Essa variante é `(auth)/curador/cadastrar/page.tsx`, fora da guarda,
  * com a mesma moldura (`MolduraDoWizard` + `PainelDeMarca`) e um formulário
- * de conta de verdade (`FormularioDeCadastro`) em vez deste.
+ * de conta de verdade (`FormularioDeContaDoCurador`) em vez deste — sem foto
+ * (o upload direto exige sessão, que ali ainda não existe), Nome/E-mail/Senha
+ * editáveis em vez de leitura, e sem o "Nome e e-mail vêm da conta..." abaixo.
  *
  * A foto é o único campo gravável, e é opcional. Um passo sem nada obrigatório
  * ainda vale existir: é onde a pessoa confirma que está na conta certa antes de

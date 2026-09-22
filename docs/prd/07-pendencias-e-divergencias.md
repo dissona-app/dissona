@@ -77,22 +77,64 @@ título "Dados básicos", aside "Sua escuta vira crédito e remuneração." / "S
 oito perguntas curtas...", botão "Continuar" e link "Voltar ao login", os
 literais do protótipo.
 
-Dois achados a mais no caminho, também corrigidos:
+Achados a mais no caminho, também corrigidos:
 
 - O aside do wizard não tinha o logotipo — o protótipo tem, 36px fixo, sem
   link. `PainelDeMarca` ganhou a marca.
-- O botão "Continuar" e o link "Voltar ao login" desta tela usavam a
-  aparência do cadastro do artista (botão largo roxo, link roxo) em vez da do
-  rodapé do wizard (botão denso, link cinza — `AcoesDoPasso`). `FormularioDeCadastro`
-  ganhou `tamanhoDoBotao`/`blocoInteiro`/`corDoRodape` para o caso do curador
-  sem mudar o padrão do artista.
+- O botão "Continuar" e o link "Voltar ao login" precisavam da aparência do
+  rodapé do wizard (botão denso, link cinza — `AcoesDoPasso`), não a do
+  cadastro do artista (botão largo roxo, link roxo).
 
-**Mantido, por decisão consciente e não por falta de fidelidade:** os campos
-"Confirmar senha" e o aceite de Termos/LGPD, que o passo 1 do protótipo não
-tem ali (aparecem em outro ponto do wizard). Removê-los para bater 1:1 com o
-protótipo tiraria uma validação de conformidade já implementada e testada, e
-essa troca não foi pedida — a divergência reportada era a tela estar igual
-entre os dois perfis, não o formato exato de cada campo.
+**RF-003 × protótipo — decisão do cliente, 2026-09-22.** A primeira versão
+desta correção manteve "Confirmar senha" e o aceite de Termos/LGPD nesta tela,
+por serem RF-003 ("preencho... senha e **confirmação**... e aceito Termos...
+quando não marco o aceite, sou barrado") — um requisito formal aprovado, não
+uma preferência de composição. O cliente, ao ver a tela lado a lado com o
+protótipo (que não tem nenhum dos dois campos no passo 1), decidiu seguir o
+protótipo mesmo assim. RF-003 foi reescrito para valer só em `/cadastrar` e
+`/artista/cadastrar`; `/curador/cadastrar` ganhou schema próprio
+(`esquemaCadastroCurador`, sem `confirmar` nem `aceite`) e componente próprio
+(`FormularioDeContaDoCurador`, sem `FormularioDeCadastro`). `criarConta()`
+(`repositorio.ts`) não mudou: ela sempre grava `aceite_termos: 'true'` nos
+metadados do Auth — o que saiu foi o gate da tela, não o campo que o trigger
+grava no perfil.
+
+**A foto e o passo duplicado — fechados em 2026-09-22, depois de a confirmação
+de e-mail ser desligada no projeto.** Duas diferenças sobreviveram à primeira
+rodada e caíram nesta:
+
+- **O campo "Adicionar foto" não existia nesta tela.** O upload direto ao
+  Storage (`useUploadDireto`) exige `usuarioId` de uma sessão, e enquanto a
+  pessoa escolhe o arquivo a conta ainda não existe. A saída não foi a chave de
+  serviço (proibida fora da suíte — `AGENTS.md`), e sim o **caminho de baixo
+  que o `CampoDeFoto` já mantinha para quem está sem JavaScript**: sem sessão o
+  hook não sobe nada, deixa o arquivo no formulário, e o `multipart` o leva à
+  Server Action — que grava depois de a sessão nascer, por
+  `resolverArquivoDoFormulario`. O arquivo é conferido **antes** do `signUp`
+  (`conferirArquivo`, pura), para que uma foto recusada não deixe a pessoa com
+  a conta criada e o e-mail já tomado.
+- **"Dados básicos · Passo 1 de 8" aparecia duas vezes.** Com a sessão nascendo
+  no `signUp`, `/curador/cadastrar` caía em `/curador/cadastro/1` — a mesma
+  tela de novo. Agora a Server Action chama `salvarDadosBasicos`, a mesma
+  função que o "Continuar" do passo 1 com sessão usa: ela grava a foto e avança
+  `passo_cadastro`, então a rota de retomada resolve para o passo **2**. Uma
+  tela só, como no protótipo.
+
+Nada disso depende de a confirmação continuar desligada: `criarConta()` lê
+`data.session` da resposta do Supabase (`precisaVerificar: data.session ===
+null`). Com a confirmação religada não há sessão, o destino volta a ser
+`/verificar-email`, a foto escolhida se perde e o passo 1 volta a pedi-la logo
+depois do link — degradação declarada em `cadastrarCurador`, não silenciosa.
+
+**Achado no caminho, corrigido junto:** o avatar do `CampoDeFoto` era um
+círculo com o gradiente da marca e as iniciais em branco, peso 800 — derivação
+que não está em protótipo nenhum. Os três usam lilás claro com o texto em
+`--dsn-purple-600`, peso 700 e sem tracking, variando só o diâmetro e o corpo
+(56px/17px no passo 1 do curador, `clamp(56px,7vh,66px)`/20px em 27.1,
+`clamp(60px,8.4vh,78px)`/22px em 7.1 — este com o lilás mais frio). Virou a
+prop `tamanho`. Passou despercebido porque as iniciais nunca pareavam nos
+cenários de paridade existentes: os dois lados mostram nomes diferentes, e
+`digitaisDeTexto` só compara texto idêntico.
 
 ---
 

@@ -14,13 +14,22 @@ import { redirect } from 'next/navigation';
 
 import { falha, falhaDeCampos, sucesso } from '@/lib/acoes';
 import type { ResultadoDeAcao } from '@/lib/acoes';
+import { conferirArquivo, FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
 import { origemDaRequisicao } from '@/lib/origem';
 import { Papel } from '@/lib/papeis';
+/*
+ * Módulo 12, a partir da autenticação: `/curador/cadastrar` **é** o passo 1 do
+ * wizard sem sessão, e gravar a foto e avançar o passo é trabalho de lá. A
+ * direção `acoes → servico` está respeitada, e é o mesmo salto cruzado que
+ * `claves/servico` faz em `pacote/servico`.
+ */
+import { salvarDadosBasicos } from '@/modulos/curador/servico';
 
 import {
   esquemaCadastro,
+  esquemaCadastroCurador,
   esquemaCredenciais,
   esquemaEmail,
   esquemaConfirmacaoSocial,
@@ -43,6 +52,7 @@ import {
   selecionarPapel,
 } from './servico';
 import { encerrarSessao } from './repositorio';
+import type { PapelEscolhivel } from './repositorio';
 
 /**
  * Um módulo `'use server'` só pode exportar função assíncrona, então os
@@ -140,6 +150,83 @@ export async function cadastrar(dadosDoFormulario: FormData): Promise<ResultadoD
   }
 
   const { nome, email, senha, papel } = analise.data;
+  return concluirCadastro(nome, email, senha, papel);
+}
+
+/**
+ * Cadastro do curador — `/curador/cadastrar`, que é o passo 1 do wizard sem
+ * sessão (`docs/R2/extraido/Curador.html`).
+ *
+ * Papel fixo em `'curador'` e sem `confirmar`/`aceite` — ver
+ * `esquemaCadastroCurador`. Três diferenças em relação a `cadastrar()`, todas
+ * porque esta tela **é** o passo 1, e não uma antessala dele:
+ *
+ *  1. A foto é conferida **antes** de a conta existir. `conferirArquivo` é
+ *     pura e não escreve nada, então recusar aqui ainda permite corrigir e
+ *     reenviar o formulário inteiro. Conferir só depois deixaria a pessoa com
+ *     a conta criada, o e-mail já tomado e um erro que ela não tem como
+ *     resolver sem sair da tela.
+ *  2. Com sessão já nascida (confirmação de e-mail desligada), a foto é
+ *     gravada e o passo avança — por `salvarDadosBasicos`, a mesma função que
+ *     o "Continuar" do passo 1 com sessão chama. É o que faz o destino ser o
+ *     passo **2**, e não o passo 1 de novo: sem isso a pessoa veria
+ *     "Dados básicos · Passo 1 de 8" duas vezes seguidas, que é o oposto do
+ *     protótipo.
+ *  3. Sem sessão (confirmação exigida), nada disso acontece e o destino
+ *     continua sendo a verificação de e-mail. A foto escolhida se perde, e é
+ *     por isso que o passo 1 volta a pedi-la logo depois do link — não há
+ *     sessão para gravá-la, e o `AGENTS.md` não deixa a chave de serviço
+ *     entrar na aplicação para contornar isso.
+ */
+export async function cadastrarCurador(dadosDoFormulario: FormData): Promise<ResultadoDeAcao> {
+  const analise = esquemaCadastroCurador.safeParse({
+    nome: dadosDoFormulario.get('nome'),
+    email: dadosDoFormulario.get('email'),
+    senha: dadosDoFormulario.get('senha'),
+  });
+
+  if (!analise.success) {
+    return falhaDeCampos(CodigoErro.ENTRADA_INVALIDA, motivosPorCampo(analise.error.issues));
+  }
+
+  const foto = dadosDoFormulario.get('foto');
+  const conferida = conferirArquivo(foto, FOTO_TIPOS, FOTO_MAX_BYTES);
+  if (!conferida.ok) {
+    return falha(
+      conferida.motivo === 'tipo'
+        ? CodigoErro.FORMATO_NAO_SUPORTADO
+        : CodigoErro.ARQUIVO_MUITO_GRANDE,
+      'foto',
+    );
+  }
+
+  const { nome, email, senha } = analise.data;
+  return concluirCadastro(nome, email, senha, 'curador', async () => {
+    // Só roda quando a sessão já existe — é a garantia de `concluirCadastro`.
+    // O caminho vem vazio de propósito: sem sessão na hora da escolha, o
+    // `useUploadDireto` não subiu nada e o arquivo veio no `multipart`.
+    await salvarDadosBasicos(foto, null);
+  });
+}
+
+/**
+ * A parte que `cadastrar()` e `cadastrarCurador()` compartilham depois da
+ * validação: criar a conta, mandar para a verificação de e-mail e, ao voltar
+ * dela, gravar o papel — idêntico para os dois, e por isso não duplicado.
+ *
+ * `aposSessao` roda **só** quando o `signUp` já devolveu sessão, o que depende
+ * de o projeto exigir confirmação de e-mail ou não (`precisaVerificar` sai de
+ * `data.session === null`, em `repositorio.ts`). É onde o cadastro do curador
+ * grava a foto e avança o passo; quem não tem o que fazer com a sessão recém
+ * nascida simplesmente não passa nada.
+ */
+async function concluirCadastro(
+  nome: string,
+  email: string,
+  senha: string,
+  papel: PapelEscolhivel | undefined,
+  aposSessao?: () => Promise<void>,
+): Promise<ResultadoDeAcao> {
   // O papel da rota exclusiva viaja com a confirmação de e-mail, do mesmo jeito
   // que `pedirLinkDeRecuperacao` já faz com `proximo` — é o único canal que
   // sobrevive até a sessão nascer no clique do link.
@@ -168,6 +255,11 @@ export async function cadastrar(dadosDoFormulario: FormData): Promise<ResultadoD
   if (resultado.estado === 'verificacao_enviada') {
     redirect(`${ROTA.VERIFICAR_EMAIL}?email=${encodeURIComponent(email)}`);
   }
+
+  // Depois de `cadastrarNoProduto` devolver `ok`, a sessão existe e o papel já
+  // está gravado — é a única janela em que dá para escrever como a pessoa que
+  // acabou de nascer, e antes do `redirect`, que lança.
+  await aposSessao?.();
 
   redirect(resultado.destino);
 }

@@ -1,0 +1,59 @@
+/* "Dados básicos" — passo 1 do wizard sem sessão. Mesmos campos e o mesmo
+   corpo de `FormularioDeCadastro.module.css`; o rodapé é o de `AcoesDoPasso`
+   (`AcoesDoPasso.module.css`), não o "Já tem conta?" do cadastro do artista. */
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
+
+.blocoSenha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-3);
+}
+
+.olho {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--dsn-ink-500);
+  cursor: pointer;
+}
+
+.olho:hover {
+  color: var(--dsn-ink-700);
+}
+
+.bannerLink {
+  font-weight: var(--dsn-weight-semibold);
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* Rodapé — literal do protótipo: "Voltar ao login" cinza à esquerda,
+   "Continuar" denso à direita, com o mesmo divisor de `AcoesDoPasso`. */
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-5);
+  padding-top: var(--dsn-space-6);
+  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+}
+
+.voltar {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-ink-500);
+  text-decoration: none;
+}
+
+.voltar:hover {
+  color: var(--dsn-purple-600);
+}

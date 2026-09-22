@@ -63,10 +63,21 @@ Requisitos funcionais (RF) e não funcionais (RNF) da plataforma. Cada RF traz c
 
 ### RF-003 · Cadastro de conta
 
+Vale para `/cadastrar` e `/artista/cadastrar`. **Não** vale para
+`/curador/cadastrar` — ver a exceção abaixo.
+
 - **Dado** que preencho nome, e-mail, senha e confirmação **e** aceito Termos + Política de privacidade, **quando** confirmo, **então** a conta é criada e recebo e-mail de verificação.
 - **Dado** que não marco o aceite, **quando** tento criar, **então** sou barrado com alerta de campo obrigatório.
 - **Dado** que o e-mail já existe, **quando** tento criar, **então** vejo o erro com link para a tela de login.
 - **Dado** que digito a senha, **quando** ela tem menos de 8 caracteres ou nenhum número, **então** o indicador de força barra o envio.
+
+**Exceção — `/curador/cadastrar`:** o protótipo (`docs/R2/extraido/Curador.html`)
+não tem "Confirmar senha" nem o checkbox de aceite no passo 1 do wizard —
+Nome completo, E-mail e Senha, só. Decisão do cliente em 2026-09-22 de seguir
+o protótipo aqui: os dois critérios de confirmação e aceite não se aplicam a
+esta rota. Os outros dois (e-mail já existe, senha fraca barrada) continuam
+valendo — ver `esquemaCadastroCurador` em `modulos/autenticacao/esquemas.ts` e
+`docs/prd/07-pendencias-e-divergencias.md`.
 
 **Rastreabilidade:** [02 · 1.1](prd/02-ambiente-artista.md#11--cadastro)
 

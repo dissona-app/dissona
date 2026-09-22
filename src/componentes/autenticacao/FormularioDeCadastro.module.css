@@ -121,17 +121,6 @@
   text-decoration: underline;
 }
 
-/* "Voltar ao login" do cadastro do curador — cinza, como o `Botao
-   variante="neutro"` do rodapé do wizard (`AcoesDoPasso`), não o roxo de
-   convite do "Entrar" do cadastro do artista. */
-.alternativaLinkNeutro {
-  color: var(--dsn-ink-500);
-}
-
-.alternativaLinkNeutro:hover {
-  color: var(--dsn-purple-600);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .olho {
     transition: none;

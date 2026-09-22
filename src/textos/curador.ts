@@ -19,8 +19,12 @@
  *    só a variante `curadorLogado` existe (`Passo1Dados`, "Nome e e-mail vêm
  *    da conta em que você já está"). A variante sem sessão é uma tela própria,
  *    fora da guarda — `(auth)/curador/cadastrar/page.tsx` —, que reaproveita
- *    `asideTitulo`/`asideTexto`/`titulos[0]`/`subtitulos[0]` mas usa
- *    `FormularioDeCadastro` em vez de `Passo1Dados`.
+ *    `asideTitulo`/`asideTexto`/`titulos[0]`/`subtitulos[0]` e os literais
+ *    `continuar`/`voltarAoLogin`, com `FormularioDeContaDoCurador` em vez de
+ *    `Passo1Dados` — sem confirmação de senha nem aceite de Termos, que o
+ *    protótipo também não tem aqui (decisão do cliente de 2026-09-22 de
+ *    seguir o protótipo; RF-003 continua valendo para `/cadastrar` e
+ *    `/artista/cadastrar`).
  *  - Os limites da bio (40 a 400) são da tela e ficam aqui. O mínimo de
  *    credenciais **não** aparece neste arquivo: é
  *    `configuracao.classe.prata_min_credenciais`, threshold de negócio, e chega
@@ -71,6 +75,12 @@ export const CURADOR_CADASTRO = {
   herdado: 'Nome e e-mail vêm da conta em que você já está. A senha segue a mesma.',
   rotuloNome: 'Nome completo',
   rotuloEmail: 'E-mail',
+  /**
+   * Só a variante **sem sessão** usa (`(auth)/curador/cadastrar`): com sessão o
+   * nome vem da conta e o campo é leitura. Literal do protótipo — e é diferente
+   * do cadastro do artista, que diz "Como você assina seu trabalho".
+   */
+  placeholderNome: 'Como assina suas curadorias',
   erroFotoTipo: 'A foto precisa ser JPG ou PNG.',
   erroFotoTamanho: 'A foto passa de 2 MB.',
 

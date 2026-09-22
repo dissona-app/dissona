@@ -32,8 +32,6 @@
  * protótipo, sendo mock, não tem.
  */
 
-import { CURADOR_CADASTRO } from './curador';
-
 export { AVALIAR } from './avaliacao';
 export { CONTA } from './conta';
 export { CURADOR_CADASTRO, CURADOR_CLASSIFICACAO, CURADOR_MANUTENCAO } from './curador';
@@ -277,45 +275,24 @@ export const CADASTRAR = {
   },
 } as const;
 
-/**
- * Mesmo shape de `CADASTRAR`, com literais alargados para `string` — sem isto
- * `CADASTRAR_CURADOR` (`enviar`/`entrar` diferentes) não seria atribuível ao
- * tipo de `CADASTRAR_ARTISTA` só porque os dois nascem de `as const`.
- */
-type Alargado<T> = T extends object
-  ? { readonly [K in keyof T]: Alargado<T[K]> }
-  : T extends string
-    ? string
-    : T;
-
-export type TextosDeCadastro = Alargado<typeof CADASTRAR>;
+export type TextosDeCadastro = typeof CADASTRAR;
 
 /** `/artista/cadastrar` — mesma copy de `CADASTRAR`, que sempre foi a do artista. */
 export const CADASTRAR_ARTISTA = CADASTRAR;
 
 /**
- * `/curador/cadastrar` — copy própria do ambiente curador.
+ * `/curador/cadastrar` **não** usa `CADASTRAR`/`FormularioDeCadastro`.
  *
- * O protótipo não tem uma tela de cadastro **isolada** para o curador: em
- * `docs/R2/extraido/Curador.html`, "Criar conta" no login leva direto ao
- * passo 1 do wizard do módulo 12 (`CURADOR_CADASTRO`, em `textos/curador.ts`),
- * que tem uma variante para quem não tem sessão ainda (`cHerdado: false`,
- * campo de senha visível). No produto o wizard só é alcançável com sessão — a
- * guarda de `(app)/curador` exige o papel —, então esta tela é essa variante,
- * fora da guarda, com a moldura e a copy do próprio wizard
- * (`MolduraDoWizard` + `PainelDeMarca`, não a `MolduraDeAutenticacao` do
- * artista): `enviar` e `entrar` usam o texto literal do rodapé do passo 1
- * ("Continuar" / "Voltar ao login"), e não o do cadastro do artista.
- *
- * `temConta` fica vazio de propósito: o protótipo não tem "Já tem conta?"
- * aqui, só o botão "Voltar ao login" sozinho.
+ * O protótipo (`docs/R2/extraido/Curador.html`) não tem uma tela de cadastro
+ * isolada para o curador: "Criar conta" no login leva direto ao **passo 1 do
+ * wizard** do módulo 12, na variante sem sessão (`cHerdado: false`, campo de
+ * senha visível, sem confirmação nem aceite de Termos — decisão do cliente em
+ * 2026-09-22 de seguir o protótipo aqui). A copy é `CURADOR_CADASTRO`
+ * (`textos/curador.ts`) e o formulário é
+ * `componentes/curador/FormularioDeContaDoCurador`, dentro de
+ * `MolduraDoWizard` — não esta moldura de auth. Ver
+ * `docs/prd/07-pendencias-e-divergencias.md`.
  */
-export const CADASTRAR_CURADOR = {
-  ...CADASTRAR,
-  enviar: CURADOR_CADASTRO.continuar,
-  temConta: '',
-  entrar: CURADOR_CADASTRO.voltarAoLogin,
-} as const;
 
 /** Verificação de e-mail (`/verificar-email`) — tela que o protótipo acrescentou. */
 export const VERIFICAR_EMAIL = {

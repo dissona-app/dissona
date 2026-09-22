@@ -125,6 +125,7 @@ export function DadosDoMembro({
             fotoUrl={fotoUrl}
             caminhoAtual={fotoCaminho}
             aoMudarEnvio={setSubindoFoto}
+            tamanho="md"
             textos={{
               botao: TEXTOS.trocarFoto,
               hint: TEXTOS.fotoHint,
