@@ -1052,3 +1052,21 @@ alguém os ligar sem mover a linha:
 Todas as outras listas tratavam o caso; a de integrantes (27.2) renderizava o
 cabeçalho da grade com nada embaixo. Na prática não acontece — quem abre a tela
 é membro e está na lista —, mas cabeçalho sem linha parece defeito, não vazio.
+
+### 5. Três falhas que não apareciam na tela
+
+A auditoria de "códigos de erro tipados" achou o mesmo defeito em três lugares,
+e é o que o [AGENTS.md](../../AGENTS.md) nomeia: **falha sem mensagem é bug**. O
+padrão era idêntico nos três — `const [, acao] = useActionState(...)`, com o
+resultado descartado e `if (resultado.ok)` anunciando só o sucesso:
+
+- **`TabelaDeMidias`** — exclusão recusada deixava o modal aberto, sem texto;
+- **`ListaDaEquipe`** — as três ações de linha (aplicar papel, desativar,
+  reenviar convite). A recusa mais provável ali é o `DS020` da `0003d`, que
+  impede alguém de mudar o próprio papel: a pessoa clicava "Aplicar" e a linha
+  não mudava, sem uma palavra;
+- **`TourDeOnboarding`** — "Finalizar" com sessão perdida voltava ao repouso.
+
+O aviso da lista da equipe passou a carregar **tom**, em vez de ser sempre
+`sucesso`. Lint não alcança esse defeito, e nenhum teste o pegaria: a tela não
+quebra, ela só não conta.

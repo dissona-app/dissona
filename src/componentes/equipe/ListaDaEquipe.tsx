@@ -9,6 +9,7 @@ import { Etiqueta } from '@/componentes/base/Etiqueta';
 import { Selecao } from '@/componentes/base/Selecao';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import type { LinhaDaEquipe } from '@/modulos/equipe/tipos';
+import { mensagemDaFalha } from '@/textos/erros';
 import { PAPEIS_ADMIN, rotuloDoPapel } from '@/modulos/equipe/tipos';
 import { EQUIPE } from '@/textos/prototipo';
 
@@ -68,7 +69,11 @@ export function ListaDaEquipe({
   acaoDeReenvio,
   acaoDeConvidar,
 }: PropsListaDaEquipe) {
-  const [aviso, setAviso] = useState<string | null>(null);
+  // O aviso carrega **tom**: as três ações de linha (papel, acesso, reenvio)
+  // descartavam o resultado e só anunciavam sucesso — uma recusa da RPC, como o
+  // `DS020` de quem tenta mudar o próprio papel, não dizia nada e a linha
+  // simplesmente não mudava.
+  const [aviso, setAviso] = useState<{ tom: 'sucesso' | 'erro'; texto: string } | null>(null);
 
   const ativos = linhas.filter((linha) => linha.situacao === 'ativo').length;
   const pendentes = linhas.filter(
@@ -87,7 +92,7 @@ export function ListaDaEquipe({
 
       {aviso === null ? null : (
         <div className={estilos.faixaDeAviso}>
-          <Aviso tom="sucesso">{aviso}</Aviso>
+          <Aviso tom={aviso.tom}>{aviso.texto}</Aviso>
         </div>
       )}
 
@@ -128,7 +133,7 @@ type PropsLinha = {
   readonly acaoDePapel: (dados: FormData) => Promise<ResultadoDeAcao>;
   readonly acaoDeAcesso: (dados: FormData) => Promise<ResultadoDeAcao>;
   readonly acaoDeReenvio: (dados: FormData) => Promise<ResultadoDeAcao<unknown>>;
-  readonly onAviso: (mensagem: string) => void;
+  readonly onAviso: (aviso: { tom: 'sucesso' | 'erro'; texto: string }) => void;
 };
 
 function LinhaDeMembro({ linha, acaoDePapel, acaoDeAcesso, acaoDeReenvio, onAviso }: PropsLinha) {
@@ -142,7 +147,8 @@ function LinhaDeMembro({ linha, acaoDePapel, acaoDeAcesso, acaoDeReenvio, onAvis
   const [, aplicarPapel, aplicandoPapel] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => {
       const resultado = await acaoDePapel(dados);
-      if (resultado.ok) onAviso(TEXTOS.papelAtualizado(primeiroNome));
+      if (resultado.ok) onAviso({ tom: 'sucesso', texto: TEXTOS.papelAtualizado(primeiroNome) });
+      else onAviso({ tom: 'erro', texto: mensagemDaFalha(resultado) });
       return resultado;
     },
     null,
@@ -152,7 +158,12 @@ function LinhaDeMembro({ linha, acaoDePapel, acaoDeAcesso, acaoDeReenvio, onAvis
     async (_anterior, dados) => {
       const resultado = await acaoDeAcesso(dados);
       if (resultado.ok) {
-        onAviso(inativo ? TEXTOS.reativado(primeiroNome) : TEXTOS.desativado(primeiroNome));
+        onAviso({
+          tom: 'sucesso',
+          texto: inativo ? TEXTOS.reativado(primeiroNome) : TEXTOS.desativado(primeiroNome),
+        });
+      } else {
+        onAviso({ tom: 'erro', texto: mensagemDaFalha(resultado) });
       }
       return resultado;
     },
@@ -165,7 +176,8 @@ function LinhaDeMembro({ linha, acaoDePapel, acaoDeAcesso, acaoDeReenvio, onAvis
       // Só anuncia se de fato reenviou. O limite de e-mail do SMTP embutido é a
       // falha comum aqui, e um "Convite reenviado" sobre ela mandaria a pessoa
       // esperar um e-mail que não saiu.
-      if (resultado.ok) onAviso(TEXTOS.conviteReenviado(linha.email));
+      if (resultado.ok) onAviso({ tom: 'sucesso', texto: TEXTOS.conviteReenviado(linha.email) });
+      else onAviso({ tom: 'erro', texto: mensagemDaFalha(resultado) });
       return resultado;
     },
     null,

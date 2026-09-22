@@ -9,6 +9,7 @@ import { Modal } from '@/componentes/base/Modal';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import type { CanalDoCurador } from '@/modulos/curador/tipos';
 import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@/textos/curador';
+import { mensagemDaFalha } from '@/textos/erros';
 
 import { ModalDeMidia } from './ModalDeMidia';
 import estilos from './TabelaDeMidias.module.css';
@@ -46,6 +47,7 @@ export function TabelaDeMidias({ midias, acaoDeSalvar, acaoDeExcluir }: PropsTab
   );
   const [aExcluir, setAExcluir] = useState<CanalDoCurador | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
 
   // O fechamento e o aviso da exclusão acontecem **dentro** da ação, e não num
   // efeito que observa o resultado: aqui isto é o tratamento de um evento (o
@@ -53,10 +55,16 @@ export function TabelaDeMidias({ midias, acaoDeSalvar, acaoDeExcluir }: PropsTab
   // sem precisar — é o que `react-hooks/set-state-in-effect` recusa.
   const [, excluir, excluindo] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => {
+      setErro(null);
       const resultado = await acaoDeExcluir(dados);
       if (resultado.ok) {
         setAviso(CURADOR_MANUTENCAO.modalExcluir.sucesso);
         setAExcluir(null);
+      } else {
+        // A recusa **tem** de aparecer. Sem isto o modal ficava aberto e nada
+        // dizia por quê — "falha sem mensagem é bug", e aqui ela era literal:
+        // o resultado do `useActionState` era descartado.
+        setErro(mensagemDaFalha(resultado));
       }
       return resultado;
     },
@@ -79,6 +87,7 @@ export function TabelaDeMidias({ midias, acaoDeSalvar, acaoDeExcluir }: PropsTab
         </Botao>
       </div>
 
+      {erro === null ? null : <Aviso tom="erro">{erro}</Aviso>}
       {aviso === null ? null : <Aviso tom="sucesso">{aviso}</Aviso>}
 
       {midias.length === 0 ? (

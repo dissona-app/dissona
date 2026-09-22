@@ -2,8 +2,10 @@
 
 import { useActionState } from 'react';
 
+import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
 import type { ResultadoDeAcao } from '@/lib/acoes';
+import { erroGeralDe } from '@/textos/erros';
 import { ONBOARDING } from '@/textos/prototipo';
 
 import { useEstadoDoTour } from './estado-do-tour';
@@ -55,10 +57,15 @@ export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourD
   // `FormData` como carga, e ignorada: é o que `<form action>` entrega, e o
   // encerramento não tem campo nenhum. Tipar como `void` compilaria a chamada
   // e não o `<form>`.
-  const [, encerrar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, encerrar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async () => acaoDeEncerrar(),
     ESTADO_INICIAL,
   );
+
+  // A ação só volta com resultado quando **falha** — no sucesso ela redireciona
+  // e este componente sai da tela. O único código possível é `NAO_AUTENTICADO`,
+  // e sem esta linha o botão voltava ao repouso sem dizer que a sessão caiu.
+  const erro = erroGeralDe(resultado !== null && !resultado.ok ? resultado : null, []);
 
   const total = passos.length;
   const passo = passos[indice];
@@ -71,6 +78,8 @@ export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourD
 
   return (
     <>
+      {erro === undefined ? null : <Aviso tom="erro">{erro}</Aviso>}
+
       <div className={estilos.topo}>
         <span className={estilos.contador}>{ONBOARDING.passoDe(indice + 1, total)}</span>
 
