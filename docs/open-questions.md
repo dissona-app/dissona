@@ -273,19 +273,22 @@ Hoje **um único projeto Supabase** (`dissona`, `us-west-2`) serve tanto o Previ
 Antes de qualquer usuário real, provisionar `dissona-staging` e `dissona-producao` (US$ 10/mês cada) e separar as env vars da Vercel por escopo.
 **Gatilho:** antes do beta. **Decisão de:** técnico. **Impacto:** [arquitetura §2.2 e §9](architecture.md), env vars da Vercel, CI.
 
-### 26. Duas reprovações de contraste mantidas por fidelidade ao protótipo
+### 26. ~~Duas reprovações de contraste~~ — **fechada em 2026-09-22**
 
-A auditoria do [Design System §4.2](design-system.md) reprova sete pares de contraste. Cinco foram corrigidos na implementação da R0 (botão em loading, botão desabilitado, dot de sucesso usado como texto, "senha média" e numeral de stepper). Dois foram **mantidos como estão no protótipo**, por decisão de fidelidade visual:
+A auditoria do [Design System §4.2](design-system.md) reprovava sete pares. Cinco foram corrigidos na R0; os dois últimos ficaram abertos por fidelidade ao protótipo, com gatilho "revisão de acessibilidade antes do beta". **Corrigidos.**
 
-| Par | Ratio | Exigência | Alternativa auditada |
-|---|---|---:|---|
-| Borda de campo em repouso `#E7E3EF` / branco | **1,26:1** | WCAG 1.4.11 pede 3:1 para componente | `#8A8398` (3,63:1), ou dar contraste pelo fundo do campo |
-| Botão primário, branco / `#E35336` | **3,78:1** | AA pede 4,5:1 para texto de 16px/600 | `#C4442A` (4,99:1), que o protótipo já usa no hover |
+| Par | Era | Virou | Ratio |
+|---|---|---|---:|
+| Botão primário, branco sobre `--dsn-orange-500` | `#E35336` | `--dsn-orange-600` | 3,78 → **4,99:1** |
+| Borda de campo em repouso, sobre branco | `--dsn-border` `#E7E3EF` | `--dsn-border-campo` `#9890A6` | 1,26 → **3,05:1** |
 
-Ambos estão marcados com `TODO(a11y)` em `src/estilos/tokens.css`, `Campo.module.css` e `Botao.module.css`.
+**O botão não ganhou cor nova.** A escala inteira desceu um degrau — repouso `orange-600`, hover `orange-700`, active `orange-800` —, e os dois primeiros já eram o hover e o active do próprio protótipo. `--dsn-orange-500` continua sendo a cor da marca; o que mudou é onde se põe texto branco sobre ela. O rótulo tem 16px/600, que **não** é "texto grande" pela WCAG (pediria 18,66px em 700, ou 24px), então o piso é 4,5:1.
 
-**Consequência:** o item "contraste AA" da [Definition of Done](architecture.md#10-definition-of-done) passa **com estas duas exceções registradas**, e não integralmente. Quem for revisar a R0 precisa saber disso.
-**Gatilho:** revisão de acessibilidade antes do beta. **Decisão de:** cliente + design.
+**A borda ganhou um token próprio**, e é a parte que muda mais a tela: campo, área de texto e seleção deixam de ter contorno quase invisível. `#9890A6` é o valor **mais claro** que passa mantendo o matiz neutro-arroxeado da família — 1% mais escuro que `--dsn-ink-400`, que para em 2,94:1 e por um triz não serve. `--dsn-border` continua claro e continua certo onde está: divisor de tabela e borda de cartão não identificam componente interativo, e a 1.4.11 não os alcança.
+
+⚠️ **O que olhar:** os campos ficaram visivelmente mais marcados em todo o produto. Se o design preferir outro ponto, é **uma linha** — o token `--dsn-border-campo` em `tokens.css`. Abaixo de 3:1 o teste de contraste falha, e é ele que passa a guardar a decisão.
+
+Os `TODO(a11y)` saíram do código. `src/estilos/__testes__/contraste.test.ts` calcula os ratios a partir dos tokens e trava os dois pisos — mais os pares que já estavam corrigidos, porque o que não é medido volta.
 
 ### 27. LGPD versus retenção fiscal no expurgo
 

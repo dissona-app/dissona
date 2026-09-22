@@ -1009,11 +1009,26 @@ TTL de marcador de recuperação, cooldown de reenvio, validade de URL assinada.
 Mudar a chave faria a tela mentir, **sem sintoma nenhum** — nenhum teste
 compara as duas coisas, e nenhuma delas quebra.
 
-**Não foram convertidas em interpolação de propósito.** São strings literais do
-protótipo, validadas com o cliente; reescrevê-las é decisão de produto. O que
-fica registrado é a consequência: **mexer nessas quatro chaves exige revisar a
-copy junto**. Se o cliente quiser os números ajustáveis sem deploy, o caminho é
-interpolar as quatro — uma tarde de trabalho, e a copy deixa de ser literal.
+**Resolvido em 2026-09-22 — por trava, e não por interpolação.**
+
+Interpolar (`Você tem ${horas}h`) tiraria a mentira e traria outra pior: a frase
+passaria a se montar sozinha e ninguém a releria. `prazo_devolucao_dias = 1`
+viraria *"sem resposta em 1 dias"*. Copy é texto que uma pessoa escreveu, com
+concordância e ritmo — o que ela precisa não é de substituição automática, é de
+**não poder divergir em silêncio**.
+
+`src/textos/__testes__/numeros-na-copy.test.ts` amarra cada número literal à sua
+fonte: o seed da `0004` para as quatro chaves, e a constante da `0003b` para a
+validade do convite (que não vive em `configuracao`, por decisão registrada lá).
+Cobre também as frases que escrevem o número **por extenso** — *"Prazo de sete
+dias"* —, onde um `toContain('7 dias')` passaria verde e cego.
+
+Verificado por mutação: trocar `prazo_avaliacao_horas` de 72 para 48 no seed
+reprova 7 asserções; o mesmo com `prazo_devolucao_dias`.
+
+Onde a tela **já lê** a configuração e mostra o número como dado — o mínimo de
+escuta, em `AVALIAR.escutaMedida(minimo)` —, a interpolação continua sendo o
+certo: ali o número não está *na* frase, ele **é** o dado.
 
 ### 2. `musica_compartilhada` estava no catálogo e ninguém a emitia
 

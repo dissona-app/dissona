@@ -27,21 +27,33 @@
 
 /* ------------------------------------------------------------- primário */
 
+/*
+ * O fundo é `orange-600`, e não o `orange-500` do protótipo.
+ *
+ * Branco sobre `#E35336` dá **3,78:1**, e o rótulo tem 16px/600 — que não é
+ * "texto grande" pela WCAG (precisaria de 18,66px em 700, ou 24px). AA pede
+ * 4,5:1, e o botão primário é o alvo mais clicado do produto.
+ *
+ * A escala inteira desceu um degrau, e **nenhuma cor nova entrou**: os três
+ * valores já estavam na paleta, e os dois primeiros já eram o hover e o active
+ * do próprio protótipo. Repouso `orange-600` (4,99:1), hover `orange-700`
+ * (6,33:1), active `orange-800` (7,62:1).
+ *
+ * `--dsn-orange-500` continua existindo e sendo a cor da marca — o que mudou é
+ * onde se põe texto branco em cima dela. Ver 07-pendências e open-questions #26.
+ */
 .primario {
-  /* TODO(a11y): 3,78:1 com label de 16px/600 — reprova AA. Mantido por
-   * decisão de fidelidade ao protótipo; alternativa auditada é
-   * --dsn-orange-600 (4,99:1). Ver design-system.md §4.2. */
-  background: var(--dsn-orange-500);
+  background: var(--dsn-orange-600);
   color: #ffffff;
 }
 
 .primario:hover:not(:disabled) {
-  background: var(--dsn-orange-600);
+  background: var(--dsn-orange-700);
   box-shadow: var(--dsn-shadow-cta);
 }
 
 .primario:active:not(:disabled) {
-  background: var(--dsn-orange-700);
+  background: var(--dsn-orange-800);
   box-shadow: none;
 }
 

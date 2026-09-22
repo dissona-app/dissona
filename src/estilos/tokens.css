@@ -42,6 +42,19 @@
   --dsn-ink-250: #c9c3d6;
   --dsn-ink-200: #d9d3e6;
   --dsn-border: #e7e3ef;
+  /*
+   * Borda de componente interativo em repouso — campo, área de texto, seleção.
+   *
+   * 3,05:1 sobre branco, contra os 3:1 que a WCAG 1.4.11 exige do contorno que
+   * identifica o componente. É o valor **mais claro** que passa mantendo o
+   * matiz neutro-arroxeado da família: 1% mais escuro que `--dsn-ink-400`, que
+   * para em 2,94:1 e por um triz não serve.
+   *
+   * Separado de `--dsn-border` de propósito. Divisor de tabela e borda de
+   * cartão não identificam componente interativo, não são alcançados pela
+   * 1.4.11, e escurecê-los junto pesaria a tela inteira sem necessidade.
+   */
+  --dsn-border-campo: #9890a6;
   --dsn-border-soft: #e2ddec;
   --dsn-border-faint: #f1eef7;
   --dsn-track: #eeeaf5;
@@ -251,18 +264,27 @@
 }
 
 /*
- * Exceções de acessibilidade — decididas com o cliente em favor da fidelidade
- * ao protótipo da R2 (docs/design-system.md §4.2).
+ * As duas exceções de acessibilidade da `open-questions #26` foram **fechadas**
+ * em 2026-09-22, a pedido — o gatilho registrado ali era "revisão de
+ * acessibilidade antes do beta".
  *
- * TODO(a11y): `--dsn-border` em repouso dá 1,26:1 sobre branco e falha a WCAG
- * 1.4.11 (componente exige 3:1). A alternativa auditada é `#8A8398` (3,63:1),
- * ou dar contraste ao campo pelo fundo em vez da borda.
+ * **Botão primário.** O fundo passou de `orange-500` (3,78:1 com branco) para
+ * `orange-600` (4,99:1), e hover e active desceram um degrau junto. Nenhuma cor
+ * nova entrou: os três valores já estavam nesta paleta, e os dois primeiros já
+ * eram o hover e o active do protótipo. `--dsn-orange-500` segue sendo a cor da
+ * marca — o que mudou é onde se põe texto branco sobre ela.
  *
- * TODO(a11y): `--dsn-orange-500` como fundo do botão primário dá 3,78:1 com
- * label de 16px/600, e falha AA para texto normal. A alternativa auditada é
- * `--dsn-orange-600` (#C4442A, 4,99:1).
+ * **Borda de campo em repouso.** `--dsn-border` dá 1,26:1 sobre branco e a
+ * WCAG 1.4.11 exige 3:1 para o contorno que identifica o componente. O campo é
+ * branco sobre fundo quase branco, então a borda é a **única** afordância — não
+ * há como a regra não valer aqui. Nasceu `--dsn-border-campo` para isso; ver o
+ * comentário dele acima.
  *
- * As duas ficam registradas como pendência aberta; o restante da auditoria
- * (botão em loading, botão desabilitado, dot de sucesso, "senha média" e
- * numeral de stepper) foi corrigido nos tokens semânticos acima.
+ * `--dsn-border` continua como está, e continua certo onde está: divisor de
+ * tabela, borda de cartão e separador não identificam componente interativo, e
+ * a 1.4.11 não os alcança.
+ *
+ * O resto da auditoria do §4.2 (botão em loading, botão desabilitado, dot de
+ * sucesso, "senha média" e numeral de stepper) já tinha sido corrigido nos
+ * tokens semânticos acima, na R0.
  */

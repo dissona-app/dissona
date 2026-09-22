@@ -27,7 +27,8 @@
   font-family: inherit;
   color: var(--dsn-ink);
   background-color: var(--dsn-surface);
-  border: var(--dsn-border-width) solid var(--dsn-border);
+  /* Mesma razão do `Campo`: a borda é a afordância do componente (1.4.11). */
+  border: var(--dsn-border-width) solid var(--dsn-border-campo);
   border-radius: var(--dsn-radius-lg);
   outline: none;
   /* Seta desenhada por gradiente, como no protótipo — sem imagem externa. */

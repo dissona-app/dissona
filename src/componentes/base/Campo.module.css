@@ -69,10 +69,10 @@
   font-size: var(--dsn-text-base);
   color: var(--dsn-ink);
   background: var(--dsn-surface);
-  /* TODO(a11y): 1,26:1 sobre branco - reprova WCAG 1.4.11 (componente exige
-   * 3:1). Mantido por decisao de fidelidade ao prototipo; alternativa
-   * auditada e #8A8398 (3,63:1). Ver design-system.md 4.2. */
-  border: var(--dsn-border-width) solid var(--dsn-border);
+  /* `--dsn-border-campo`, e não `--dsn-border`: o campo é branco sobre fundo
+   * quase branco, então a borda é a única afordância do componente e a WCAG
+   * 1.4.11 exige 3:1 dela. Ver o comentário do token. */
+  border: var(--dsn-border-width) solid var(--dsn-border-campo);
   border-radius: var(--dsn-radius-lg);
   padding: 13px var(--dsn-space-7);
   outline: none;

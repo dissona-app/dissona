@@ -828,7 +828,27 @@ Razões calculadas sobre os pares efetivamente usados no R2:
 | `#7F47DD` / `#FFFFFF` — borda de foco | 5.46:1 | ✅ | > 3:1 exigido para componente |
 | `#8C3A2C` / `#FFFFFF` — borda de erro | 7.62:1 | ✅ | |
 
-**Reprovações e riscos — corrigir na implementação:**
+**Reprovações e riscos — todas corrigidas.** As cinco primeiras na R0; as duas
+últimas (botão primário e borda de campo) em 2026-09-22, quando o gatilho
+"revisão de acessibilidade antes do beta" da [open-questions #26](open-questions.md)
+foi puxado. O que foi implementado difere da sugestão em dois pontos, e por
+razão:
+
+- **Botão primário** — a escala inteira desceu um degrau (repouso
+  `--dsn-orange-600`, hover `--dsn-orange-700`, active `--dsn-orange-800`), em
+  vez de só o repouso. Sem isso o hover ficaria igual ao repouso. Nenhuma cor
+  nova entrou: os três valores já estavam na paleta.
+- **Borda de campo** — `#9890A6` (3,05:1) em vez do `#8A8398` (3,63:1)
+  sugerido: é o valor **mais claro** que passa mantendo o matiz da família, e a
+  borda de campo é um elemento que aparece em toda tela — cada ponto de
+  luminosidade a mais pesa o produto inteiro. Vive num token próprio,
+  `--dsn-border-campo`; `--dsn-border` segue claro para divisor e cartão, que a
+  1.4.11 não alcança.
+
+`src/estilos/__testes__/contraste.test.ts` calcula os ratios a partir de
+`tokens.css` e trava os pisos, para a tabela abaixo não voltar a ser verdade.
+
+**A tabela, como estava na auditoria:**
 
 | Par | Ratio | Problema | Correção sugerida |
 |---|---|---:|---|

@@ -69,7 +69,8 @@
 .bio {
   font-size: var(--dsn-text-base);
   line-height: var(--dsn-leading-normal);
-  border: var(--dsn-border-width) solid var(--dsn-border);
+  /* Mesma razão do `Campo`: a borda é a afordância do componente (1.4.11). */
+  border: var(--dsn-border-width) solid var(--dsn-border-campo);
   padding: 11px var(--dsn-space-7);
 }
 
