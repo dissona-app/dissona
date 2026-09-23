@@ -31,7 +31,7 @@ export const metadata: Metadata = {
  */
 export default async function Pagina() {
   const estado = await lerCadastroDoCurador();
-  if (estado === null) redirect(ROTA.ENTRAR);
+  if (estado === null) redirect(ROTA.CURADOR_ENTRAR);
   if (!estado.concluido) redirect(ROTA.CURADOR_CADASTRO);
 
   // Candidato a Prata não passa por aqui: a tela dele é a de análise, e o

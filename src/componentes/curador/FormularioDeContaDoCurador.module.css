@@ -1,17 +1,10 @@
-/* "Dados básicos" — passo 1 do wizard sem sessão. Mesmos campos e o mesmo
-   corpo de `FormularioDeCadastro.module.css`; o rodapé é o de `AcoesDoPasso`
-   (`AcoesDoPasso.module.css`), não o "Já tem conta?" do cadastro do artista. */
+/* "Dados básicos" — passo 1 do wizard sem sessão. Campos com o mesmo corpo de
+   `FormularioDeCadastro.module.css`; o rodapé é o do protótipo — ver `.rodape`. */
 
 .campos {
   display: flex;
   flex-direction: column;
   gap: var(--dsn-space-6);
-}
-
-.blocoSenha {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dsn-space-3);
 }
 
 .olho {
@@ -36,24 +29,32 @@
   text-decoration: underline;
 }
 
-/* Rodapé — literal do protótipo: "Voltar ao login" cinza à esquerda,
-   "Continuar" denso à direita, com o mesmo divisor de `AcoesDoPasso`. */
+/* Rodapé — literal do protótipo: "Voltar ao login" à esquerda, "Continuar" à
+   direita, sem divisor. Quem o prende ao pé da tela é a moldura
+   (`MolduraDoWizard.module.css`, `.corpoDividido > form > :last-child`). */
 .rodape {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dsn-space-5);
-  padding-top: var(--dsn-space-6);
-  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+  gap: 12px;
 }
 
+/* Um link com a aparência do botão fantasma do protótipo: 14px, cinza, e o
+   fundo lilás só no hover. É link, e não botão, porque navega. */
 .voltar {
   font-size: var(--dsn-text-sm);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-ink-500);
   text-decoration: none;
+  white-space: nowrap;
+  padding: 12px 14px;
+  border-radius: var(--dsn-radius-lg);
+  transition:
+    background var(--dsn-duration-base) var(--dsn-ease-out),
+    color var(--dsn-duration-base) var(--dsn-ease-out);
 }
 
 .voltar:hover {
-  color: var(--dsn-purple-600);
+  background: #f6f3fb;
+  color: var(--dsn-ink);
 }

@@ -19,11 +19,11 @@ import { CADASTRAR, CURADOR_CADASTRO } from '../apoio/textos';
  * 1. Confira que os dois campos que RF-003 exige em outro lugar não existem
  *    aqui — é a regressão exata que motivou a mudança (a tela usava
  *    `FormularioDeCadastro`, com os dois).
- * 2. Tente com uma senha que o medidor recusa.
- * 3. Tente com um e-mail que já tem conta.
+ * 2. Tente com uma senha curta ou sem número.
+ * 3. Crie a conta de verdade, com foto.
+ * 4. Tente com um e-mail que já tem conta.
  *
- * Nenhum cenário aqui cria conta, então não há o que limpar depois — mesmo
- * raciocínio de D7.
+ * Só o passo 3 cria conta, e ele mesmo a apaga no fim.
  */
 
 test.describe('D7b · Cadastro de conta do curador', () => {
@@ -48,7 +48,7 @@ test.describe('D7b · Cadastro de conta do curador', () => {
   });
 
   test(
-    'senha sem número ou curta demais é barrada pelo medidor',
+    'senha sem número ou curta demais é barrada no envio',
     { tag: ['@RF-003'] },
     async ({ page }, info) => {
       await page.getByLabel(CADASTRAR.rotuloNome).fill('E2E Cadastro Curador');
@@ -57,8 +57,9 @@ test.describe('D7b · Cadastro de conta do curador', () => {
         .fill(`e2e_d7b_senha_${info.workerIndex}@e2e.dissona.local`);
       await page.getByLabel(CADASTRAR.rotuloSenha, { exact: true }).fill('abcdefgh');
 
-      await expect(page.getByText(CADASTRAR.forcaDaSenha[1])).toBeVisible();
-      await expect(page.getByText(CADASTRAR.requisitoNumero)).toBeVisible();
+      // Sem medidor nesta tela — o protótipo do passo 1 não o tem. A política
+      // é a mesma do artista, e quem a aplica é o servidor.
+      await expect(page.getByText(CADASTRAR.requisitoNumero)).toHaveCount(0);
 
       await page.getByRole('button', { name: CURADOR_CADASTRO.continuar, exact: true }).click();
 

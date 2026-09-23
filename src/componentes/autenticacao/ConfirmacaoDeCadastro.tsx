@@ -9,7 +9,7 @@ import { Campo } from '@/componentes/base/Campo';
 import { Checkbox } from '@/componentes/base/Checkbox';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { erroGeralDe } from '@/textos/erros';
 import { CONFIRMAR_SOCIAL } from '@/textos/prototipo';
 
@@ -103,7 +103,7 @@ export function ConfirmacaoDeCadastro({
           tom="erro"
           titulo={CONFIRMAR_SOCIAL.bannerEmailEmUso.titulo}
           acao={
-            <Link className={estilos.aceiteLink} href={ROTA.ENTRAR}>
+            <Link className={estilos.aceiteLink} href={ENTRAR_PADRAO}>
               {CONFIRMAR_SOCIAL.bannerEmailEmUso.acao}
             </Link>
           }

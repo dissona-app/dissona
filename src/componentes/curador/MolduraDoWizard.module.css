@@ -10,35 +10,42 @@
   background: var(--dsn-grad-auth-bg);
 }
 
-/* `<progress>` nativo, restilizado. O valor é anunciado sem ARIA escrito à
-   mão, e o `appearance: none` é o que permite pintá-lo com o gradiente da
-   marca. */
+/*
+ * `<progress>` nativo, restilizado. O valor é anunciado sem ARIA escrito à
+ * mão, e o `appearance: none` é o que permite pintá-lo.
+ *
+ * Literal do protótipo: absoluto no topo da tela, trilho `#EFEBF7` e
+ * preenchimento **roxo sólido** `#7F47DD`, com 340ms na transição da largura.
+ * Era o gradiente roxo→laranja da marca — que o protótipo usa em outros
+ * lugares, mas não aqui.
+ */
 .progresso {
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
   appearance: none;
   width: 100%;
   height: 3px;
   border: none;
-  background: var(--dsn-border);
-  flex: none;
+  background: #efebf7;
 }
 
 .progresso::-webkit-progress-bar {
-  background: var(--dsn-border);
+  background: #efebf7;
 }
 
 .progresso::-webkit-progress-value {
-  background: var(--dsn-grad-brand-h);
-  transition: width var(--dsn-duration-slow) var(--dsn-ease-out);
+  background: var(--dsn-purple-500);
+  transition: width 340ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .progresso::-moz-progress-bar {
-  background: var(--dsn-grad-brand-h);
+  background: var(--dsn-purple-500);
 }
 
-.miolo,
-.mioloDividido {
+.miolo {
   position: relative;
   z-index: 1;
   flex: 1;
@@ -47,29 +54,6 @@
   justify-content: center;
   gap: clamp(var(--dsn-space-8), 3vw, var(--dsn-space-24));
   padding: var(--dsn-pad-secao-y) var(--dsn-pad-auth-x);
-}
-
-/* `auto-fit` em vez de `@media`: os protótipos da R2 não têm nenhum breakpoint
-   (pendência #24), e inventar um aqui fingiria uma decisão de mobile que
-   ninguém tomou. Assim as duas colunas viram uma quando não cabem. */
-.mioloDividido {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(404px, 100%), 1fr));
-  align-items: start;
-  max-width: 920px;
-  margin: 0 auto;
-}
-
-/* O painel de marca do passo 1 — o "Sua escuta vira crédito e remuneração." é
-   um hero de 38 px no protótipo, e não um título de card. */
-.painel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dsn-space-6);
-  background: var(--dsn-auth-painel-bg);
-  border: var(--dsn-border-width) solid var(--dsn-auth-painel-border);
-  border-radius: var(--dsn-radius-2xl);
-  padding: clamp(15px, 1.8vw, 20px);
 }
 
 .coluna {
@@ -131,6 +115,151 @@
 /* Acompanha `.tituloEstreito`: no passo 1 a coluna é mais estreita. */
 .subtituloEstreito {
   font-size: var(--dsn-text-sm);
+}
+
+/* ------------------------------------------------------------------------
+ * Passo 1 — tela dividida. Literais de `docs/R2/extraido/Curador.html`,
+ * ramo `cStep1`. O porquê de cada decisão está no TSX (`MolduraDividida`).
+ * --------------------------------------------------------------------- */
+
+.paginaDividida {
+  --dsn-rotulo-corpo: var(--dsn-text-4xs);
+  position: relative;
+  display: grid;
+  grid-template-columns: 46% minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--dsn-surface);
+}
+
+/* O painel: altura inteira, ondas por dentro, logotipo no alto e a promessa
+   embaixo (`justify-content: space-between`). */
+.painelDividido {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(28px, 4.6vh, 52px) clamp(26px, 3.2vw, 48px);
+  background: linear-gradient(180deg, #fdfcff 0%, #f7f3fd 55%, #f1ecfa 100%);
+  border-right: var(--dsn-border-width) solid #ede8f6;
+}
+
+.ondasDoPainel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.derivaA,
+.derivaB {
+  position: absolute;
+  inset: -6% 0;
+  animation: dsnDriftA 26s ease-in-out infinite;
+}
+
+.derivaB {
+  inset: -8% 0;
+  animation: dsnDriftB 34s ease-in-out infinite;
+}
+
+/* `width: 200%` com o padrão repetindo a cada metade: o `dsnWaveX` de −50% a 0
+   fecha o ciclo sem costura. */
+.ondaA,
+.ondaB {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  overflow: visible;
+  animation: dsnWaveX 46s linear infinite;
+}
+
+.ondaB {
+  animation-duration: 33s;
+}
+
+.claraoDoPainel {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    92% 60% at 50% 48%,
+    rgb(255 255 255 / 94%) 0%,
+    rgb(255 255 255 / 74%) 44%,
+    rgb(255 255 255 / 0%) 82%
+  );
+}
+
+/* A coluna do formulário: fundo branco, contador no canto superior direito. */
+.colunaDividida {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cabecalhoDividido {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: clamp(22px, 3.4vh, 34px) clamp(24px, 4vw, 56px) 0;
+}
+
+.corpoDividido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 2.2vh, 22px);
+  padding: clamp(14px, 2vh, 24px) clamp(24px, 4vw, 56px) clamp(22px, 3.4vh, 34px);
+}
+
+/* O `<form>` do passo perde a caixa, e os filhos dele viram itens desta coluna
+   — é o que deixa o rodapé, que está dentro do formulário, encostar no pé da
+   tela. Ver `MolduraDividida`. */
+.corpoDividido > form {
+  display: contents;
+}
+
+.corpoDividido > *,
+.corpoDividido > form > * {
+  width: 100%;
+  max-width: 404px;
+}
+
+/* Os dois `auto` dividem o espaço livre: metade acima do título, metade acima
+   do rodapé — o bloco fica centrado e o rodapé vai para o pé. */
+.tituloDividido {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/*
+ * O rodapé é sempre o último filho do formulário. No passo 1 do protótipo ele
+ * não tem divisor nenhum — daí o `border-top` e o `padding-top` de
+ * `AcoesDoPasso` zerados aqui, e só aqui: os passos 2 a 8 não passam por esta
+ * moldura e não são afetados.
+ */
+.corpoDividido > form > :last-child {
+  margin-top: auto;
+  border-top: none;
+  padding-top: 0;
+}
+
+/* O breakpoint é do protótipo (`s.w < 980`): abaixo dele o painel some e a
+   coluna do formulário ocupa a tela. */
+@media (width < 980px) {
+  .paginaDividida {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .painelDividido {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

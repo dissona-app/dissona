@@ -43,7 +43,7 @@ export default async function Pagina({
 
   // A guarda de rota já exige sessão; chegar aqui sem ela é sessão perdida
   // entre o middleware e o render.
-  if (contexto.estado !== 'ok' || identidade === null) redirect(ROTA.ENTRAR);
+  if (contexto.estado !== 'ok' || identidade === null) redirect(ROTA.ARTISTA_ENTRAR);
 
   const sessoes = aba === 'seguranca' ? await lerSessoesDaConta() : [];
   const preferencias = aba === 'preferencias' ? await lerPreferencias('artista') : null;

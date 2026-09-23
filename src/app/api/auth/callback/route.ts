@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO } from '@/lib/guarda-rota';
 import { destinoSeguro } from '@/modulos/autenticacao/esquemas';
 import { trocarCodigoPorSessao } from '@/modulos/autenticacao/repositorio';
 
@@ -31,12 +31,12 @@ export async function GET(requisicao: NextRequest) {
 
   // O provedor recusa com `?error=access_denied` quando a pessoa cancela na
   // tela dele. Não é erro nosso, e não merece banner de falha — só o retorno.
-  if (erroDoProvedor !== null) return paraUrl(ROTA.ENTRAR);
+  if (erroDoProvedor !== null) return paraUrl(ENTRAR_PADRAO);
 
-  if (codigo === null) return paraUrl(`${ROTA.ENTRAR}?motivo=social`);
+  if (codigo === null) return paraUrl(`${ENTRAR_PADRAO}?motivo=social`);
 
   const resultado = await trocarCodigoPorSessao(codigo);
-  if (!resultado.ok) return paraUrl(`${ROTA.ENTRAR}?motivo=social`);
+  if (!resultado.ok) return paraUrl(`${ENTRAR_PADRAO}?motivo=social`);
 
   return paraUrl(destinoSeguro(proximo, resultado.destino));
 }

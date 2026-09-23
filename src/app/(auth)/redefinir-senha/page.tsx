@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { FormularioDeRedefinicao } from '@/componentes/autenticacao/FormularioDeRedefinicao';
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { redefinirSenha } from '@/modulos/autenticacao/acoes';
 import { recuperacaoEmCurso } from '@/modulos/autenticacao/marcador-de-recuperacao';
 
@@ -40,7 +40,7 @@ export default async function Pagina({
     >
       <FormularioDeRedefinicao
         acao={redefinirSenha}
-        hrefDoLogin={ROTA.ENTRAR}
+        hrefDoLogin={ENTRAR_PADRAO}
         hrefDaRecuperacao={ROTA.RECUPERAR_SENHA}
         autorizado={autorizado}
       />

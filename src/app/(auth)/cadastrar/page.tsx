@@ -4,7 +4,7 @@ import { BotoesSociais } from '@/componentes/autenticacao/BotoesSociais';
 import { FormularioDeCadastro } from '@/componentes/autenticacao/FormularioDeCadastro';
 import { ComoFunciona } from '@/componentes/autenticacao/ComoFunciona';
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { cadastrar, entrarComProvedor } from '@/modulos/autenticacao/acoes';
 import { CADASTRAR } from '@/textos/prototipo';
 
@@ -47,7 +47,7 @@ export default function Pagina() {
       <FormularioDeCadastro
         acao={cadastrar}
         textos={CADASTRAR}
-        hrefEntrar={ROTA.ENTRAR}
+        hrefEntrar={ENTRAR_PADRAO}
         social={<BlocoSocial />}
       />
     </MolduraDeAutenticacao>

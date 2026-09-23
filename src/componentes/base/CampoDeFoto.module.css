@@ -123,6 +123,20 @@
   color: var(--dsn-ink-500);
 }
 
+/* `semDica`: a linha some da tela e continua sendo a região viva que anuncia
+   o arquivo escolhido — o mesmo `sr-only` de `.arquivo`, pelo mesmo motivo. */
+.hintOculta {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* Envolve o aviso de recusa e a linha do avatar. */
 .envolvente {
   display: flex;

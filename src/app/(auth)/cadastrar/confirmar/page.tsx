@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { ConfirmacaoDeCadastro } from '@/componentes/autenticacao/ConfirmacaoDeCadastro';
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { usuarioAtual } from '@/lib/supabase/servidor';
 import { confirmarCadastro, sair } from '@/modulos/autenticacao/acoes';
 
@@ -30,7 +30,7 @@ export default async function Pagina() {
   // A guarda de rota já exige sessão; este `redirect` cobre a corrida entre a
   // decisão dela e a renderização — e é preferível a renderizar uma tela de
   // confirmação sem ninguém para confirmar.
-  if (usuario === null) redirect(ROTA.ENTRAR);
+  if (usuario === null) redirect(ENTRAR_PADRAO);
 
   const metadados = usuario.user_metadata as {
     readonly nome_completo?: unknown;

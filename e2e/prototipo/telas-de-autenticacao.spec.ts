@@ -61,18 +61,13 @@ const TRACKING_DE_BOTAO = (texto: string): Excecao => ({
 
 const CENARIOS: readonly Cenario[] = [
   {
-    nome: 'login de artista e curador',
-    prototipo: PROTOTIPO.ARTISTA,
+    // O login do artista. Não há cenário para uma rota `/entrar` neutra porque
+    // ela não existe mais: o protótipo tem três telas de login, uma por
+    // ambiente, e a quarta — cópia desta — foi apagada em 2026-09-23.
+    //
     // As provas sociais do pé vêm desligadas por padrão no painel do protótipo,
     // e a tela as tem — é o que `mostrarProvas` liga.
-    props: { telaInicial: 'Login', mostrarProvas: true },
-    rota: '/entrar',
-  },
-  {
-    // Rota exclusiva do artista — mesma composição da neutra acima
-    // (`ENTRAR_ARTISTA` é `ENTRAR`), verificada em separado porque tem CTA e
-    // `href` próprios (`/artista/cadastrar`).
-    nome: 'login exclusivo do artista',
+    nome: 'login do artista',
     prototipo: PROTOTIPO.ARTISTA,
     props: { telaInicial: 'Login', mostrarProvas: true },
     rota: '/artista/entrar',
@@ -82,7 +77,7 @@ const CENARIOS: readonly Cenario[] = [
     // 36px fixo (não `clamp(28px,3vw,36px)`), `gap` de chamada 7px (não
     // 8px), `max-width` de 620px (não 600px) e o subtítulo do curador, que
     // simplesmente não existia. É este cenário que teria acusado.
-    nome: 'login exclusivo do curador',
+    nome: 'login do curador',
     prototipo: PROTOTIPO.CURADOR,
     props: { telaInicial: 'Login', mostrarProvas: true },
     rota: '/curador/entrar',

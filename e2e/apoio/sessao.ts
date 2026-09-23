@@ -72,7 +72,7 @@ export async function entrarComo(page: Page, persona: Persona) {
  * senha, passa a que quer conferir.
  */
 export async function entrarComCredenciais(page: Page, email: string, senha?: string) {
-  await page.goto('/entrar');
+  await page.goto('/artista/entrar');
   await page.getByLabel(ENTRAR.rotuloEmail, { exact: true }).fill(email);
   await page.getByLabel(ENTRAR.rotuloSenha, { exact: true }).fill(senha ?? senhaDeTeste());
   await page.getByRole('button', { name: ENTRAR.enviar, exact: true }).click();

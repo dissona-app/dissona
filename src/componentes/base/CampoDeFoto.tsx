@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
 import { iniciaisDe } from '@/lib/iniciais';
@@ -56,6 +56,14 @@ export type PropsCampoDeFoto = {
    * (27.1) e `lg` o perfil do artista (7.1), que é o maior. Ver o módulo CSS.
    */
   readonly tamanho?: 'sm' | 'md' | 'lg';
+  /**
+   * Sem a linha de dica ao lado do botão. O passo 1 do curador no protótipo não
+   * tem dica nenhuma: o retorno de "escolhi uma foto" é o próprio avatar, que
+   * passa a mostrar a imagem — o que este componente faz sempre, com ou sem a
+   * dica (`previa`). O estado "enviando" continua anunciado, só que no rótulo
+   * do botão; sem isso o upload em curso ficaria mudo.
+   */
+  readonly semDica?: boolean;
   readonly textos: TextosDoCampoDeFoto;
 };
 
@@ -78,6 +86,7 @@ export function CampoDeFoto({
   aoMudarEnvio,
   tamanhoDoBotao = 'md',
   tamanho = 'sm',
+  semDica = false,
   textos,
 }: PropsCampoDeFoto) {
   const foto = useUploadDireto({
@@ -93,6 +102,35 @@ export function CampoDeFoto({
     aoMudarEnvio?.(subindo);
   }, [aoMudarEnvio, subindo]);
 
+  /*
+   * A prévia do arquivo escolhido, no lugar das iniciais — é o
+   * `background-image: cAvatarImage` do protótipo. Fica local ao navegador
+   * (`URL.createObjectURL`), e por isso aparece também quando o arquivo não
+   * subiu direto e vai viajar no `multipart` (o passo 1 sem sessão).
+   *
+   * Só para arquivo que o hook aceitou: uma prévia de um PDF recusado mostraria
+   * como foto algo que não vai ser gravado.
+   */
+  const [previa, setPrevia] = useState<string | null>(null);
+  useEffect(
+    () => () => {
+      if (previa !== null) URL.revokeObjectURL(previa);
+    },
+    [previa],
+  );
+
+  const aoEscolher = (evento: React.ChangeEvent<HTMLInputElement>) => {
+    const escolhido = evento.currentTarget.files?.[0] ?? null;
+    const aceito =
+      escolhido !== null &&
+      (FOTO_TIPOS as readonly string[]).includes(escolhido.type) &&
+      escolhido.size <= FOTO_MAX_BYTES;
+    setPrevia(aceito ? URL.createObjectURL(escolhido) : null);
+    foto.aoEscolher(evento);
+  };
+
+  const imagem = previa ?? (fotoUrl != null && fotoUrl !== '' ? fotoUrl : null);
+
   return (
     <div className={estilos.envolvente}>
       {/*
@@ -104,13 +142,13 @@ export function CampoDeFoto({
       {foto.erro === undefined ? null : <Aviso tom="erro">{foto.erro}</Aviso>}
 
       <div className={estilos.base}>
-        {fotoUrl != null && fotoUrl !== '' ? (
+        {imagem !== null ? (
           // `<img>` e não `next/image`: a origem é o bucket público do Supabase,
           // e passar por `remotePatterns` só para um avatar de 56px não paga.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             className={[estilos.avatarImagem, CLASSE_DO_TAMANHO[tamanho]].filter(Boolean).join(' ')}
-            src={fotoUrl}
+            src={imagem}
             alt=""
           />
         ) : (
@@ -130,19 +168,19 @@ export function CampoDeFoto({
               .filter(Boolean)
               .join(' ')}
           >
-            {textos.botao}
+            {semDica && foto.subindo ? textos.enviando : textos.botao}
             <input
               type="file"
               name="foto"
               accept={FOTO_TIPOS.join(',')}
               className={estilos.arquivo}
-              onChange={foto.aoEscolher}
+              onChange={aoEscolher}
             />
           </label>
 
           <input type="hidden" name="foto_caminho" value={foto.caminho} />
 
-          <span className={estilos.hint} aria-live="polite">
+          <span className={semDica ? estilos.hintOculta : estilos.hint} aria-live="polite">
             {foto.subindo
               ? textos.enviando
               : (foto.nome ?? ((caminhoAtual ?? '') === '' ? textos.hint : textos.enviada))}

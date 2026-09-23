@@ -59,7 +59,7 @@ export default async function Pagina({
   // Sem `perfil_curador` não há wizard. A guarda de rota já exige o papel
   // `curador`, e `lerCadastroDoCurador` cria a linha se ela faltar — então
   // chegar aqui com `null` significa sessão perdida no meio do caminho.
-  if (estado === null) redirect(ROTA.ENTRAR);
+  if (estado === null) redirect(ROTA.CURADOR_ENTRAR);
 
   // Cadastro concluído não volta ao wizard: a classificação é o que responde
   // "e agora?". A alteração de cadastro é outra tela (12.6).

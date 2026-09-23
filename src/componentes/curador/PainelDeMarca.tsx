@@ -13,6 +13,10 @@ import estilos from './PainelDeMarca.module.css';
  * mesma tela nos dois estados (`cHerdado`), então o componente é um só,
  * extraído para não divergir por cópia.
  *
+ * **Dois** filhos, e não três: o painel da moldura é `justify-content:
+ * space-between`, e é isso que põe o logotipo no alto e a promessa no pé. Com
+ * título e texto soltos, o título iria para o meio.
+ *
  * O logotipo não é link aqui — no protótipo é uma `<img>` solta, sem `<a>` em
  * volta, 36px de altura fixa, alinhada ao início do painel. Nas telas de auth
  * (`MolduraDeAutenticacao`) ele é link para a home; aqui não, porque as duas
@@ -23,9 +27,11 @@ export function PainelDeMarca() {
   return (
     <>
       <Marca variante="colorida" altura="36px" className={estilos.marca} />
-      {/* `<h2>`: o `<h1>` da página é o título do passo, na moldura. */}
-      <h2 className={estilos.titulo}>{CURADOR_CADASTRO.asideTitulo}</h2>
-      <p className={estilos.texto}>{CURADOR_CADASTRO.asideTexto}</p>
+      <div className={estilos.promessa}>
+        {/* `<h2>`: o `<h1>` da página é o título do passo, na moldura. */}
+        <h2 className={estilos.titulo}>{CURADOR_CADASTRO.asideTitulo}</h2>
+        <p className={estilos.texto}>{CURADOR_CADASTRO.asideTexto}</p>
+      </div>
     </>
   );
 }

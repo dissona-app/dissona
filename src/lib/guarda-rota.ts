@@ -17,9 +17,17 @@ export const ROTA = {
   HOME: '/',
   TERMOS: '/termos',
   PRIVACIDADE: '/privacidade',
-  ENTRAR: '/entrar',
   CADASTRAR: '/cadastrar',
-  /** Login e cadastro exclusivos por perfil — copy e branding próprios (docs/prd/02 e 03). */
+  /**
+   * Login e cadastro exclusivos por perfil — copy e branding próprios
+   * (docs/prd/02 e 03).
+   *
+   * Não existe `/entrar` neutro: os três protótipos da R2 desenham **uma** tela
+   * de login por ambiente, e nenhum deles tem uma quarta, genérica. A que
+   * existia era cópia da do artista, e foi apagada em 2026-09-23 — ver
+   * `docs/prd/07-pendencias-e-divergencias.md`. Quem precisa de um destino de
+   * login sem saber o ambiente usa `ENTRAR_PADRAO`.
+   */
   ARTISTA_ENTRAR: '/artista/entrar',
   ARTISTA_CADASTRAR: '/artista/cadastrar',
   CURADOR_ENTRAR: '/curador/entrar',
@@ -93,6 +101,19 @@ export const ROTA = {
 } as const;
 
 /**
+ * O login para quem chega **sem ambiente conhecido**: a raiz do site, o retorno
+ * de erro do OAuth e o "Voltar para o login" das telas que os dois perfis
+ * compartilham (recuperação, redefinição, verificação de e-mail).
+ *
+ * É o login do artista, e não uma quarta tela neutra: o protótipo tem três
+ * telas de login, uma por ambiente, e a porta de entrada do produto é o
+ * artista — o curador chega por link direto ou convite, e o admin por
+ * `/admin/entrar`. A constante existe para que essa escolha tenha **um** lugar,
+ * em vez de `ROTA.ARTISTA_ENTRAR` espalhado por doze arquivos sem dizer por quê.
+ */
+export const ENTRAR_PADRAO: string = ROTA.ARTISTA_ENTRAR;
+
+/**
  * Motivos que a tela de login lê de `?motivo=` para escolher o banner.
  *
  * Existem porque o middleware não tem como devolver um `ResultadoDeAcao`: ele
@@ -132,7 +153,6 @@ const API_SEM_SESSAO: readonly string[] = [
  * exige sessão e papel de artista.
  */
 const AUTH_SEM_SESSAO: readonly string[] = [
-  ROTA.ENTRAR,
   ROTA.CADASTRAR,
   ROTA.RECUPERAR_SENHA,
   ROTA.ARTISTA_ENTRAR,
@@ -253,6 +273,30 @@ export function inicioDoUsuario(leitura: LeituraDePapeis): string {
   return ambienteDoUsuario(leitura);
 }
 
+/**
+ * As duas telas de login de usuário — não há uma terceira, neutra.
+ *
+ * Usadas pelo desvio de conta bloqueada: quem já está no login **fica** nele,
+ * para ver o banner em vez de entrar em laço de redirecionamento.
+ */
+function ehLoginDeUsuario(caminho: string): boolean {
+  return caminho === ROTA.ARTISTA_ENTRAR || caminho === ROTA.CURADOR_ENTRAR;
+}
+
+/**
+ * O login do ambiente de um caminho qualquer.
+ *
+ * Quem é bloqueado enquanto navega volta ao login **do ambiente em que
+ * estava** — o curador ao dele, o artista ao dele —, e não a uma tela genérica
+ * que não existe mais. Sem contexto (uma tela neutra, a raiz), cai no
+ * `ENTRAR_PADRAO`.
+ */
+function loginDoCaminho(caminho: string): string {
+  if (ehOuEstaSob(caminho, ROTA.CURADOR)) return ROTA.CURADOR_ENTRAR;
+  if (ehOuEstaSob(caminho, ROTA.ARTISTA)) return ROTA.ARTISTA_ENTRAR;
+  return ENTRAR_PADRAO;
+}
+
 function exigirSessao(contexto: ContextoDeAcesso, destinoDeLogin: string): Decisao | null {
   if (temSessao(contexto.leitura)) return null;
   const proximo = encodeURIComponent(contexto.caminho);
@@ -265,8 +309,13 @@ function exigirSessao(contexto: ContextoDeAcesso, destinoDeLogin: string): Decis
  * Conta sem papel nenhum vai para a seleção de perfil (1.4), e não para o
  * login: ela **está** autenticada, só não escolheu o ambiente ainda.
  */
-function exigirPapel(leitura: LeituraDePapeis, papel: Papel, destinoAlternativo: string): Decisao {
-  if (leitura.estado === 'sem_sessao') return para(ROTA.ENTRAR);
+function exigirPapel(
+  leitura: LeituraDePapeis,
+  papel: Papel,
+  destinoAlternativo: string,
+  destinoDeLogin: string = ENTRAR_PADRAO,
+): Decisao {
+  if (leitura.estado === 'sem_sessao') return para(destinoDeLogin);
   if (leitura.papeis.length === 0) return para(ROTA.SELECAO_DE_PERFIL);
   return leitura.papeis.includes(papel) ? seguir : para(destinoAlternativo);
 }
@@ -308,8 +357,8 @@ export function decidirAcesso(contexto: ContextoDeAcesso): Decisao {
   // `desativada` não cai aqui: a exclusão é reversível por 30 dias "entrando de
   // novo", e é o próprio login que reverte.
   if (leitura.estado === 'ok' && !contaAtiva(leitura)) {
-    if (caminho === ROTA.ENTRAR || caminho === ROTA.ADMIN_ENTRAR) return seguir;
-    return para(`${ROTA.ENTRAR}?motivo=${MOTIVO_LOGIN.BLOQUEADA}`);
+    if (ehLoginDeUsuario(caminho) || caminho === ROTA.ADMIN_ENTRAR) return seguir;
+    return para(`${loginDoCaminho(caminho)}?motivo=${MOTIVO_LOGIN.BLOQUEADA}`);
   }
 
   // --- (admin), rotas de login próprio -------------------------------------
@@ -347,7 +396,7 @@ export function decidirAcesso(contexto: ContextoDeAcesso): Decisao {
   // depois do callback do OAuth, para colher o aceite de termos que o provedor
   // não colhe.
   if (caminho === ROTA.CADASTRAR_CONFIRMAR) {
-    return exigirSessao(contexto, ROTA.ENTRAR) ?? seguir;
+    return exigirSessao(contexto, ENTRAR_PADRAO) ?? seguir;
   }
 
   // --- aceite de termos pendente -------------------------------------------
@@ -390,7 +439,7 @@ export function decidirAcesso(contexto: ContextoDeAcesso): Decisao {
   }
 
   if (caminho === ROTA.SELECAO_DE_PERFIL) {
-    const semSessao = exigirSessao(contexto, ROTA.ENTRAR);
+    const semSessao = exigirSessao(contexto, ENTRAR_PADRAO);
     if (semSessao !== null) return semSessao;
     // Quem já tem papel não precisa escolher de novo.
     if (leitura.estado === 'ok' && leitura.papeis.length > 0) {
@@ -404,7 +453,7 @@ export function decidirAcesso(contexto: ContextoDeAcesso): Decisao {
   // Sem redirecionamento de saída, de propósito: "Rever onboarding" no menu de
   // ajuda reabre o tour depois de ele já ter sido visto (RF-007).
   if (caminho === ROTA.ONBOARDING) {
-    const semSessao = exigirSessao(contexto, ROTA.ENTRAR);
+    const semSessao = exigirSessao(contexto, ENTRAR_PADRAO);
     if (semSessao !== null) return semSessao;
     if (leitura.estado === 'ok' && leitura.papeis.length === 0) {
       return para(ROTA.SELECAO_DE_PERFIL);
@@ -414,17 +463,22 @@ export function decidirAcesso(contexto: ContextoDeAcesso): Decisao {
 
   // --- (app)/artista -------------------------------------------------------
   if (ehOuEstaSob(caminho, ROTA.ARTISTA)) {
-    const semSessao = exigirSessao(contexto, ROTA.ENTRAR);
+    const semSessao = exigirSessao(contexto, ROTA.ARTISTA_ENTRAR);
     if (semSessao !== null) return semSessao;
-    return exigirPapel(leitura, Papel.ARTISTA, inicioDoUsuario(leitura));
+    return exigirPapel(leitura, Papel.ARTISTA, inicioDoUsuario(leitura), ROTA.ARTISTA_ENTRAR);
   }
 
   // --- (app)/curador -------------------------------------------------------
   if (ehOuEstaSob(caminho, ROTA.CURADOR)) {
-    const semSessao = exigirSessao(contexto, ROTA.ENTRAR);
+    const semSessao = exigirSessao(contexto, ROTA.CURADOR_ENTRAR);
     if (semSessao !== null) return semSessao;
 
-    const decisaoPapel = exigirPapel(leitura, Papel.CURADOR, inicioDoUsuario(leitura));
+    const decisaoPapel = exigirPapel(
+      leitura,
+      Papel.CURADOR,
+      inicioDoUsuario(leitura),
+      ROTA.CURADOR_ENTRAR,
+    );
     if (decisaoPapel.tipo === 'redirecionar') return decisaoPapel;
 
     // Duas famílias de rota ficam de fora dos dois desvios abaixo.

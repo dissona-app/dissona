@@ -34,7 +34,7 @@ export default async function Pagina({
     lerIdentidadeDaSessao(),
   ]);
 
-  if (contexto.estado !== 'ok' || identidade === null) redirect(ROTA.ENTRAR);
+  if (contexto.estado !== 'ok' || identidade === null) redirect(ROTA.CURADOR_ENTRAR);
 
   // Cada leitura só na aba que a usa — a mesma decisão já aplicada às sessões.
   const sessoes = aba === 'seguranca' ? await lerSessoesDaConta() : [];

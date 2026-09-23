@@ -50,7 +50,7 @@ test.describe('D1 · Entrar', () => {
     await entrarComo(page, PERSONA.ARTISTA);
     await expect(page).toHaveURL(/\/artista/);
 
-    await page.goto('/entrar');
+    await page.goto('/artista/entrar');
     // A guarda expulsa quem já tem sessão: não há como "entrar de novo" sem
     // sair antes, e é isso que se afirma.
     await expect(page).not.toHaveURL(/\/entrar$/);
@@ -62,7 +62,7 @@ test.describe('D1 · Entrar', () => {
   });
 
   test('credencial inválida não diz qual campo falhou', { tag: ['@RF-001'] }, async ({ page }) => {
-    await page.goto('/entrar');
+    await page.goto('/artista/entrar');
     await page.getByLabel(ENTRAR.rotuloEmail, { exact: true }).fill(PERSONA.ARTISTA.email);
     await page.getByLabel(ENTRAR.rotuloSenha, { exact: true }).fill('senha-errada-de-proposito');
     await page.getByRole('button', { name: ENTRAR.enviar, exact: true }).click();
@@ -95,7 +95,7 @@ test.describe('D1 · Entrar', () => {
     'campo vazio é barrado sem virar tentativa de login',
     { tag: ['@RF-001'] },
     async ({ page }) => {
-      await page.goto('/entrar');
+      await page.goto('/artista/entrar');
       await page.getByRole('button', { name: ENTRAR.enviar, exact: true }).click();
 
       await expect(page.getByText(ENTRAR.erroEmailVazio)).toBeVisible();
@@ -121,7 +121,7 @@ test.describe('D1 · Entrar', () => {
     'conta bloqueada vê o banner próprio, e não o de credencial',
     { tag: ['@RF-001'] },
     async ({ page }) => {
-      await page.goto('/entrar');
+      await page.goto('/artista/entrar');
       await page.getByLabel(ENTRAR.rotuloEmail, { exact: true }).fill(PERSONA.BLOQUEADA.email);
       await page.getByLabel(ENTRAR.rotuloSenha, { exact: true }).fill(senhaDeTeste());
       await page.getByRole('button', { name: ENTRAR.enviar, exact: true }).click();
@@ -198,7 +198,7 @@ test.describe('D1 · Entrar', () => {
 
     // O que o requisito promete não é a navegação — é a memória dela. Entrar de
     // novo tem de cair no ambiente que ficou.
-    await page.goto('/entrar');
+    await page.goto('/artista/entrar');
     await expect(page).toHaveURL(/\/artista/);
   });
 

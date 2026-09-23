@@ -178,7 +178,8 @@ O sitemap do [PRD §6.1](PRD.md) nomeia telas, não caminhos. Os slugs abaixo fo
 |---|---|---|
 | `(publico)` | `/` | 26 (R5) |
 | `(publico)` | `/termos` · `/privacidade` | R0 |
-| `(auth)` | `/entrar` · `/cadastrar` | 1 · 1.1 |
+| `(auth)` | `/artista/entrar` · `/curador/entrar` | 1 (uma tela por ambiente — não há `/entrar` neutro) |
+| `(auth)` | `/cadastrar` · `/artista/cadastrar` · `/curador/cadastrar` | 1.1 (o do curador é o passo 1 do módulo 12) |
 | `(auth)` | `/recuperar-senha` · `/redefinir-senha` · `/verificar-email` | 1.2 · 1.3 |
 | `(auth)` | `/selecao-de-perfil` | 1.4 |
 | `(app)` | `/artista` e subrotas | 2–10 |

@@ -76,6 +76,7 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
         nome={estado.nome}
         aoMudarEnvio={setSubindoFoto}
         tamanhoDoBotao="sm"
+        semDica
         caminhoAtual={estado.fotoCaminho}
         textos={{
           botao: CURADOR_CADASTRO.adicionarFoto,

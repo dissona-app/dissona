@@ -7,7 +7,6 @@ import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
 import { Campo } from '@/componentes/base/Campo';
 import { CampoDeFoto } from '@/componentes/base/CampoDeFoto';
-import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
 import { IconeOlho } from '@/componentes/autenticacao/IconeOlho';
 import type { Banner } from '@/componentes/autenticacao/FormularioDeLogin';
 import type { ResultadoDeAcao } from '@/lib/acoes';
@@ -53,7 +52,6 @@ export function FormularioDeContaDoCurador({
   );
 
   const [nome, setNome] = useState('');
-  const [senha, setSenha] = useState('');
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   // Enviar com a foto ainda subindo mandaria `foto_caminho` vazio — mesma
   // trava do passo 1 do wizard (`Passo1Dados`).
@@ -117,6 +115,7 @@ export function FormularioDeContaDoCurador({
         nome={nome}
         aoMudarEnvio={setSubindoFoto}
         tamanhoDoBotao="sm"
+        semDica
         textos={{
           botao: CURADOR_CADASTRO.adicionarFoto,
           hint: CURADOR_CADASTRO.fotoHint,
@@ -134,6 +133,7 @@ export function FormularioDeContaDoCurador({
         placeholder={CURADOR_CADASTRO.placeholderNome}
         autoComplete="name"
         required
+        semMarcador
         value={nome}
         onChange={(evento) => setNome(evento.target.value)}
         erro={erroDeCampo('nome')}
@@ -146,43 +146,39 @@ export function FormularioDeContaDoCurador({
         placeholder={CADASTRAR.placeholderEmail}
         autoComplete="email"
         required
+        semMarcador
         erro={erroDeCampo('email')}
       />
 
-      <div className={estilos.blocoSenha}>
-        <Campo
-          name="senha"
-          type={senhaVisivel ? 'text' : 'password'}
-          rotulo={CADASTRAR.rotuloSenha}
-          placeholder={CADASTRAR.placeholderSenha}
-          autoComplete="new-password"
-          required
-          value={senha}
-          onChange={(evento) => setSenha(evento.target.value)}
-          erro={erroDeCampo('senha')}
-          acao={
-            <button
-              type="button"
-              className={estilos.olho}
-              onClick={() => setSenhaVisivel((visivel) => !visivel)}
-              aria-pressed={senhaVisivel}
-              aria-label={senhaVisivel ? CADASTRAR.ocultarSenha : CADASTRAR.mostrarSenha}
-              title={senhaVisivel ? CADASTRAR.ocultarSenha : CADASTRAR.mostrarSenha}
-            >
-              <IconeOlho riscado={senhaVisivel} />
-            </button>
-          }
-        />
-
-        <MedidorDeSenha
-          senha={senha}
-          rotulos={CADASTRAR.forcaDaSenha}
-          requisitos={{
-            tamanho: CADASTRAR.requisitoTamanho,
-            numero: CADASTRAR.requisitoNumero,
-          }}
-        />
-      </div>
+      {/*
+        Sem o medidor de força: o protótipo não o tem neste passo — é o que
+        separa esta tela do cadastro do artista, que tem. A política continua
+        valendo: `esquemaCadastroCurador` recusa senha curta ou sem número, e a
+        recusa aparece no próprio campo. O placeholder "8+ caracteres, com
+        número" é quem avisa antes.
+      */}
+      <Campo
+        name="senha"
+        type={senhaVisivel ? 'text' : 'password'}
+        rotulo={CADASTRAR.rotuloSenha}
+        placeholder={CADASTRAR.placeholderSenha}
+        autoComplete="new-password"
+        required
+        semMarcador
+        erro={erroDeCampo('senha')}
+        acao={
+          <button
+            type="button"
+            className={estilos.olho}
+            onClick={() => setSenhaVisivel((visivel) => !visivel)}
+            aria-pressed={senhaVisivel}
+            aria-label={senhaVisivel ? CADASTRAR.ocultarSenha : CADASTRAR.mostrarSenha}
+            title={senhaVisivel ? CADASTRAR.ocultarSenha : CADASTRAR.mostrarSenha}
+          >
+            <IconeOlho riscado={senhaVisivel} />
+          </button>
+        }
+      />
 
       <div className={estilos.rodape}>
         <Link className={estilos.voltar} href={ROTA.CURADOR_ENTRAR}>

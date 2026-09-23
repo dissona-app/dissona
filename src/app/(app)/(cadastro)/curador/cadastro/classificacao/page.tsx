@@ -32,7 +32,7 @@ export const metadata: Metadata = {
  */
 export default async function Pagina() {
   const estado = await lerCadastroDoCurador();
-  if (estado === null) redirect(ROTA.ENTRAR);
+  if (estado === null) redirect(ROTA.CURADOR_ENTRAR);
 
   // Chegou aqui sem ter enviado: o lugar dele é o wizard.
   if (!estado.concluido) redirect(ROTA.CURADOR_CADASTRO);

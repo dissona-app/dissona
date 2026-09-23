@@ -16,7 +16,7 @@ import { falha, falhaDeCampos, sucesso } from '@/lib/acoes';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { conferirArquivo, FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
 import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { origemDaRequisicao } from '@/lib/origem';
 import { Papel } from '@/lib/papeis';
 /*
@@ -431,7 +431,7 @@ export async function entrarComProvedor(dadosDoFormulario: FormData): Promise<ne
   // `<form action>` puro, sem `useActionState`, e um valor de retorno ali seria
   // descartado em silêncio. Provedor inválido só chega por formulário forjado,
   // e o login com o banner de falha social é a resposta honesta.
-  if (!analise.success) redirect(`${ROTA.ENTRAR}?motivo=social`);
+  if (!analise.success) redirect(`${ENTRAR_PADRAO}?motivo=social`);
 
   const { provedor, proximo } = analise.data;
   const origem = await origemDaRequisicao();

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { FormularioDeRecuperacao } from '@/componentes/autenticacao/FormularioDeRecuperacao';
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { recuperarSenha } from '@/modulos/autenticacao/acoes';
 import { SEGUNDOS_DE_COOLDOWN_DE_ENVIO } from '@/modulos/autenticacao/servico';
 
@@ -22,7 +22,7 @@ export default function Pagina() {
     >
       <FormularioDeRecuperacao
         acao={recuperarSenha}
-        hrefDoLogin={ROTA.ENTRAR}
+        hrefDoLogin={ENTRAR_PADRAO}
         segundosDeCooldown={SEGUNDOS_DE_COOLDOWN_DE_ENVIO}
       />
     </MolduraDeAutenticacao>

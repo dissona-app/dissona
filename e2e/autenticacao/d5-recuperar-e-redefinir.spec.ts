@@ -141,7 +141,7 @@ test.describe('D5 · Recuperação e redefinição', { tag: ['@RF-005'] }, () =>
     await expect(page).toHaveURL(/\/artista/);
 
     await page.context().clearCookies();
-    await page.goto('/entrar');
+    await page.goto('/artista/entrar');
     await page.getByLabel(ENTRAR.rotuloEmail, { exact: true }).fill(criada.email);
     await page.getByLabel(ENTRAR.rotuloSenha, { exact: true }).fill(senhaDeTeste());
     await page.getByRole('button', { name: ENTRAR.enviar, exact: true }).click();

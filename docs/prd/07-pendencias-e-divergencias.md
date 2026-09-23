@@ -6,6 +6,36 @@ Tudo o que **não foi decidido** neste PRD, porque a decisão não é do time de
 
 ---
 
+## `/entrar` não existe — rota apagada · 2026-09-23
+
+O protótipo desenha **três** telas de login, uma por ambiente, e nenhuma quarta
+genérica. A aplicação tinha uma: `/entrar`, cópia da do artista
+(`ENTRAR_ARTISTA` sempre foi um alias de `ENTRAR`). Era tela de fallback, e foi
+apagada por decisão do cliente.
+
+Ela não era só uma tela: era o **destino de login de todo o produto** — a
+guarda mandava para lá quem não tinha sessão em qualquer rota não-admin, a raiz
+redirecionava para lá, o "Voltar para o login" das telas de recuperação
+apontava para lá e o erro do OAuth também. A remoção rearranjou isso assim:
+
+- **Cada ambiente devolve ao seu próprio login.** `/artista/*` → `/artista/entrar`,
+  `/curador/*` → `/curador/entrar`, `/admin/*` → `/admin/entrar` (já era). Vale
+  também para a ejeção de conta bloqueada, que antes jogava todo mundo na mesma
+  tela: agora o curador lê o banner na tela dele, com a copy dele.
+- **Quem chega sem ambiente usa `ENTRAR_PADRAO`**, uma constante em
+  `lib/guarda-rota.ts` apontada para `/artista/entrar`: a raiz do site, o
+  retorno de erro do OAuth e o "Voltar para o login" das telas que os dois
+  perfis compartilham (recuperação, redefinição, verificação, seleção de
+  perfil, onboarding, confirmação social). Não é uma tela neutra disfarçada — é
+  a escolha de **qual das três** atende quem chegou sem contexto, num lugar só.
+
+A constante `ROTA.ENTRAR` foi removida em vez de reapontada, de propósito: sem
+ela o `typecheck` enumera os dezenove pontos que dependiam da rota, um a um, e
+cada um foi decidido com o ambiente à vista. Reapontar teria repassado a
+decisão em silêncio.
+
+---
+
 ## Precedência confirmada pelo cliente · 2026-09-22
 
 O protótipo manda em **tudo que é visual e em tudo que é navegação de
@@ -135,6 +165,50 @@ que não está em protótipo nenhum. Os três usam lilás claro com o texto em
 prop `tamanho`. Passou despercebido porque as iniciais nunca pareavam nos
 cenários de paridade existentes: os dois lados mostram nomes diferentes, e
 `digitaisDeTexto` só compara texto idêntico.
+
+### A moldura do passo 1 era um card, e o protótipo é uma tela dividida
+
+Terceira rodada, a partir de uma captura de produção. Com a copy e os campos já
+certos, **a moldura** continuava derivada: o painel de marca era um card
+empilhado acima do formulário (`grid-template-columns: repeat(auto-fit, …)`,
+`max-width: 920px`), as ondas cobriam a página inteira e o rodapé ficava logo
+abaixo dos campos. No protótipo (`ramo cStep1`) é outra coisa:
+
+| | Protótipo | Estava |
+|---|---|---|
+| Composição | `grid-template-columns: 46% minmax(0,1fr)`, `min-height:100vh` | card de 920px centralizado |
+| Painel | coluna inteira, lilás com as ondas **dentro dela**, borda à direita | card com `border-radius` |
+| Fundo da direita | branco | gradiente da página, com ondas |
+| Contador | canto superior direito, em `<header>` próprio | acima do título |
+| Rodapé | preso ao pé da coluna | logo depois do último campo |
+| Barra de progresso | absoluta no topo, trilho `#EFEBF7`, roxo **sólido** | gradiente roxo→laranja da marca |
+| Rótulos | sem asterisco de obrigatório | `NOME COMPLETO *` |
+| Senha | sem medidor de força | medidor + requisitos |
+| Foto | sem dica; o retorno é o avatar virar a imagem | dica "JPG ou PNG, até 2 MB." |
+
+O rodapé preso ao pé exigiu uma decisão: no protótipo ele é irmão do `<main>`,
+e aqui os botões dele precisam estar dentro do `<form>` do passo. O `<form>`
+virou `display: contents` na moldura dividida — a caixa dele some e os filhos
+viram itens da coluna —, e dois `margin-top: auto` (no título e no rodapé)
+dividem o espaço livre: o bloco fica centrado e o rodapé encosta embaixo.
+
+Três coisas que **vieram do protótipo** e não eram derivação nossa: o
+breakpoint de 980px (`cSplitCols`/`cSplitDisplay`, o único `@media` desta
+moldura — a pendência #24 proíbe breakpoint inventado, não o que está
+desenhado), os keyframes `dsnDriftA`/`dsnDriftB` que faltavam no `global.css`,
+e o `height: 405px` do bloco da promessa, que é o que o põe na metade de baixo
+do painel em vez de encostado no pé.
+
+**Fica diferente de propósito:** o "Continuar" é `#C4442A`, e o protótipo usa
+`#E35336`. Branco sobre `#E35336` dá 3,8:1 e reprova a AA para texto de 15px —
+é a correção de contraste do commit `525430d`, e desfazê-la para ganhar
+fidelidade quebraria o Definition of Done.
+
+**Continua divergindo, fora desta rodada:** os passos 2 a 8 do wizard. O
+protótipo os desenha com `<header>` próprio (logo à esquerda, contador à
+direita), `<main>` centrado e rodapé ao pé — a mesma estrutura do passo 1 —, e
+a aplicação ainda os monta como uma coluna única com o contador acima do
+título. Nenhum cenário de paridade cobre a geometria deles.
 
 ---
 

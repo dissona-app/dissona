@@ -442,7 +442,7 @@ export async function voltarPasso(dados: FormData): Promise<never> {
   const atual = Number(passo);
   // O "Voltar" do passo 1 sai do wizard, como no protótipo ("Voltar ao login").
   // Aqui ele volta ao login de verdade, porque é de lá que a pessoa veio.
-  if (atual <= 1) redirect(ROTA.ENTRAR);
+  if (atual <= 1) redirect(ROTA.CURADOR_ENTRAR);
 
   redirect(`${ROTA.CURADOR_CADASTRO}/${atual - 1}`);
 }

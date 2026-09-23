@@ -8,7 +8,7 @@ import { Botao } from '@/componentes/base/Botao';
 import { BotaoLink } from '@/componentes/base/BotaoLink';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { VERIFICAR_EMAIL } from '@/textos/prototipo';
 
 import estilos from './AcoesDeVerificacao.module.css';
@@ -82,7 +82,7 @@ export function AcoesDeVerificacao({
       ) : null}
 
       <div className={estilos.acoes}>
-        <BotaoLink href={ROTA.ENTRAR} blocoInteiro>
+        <BotaoLink href={ENTRAR_PADRAO} blocoInteiro>
           {VERIFICAR_EMAIL.continuar}
         </BotaoLink>
 

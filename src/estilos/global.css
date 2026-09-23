@@ -131,6 +131,32 @@ a:hover {
 }
 
 /*
+ * Flutuação vertical de cada camada de ondas — os três protótipos declaram as
+ * três, e cada camada anda num ritmo (26s, 34s, 41s) para o conjunto não
+ * pulsar em uníssono. Literais do protótipo; a guarda de reduced-motion abaixo
+ * vale para elas também.
+ */
+@keyframes dsnDriftA {
+  0%,
+  100% {
+    transform: translateY(-12px);
+  }
+  50% {
+    transform: translateY(16px);
+  }
+}
+
+@keyframes dsnDriftB {
+  0%,
+  100% {
+    transform: translateY(14px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+/*
  * Guarda de reduced-motion.
  *
  * Nenhum dos três protótipos da R2 declara `prefers-reduced-motion`, e vários

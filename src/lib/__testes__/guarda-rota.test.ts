@@ -92,7 +92,7 @@ describe('código de OAuth que caiu na home', () => {
   it('só vale para a raiz — nas demais rotas a guarda de papel continua mandando', () => {
     expect(decidirComCodigo(ROTA.ARTISTA, semSessao, 'abc')).toEqual({
       tipo: 'redirecionar',
-      para: `${ROTA.ENTRAR}?proximo=${encodeURIComponent(ROTA.ARTISTA)}`,
+      para: `${ROTA.ARTISTA_ENTRAR}?proximo=${encodeURIComponent(ROTA.ARTISTA)}`,
     });
     expect(decidirComCodigo(ROTA.API_AUTH_CALLBACK, semSessao, 'abc')).toEqual({
       tipo: 'seguir',
@@ -103,7 +103,6 @@ describe('código de OAuth que caiu na home', () => {
 describe('(auth)', () => {
   it('deixa entrar quem não tem sessão', () => {
     for (const caminho of [
-      ROTA.ENTRAR,
       ROTA.CADASTRAR,
       ROTA.RECUPERAR_SENHA,
       ROTA.REDEFINIR_SENHA,
@@ -135,15 +134,15 @@ describe('(auth)', () => {
   });
 
   it('redireciona quem já está autenticado para o seu início', () => {
-    expect(decidir(ROTA.ENTRAR, comPapeis(Papel.ARTISTA))).toEqual({
+    expect(decidir(ROTA.ARTISTA_ENTRAR, comPapeis(Papel.ARTISTA))).toEqual({
       tipo: 'redirecionar',
       para: ROTA.ARTISTA,
     });
-    expect(decidir(ROTA.ENTRAR, comPapeis(Papel.CURADOR))).toEqual({
+    expect(decidir(ROTA.CURADOR_ENTRAR, comPapeis(Papel.CURADOR))).toEqual({
       tipo: 'redirecionar',
       para: ROTA.CURADOR,
     });
-    expect(decidir(ROTA.ENTRAR, semPapel)).toEqual({
+    expect(decidir(ROTA.ARTISTA_ENTRAR, semPapel)).toEqual({
       tipo: 'redirecionar',
       para: ROTA.SELECAO_DE_PERFIL,
     });
@@ -186,7 +185,7 @@ describe('(auth)', () => {
     // termos que o provedor não colhe.
     expect(decidir(ROTA.CADASTRAR_CONFIRMAR, semSessao)).toEqual({
       tipo: 'redirecionar',
-      para: '/entrar?proximo=%2Fcadastrar%2Fconfirmar',
+      para: '/artista/entrar?proximo=%2Fcadastrar%2Fconfirmar',
     });
     expect(decidir(ROTA.CADASTRAR_CONFIRMAR, semPapel)).toEqual({ tipo: 'seguir' });
   });
@@ -198,7 +197,7 @@ describe('aceite de termos pendente', () => {
   const semAceite = com([Papel.ARTISTA], { aceiteTermos: false });
 
   it('devolve qualquer navegação para a tela de confirmação', () => {
-    for (const caminho of ['/artista/carteira', ROTA.CURADOR, ROTA.ONBOARDING, ROTA.ENTRAR]) {
+    for (const caminho of ['/artista/carteira', ROTA.CURADOR, ROTA.ONBOARDING]) {
       expect(decidir(caminho, semAceite)).toEqual({
         tipo: 'redirecionar',
         para: ROTA.CADASTRAR_CONFIRMAR,
@@ -225,7 +224,7 @@ describe('aceite de termos pendente', () => {
     });
     expect(decidir(ROTA.ARTISTA, bloqueadaSemAceite)).toEqual({
       tipo: 'redirecionar',
-      para: `${ROTA.ENTRAR}?motivo=${MOTIVO_LOGIN.BLOQUEADA}`,
+      para: `${ROTA.ARTISTA_ENTRAR}?motivo=${MOTIVO_LOGIN.BLOQUEADA}`,
     });
   });
 });
@@ -233,28 +232,39 @@ describe('aceite de termos pendente', () => {
 describe('conta bloqueada', () => {
   const bloqueada = com([Papel.ARTISTA], { situacao: SituacaoConta.BLOQUEADA });
   const excluida = com([Papel.ARTISTA], { situacao: SituacaoConta.EXCLUIDA });
-  const destinoDoBanner = `${ROTA.ENTRAR}?motivo=${MOTIVO_LOGIN.BLOQUEADA}`;
+  const bannerEm = (login: string) => `${login}?motivo=${MOTIVO_LOGIN.BLOQUEADA}`;
 
-  it('é ejetada de qualquer ambiente, com o motivo na URL', () => {
+  it('é ejetada para o login do ambiente em que estava, com o motivo na URL', () => {
     // O caso real: o admin bloqueia (20.2 / 23.2) alguém que já está
     // navegando. A ação de login não alcança isso — a sessão já existe.
-    for (const caminho of ['/artista/carteira', ROTA.CURADOR, '/admin/pacotes', ROTA.ONBOARDING]) {
+    //
+    // Cada ambiente devolve ao seu próprio login desde que `/entrar` foi
+    // apagada: não há mais uma tela neutra para onde mandar todo mundo, e
+    // mandar o curador ao login do artista mostraria a copy errada.
+    const casos: readonly (readonly [string, string])[] = [
+      ['/artista/carteira', ROTA.ARTISTA_ENTRAR],
+      [ROTA.CURADOR, ROTA.CURADOR_ENTRAR],
+      ['/admin/pacotes', ROTA.ARTISTA_ENTRAR],
+      [ROTA.ONBOARDING, ROTA.ARTISTA_ENTRAR],
+    ];
+    for (const [caminho, login] of casos) {
       expect(decidir(caminho, bloqueada)).toEqual({
         tipo: 'redirecionar',
-        para: destinoDoBanner,
+        para: bannerEm(login),
       });
     }
   });
 
-  it('alcança as duas telas de login, senão não há como ler o banner', () => {
-    expect(decidir(ROTA.ENTRAR, bloqueada)).toEqual({ tipo: 'seguir' });
+  it('alcança as três telas de login, senão não há como ler o banner', () => {
+    expect(decidir(ROTA.ARTISTA_ENTRAR, bloqueada)).toEqual({ tipo: 'seguir' });
+    expect(decidir(ROTA.CURADOR_ENTRAR, bloqueada)).toEqual({ tipo: 'seguir' });
     expect(decidir(ROTA.ADMIN_ENTRAR, bloqueada)).toEqual({ tipo: 'seguir' });
   });
 
   it('a conta excluída pelo job é tratada igual', () => {
     expect(decidir(ROTA.ARTISTA, excluida)).toEqual({
       tipo: 'redirecionar',
-      para: destinoDoBanner,
+      para: bannerEm(ROTA.ARTISTA_ENTRAR),
     });
   });
 
@@ -270,7 +280,7 @@ describe('seleção de perfil', () => {
   it('exige sessão e preserva o destino', () => {
     expect(decidir(ROTA.SELECAO_DE_PERFIL, semSessao)).toEqual({
       tipo: 'redirecionar',
-      para: '/entrar?proximo=%2Fselecao-de-perfil',
+      para: '/artista/entrar?proximo=%2Fselecao-de-perfil',
     });
   });
 
@@ -290,7 +300,7 @@ describe('onboarding', () => {
   it('exige sessão', () => {
     expect(decidir(ROTA.ONBOARDING, semSessao)).toEqual({
       tipo: 'redirecionar',
-      para: '/entrar?proximo=%2Fonboarding',
+      para: '/artista/entrar?proximo=%2Fonboarding',
     });
   });
 
@@ -308,7 +318,7 @@ describe('onboarding', () => {
   it('é o destino do 1º acesso do artista', () => {
     const primeiroAcesso = com([Papel.ARTISTA], { onboardingVisto: false });
     expect(inicioDoUsuario(primeiroAcesso)).toBe(ROTA.ONBOARDING);
-    expect(decidir(ROTA.ENTRAR, primeiroAcesso)).toEqual({
+    expect(decidir(ROTA.ARTISTA_ENTRAR, primeiroAcesso)).toEqual({
       tipo: 'redirecionar',
       para: ROTA.ONBOARDING,
     });
@@ -358,7 +368,7 @@ describe('(app)/artista', () => {
   it('sem sessão manda para o login com o destino preservado', () => {
     expect(decidir('/artista/carteira', semSessao)).toEqual({
       tipo: 'redirecionar',
-      para: '/entrar?proximo=%2Fartista%2Fcarteira',
+      para: '/artista/entrar?proximo=%2Fartista%2Fcarteira',
     });
   });
 

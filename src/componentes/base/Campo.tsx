@@ -19,6 +19,13 @@ export type PropsCampo = Omit<InputHTMLAttributes<HTMLInputElement>, 'className'
    * seria alcançado pelo clique que deveria focar o campo.
    */
   readonly acessorioDoRotulo?: ReactNode;
+  /**
+   * Tira o asterisco visual de campo obrigatório, e só ele: `required` e
+   * `aria-required` continuam no input. Para telas cujo protótipo não marca
+   * obrigatoriedade — o passo 1 do curador, onde os três campos são
+   * obrigatórios e nenhum leva asterisco.
+   */
+  readonly semMarcador?: boolean;
 };
 
 /**
@@ -34,6 +41,7 @@ export function Campo({
   acao,
   acessorioDoRotulo,
   required = false,
+  semMarcador = false,
   ...resto
 }: PropsCampo) {
   const id = useId();
@@ -58,7 +66,7 @@ export function Campo({
 
   const marcacaoDoRotulo = (
     <label
-      className={[estilos.rotulo, required ? estilos.rotuloObrigatorio : undefined]
+      className={[estilos.rotulo, required && !semMarcador ? estilos.rotuloObrigatorio : undefined]
         .filter(Boolean)
         .join(' ')}
       htmlFor={id}

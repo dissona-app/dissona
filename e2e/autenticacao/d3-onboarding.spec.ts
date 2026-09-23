@@ -90,7 +90,7 @@ test.describe('D3 · Onboarding', { tag: ['@RF-007'] }, () => {
 
     // A segunda entrada é a prova: pular tem de gravar tanto quanto finalizar,
     // senão o tour vira uma parede que reaparece a cada login.
-    await page.goto('/entrar');
+    await page.goto('/artista/entrar');
     await expect(page).toHaveURL(/\/artista/);
     await expect(page).not.toHaveURL(/\/onboarding/);
   });
@@ -107,7 +107,7 @@ test.describe('D3 · Onboarding', { tag: ['@RF-007'] }, () => {
     await page.getByRole('button', { name: ONBOARDING.finalizar }).click();
     await page.waitForURL(/\/artista/);
 
-    await page.goto('/entrar');
+    await page.goto('/artista/entrar');
     await expect(page).toHaveURL(/\/artista/);
     await expect(page).not.toHaveURL(/\/onboarding/);
   });
