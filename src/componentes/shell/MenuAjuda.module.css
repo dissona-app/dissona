@@ -63,10 +63,13 @@
   color: var(--dsn-ink);
 }
 
+/* Literal do dropdown do protótipo: `height:1px;background:#E7E3EF;margin:4px 0`.
+   Era `--dsn-border-faint` com 6px — a classe existia e nunca foi renderizada,
+   então nada dependia dos valores antigos. */
 .separador {
   height: 1px;
-  margin: var(--dsn-space-3) 0;
-  background: var(--dsn-border-faint);
+  margin: var(--dsn-space-2) 0;
+  background: var(--dsn-border);
 }
 
 /* Disparador sem caixa fixa — o do menu da conta, que carrega iniciais e nome

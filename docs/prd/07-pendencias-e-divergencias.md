@@ -6,6 +6,83 @@ Tudo o que **não foi decidido** neste PRD, porque a decisão não é do time de
 
 ---
 
+## Painel — auditoria do shell contra os protótipos · 2026-09-23
+
+Investigação pedida pelo cliente, partindo da premissa de que **o painel não
+bifurca: é um só, com permissões e menus por tipo de usuário**. A premissa se
+confirma dos dois lados — os três protótipos usam a mesma moldura (grade
+`260px 1fr`, sidebar `linear-gradient(180deg,#2D1747,#241239 52%,#1B0D2A)`,
+header `rgba(255,255,255,0.9)` com `blur(10px)`), e o `Shell` da aplicação já é
+um componente único parametrizado por `papelAtivo`. Não havia bifurcação a
+desfazer; havia **cinco divergências de conteúdo dentro da moldura**.
+
+### Corrigidas
+
+- **Busca no header.** Os três protótipos desenham um botão de 38×38 com lupa à
+  esquerda da pílula da conta; a aplicação não tinha nenhum. Entrou
+  `disabled`, com o motivo no `title` — no protótipo ele não tem `on-click` nem
+  rótulo acessível, é decoração, e entregá-lo funcional exigiria um módulo de
+  busca que a R2 não tem. Mesmo tratamento que a navegação já dá a item de
+  release futura.
+- **Menu da conta, item a item.** Passou a ser exatamente o do protótipo:
+  artista `Ver como curador` · — · `Configurações` · `Rever onboarding` · — ·
+  `Sair`; curador o mesmo sem o "Rever onboarding" e com `Ver como artista`;
+  admin `Conta e equipe` · — · `Sair`. Três consequências:
+  - a **troca de ambiente saiu do header** e virou um item do dropdown,
+    apontando para o ambiente de destino. `TrocaDePapel` foi removido. No
+    protótipo o item é falso (`title="Disponível na versão final"`); aqui é o
+    link que funciona.
+  - entrou o **atalho para a Conta**, que não existia em nenhum dos três.
+  - `MenuAjuda` ganhou separador (`separadorAntes`), renderizado como
+    `<li role="separator">` e fora do ciclo de foco de ↑/↓. A classe
+    `.separador` já existia no CSS e nunca tinha sido usada.
+- **Rodapé da sidebar do admin.** A faixa "Ambiente administrativo" (ponto de
+  6px em `--dsn-purple-500` + rótulo de 11px com `letter-spacing:0.1em`)
+  não era renderizada. A copy `ADMIN_NAVEGACAO.rodape` já existia no repo desde
+  a portabilidade da navegação — faltava o elemento, não o texto. Usa o mesmo
+  slot `rodape` da `Navegacao` que o cartão de saldo do artista ocupa.
+
+### Mantidas, por decisão
+
+- **Módulos de release futura continuam desabilitados.** No protótipo o item é
+  clicável e leva a uma tela "Próximo release" (ícone 44×44, overline, `h2` de
+  32px, texto e um CTA para a Conta — "Ir para Conta e equipe" no admin, "Ir
+  para Configurações" no artista, "Ir para Conta e configurações" no curador).
+  A aplicação mantém `<span aria-disabled>` com o motivo no `title`. A copy dos
+  16 módulos está no `<script>` de cada `.html` (`modules`/`modulos`) se a
+  decisão mudar.
+- **O bloco de nome e e-mail no topo do dropdown fica nos três**, embora o
+  protótipo só o desenhe no admin: é a única superfície do aviso "E-mail não
+  confirmado — confirmar", que o cadastro por SoundCloud precisa
+  ([#9](../open-questions.md)). Tirá-lo do artista e do curador esconderia uma
+  pendência real por fidelidade a um detalhe de layout.
+- **A 4ª aba "Perfil" da Conta do curador.** O protótipo do curador tem três
+  abas e nenhum item de perfil na sidebar; a 4ª vem do PRD 17.1, que o
+  protótipo não acomoda em lugar nenhum. Já estava documentada em
+  `src/textos/conta.ts`. Removê-la deixaria 17.1 sem tela.
+
+### RF-007 emendado
+
+O terceiro critério do RF-007 dizia *"aciono 'Rever onboarding' no menu de
+ajuda"*, sem distinguir ambiente — e o mesmo RF descreve o conteúdo do tour do
+curador. Com o menu alinhado ao protótipo, o item existe **só no artista**, e
+não há menu de ajuda nenhum (o botão do header é busca). O tour do curador
+continua alcançável por `/onboarding?rever=1`, que é o que o E2E cobre. O
+critério foi reescrito em [requirements.md](../requirements.md#rf-007--onboarding-por-ambiente)
+para dizer isso — sem a emenda, ficaria um critério aprovado que a tela não
+cumpre.
+
+### Não é divergência
+
+Três desvios são do protótipo **consigo mesmo**, e a aplicação já usa o valor
+majoritário: `<main>` com padding menor no admin (reproduzido em
+`.conteudoAdmin`), logotipo de `30px` fixo na sidebar do curador contra
+`clamp(28px,3.8vh,34px)` nos outros dois, e o `<nav>` do artista *flat* contra
+os grupos dos outros dois. E `(app)/artista/*` fora do route group `(painel)`
+é organização interna: não afeta URL nem tela.
+
+---
+
 ## `/entrar` não existe — rota apagada · 2026-09-23
 
 O protótipo desenha **três** telas de login, uma por ambiente, e nenhuma quarta

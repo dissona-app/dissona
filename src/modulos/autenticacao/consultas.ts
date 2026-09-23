@@ -4,9 +4,9 @@ import 'server-only';
  * Leituras de sessão para Server Components.
  *
  * Os `layout.tsx` dos três ambientes passavam `papeis` fixo (`['artista']`,
- * `['admin']`) desde a R0, com o efeito de `TrocaDePapel` nunca aparecer — nem
- * para a conta que tem os dois papéis, que é o único caso em que ela serve.
- * Isto é o que fecha aquela lacuna.
+ * `['admin']`) desde a R0, com o efeito de a troca de ambiente nunca aparecer
+ * — nem para a conta que tem os dois papéis, que é o único caso em que ela
+ * serve. Isto é o que fecha aquela lacuna.
  */
 
 import type { LeituraDePapeis, Papel } from '@/lib/papeis';

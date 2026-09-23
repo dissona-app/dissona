@@ -179,10 +179,15 @@ test.describe('D1 · Entrar', () => {
   test('trocar de papel muda o ambiente, e é lembrado', { tag: ['@RF-008'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.DOIS_PAPEIS);
 
-    const troca = page.getByRole('navigation', { name: 'Trocar de ambiente' });
-    await expect(troca, 'quem tem dois papéis precisa ver a troca').toBeVisible();
+    // A troca de ambiente vive **dentro** do menu da conta desde 2026-09-23,
+    // que é onde o protótipo a põe — antes era um par de opções solto no
+    // header. O item nomeia o ambiente de destino.
+    await page.getByRole('button', { name: /^Conta de / }).click();
 
-    await troca.getByRole('link', { name: 'Artista' }).click();
+    const irParaArtista = page.getByRole('menuitem', { name: 'Ver como artista' });
+    await expect(irParaArtista, 'quem tem dois papéis precisa ver a troca').toBeVisible();
+
+    await irParaArtista.click();
     await page.waitForURL(/\/artista/);
 
     // `RegistrarAmbiente` grava num `useEffect`, depois da pintura — ir direto
@@ -223,10 +228,11 @@ test.describe('D1 · Entrar', () => {
     { tag: ['@RF-008'] },
     async ({ page }) => {
       await entrarComo(page, PERSONA.ARTISTA);
+      await page.getByRole('button', { name: /^Conta de / }).click();
 
       await expect(
-        page.getByRole('navigation', { name: 'Trocar de ambiente' }),
-        'uma escolha de um item só é ruído',
+        page.getByRole('menuitem', { name: /^Ver como / }),
+        'oferecer a troca para quem só tem um papel é ruído',
       ).toHaveCount(0);
     },
   );

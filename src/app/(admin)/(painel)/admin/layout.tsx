@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { RodapeDoAdmin } from '@/componentes/shell/RodapeDoAdmin';
 import { Shell } from '@/componentes/shell/Shell';
 import { sairDoAdmin } from '@/modulos/autenticacao/acoes';
 import { lerIdentidadeDaSessao, lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
@@ -12,15 +13,16 @@ import { lerIdentidadeDaSessao, lerPapeisDaSessao } from '@/modulos/autenticacao
  * toda tela do painel mostraria "Administração" no `<h1>` — inclusive a de
  * pacotes, cujo título é "Pacotes de Claves".
  *
- * `papeis` vem da sessão, e não mais fixo em `['admin']`. A diferença é
- * visível: `TrocaDePapel` só aparece para quem tem mais de um papel, e com o
- * valor fixo ela nunca aparecia — nem para o admin que também é artista, que é
- * exatamente o caso que a troca existe para servir.
+ * `papeis` vem da sessão, e não mais fixo em `['admin']`. Hoje o efeito é
+ * outro: a troca de ambiente vive no menu da conta e **não** aparece no
+ * ambiente administrativo (o admin é papel à parte, RF-008), mas `papeis`
+ * continua sendo o dado que essa decisão lê.
  *
  * `sairDoAdmin`, e não `sair`: quem sai do painel volta para o login
  * administrativo, não para a home pública. E **sem** `registrarAmbiente`: o
  * admin tem porta própria e não entra no "último ambiente usado" (RF-008) —
- * gravá-lo mandaria um admin-e-artista para o painel no login pelo `/entrar`.
+ * gravá-lo mandaria um admin-e-artista para o painel administrativo no login
+ * pelo ambiente do artista.
  */
 export default async function LayoutPainelAdmin({ children }: { children: ReactNode }) {
   const [papeis, identidade] = await Promise.all([
@@ -33,6 +35,9 @@ export default async function LayoutPainelAdmin({ children }: { children: ReactN
       papelAtivo="admin"
       papeis={papeis}
       limite="total"
+      // A faixa "Ambiente administrativo" do pé da sidebar — o equivalente ao
+      // cartão de saldo do artista no mesmo slot.
+      rodapeNavegacao={<RodapeDoAdmin />}
       identidade={identidade ?? undefined}
       acaoDeSair={sairDoAdmin}
     >

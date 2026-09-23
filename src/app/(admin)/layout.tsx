@@ -8,8 +8,8 @@ import type { ReactNode } from 'react';
  *
  * A divisão corrige o bug que a R0 deixou anotado: `/admin/entrar` vivia
  * dentro de `admin/layout.tsx` e herdava o `Shell`, então quem **não** tinha
- * sessão via a navegação do painel em volta do formulário de login — com
- * `TrocaDePapel` e todo o resto. Route group não afeta URL, então o caminho
+ * sessão via a navegação do painel em volta do formulário de login — com a
+ * sidebar, o menu da conta e todo o resto. Route group não afeta URL, então o caminho
  * `/admin/entrar` continua o mesmo; só o layout que o envolve mudou.
  */
 export default function LayoutAdmin({ children }: { children: ReactNode }) {

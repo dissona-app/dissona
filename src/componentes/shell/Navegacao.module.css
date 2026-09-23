@@ -104,6 +104,34 @@
   border-top: var(--dsn-border-width) solid var(--dsn-nav-divider);
 }
 
+/*
+ * A faixa de ambiente do pé da sidebar do admin — literal do protótipo: ponto
+ * de 6px em `--dsn-purple-500`, rótulo de 11px com `letter-spacing:0.1em` em
+ * `#9B8CB5`, tudo em caixa alta.
+ *
+ * Divide o slot `.rodape` com o cartão de saldo do artista, e por isso zera a
+ * margem do `<p>` em vez de depender do reset.
+ */
+.faixaDeAmbiente {
+  display: flex;
+  align-items: center;
+  gap: var(--dsn-space-4);
+  margin: 0;
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: 0.1em;
+  color: var(--dsn-nav-overline);
+  text-transform: uppercase;
+}
+
+.pontoDeAmbiente {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-purple-500);
+}
+
 .cartaoSaldo {
   display: flex;
   flex-direction: column;

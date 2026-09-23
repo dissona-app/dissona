@@ -63,6 +63,38 @@
   flex-shrink: 0;
 }
 
+/*
+ * A busca do header — 38×38 nos três protótipos, à esquerda da pílula da conta.
+ *
+ * Fica `disabled` enquanto não há módulo de busca (ver `BotaoDeBusca`), e por
+ * isso o cursor não é de clique e o hover não acende a borda: o estado
+ * desabilitado tem de ser legível sem passar o mouse.
+ */
+.busca {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+  background: var(--dsn-surface);
+  color: var(--dsn-ink);
+  cursor: pointer;
+  transition: border-color var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.busca:hover:not(:disabled) {
+  border-color: var(--dsn-purple-600);
+}
+
+.busca:disabled {
+  color: var(--dsn-ink-400);
+  cursor: not-allowed;
+}
+
 .conteudo {
   padding: clamp(18px, 2.8vh, 32px) var(--dsn-space-20) clamp(20px, 3vh, 40px);
 }

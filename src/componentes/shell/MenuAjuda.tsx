@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { KeyboardEvent, ReactNode } from 'react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { Fragment, useEffect, useId, useRef, useState } from 'react';
 
 import estilos from './MenuAjuda.module.css';
 
@@ -18,6 +18,16 @@ import estilos from './MenuAjuda.module.css';
  */
 export type ItemMenu = {
   readonly rotulo: string;
+  /**
+   * Linha divisória **antes** deste item — os grupos que o protótipo separa no
+   * dropdown da conta.
+   *
+   * Vem como propriedade do item, e não como uma entrada `{ separador: true }`
+   * na lista, por dois motivos: a lista continua sendo só de itens acionáveis
+   * (a chave do `map` segue sendo o rótulo, e nenhuma entrada fica sem um), e
+   * é impossível terminar o menu num separador solto.
+   */
+  readonly separadorAntes?: boolean;
   readonly href?: string;
   /**
    * Server Action. A assinatura é a que `<form action>` exige — ela recebe o
@@ -131,9 +141,19 @@ export function MenuAjuda({ itens, disparador, rotulo = 'Ajuda', cabecalho }: Pr
           ) : null}
 
           {itens.map((item) => (
-            <li key={item.rotulo} role="none">
-              <ItemDoMenu item={item} aoConcluir={() => fechar()} />
-            </li>
+            <Fragment key={item.rotulo}>
+              {/*
+                `role="separator"` e sem conteúdo: o `moverFoco` busca por
+                `a, button`, então ele já fica fora do ciclo de ↑/↓ sem precisar
+                de `tabindex`. É decoração com semântica, não um item.
+              */}
+              {item.separadorAntes === true ? (
+                <li className={estilos.separador} role="separator" />
+              ) : null}
+              <li role="none">
+                <ItemDoMenu item={item} aoConcluir={() => fechar()} />
+              </li>
+            </Fragment>
           ))}
         </ul>
       ) : null}

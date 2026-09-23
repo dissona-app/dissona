@@ -11,7 +11,6 @@ import { Navegacao } from './Navegacao';
 import { RegistrarAmbiente } from './RegistrarAmbiente';
 import estilos from './Shell.module.css';
 import { tituloDoCaminho } from './titulo-por-caminho';
-import { TrocaDePapel } from './TrocaDePapel';
 
 export type LimiteConteudo = 'total' | 'conta' | 'contaAdmin' | 'formulario' | 'passo';
 
@@ -29,7 +28,7 @@ export type PropsShell = {
   /** Release em execução; item de release futura fica desabilitado na nav. */
   readonly releaseAtual?: number;
   readonly limite?: LimiteConteudo;
-  /** Ações extra no header, à esquerda do menu de ajuda. */
+  /** Ações extra no header, à esquerda do menu da conta. */
   readonly acoes?: ReactNode;
   /** Card de saldo no pé da sidebar. */
   readonly rodapeNavegacao?: ReactNode;
@@ -57,6 +56,43 @@ const CLASSE_LIMITE: Record<LimiteConteudo, string | undefined> = {
 };
 
 const ID_CONTEUDO = 'conteudo-principal';
+
+/**
+ * A busca do header — desenhada nos três protótipos, e sem nenhum módulo por
+ * trás na R2.
+ *
+ * `disabled`, e não ausente: o protótipo põe o botão nos três ambientes, e é o
+ * mesmo tratamento que a navegação já dá a item de release futura — mostrar o
+ * produto inteiro sem fingir que ele já está lá. No protótipo o botão não tem
+ * `on-click` nem rótulo acessível nenhum: é decoração, e implementá-lo por
+ * fidelidade seria entregar um controle que não faz nada.
+ */
+function BotaoDeBusca() {
+  return (
+    <button
+      type="button"
+      className={estilos.busca}
+      disabled
+      title="A busca chega numa release futura"
+      aria-label="Buscar"
+    >
+      <svg
+        width="17"
+        height="17"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <path d="m16.5 16.5 4 4" />
+      </svg>
+    </button>
+  );
+}
 
 /**
  * Shell do ambiente autenticado (design-system.md §3.2).
@@ -110,16 +146,14 @@ export function Shell({
           </div>
 
           <div className={estilos.acoesHeader}>
-            <TrocaDePapel papelAtivo={papelAtivo} papeis={papeis} />
             {acoes}
+            <BotaoDeBusca />
             {identidade !== undefined && acaoDeSair !== undefined ? (
               <MenuDaConta
                 identidade={identidade}
                 acaoDeSair={acaoDeSair}
-                // O onboarding do admin é a versão enxuta e não vale um item
-                // permanente no menu — e "Rever onboarding" apontando para o
-                // tour do artista seria pior que não ter o item.
-                ofereceOnboarding={!ehAdmin}
+                papelAtivo={papelAtivo}
+                papeis={papeis}
               />
             ) : null}
           </div>

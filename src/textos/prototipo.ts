@@ -838,6 +838,22 @@ export const NAVEGACAO_DO_CURADOR = {
   conta: 'Conta e configurações',
 } as const;
 
+/**
+ * O dropdown do avatar, nos três ambientes.
+ *
+ * Literal do protótipo: os rótulos de dentro do menu, que **não** são os da
+ * sidebar. O curador tem "Conta e configurações" na sidebar e "Configurações"
+ * aqui; o item de troca de ambiente nomeia o ambiente de **destino**, não o
+ * atual.
+ */
+export const MENU_DA_CONTA = {
+  verComoCurador: 'Ver como curador',
+  verComoArtista: 'Ver como artista',
+  configuracoes: 'Configurações',
+  reverOnboarding: 'Rever onboarding',
+  sair: 'Sair',
+} as const;
+
 /** Navegação do ambiente administrativo, como está na sidebar do protótipo. */
 export const ADMIN_NAVEGACAO = {
   inicio: 'Início',

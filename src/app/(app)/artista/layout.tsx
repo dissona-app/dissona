@@ -12,8 +12,8 @@ import { lerSaldoDisponivel } from '@/modulos/claves/consultas';
  *
  * `papeis` vem da sessão. Até a `0001` existir, a R0 passava `['artista']`
  * fixo, com a consequência declarada de esconder a troca de ambiente — não
- * havia como saber se a conta acumulava os dois papéis. Agora há, e
- * `TrocaDePapel` aparece para quem de fato tem os dois.
+ * havia como saber se a conta acumulava os dois papéis. Agora há, e o item
+ * "Ver como curador" do menu da conta aparece para quem de fato tem os dois.
  *
  * O `registrarAmbiente` só é passado quando o valor gravado **difere** deste
  * ambiente (RF-008). Passá-lo sempre seria uma escrita no banco por navegação;

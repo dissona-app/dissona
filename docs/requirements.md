@@ -109,7 +109,10 @@ valendo — ver `esquemaCadastroCurador` em `modulos/autenticacao/esquemas.ts` e
 
 - **Dado** que é meu primeiro acesso ao ambiente, **quando** entro, **então** vejo um tour de **4 passos** com "Passo X de 4", Avançar, Voltar e Pular.
 - **Dado** que pulo ou finalizo, **quando** a ação conclui, **então** entro no ambiente e o tour não reaparece.
-- **Dado** que quero rever, **quando** aciono "Rever onboarding" no menu de ajuda, **então** o tour reabre.
+- **Dado** que sou artista e quero rever, **quando** aciono "Rever onboarding" no **menu da conta**, **então** o tour reabre.
+- **Dado** que sou curador e quero rever, **quando** abro `/onboarding?rever=1`, **então** o tour reabre.
+
+⚠️ **Emenda de 2026-09-23.** O critério dizia "no menu de ajuda", sem distinguir ambiente. Duas coisas mudaram, e as duas vêm do protótipo: **não existe menu de ajuda** — o botão do header é a busca —, e o item "Rever onboarding" só aparece no dropdown do **artista**. O tour do curador continua existindo e continua alcançável pela URL; o que ele não tem é um caminho de UI. Decisão do cliente de seguir o protótipo item a item no menu da conta — ver [07-pendências](prd/07-pendencias-e-divergencias.md).
 
 Conteúdo — **artista:** enviar música · receber leitura real · acompanhar evolução · circular mais longe. **Curador:** fila · avaliação · remuneração · classes. **Admin:** versão enxuta.
 
