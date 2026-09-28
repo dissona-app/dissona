@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ROTA } from '@/lib/guarda-rota';
 import { senhaAtendePolitica } from '@/lib/senha';
 
 /**
@@ -155,6 +156,16 @@ export function destinoSeguro(proximo: string | undefined, padrao: string): stri
   if (!proximo.startsWith('/')) return padrao;
   if (proximo.startsWith('//')) return padrao;
   return proximo;
+}
+
+/**
+ * O destino (já passado por `destinoSeguro`) é a tela de aceite de convite
+ * (27.3), com ou sem query. É a única exceção do login administrativo para
+ * conta sem papel `admin` — ver `entrarComoAdministrador`.
+ */
+export function levaAoAceiteDeConvite(destino: string): boolean {
+  const { pathname } = new URL(destino, 'http://interno');
+  return pathname === ROTA.ADMIN_CONVITE || pathname.startsWith(`${ROTA.ADMIN_CONVITE}/`);
 }
 
 /**

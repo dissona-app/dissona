@@ -24,6 +24,7 @@ import type {
   ClasseCurador,
   CompartilhamentoEmEdicao,
   Criterio,
+  ItemDoHistorico,
   NotaDeCriterio,
   OpcionaisCumpridos,
   Remuneracao,
@@ -475,4 +476,106 @@ export async function removerCompartilhamento(avaliacaoId: string): Promise<void
     .eq('avaliacao_id', avaliacaoId);
 
   estourarSeErro(error);
+}
+
+/**
+ * O histórico do curador da sessão — "Notas e feedback".
+ *
+ * Três idas, uma por tabela, e nenhuma por linha: as avaliações, a faixa de
+ * cada uma pela `fila_do_curador` (que cobre o envio em qualquer situação,
+ * `pronto` incluído, e traz o nome do artista que `perfil` esconderia) e o
+ * ganho das entregues. As policies decidem o que volta: `avaliacao` e
+ * `ganho_curador` só entregam as do próprio curador, e a view já se restringe
+ * a ele.
+ *
+ * Mais recente primeiro — pela entrega, ou pela última edição do rascunho.
+ */
+export async function listarHistorico(): Promise<readonly ItemDoHistorico[]> {
+  // O filtro pelo curador é obrigatório, e não redundância com a policy: ela
+  // também entrega a `avaliacao` ao admin e ao artista dono do envio. Quem é
+  // curador **e** admin veria o histórico da plataforma inteira.
+  const curador = await meuPerfilCurador();
+  if (curador === null) return [];
+
+  const supabase = await criarClienteServidor();
+
+  const { data: avaliacoes, error } = await supabase
+    .from('avaliacao')
+    .select(
+      'id, envio_id, situacao, passo_atual, nota_subjetiva, no_prazo, concluida_em, atualizado_em',
+    )
+    .eq('perfil_curador_id', curador.id);
+  estourarSeErro(error);
+  if (avaliacoes === null || avaliacoes.length === 0) return [];
+
+  const envioIds = avaliacoes.map((a) => a.envio_id);
+  const concluidas = avaliacoes.filter((a) => a.situacao === 'concluida').map((a) => a.id);
+
+  // A view não está nos tipos gerados — o mesmo acesso de `fila/repositorio`.
+  const view = supabase as unknown as {
+    from(view: string): {
+      select(colunas: string): {
+        in(
+          coluna: string,
+          valores: readonly string[],
+        ): PromiseLike<{
+          readonly data:
+            | {
+                readonly envio_id: string;
+                readonly titulo: string;
+                readonly artista: string;
+              }[]
+            | null;
+          readonly error: unknown;
+        }>;
+      };
+    };
+  };
+
+  // O ganho também filtra pelo curador: `tem_permissao('financeiro')` abre a
+  // tabela inteira ao admin.
+  const [faixas, ganhos] = await Promise.all([
+    view
+      .from('fila_do_curador')
+      .select('envio_id, titulo, artista')
+      .in('envio_id', envioIds),
+    concluidas.length === 0
+      ? Promise.resolve({ data: [], error: null })
+      : supabase
+          .from('ganho_curador')
+          .select('avaliacao_id, valor_centavos')
+          .eq('perfil_curador_id', curador.id)
+          .in('avaliacao_id', concluidas),
+  ]);
+  estourarSeErro(faixas.error);
+  estourarSeErro(ganhos.error);
+
+  const faixaPorEnvio = new Map((faixas.data ?? []).map((f) => [f.envio_id, f]));
+  const ganhoPorAvaliacao = new Map(
+    (ganhos.data ?? []).map((g) => [g.avaliacao_id, BigInt(g.valor_centavos)]),
+  );
+
+  const itens: ItemDoHistorico[] = [];
+  for (const avaliacao of avaliacoes) {
+    const faixa = faixaPorEnvio.get(avaliacao.envio_id);
+    // Sem a faixa não há o que mostrar na linha; a view é quem diz se o envio
+    // ainda é deste curador.
+    if (faixa === undefined) continue;
+
+    itens.push({
+      envioId: avaliacao.envio_id,
+      titulo: faixa.titulo,
+      artista: faixa.artista,
+      concluida: avaliacao.situacao === 'concluida',
+      passoAtual: avaliacao.passo_atual,
+      notaSubjetiva: avaliacao.nota_subjetiva,
+      noPrazo: avaliacao.no_prazo,
+      concluidaEm: avaliacao.concluida_em === null ? null : new Date(avaliacao.concluida_em),
+      atualizadaEm: new Date(avaliacao.atualizado_em),
+      valorCentavos: ganhoPorAvaliacao.get(avaliacao.id) ?? null,
+    });
+  }
+
+  const momento = (item: ItemDoHistorico) => (item.concluidaEm ?? item.atualizadaEm).getTime();
+  return itens.sort((a, b) => momento(b) - momento(a));
 }

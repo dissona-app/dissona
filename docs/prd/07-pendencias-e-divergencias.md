@@ -1080,11 +1080,9 @@ Consequências, todas deliberadas:
 - **"Meu cadastro" saiu da sidebar do curador** e não perdeu acesso: a aba
   Perfil de Conta tem o botão "Editar" que leva a `/curador/meu-cadastro` — ver
   §3 da seção de 2026-09-14.
-- **"Notas e feedback" é item de primeiro nível e não é clicável.** No protótipo
-  ele abre o card "Próximo release"; aqui a tela **existe** e é da R2, e o que
-  não existe é um endereço para ela sem uma faixa escolhida. Por isso o item
-  ganhou `motivo` ("Abre a partir de uma faixa da fila") em vez de uma release —
-  dizer "Disponível na Release 4" seria mentira sobre uma tela entregue.
+- ~~**"Notas e feedback" é item de primeiro nível e não é clicável.**~~
+  Revertido em 2026-09-28 (QA D-087): o item abre o histórico em
+  `/curador/avaliar` — ver a seção "Correções do QA D-087".
 
 ### 2. Os três "Início" prometiam o que já estava entregue
 
@@ -1368,3 +1366,40 @@ resultado descartado e `if (resultado.ok)` anunciando só o sucesso:
 O aviso da lista da equipe passou a carregar **tom**, em vez de ser sempre
 `sucesso`. Lint não alcança esse defeito, e nenhum teste o pegaria: a tela não
 quebra, ela só não conta.
+
+## Correções do QA D-087 · 2026-09-28
+
+### 1. "Notas e feedback" virou o histórico do curador
+
+O QA leu o item sem clique como defeito, e com razão: a sidebar prometia uma
+tela que não abria. O protótipo só descreve o módulo, no card de próximo
+release (`modules.notas`): *"Escrita da devolutiva por critério, notas e
+histórico do que você já entregou"*. A escrita já existia, a partir da fila.
+Faltava o **histórico**, e é o que `/curador/avaliar` passou a ser: as
+avaliações do curador em duas tabelas, **Em andamento** (etapa do wizard, com
+"Continuar") e **Entregues** (data, nota, pontualidade e valor congelado em
+`ganho_curador`, com "Ver"). Cada linha leva a `/curador/avaliar/<envio>`, que
+não mudou.
+
+A tela é **derivada**: título e subtítulo vêm do card do protótipo, e o resto
+segue o tom da fila (13). A consulta filtra por `perfil_curador_id` mesmo com
+RLS, porque a policy de `avaliacao` também abre a tabela ao admin e ao artista
+dono do envio: quem é curador **e** admin veria o histórico da plataforma.
+
+### 2. O header mostra a foto de perfil
+
+O protótipo desenha iniciais no header ("RS") porque nele a foto não sobe. Aqui
+ela sobe desde a seção 8 da auditoria de 2026-09-18, e o header seguia só com
+iniciais, o que o QA leu como "foto não apresentada". `lerIdentidadeDaSessao`
+passou a ler `perfil` (nome e foto), e as iniciais ficam para quem não tem
+foto. O nome do header também passou a vir de `perfil.nome_completo`: antes
+vinha de `user_metadata`, o retrato do cadastro, e não acompanhava a edição em
+"Dados pessoais".
+
+### 3. Convidado com conta existente não conseguia aceitar o convite
+
+Quem abria o link sem sessão ia ao login administrativo, que desfaz a sessão de
+conta sem papel `admin`. E o papel só nasce no aceite: um laço. Agora o botão
+leva ao login com `proximo=/admin/convite?token=…`, e esse destino é a única
+exceção de `entrarComoAdministrador`: a conta entra e volta ao aceite. Quem
+decide se o convite vale continua sendo `aceitar_convite_admin`.

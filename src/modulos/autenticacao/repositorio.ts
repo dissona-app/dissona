@@ -516,3 +516,35 @@ export async function registrarAceiteDeTermos(perfilId: string, nome: string): P
 
   estourarSeErro(error);
 }
+
+export type PerfilDoHeader = {
+  readonly nomeCompleto: string | null;
+  readonly fotoCaminho: string | null;
+  readonly atualizadoEm: string | null;
+};
+
+/**
+ * Nome e foto que o header mostra, lidos de `perfil` — e não de `user_metadata`.
+ *
+ * `user_metadata` é o retrato do cadastro: nome e foto trocados depois, em
+ * "Dados pessoais", só existem em `perfil`. `null` quando a linha não vem (a
+ * policy de `perfil` só entrega a do próprio dono).
+ */
+export async function lerPerfilDoHeader(usuarioId: string): Promise<PerfilDoHeader | null> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('perfil')
+    .select('nome_completo, foto_caminho, atualizado_em')
+    .eq('id', usuarioId)
+    .maybeSingle();
+
+  estourarSeErro(error);
+  if (data === null) return null;
+
+  return {
+    nomeCompleto: data.nome_completo,
+    fotoCaminho: data.foto_caminho,
+    atualizadoEm: data.atualizado_em,
+  };
+}

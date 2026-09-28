@@ -239,3 +239,46 @@ export const AVALIAR = {
     ouro: 'Ouro',
   } satisfies Record<ClasseCurador, string>,
 } as const;
+
+/**
+ * "Notas e feedback" — o histórico do curador.
+ *
+ * **Derivada.** O protótipo só descreve o módulo, no card de próximo release
+ * (`modules.notas`): "Escrita da devolutiva por critério, notas e histórico do
+ * que você já entregou". O título e o subtítulo vêm de lá; o resto segue o tom
+ * da fila (13).
+ */
+export const HISTORICO = {
+  titulo: 'Notas e feedback',
+  subtitulo: 'Escrita da devolutiva por critério, notas e histórico do que você já entregou.',
+
+  emAndamentoTitulo: 'Em andamento',
+  emAndamentoResumo: (n: number) => `${n} ${n === 1 ? 'avaliação' : 'avaliações'} em rascunho`,
+  entreguesTitulo: 'Entregues',
+  entreguesResumo: (n: number) =>
+    `${n} ${n === 1 ? 'devolutiva entregue' : 'devolutivas entregues'}`,
+
+  colunas: {
+    musica: 'Música',
+    etapa: 'Etapa',
+    prazo: 'Prazo',
+    entregue: 'Entregue em',
+    nota: 'Nota',
+    pontualidade: 'Pontualidade',
+    valor: 'Valor',
+    acao: 'Ação',
+  },
+
+  continuar: 'Continuar',
+  ver: 'Ver',
+  noPrazo: 'No prazo',
+  foraDoPrazo: 'Fora das 72h',
+  semValor: '—',
+
+  vazioTitulo: 'Nenhuma avaliação ainda',
+  vazioDescricao:
+    'Suas devolutivas aparecem aqui assim que você começar a avaliar uma faixa da fila.',
+  irParaFila: 'Ir para a fila',
+  vazioEmAndamento: 'Nenhuma avaliação em rascunho.',
+  vazioEntregues: 'Nenhuma devolutiva entregue ainda.',
+} as const;

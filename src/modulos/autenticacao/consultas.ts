@@ -11,7 +11,10 @@ import 'server-only';
 
 import type { LeituraDePapeis, Papel } from '@/lib/papeis';
 import { lerContextoSessao } from '@/lib/papeis';
+import { urlPublicaDoAvatar } from '@/lib/supabase/armazenamento';
 import { criarClienteServidor, usuarioAtual } from '@/lib/supabase/servidor';
+
+import { lerPerfilDoHeader } from './repositorio';
 
 /**
  * O contexto de sessão inteiro, para Server Components.
@@ -53,11 +56,17 @@ export type IdentidadeDaSessao = {
    */
   readonly emailPendente: boolean;
   readonly iniciais: string;
+  /** URL pública da foto de perfil; `null` quando não há foto e o header mostra as iniciais. */
+  readonly fotoUrl: string | null;
 };
 
 /**
- * Nome, e-mail e iniciais para o menu do header (o "RS · Rafael" do
+ * Nome, e-mail, iniciais e foto para o menu do header (o "RS · Rafael" do
  * protótipo). `null` sem sessão.
+ *
+ * O protótipo desenha só iniciais, porque nele a foto não sobe; aqui ela sobe
+ * (27.1 e os perfis de artista e curador), e o header a mostra — as iniciais
+ * ficam para quem não tem foto. Ver 07-pendencias-e-divergencias.md.
  */
 export async function lerIdentidadeDaSessao(): Promise<IdentidadeDaSessao | null> {
   const usuario = await usuarioAtual();
@@ -80,8 +89,17 @@ export async function lerIdentidadeDaSessao(): Promise<IdentidadeDaSessao | null
   // chave, o que o provedor mandou, e só então o e-mail. Sem `full_name`/`name`
   // aqui, uma conta social recém-criada cairia no `split('@')` de um endereço
   // que ainda nem existe, e ficaria sem nome e com as iniciais de fallback.
+  //
+  // `perfil.nome_completo` vem antes de todos: é onde "Dados pessoais" grava, e
+  // `user_metadata` continua com o nome do cadastro.
+  const perfil = await lerPerfilDoHeader(usuario.id);
   const nomeCompleto =
-    primeiroTexto(metadados?.nome_completo, metadados?.full_name, metadados?.name) ||
+    primeiroTexto(
+      perfil?.nomeCompleto,
+      metadados?.nome_completo,
+      metadados?.full_name,
+      metadados?.name,
+    ) ||
     (email.split('@')[0] ?? '');
 
   return {
@@ -89,6 +107,7 @@ export async function lerIdentidadeDaSessao(): Promise<IdentidadeDaSessao | null
     email,
     emailPendente: confirmado === '' && pendente !== '',
     iniciais: iniciaisDe(nomeCompleto),
+    fotoUrl: await urlPublicaDoAvatar(perfil?.fotoCaminho ?? null, perfil?.atualizadoEm),
   };
 }
 

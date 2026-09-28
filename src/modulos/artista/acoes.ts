@@ -112,6 +112,8 @@ export async function salvarPerfilDoArtista(dados: FormData): Promise<ResultadoD
     // continuaria a antiga na vitrine.
     revalidatePath(ROTA.ARTISTA_PERFIL);
     revalidatePath(ROTA.ARTISTA_PERFIL_EDITAR);
+    // E o header, que também mostra a foto em todas as telas do ambiente.
+    revalidatePath(ROTA.ARTISTA, 'layout');
     return sucesso();
   });
 }

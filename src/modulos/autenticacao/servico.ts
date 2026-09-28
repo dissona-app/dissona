@@ -18,7 +18,7 @@ import { criarClienteServidor, usuarioAtual } from '@/lib/supabase/servidor';
 import { notificar, notificarEquipeAdmin } from '@/modulos/notificacao/servico';
 import { EventoNotificacao } from '@/modulos/notificacao/tipos';
 
-import { destinoSeguro } from './esquemas';
+import { destinoSeguro, levaAoAceiteDeConvite } from './esquemas';
 import { limparRecuperacao, recuperacaoEmCurso } from './marcador-de-recuperacao';
 import {
   ativarPapel,
@@ -100,6 +100,16 @@ export async function entrarComoUsuario(
  *
  * Também não reativa conta desativada: reverter uma exclusão é ato do dono na
  * porta dele, não um efeito colateral de tentar o painel.
+ *
+ * ## A exceção: quem vem aceitar um convite
+ *
+ * Com `proximo` apontando para o aceite (27.3), a conta sem papel `admin`
+ * **entra** e segue para lá. É o único jeito de a pessoa convidada que já tem
+ * conta de artista ou curador chegar ao aceite com sessão: desfazer a sessão
+ * aqui a deixaria num laço — o aceite pede login, o login recusa por falta do
+ * papel que só o aceite concede. A guarda deixa `/admin/convite` passar sem
+ * papel, e quem decide se o convite vale é `aceitar_convite_admin`, que confere
+ * token e e-mail; a sessão sozinha não abre nada do painel.
  */
 export async function entrarComoAdministrador(
   email: string,
@@ -119,12 +129,17 @@ export async function entrarComoAdministrador(
     return { estado: 'conta_bloqueada' };
   }
 
+  const destino = destinoSeguro(proximo, ROTA.ADMIN);
+
   if (contexto.estado !== 'ok' || !contexto.papeis.includes(Papel.ADMIN)) {
+    if (contexto.estado === 'ok' && levaAoAceiteDeConvite(destino)) {
+      return { estado: 'ok', destino };
+    }
     await encerrarSessao();
     return { estado: 'sem_acesso_admin' };
   }
 
-  return { estado: 'ok', destino: destinoSeguro(proximo, ROTA.ADMIN) };
+  return { estado: 'ok', destino };
 }
 
 /* ------------------------------------------------ cadastro e verificação --- */

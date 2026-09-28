@@ -248,7 +248,7 @@ export const EQUIPE = {
 
     tituloSemSessao: 'Entre para aceitar o convite',
     textoSemSessao:
-      'O convite vale para o e-mail que o recebeu. Entre com essa conta e abra o link de novo.',
+      'O convite vale para o e-mail que o recebeu. Entre com essa conta e você volta direto para cá.',
     irAoLogin: 'Ir para o login administrativo',
 
     sucessoTitulo: 'Acesso concluído',

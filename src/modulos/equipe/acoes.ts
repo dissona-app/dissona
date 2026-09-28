@@ -286,6 +286,8 @@ export async function salvarDadosPessoais(dadosDoFormulario: FormData): Promise<
   if (resultado.estado === 'sem_sessao') return falha(CodigoErro.NAO_AUTENTICADO);
   if (resultado.estado === 'sem_vinculo') return falha(CodigoErro.NAO_AUTORIZADO);
 
-  revalidatePath(ROTA.ADMIN_EQUIPE);
+  // O layout inteiro, e não só a Equipe: nome e foto também estão no header de
+  // todas as telas do painel.
+  revalidatePath(ROTA.ADMIN, 'layout');
   return sucesso();
 }

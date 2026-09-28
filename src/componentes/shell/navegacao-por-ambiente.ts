@@ -76,14 +76,9 @@ const CURADOR: readonly GrupoNavegacao[] = [
     titulo: NAVEGACAO_DO_CURADOR.grupoAvaliacoes,
     itens: [
       { rotulo: NAVEGACAO_DO_CURADOR.fila, caminho: ROTA.CURADOR_FILA, release: 2 },
-      // A tela existe e é da R2 — o que não existe é endereço para ela sem uma
-      // faixa escolhida, e por isso o motivo não é uma release.
-      {
-        rotulo: NAVEGACAO_DO_CURADOR.notas,
-        caminho: ROTA.CURADOR_AVALIAR,
-        release: 2,
-        motivo: NAVEGACAO_DO_CURADOR.motivoNotas,
-      },
+      // O histórico das avaliações — em andamento e entregues. Cada linha leva
+      // à avaliação daquele envio, que continua em `/curador/avaliar/<envio>`.
+      { rotulo: NAVEGACAO_DO_CURADOR.notas, caminho: ROTA.CURADOR_AVALIAR, release: 2 },
     ],
   },
   {

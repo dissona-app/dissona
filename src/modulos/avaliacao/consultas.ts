@@ -24,6 +24,7 @@ import {
   buscarRascunho,
   classeDoCurador,
   listarCriterios,
+  listarHistorico,
   preverRemuneracao,
   urlDoAudio,
 } from './repositorio';
@@ -32,6 +33,7 @@ import type {
   AvaliacaoEmEdicao,
   ClasseCurador,
   Criterio,
+  ItemDoHistorico,
   RegrasDaAvaliacao,
   Remuneracao,
 } from './tipos';
@@ -181,5 +183,25 @@ export async function lerRemuneracao(envioId: string): Promise<TelaDaRemuneracao
     tetoAtrasoPercentual: tetoAtraso,
     servicos,
     justificativasLongas: justificativasLongas(base.avaliacao, base.regras),
+  };
+}
+
+export type TelaDoHistorico = {
+  readonly emAndamento: readonly ItemDoHistorico[];
+  readonly entregues: readonly ItemDoHistorico[];
+};
+
+/**
+ * "Notas e feedback" — o histórico do curador, em rascunho e entregue.
+ *
+ * O protótipo descreve o módulo ("escrita da devolutiva por critério, notas e
+ * histórico do que você já entregou") e desenha só o card de próximo release.
+ * A escrita já existe, a partir da fila; esta é a parte do histórico.
+ */
+export async function lerHistorico(): Promise<TelaDoHistorico> {
+  const itens = await listarHistorico();
+  return {
+    emAndamento: itens.filter((item) => !item.concluida),
+    entregues: itens.filter((item) => item.concluida),
   };
 }

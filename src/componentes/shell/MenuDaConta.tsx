@@ -20,6 +20,8 @@ export type IdentidadeExibida = {
    */
   readonly emailPendente?: boolean;
   readonly iniciais: string;
+  /** Foto de perfil; sem ela, o avatar mostra as iniciais. */
+  readonly fotoUrl?: string | null;
 };
 
 export type PropsMenuDaConta = {
@@ -95,7 +97,15 @@ export function MenuDaConta({ identidade, acaoDeSair, papelAtivo, papeis }: Prop
       disparador={
         <>
           <span className={estilos.avatar} aria-hidden="true">
-            {identidade.iniciais}
+            {identidade.fotoUrl ? (
+              // `<img>` e não `next/image`, como no `CampoDeFoto`: a URL é do
+              // Storage, e o otimizador exigiria `remotePatterns` para um
+              // avatar de 28 px.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className={estilos.foto} src={identidade.fotoUrl} alt="" />
+            ) : (
+              identidade.iniciais
+            )}
           </span>
           <span className={estilos.nome}>{identidade.nome}</span>
         </>

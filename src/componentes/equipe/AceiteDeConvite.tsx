@@ -113,12 +113,19 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
     estadoInicial === 'sem_sessao' ||
     (falhou && resultado.codigo === CodigoErro.NAO_AUTENTICADO)
   ) {
+    // O login volta para cá **com o token**. Sem o `proximo`, a pessoa ainda
+    // sem papel `admin` era recusada pelo login administrativo, que desfaz a
+    // sessão — e o convite ficava inalcançável.
+    const voltaAoConvite = `${ROTA.ADMIN_CONVITE}?token=${encodeURIComponent(token)}`;
     return (
       <div className={estilos.cabecalho}>
         <span className={estilos.overline}>{TEXTOS.overline}</span>
         <h1 className={estilos.titulo}>{TEXTOS.tituloSemSessao}</h1>
         <p className={estilos.texto}>{TEXTOS.textoSemSessao}</p>
-        <BotaoLink href={ROTA.ADMIN_ENTRAR} blocoInteiro>
+        <BotaoLink
+          href={`${ROTA.ADMIN_ENTRAR}?proximo=${encodeURIComponent(voltaAoConvite)}`}
+          blocoInteiro
+        >
           {TEXTOS.irAoLogin}
         </BotaoLink>
       </div>

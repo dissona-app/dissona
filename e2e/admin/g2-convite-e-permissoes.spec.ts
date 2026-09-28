@@ -4,7 +4,7 @@ import { clienteDeServico } from '../apoio/banco';
 import { apagarContaEfemera, criarContaEfemera } from '../apoio/contas';
 import type { ContaEfemera } from '../apoio/contas';
 import { gerarLinkDeEmail } from '../apoio/email';
-import { PERSONA } from '../apoio/personas';
+import { PERSONA, senhaDeTeste } from '../apoio/personas';
 import { entrarComCredenciais, entrarComoAdmin } from '../apoio/sessao';
 import { ADMIN_ENTRAR, EQUIPE, SENHA } from '../apoio/textos';
 
@@ -187,6 +187,80 @@ test.describe('G2 · Convite, aceite e permissões', () => {
 
         expect(membro, 'aceitar o convite precisa criar o membro da equipe').not.toBeNull();
         expect(membro?.ativo).toBe(true);
+      } finally {
+        await contexto.close();
+      }
+    },
+  );
+
+  /**
+   * RF-033 · quem já tem conta abre o link **sem sessão** e chega ao aceite.
+   *
+   * Era o defeito do QA D-087: o botão "Ir para o login administrativo" levava
+   * a `/admin/entrar` sem o token, e o login administrativo desfazia a sessão
+   * de quem ainda não tem papel `admin` — "Conta sem acesso administrativo". O
+   * papel só nasce no aceite, então a pessoa ficava presa. Agora o login volta
+   * ao convite, com o token.
+   */
+  test(
+    'convidado sem sessão entra pelo login administrativo e aceita',
+    { tag: ['@RF-033'] },
+    async ({ page, browser }, info) => {
+      const convidada = await criarContaEfemera({
+        rotulo: 'aceite_sem_sessao',
+        indiceDoWorker: info.workerIndex,
+        papeis: ['artista'],
+      });
+      descartaveis.push(convidada);
+
+      await entrarComoAdmin(page);
+      await page.goto('/admin/equipe?aba=equipe');
+      await page.getByRole('button', { name: EQUIPE.equipe.convidar }).click();
+
+      const dialogo = page.getByRole('dialog');
+      await dialogo.getByLabel(EQUIPE.convite.rotuloEmail, { exact: true }).fill(convidada.email);
+      await dialogo.getByRole('button', { name: EQUIPE.convite.enviar }).click();
+      await expect(page.getByLabel(EQUIPE.convite.linkTitulo)).toBeVisible({ timeout: 30_000 });
+      const link = new URL(await page.getByLabel(EQUIPE.convite.linkTitulo).inputValue());
+
+      const contexto = await browser.newContext();
+      try {
+        const convidado = await contexto.newPage();
+        await convidado.goto(link.pathname + link.search);
+
+        await expect(
+          convidado.getByRole('heading', { name: EQUIPE.aceite.tituloSemSessao }),
+        ).toBeVisible();
+        await convidado.getByRole('link', { name: EQUIPE.aceite.irAoLogin }).click();
+        await convidado.waitForURL(/\/admin\/entrar/);
+
+        await convidado.getByLabel(ADMIN_ENTRAR.rotuloEmail, { exact: true }).fill(convidada.email);
+        await convidado.getByLabel(ADMIN_ENTRAR.rotuloSenha, { exact: true }).fill(senhaDeTeste());
+        await convidado.getByRole('button', { name: ADMIN_ENTRAR.enviar }).click();
+
+        // A volta é ao convite, com o token — e não "Conta sem acesso".
+        await convidado.waitForURL(
+          (url) => url.pathname === link.pathname && url.search === link.search,
+        );
+
+        const senhaNova = `E2e-${Math.random().toString(36).slice(2, 10)}-9`;
+        const camposDeSenha = convidado.locator('input[type="password"]');
+        const quantos = await camposDeSenha.count();
+        for (let i = 0; i < quantos; i += 1) {
+          await camposDeSenha.nth(i).fill(senhaNova);
+        }
+        await convidado.getByRole('button', { name: EQUIPE.aceite.enviar }).click();
+
+        await expect(
+          convidado.getByRole('heading', { name: EQUIPE.aceite.sucessoTitulo }),
+        ).toBeVisible({ timeout: 30_000 });
+
+        const { data: membro } = await clienteDeServico()
+          .from('membro_admin')
+          .select('ativo')
+          .eq('perfil_id', convidada.id)
+          .maybeSingle();
+        expect(membro?.ativo, 'o aceite precisa criar o membro da equipe').toBe(true);
       } finally {
         await contexto.close();
       }

@@ -18,6 +18,14 @@
   color: var(--dsn-purple-600);
   font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-bold);
+  overflow: hidden;
+}
+
+/* A foto enviada ocupa o círculo inteiro; `cover` corta em vez de distorcer. */
+.foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .nome {

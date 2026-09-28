@@ -141,3 +141,22 @@ export type Remuneracao = {
   readonly comissaoCentavos: bigint;
   readonly acrescimos: readonly { readonly chave: string; readonly percentual: number }[];
 };
+
+/**
+ * Uma linha do histórico em "Notas e feedback" — a avaliação e a faixa dela.
+ *
+ * `valorCentavos` é o de `ganho_curador`, congelado na entrega; `null` enquanto
+ * a avaliação é rascunho.
+ */
+export type ItemDoHistorico = {
+  readonly envioId: string;
+  readonly titulo: string;
+  readonly artista: string;
+  readonly concluida: boolean;
+  readonly passoAtual: number;
+  readonly notaSubjetiva: number | null;
+  readonly noPrazo: boolean | null;
+  readonly concluidaEm: Date | null;
+  readonly atualizadaEm: Date;
+  readonly valorCentavos: bigint | null;
+};

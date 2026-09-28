@@ -32,7 +32,7 @@
  * protótipo, sendo mock, não tem.
  */
 
-export { AVALIAR } from './avaliacao';
+export { AVALIAR, HISTORICO } from './avaliacao';
 export { CONTA } from './conta';
 export { CURADOR_CADASTRO, CURADOR_CLASSIFICACAO, CURADOR_MANUTENCAO } from './curador';
 export { EQUIPE } from './equipe';
@@ -825,12 +825,6 @@ export const NAVEGACAO_DO_CURADOR = {
   grupoAvaliacoes: 'Avaliações',
   fila: 'Fila',
   notas: 'Notas e feedback',
-  /**
-   * "Notas e feedback" é item de sidebar no protótipo e lá abre um placeholder.
-   * Aqui a tela existe — o que não existe é um endereço para ela sem uma faixa
-   * escolhida, porque a avaliação é sempre de um envio.
-   */
-  motivoNotas: 'Abre a partir de uma faixa da fila',
   grupoDesempenho: 'Desempenho',
   metricas: 'Métricas',
   financeiro: 'Financeiro',

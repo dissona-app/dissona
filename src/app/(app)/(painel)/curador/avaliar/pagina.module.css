@@ -1,0 +1,7 @@
+/* Notas e feedback — os dois painéis do histórico, empilhados como os da fila. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-6);
+}
