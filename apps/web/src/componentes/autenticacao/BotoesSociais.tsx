@@ -1,4 +1,4 @@
-import { soundcloudLigado } from '@/lib/ambiente';
+import { soundcloudLigado } from '@dissona/nucleo/lib/ambiente';
 
 import estilos from './BotoesSociais.module.css';
 

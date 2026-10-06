@@ -2,10 +2,10 @@
 
 import { useActionState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { FILA as TEXTOS } from '@/textos/prototipo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { FILA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 export type PropsIniciarAvaliacao = {
   readonly envioId: string;

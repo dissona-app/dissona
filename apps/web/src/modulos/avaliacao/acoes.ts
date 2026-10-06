@@ -25,10 +25,10 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { executar, falha, falhaDeCampos, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
+import { executar, falha, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 
 import { lerRegras } from './consultas';
 import {
@@ -53,8 +53,8 @@ import {
   salvarSubjetiva,
 } from './repositorio';
 import { impedimentosParaConcluir } from './servico';
-import type { PassoDaAvaliacao } from './tipos';
-import { numeroDoPasso } from './tipos';
+import type { PassoDaAvaliacao } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import { numeroDoPasso } from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 function texto(dados: FormData, campo: string): string {
   const valor = dados.get(campo);

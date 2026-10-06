@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { deClavesInteiras, paraClaves } from '@/lib/claves';
-import { paraCentavos } from '@/lib/dinheiro';
+import { deClavesInteiras, paraClaves } from '@dissona/nucleo/lib/claves';
+import { paraCentavos } from '@dissona/nucleo/lib/dinheiro';
 
 import { resumoDoPedido } from '../servico';
 

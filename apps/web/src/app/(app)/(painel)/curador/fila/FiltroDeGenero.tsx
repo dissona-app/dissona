@@ -2,8 +2,8 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { Selecao } from '@/componentes/base/Selecao';
-import { FILA as TEXTOS } from '@/textos/prototipo';
+import { Selecao } from '@dissona/nucleo/componentes/base/Selecao';
+import { FILA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 export type PropsFiltroDeGenero = {
   readonly generos: readonly string[];

@@ -11,26 +11,26 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { falha, falhaDeCampos, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { origemDaRequisicao } from '@/lib/origem';
+import { falha, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { origemDaRequisicao } from '@dissona/nucleo/lib/origem';
 
 import {
   esquemaExclusao,
   esquemaSessao,
   esquemaTrocaDeEmail,
   esquemaTrocaDeSenha,
-} from './esquemas';
+} from '@dissona/nucleo/modulos/conta/esquemas';
 import {
   encerrarUmaSessao,
   excluirConta,
   exportarDados,
   trocarEmailDaConta,
   trocarSenhaDaConta,
-} from './servico';
-import type { ResultadoDeCredencial } from './servico';
+} from '@dissona/nucleo/modulos/conta/servico';
+import type { ResultadoDeCredencial } from '@dissona/nucleo/modulos/conta/servico';
 
 /** Um motivo por campo, para o formulário mostrar todos de uma vez. */
 function motivosDe(

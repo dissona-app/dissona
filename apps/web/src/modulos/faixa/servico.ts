@@ -7,7 +7,7 @@
 
 import { z } from 'zod';
 
-import { normalizarLink } from '@/lib/link';
+import { normalizarLink } from '@dissona/nucleo/lib/link';
 
 import type {
   FaixaEmEdicao,

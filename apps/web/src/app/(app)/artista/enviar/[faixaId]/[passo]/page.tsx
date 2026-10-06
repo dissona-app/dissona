@@ -5,14 +5,14 @@ import { FormularioDaFaixa } from '@/componentes/artista/FormularioDaFaixa';
 import { FormularioDoContexto } from '@/componentes/artista/FormularioDoContexto';
 import { MolduraDoEnvio } from '@/componentes/artista/MolduraDoEnvio';
 import { Revisao } from '@/componentes/artista/Revisao';
-import { Aviso } from '@/componentes/base/Aviso';
-import * as claves from '@/lib/claves';
-import { ROTA } from '@/lib/guarda-rota';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import * as claves from '@dissona/nucleo/lib/claves';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerCarteira } from '@/modulos/claves/consultas';
 import { detectarFaixa, salvarContexto, salvarFaixa } from '@/modulos/faixa/acoes';
 import { lerFaixaDoPasso, lerLimitesDeUpload } from '@/modulos/faixa/consultas';
 import { ehPassoDoEnvio } from '@/modulos/faixa/tipos';
-import { CARTEIRA, ENVIAR } from '@/textos/prototipo';
+import { CARTEIRA, ENVIAR } from '@dissona/nucleo/textos/prototipo';
 
 export const metadata: Metadata = {
   title: 'Enviar música',

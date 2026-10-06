@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 
-import { Botao } from '@/componentes/base/Botao';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CONTA } from '@/textos/prototipo';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CONTA } from '@dissona/nucleo/textos/prototipo';
 
 import { CartaoDeConta } from './CartaoDeConta';
 import { ExclusaoDeConta } from './ExclusaoDeConta';

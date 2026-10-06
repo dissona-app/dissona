@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { CartaoDaClasse } from '@/componentes/curador/CartaoDaClasse';
 import { FormularioDeServicos } from '@/componentes/curador/FormularioDeServicos';
 import { TabelaDeMidias } from '@/componentes/curador/TabelaDeMidias';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import {
   removerMidiaDoCurador,
   salvarMidiaDoCurador,

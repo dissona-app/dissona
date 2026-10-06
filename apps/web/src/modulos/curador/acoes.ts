@@ -15,10 +15,10 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { falha, falhaDeCampos, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
+import { falha, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 
 import {
   esquemaAtuacao,
@@ -31,8 +31,8 @@ import {
   esquemaRemocaoDeMidia,
   esquemaServicos,
   normalizarLink,
-} from './esquemas';
-import type { ServicoParaSalvar } from './repositorio';
+} from '@dissona/nucleo/modulos/curador/esquemas';
+import type { ServicoParaSalvar } from '@dissona/nucleo/modulos/curador/repositorio';
 import {
   enviarCadastro as enviarCadastroDoCurador,
   pularPasso as pularPassoDoCadastro,
@@ -46,15 +46,24 @@ import {
   salvarGeneros,
   salvarMidia,
   salvarServicosDoCurador,
-} from './servico';
+} from '@dissona/nucleo/modulos/curador/servico';
 import type {
   CredencialMarcada,
   MotivoDeArquivo,
   ResultadoDaManutencao,
   ResultadoDoPasso,
-} from './servico';
-import type { PassoDoCadastro, TipoDeCredencial, TipoDeMidia, TipoDeServico } from './tipos';
-import { CREDENCIAL_POR_ANEXO, ehPasso, TIPOS_DE_CREDENCIAL } from './tipos';
+} from '@dissona/nucleo/modulos/curador/servico';
+import type {
+  PassoDoCadastro,
+  TipoDeCredencial,
+  TipoDeMidia,
+  TipoDeServico,
+} from '@dissona/nucleo/modulos/curador/tipos';
+import {
+  CREDENCIAL_POR_ANEXO,
+  ehPasso,
+  TIPOS_DE_CREDENCIAL,
+} from '@dissona/nucleo/modulos/curador/tipos';
 
 /**
  * O código de erro de cada motivo de recusa de arquivo.

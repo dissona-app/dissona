@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 
 import { TabelaDaFila } from '@/componentes/curador/TabelaDaFila';
 import type { LinhaDaFila } from '@/componentes/curador/TabelaDaFila';
-import { Abas } from '@/componentes/base/Abas';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
+import { Abas } from '@dissona/nucleo/componentes/base/Abas';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import { Painel } from '@/componentes/base/Painel';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerFila } from '@/modulos/fila/consultas';
 import { horasRestantes, statusNaTela } from '@/modulos/fila/servico';
 import {
@@ -15,7 +15,7 @@ import {
   type ItemDaFila,
   type TipoServico,
 } from '@/modulos/fila/tipos';
-import { FILA as TEXTOS } from '@/textos/prototipo';
+import { FILA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 import { FiltroDeGenero } from './FiltroDeGenero';

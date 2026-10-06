@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { BotoesSociais } from '@/componentes/autenticacao/BotoesSociais';
-import { FormularioDeLogin } from '@/componentes/autenticacao/FormularioDeLogin';
-import type { Banner } from '@/componentes/autenticacao/FormularioDeLogin';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { MOTIVO_LOGIN, ROTA } from '@/lib/guarda-rota';
+import { FormularioDeLogin } from '@dissona/nucleo/componentes/autenticacao/FormularioDeLogin';
+import type { Banner } from '@dissona/nucleo/componentes/autenticacao/FormularioDeLogin';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { MOTIVO_LOGIN, ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { entrar, entrarComProvedor } from '@/modulos/autenticacao/acoes';
-import { ENTRAR_ARTISTA } from '@/textos/prototipo';
+import { ENTRAR_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

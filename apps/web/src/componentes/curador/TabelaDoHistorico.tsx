@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 
-import { Etiqueta } from '@/componentes/base/Etiqueta';
-import { Tabela } from '@/componentes/base/Tabela';
-import type { ColunaTabela } from '@/componentes/base/Tabela';
-import { ROTA } from '@/lib/guarda-rota';
-import { HISTORICO as TEXTOS } from '@/textos/avaliacao';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
+import { Tabela } from '@dissona/nucleo/componentes/base/Tabela';
+import type { ColunaTabela } from '@dissona/nucleo/componentes/base/Tabela';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { HISTORICO as TEXTOS } from '@dissona/nucleo/textos/avaliacao';
 
 import estilos from './TabelaDaFila.module.css';
 

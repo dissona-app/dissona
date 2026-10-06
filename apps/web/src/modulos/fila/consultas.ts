@@ -2,7 +2,7 @@ import 'server-only';
 
 /** Leituras da fila (13) e do detalhe (13.1). */
 
-import { lerConfiguracoes } from '@/lib/configuracao';
+import { lerConfiguracoes } from '@dissona/nucleo/lib/configuracao';
 import { buscarRascunho, urlDoAudio } from '@/modulos/avaliacao/repositorio';
 
 import { buscarItem, listarFila, servicosDoEnvio } from './repositorio';

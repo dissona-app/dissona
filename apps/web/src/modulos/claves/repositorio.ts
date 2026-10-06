@@ -15,10 +15,10 @@ import 'server-only';
  * financeiro.
  */
 
-import { paraClavesComSinal } from '@/lib/claves';
-import type { Claves } from '@/lib/claves';
-import { estourarSeErro } from '@/lib/supabase/erros';
-import { criarClienteServidor } from '@/lib/supabase/servidor';
+import { paraClavesComSinal } from '@dissona/nucleo/lib/claves';
+import type { Claves } from '@dissona/nucleo/lib/claves';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
+import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
 
 import type { Movimentacao } from './tipos';
 

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
-import { FormularioDeLogin } from '@/componentes/autenticacao/FormularioDeLogin';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
-import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
+import { FormularioDeLogin } from '@dissona/nucleo/componentes/autenticacao/FormularioDeLogin';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { urlDoAdmin } from '@dissona/nucleo/lib/rotas-admin-servidor';
 import { entrarComoAdmin } from '@/modulos/autenticacao/acoes';
-import { ADMIN_ENTRAR } from '@/textos/prototipo';
+import { ADMIN_ENTRAR } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

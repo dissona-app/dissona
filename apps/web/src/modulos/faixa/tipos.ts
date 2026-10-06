@@ -1,4 +1,4 @@
-import type { Database } from '@/lib/supabase/tipos-bd';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 /**
  * Envio de música — módulo 3.

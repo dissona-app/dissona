@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { Passos } from '@/componentes/base/Passos';
-import { ENVIAR } from '@/textos/prototipo';
+import { ENVIAR } from '@dissona/nucleo/textos/prototipo';
 import type { PassoDoEnvio } from '@/modulos/faixa/tipos';
 import { PASSOS } from '@/modulos/faixa/tipos';
 

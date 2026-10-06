@@ -1,14 +1,18 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import * as dinheiro from '@/lib/dinheiro';
+import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
 import { acompanharPix, comprarClaves } from '@/modulos/claves/acoes';
 import { lerCartaoSalvo } from '@/modulos/claves/consultas';
 import { checkoutSimulado } from '@/modulos/claves/pagamento';
 import { resumoDoPedido } from '@/modulos/claves/servico';
-import { lerValorDaClave, buscarPacote } from '@/modulos/pacote/consultas';
-import { formatarDesconto, formatarQuantidade, temDesconto } from '@/modulos/pacote/formato';
-import { CHECKOUT as TEXTOS } from '@/textos/prototipo';
+import { lerValorDaClave, buscarPacote } from '@dissona/nucleo/modulos/pacote/consultas';
+import {
+  formatarDesconto,
+  formatarQuantidade,
+  temDesconto,
+} from '@dissona/nucleo/modulos/pacote/formato';
+import { CHECKOUT as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import { FormularioDeCheckout } from './FormularioDeCheckout';
 

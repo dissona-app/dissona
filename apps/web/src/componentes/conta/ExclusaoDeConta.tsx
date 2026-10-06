@@ -2,14 +2,14 @@
 
 import { useActionState, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
-import { Modal } from '@/componentes/base/Modal';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { erroGeralDe } from '@/textos/erros';
-import { CONTA } from '@/textos/prototipo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
+import { Modal } from '@dissona/nucleo/componentes/base/Modal';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { CONTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './ExclusaoDeConta.module.css';
 

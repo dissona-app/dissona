@@ -2,8 +2,8 @@
  * Regra da seleção — **pura**, sem `server-only` e sem Supabase.
  */
 
-import { deClavesInteiras, somar } from '@/lib/claves';
-import type { Claves } from '@/lib/claves';
+import { deClavesInteiras, somar } from '@dissona/nucleo/lib/claves';
+import type { Claves } from '@dissona/nucleo/lib/claves';
 
 import { SERVICO_OBRIGATORIO } from './tipos';
 import type { CuradorDisponivel, EscolhaDeCurador, TipoServico } from './tipos';

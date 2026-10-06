@@ -31,13 +31,13 @@
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 
-import { executar, falha, falhaDeCampos, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import * as claves from '@/lib/claves';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { usuarioAtual } from '@/lib/supabase/servidor';
-import { buscarPacote } from '@/modulos/pacote/consultas';
+import { executar, falha, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import * as claves from '@dissona/nucleo/lib/claves';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
+import { buscarPacote } from '@dissona/nucleo/modulos/pacote/consultas';
 
 import { esquemaDeCompra } from './esquemas';
 import { provedorEmVigor } from './pagamento';

@@ -25,8 +25,8 @@ import 'server-only';
 
 import { randomUUID } from 'node:crypto';
 
-import { pagamentoSimulado } from '@/lib/ambiente';
-import { CodigoErro, falhar } from '@/lib/erros';
+import { pagamentoSimulado } from '@dissona/nucleo/lib/ambiente';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
 
 import {
   buscarClientePorCpf,

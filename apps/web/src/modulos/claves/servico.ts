@@ -10,10 +10,10 @@ import {
   paraCentavos as clavesParaCentavos,
   precoPorClave,
   somar,
-} from '@/lib/claves';
-import type { Claves } from '@/lib/claves';
-import type { Centavos } from '@/lib/dinheiro';
-import { descontoDerivado } from '@/modulos/pacote/servico';
+} from '@dissona/nucleo/lib/claves';
+import type { Claves } from '@dissona/nucleo/lib/claves';
+import type { Centavos } from '@dissona/nucleo/lib/dinheiro';
+import { descontoDerivado } from '@dissona/nucleo/modulos/pacote/servico';
 
 import type {
   FiltroDoExtrato,

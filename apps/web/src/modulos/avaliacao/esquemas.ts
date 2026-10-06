@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { esquemaLinkOpcional } from '@/lib/link';
+import { esquemaLinkOpcional } from '@dissona/nucleo/lib/link';
 
 import { notaValida, truncarNota } from './servico';
-import { MODALIDADES } from './tipos';
+import { MODALIDADES } from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 /**
  * Validação das cinco etapas da avaliação.

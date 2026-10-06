@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { ENTRAR_PADRAO } from '@/lib/guarda-rota';
-import { origemDaRequisicao } from '@/lib/origem';
-import { destinoSeguro } from '@/modulos/autenticacao/esquemas';
-import { trocarCodigoPorSessao } from '@/modulos/autenticacao/repositorio';
+import { ENTRAR_PADRAO } from '@dissona/nucleo/lib/guarda-rota';
+import { origemDaRequisicao } from '@dissona/nucleo/lib/origem';
+import { destinoSeguro } from '@dissona/nucleo/modulos/autenticacao/esquemas';
+import { trocarCodigoPorSessao } from '@dissona/nucleo/modulos/autenticacao/repositorio';
 
 /**
  * Callback do OAuth (Google e Facebook).

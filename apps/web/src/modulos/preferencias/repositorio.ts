@@ -10,10 +10,10 @@ import 'server-only';
  * notificação, que é revogado até de `authenticated` e passa pela service role.
  */
 
-import { CodigoErro, falhar } from '@/lib/erros';
-import type { Papel } from '@/lib/papeis';
-import { estourarSeErro } from '@/lib/supabase/erros';
-import { criarClienteServidor } from '@/lib/supabase/servidor';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
+import type { Papel } from '@dissona/nucleo/lib/papeis';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
+import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
 
 import type { Canal, EscolhaDeEvento, EventoDoCatalogo, Idioma } from './tipos';
 

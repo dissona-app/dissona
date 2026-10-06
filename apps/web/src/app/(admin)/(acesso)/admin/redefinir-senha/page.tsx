@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
-import { FormularioDeRedefinicao } from '@/componentes/autenticacao/FormularioDeRedefinicao';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
-import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
+import { FormularioDeRedefinicao } from '@dissona/nucleo/componentes/autenticacao/FormularioDeRedefinicao';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { urlDoAdmin } from '@dissona/nucleo/lib/rotas-admin-servidor';
 import { redefinirSenha } from '@/modulos/autenticacao/acoes';
-import { recuperacaoEmCurso } from '@/modulos/autenticacao/marcador-de-recuperacao';
+import { recuperacaoEmCurso } from '@dissona/nucleo/modulos/autenticacao/marcador-de-recuperacao';
 
 export const metadata: Metadata = {
   title: 'Definir nova senha · Dissona',

@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
 import { NavegadorDoTour } from '@/componentes/autenticacao/NavegadorDoTour';
 import { ProvedorDoTour } from '@/componentes/autenticacao/estado-do-tour';
 import { TourDeOnboarding } from '@/componentes/autenticacao/TourDeOnboarding';
 import type { PassoDoTour } from '@/componentes/autenticacao/TourDeOnboarding';
-import { ROTA } from '@/lib/guarda-rota';
-import { Papel } from '@/lib/papeis';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { Papel } from '@dissona/nucleo/lib/papeis';
 import { encerrarOnboarding } from '@/modulos/autenticacao/acoes';
-import { lerContextoDaSessao } from '@/modulos/autenticacao/consultas';
-import { ONBOARDING } from '@/textos/prototipo';
+import { lerContextoDaSessao } from '@dissona/nucleo/modulos/autenticacao/consultas';
+import { ONBOARDING } from '@dissona/nucleo/textos/prototipo';
 
 export const metadata: Metadata = {
   title: 'Como a Dissona funciona · Dissona',

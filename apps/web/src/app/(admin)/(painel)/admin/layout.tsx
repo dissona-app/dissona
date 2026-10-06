@@ -1,9 +1,12 @@
 import type { ReactNode } from 'react';
 
-import { RodapeDoAdmin } from '@/componentes/shell/RodapeDoAdmin';
-import { Shell } from '@/componentes/shell/Shell';
+import { RodapeDoAdmin } from '@dissona/nucleo/componentes/shell/RodapeDoAdmin';
+import { Shell } from '@dissona/nucleo/componentes/shell/Shell';
 import { sairDoAdmin } from '@/modulos/autenticacao/acoes';
-import { lerIdentidadeDaSessao, lerPapeisDaSessao } from '@/modulos/autenticacao/consultas';
+import {
+  lerIdentidadeDaSessao,
+  lerPapeisDaSessao,
+} from '@dissona/nucleo/modulos/autenticacao/consultas';
 
 /**
  * Shell do painel administrativo.

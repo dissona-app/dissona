@@ -1,9 +1,12 @@
 import type { ReactNode } from 'react';
 
-import { Shell } from '@/componentes/shell/Shell';
-import { Papel } from '@/lib/papeis';
+import { Shell } from '@dissona/nucleo/componentes/shell/Shell';
+import { Papel } from '@dissona/nucleo/lib/papeis';
 import { registrarAmbiente, sair } from '@/modulos/autenticacao/acoes';
-import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
+import {
+  lerContextoDaSessao,
+  lerIdentidadeDaSessao,
+} from '@dissona/nucleo/modulos/autenticacao/consultas';
 
 /**
  * Shell do ambiente do curador — o **painel**.

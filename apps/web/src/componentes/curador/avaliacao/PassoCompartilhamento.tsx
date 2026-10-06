@@ -2,12 +2,15 @@
 
 import { useActionState, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Campo } from '@/componentes/base/Campo';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import type { AvaliacaoEmEdicao, ModalidadeCompartilhamento } from '@/modulos/avaliacao/tipos';
-import { MODALIDADES_DE_DIVULGACAO } from '@/modulos/avaliacao/tipos';
-import { AVALIAR } from '@/textos/avaliacao';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import type {
+  AvaliacaoEmEdicao,
+  ModalidadeCompartilhamento,
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
+import { MODALIDADES_DE_DIVULGACAO } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 
 import { AcoesDaAvaliacao } from './AcoesDaAvaliacao';
 import { ID_DO_FORMULARIO } from './MolduraDaAvaliacao';

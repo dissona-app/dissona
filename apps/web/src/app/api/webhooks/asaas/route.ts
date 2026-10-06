@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { CodigoErro, ehErroDominio } from '@/lib/erros';
+import { CodigoErro, ehErroDominio } from '@dissona/nucleo/lib/erros';
 import { lerEventoAsaas, tokenConfere } from '@/modulos/claves/webhook-asaas';
 import {
   confirmarPedido,

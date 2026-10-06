@@ -15,7 +15,7 @@ import type {
   NotaDeCriterio,
   OpcionaisCumpridos,
   RegrasDaAvaliacao,
-} from './tipos';
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 /** Nota válida: 0 a 5, com no máximo uma casa decimal. */
 export function notaValida(nota: number): boolean {

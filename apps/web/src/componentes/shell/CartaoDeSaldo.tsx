@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
-import * as claves from '@/lib/claves';
-import type { Claves } from '@/lib/claves';
-import { ROTA } from '@/lib/guarda-rota';
-import { CARTEIRA, SALDO_NA_NAVEGACAO } from '@/textos/prototipo';
+import * as claves from '@dissona/nucleo/lib/claves';
+import type { Claves } from '@dissona/nucleo/lib/claves';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { CARTEIRA, SALDO_NA_NAVEGACAO } from '@dissona/nucleo/textos/prototipo';
 
-import estilos from './Navegacao.module.css';
+import estilos from '@dissona/nucleo/componentes/shell/Navegacao.module.css';
 
 /**
  * Card de saldo no pé da sidebar do artista.

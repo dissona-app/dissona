@@ -11,14 +11,14 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { executar, falhaDeCampos, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { usuarioAtual } from '@/lib/supabase/servidor';
-import { resolverArquivoDoFormulario } from '@/lib/supabase/upload-de-perfil';
-import type { MotivoDeArquivo } from '@/lib/supabase/upload-de-perfil';
+import { executar, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@dissona/nucleo/lib/arquivos';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
+import { resolverArquivoDoFormulario } from '@dissona/nucleo/lib/supabase/upload-de-perfil';
+import type { MotivoDeArquivo } from '@dissona/nucleo/lib/supabase/upload-de-perfil';
 
 import { esquemaDadosDoPerfil } from './esquemas';
 import { atualizarPerfil, lerMeuPerfil } from './repositorio';

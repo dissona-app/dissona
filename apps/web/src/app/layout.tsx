@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import { ProvedorDeConsulta } from '@/lib/consulta/provedor';
+import { ProvedorDeConsulta } from '@dissona/nucleo/lib/consulta/provedor';
 
-import '@/estilos/global.css';
+import '@dissona/nucleo/estilos/global.css';
 
 export const metadata: Metadata = {
   title: 'Dissona',

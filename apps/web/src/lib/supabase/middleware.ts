@@ -3,8 +3,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { ambiente } from '../ambiente';
-import type { Database } from './tipos-bd';
+import { ambiente } from '@dissona/nucleo/lib/ambiente';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 export type SessaoDaRequisicao = {
   /** Resposta já com os cookies de sessão renovados. Sempre use esta. */

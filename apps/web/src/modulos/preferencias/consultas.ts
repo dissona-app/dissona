@@ -2,7 +2,7 @@ import 'server-only';
 
 /** Leituras das preferências (7.3 / 17.3) para Server Components. */
 
-import type { Papel } from '@/lib/papeis';
+import type { Papel } from '@dissona/nucleo/lib/papeis';
 
 import { lerCatalogoEEscolhas, lerIdioma } from './repositorio';
 import { aplicarEscolhas } from './servico';

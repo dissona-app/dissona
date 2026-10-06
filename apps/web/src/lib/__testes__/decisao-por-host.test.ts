@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import type { ContextoDoHost } from '../decisao-por-host';
 import { decidirNoHost } from '../decisao-por-host';
-import { ROTA } from '../guarda-rota';
-import type { LeituraDePapeis } from '../papeis';
-import { Papel, SituacaoConta } from '../papeis';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import type { LeituraDePapeis } from '@dissona/nucleo/lib/papeis';
+import { Papel, SituacaoConta } from '@dissona/nucleo/lib/papeis';
 
 const semSessao: LeituraDePapeis = { estado: 'sem_sessao' };
 

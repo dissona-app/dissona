@@ -2,8 +2,8 @@
 
 import { useFormStatus } from 'react-dom';
 
-import { Botao } from '@/componentes/base/Botao';
-import { CURADOR_CADASTRO } from '@/textos/curador';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './AcoesDoPasso.module.css';
 

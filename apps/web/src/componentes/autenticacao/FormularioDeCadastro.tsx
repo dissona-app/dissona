@@ -4,20 +4,20 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useActionState, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
 import { Checkbox } from '@/componentes/base/Checkbox';
-import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import type { TextosDeCadastro } from '@/textos/prototipo';
-import { erroGeralDe } from '@/textos/erros';
+import { MedidorDeSenha } from '@dissona/nucleo/componentes/base/MedidorDeSenha';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import type { TextosDeCadastro } from '@dissona/nucleo/textos/prototipo';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 
 import estilos from './FormularioDeCadastro.module.css';
-import type { Banner } from './FormularioDeLogin';
-import { IconeOlho } from './IconeOlho';
+import type { Banner } from '@dissona/nucleo/componentes/autenticacao/FormularioDeLogin';
+import { IconeOlho } from '@dissona/nucleo/componentes/autenticacao/IconeOlho';
 
 export type PropsFormularioDeCadastro = {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;

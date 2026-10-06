@@ -2,11 +2,11 @@
 
 import { useActionState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import type { ServicoDoCurador } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@/textos/curador';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import type { ServicoDoCurador } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@dissona/nucleo/textos/curador';
 
 import { ListaDeServicos } from './ListaDeServicos';
 import estilos from './FormularioDeServicos.module.css';

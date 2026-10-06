@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ErroDominio } from '../erros';
+import { ErroDominio } from '@dissona/nucleo/lib/erros';
 import {
   chavePixValida,
   cnpjValido,

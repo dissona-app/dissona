@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { BarraProgresso } from '@/componentes/base/BarraProgresso';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { Painel } from '@/componentes/base/Painel';
-import { prazoRestante } from '@/lib/formato';
+import { prazoRestante } from '@dissona/nucleo/lib/formato';
 import { buscar } from '@/modulos/faixa/repositorio';
 import { lerEnviosDaFaixa } from '@/modulos/selecao/consultas';
-import { STATUS_DO_ENVIO as TEXTOS } from '@/textos/prototipo';
+import { STATUS_DO_ENVIO as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

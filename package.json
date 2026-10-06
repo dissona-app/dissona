@@ -16,7 +16,7 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm -r --filter \"./apps/**\" typecheck && tsc --noEmit -p tsconfig.json",
+    "typecheck": "pnpm -r typecheck && tsc --noEmit -p tsconfig.json",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
     "e2e": "playwright test",
@@ -33,6 +33,7 @@
     "rastreabilidade": "node scripts/matriz-rastreabilidade.mjs"
   },
   "devDependencies": {
+    "@dissona/nucleo": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@supabase/supabase-js": "^2.114.0",
     "@testing-library/jest-dom": "^7.0.1",

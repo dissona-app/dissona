@@ -11,11 +11,11 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { executar, falha, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro, falhar } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { usuarioAtual } from '@/lib/supabase/servidor';
+import { executar, falha, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
 
 import { esquemaAlternarCanal, esquemaIdioma } from './esquemas';
 import { gravarIdioma, gravarPreferencia, lerCriticidade } from './repositorio';

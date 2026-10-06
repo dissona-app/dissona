@@ -1,5 +1,5 @@
-import type { Claves } from '@/lib/claves';
-import type { Database } from '@/lib/supabase/tipos-bd';
+import type { Claves } from '@dissona/nucleo/lib/claves';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 /**
  * Fila de avaliações — módulo 13.

@@ -9,10 +9,10 @@ import 'server-only';
  * é exclusiva desta tela.
  */
 
-import { lerSessoesDaConta as lerSessoesDoServico } from './servico';
-import type { SessaoAtiva } from './repositorio';
+import { lerSessoesDaConta as lerSessoesDoServico } from '@dissona/nucleo/modulos/conta/servico';
+import type { SessaoAtiva } from '@dissona/nucleo/modulos/conta/repositorio';
 
-export type { SessaoAtiva } from './repositorio';
+export type { SessaoAtiva } from '@dissona/nucleo/modulos/conta/repositorio';
 
 /** Sessões ativas da própria conta, da mais recente para a mais antiga. */
 export async function lerSessoesDaConta(): Promise<readonly SessaoAtiva[]> {

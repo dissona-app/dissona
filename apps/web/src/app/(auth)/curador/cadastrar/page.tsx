@@ -4,7 +4,7 @@ import { FormularioDeContaDoCurador } from '@/componentes/curador/FormularioDeCo
 import { MolduraDoWizard } from '@/componentes/curador/MolduraDoWizard';
 import { PainelDeMarca } from '@/componentes/curador/PainelDeMarca';
 import { cadastrarCurador } from '@/modulos/autenticacao/acoes';
-import { TOTAL_DE_PASSOS } from '@/modulos/curador/tipos';
+import { TOTAL_DE_PASSOS } from '@dissona/nucleo/modulos/curador/tipos';
 
 export const metadata: Metadata = {
   title: 'Criar conta · Dissona',

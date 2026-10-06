@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
-import { Selecao } from '@/componentes/base/Selecao';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { erroGeralDe } from '@/textos/erros';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
+import { Selecao } from '@dissona/nucleo/componentes/base/Selecao';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';

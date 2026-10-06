@@ -13,9 +13,9 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     include: [
       'apps/*/src/**/*.{test,spec}.{ts,tsx}',
-      'packages/*/src/**/*.{test,spec}.{ts,tsx}',
+      'packages/*/**/*.{test,spec}.{ts,tsx}',
       'supabase/functions/**/*.test.ts',
     ],
-    exclude: ['e2e/**', 'node_modules/**'],
+    exclude: ['e2e/**', '**/node_modules/**'],
   },
 });

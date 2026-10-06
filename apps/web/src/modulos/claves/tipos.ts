@@ -1,6 +1,6 @@
-import type { Claves } from '@/lib/claves';
-import type { Centavos } from '@/lib/dinheiro';
-import type { Database } from '@/lib/supabase/tipos-bd';
+import type { Claves } from '@dissona/nucleo/lib/claves';
+import type { Centavos } from '@dissona/nucleo/lib/dinheiro';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 /**
  * Carteira e extrato de Claves — módulo 5.

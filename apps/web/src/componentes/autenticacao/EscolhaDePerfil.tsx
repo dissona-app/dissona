@@ -2,9 +2,9 @@
 
 import { useActionState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { SELECAO_DE_PERFIL } from '@/textos/prototipo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { SELECAO_DE_PERFIL } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './EscolhaDePerfil.module.css';
 

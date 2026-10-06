@@ -2,13 +2,13 @@
 
 import { useCallback, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import type { ResultadoDeAcao } from '@/lib/acoes';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 
 import { CartaoDeConta } from './CartaoDeConta';
-import { ModalDeCredencial } from './ModalDeCredencial';
-import type { TipoDeCredencial } from './ModalDeCredencial';
+import { ModalDeCredencial } from '@dissona/nucleo/componentes/conta/ModalDeCredencial';
+import type { TipoDeCredencial } from '@dissona/nucleo/componentes/conta/ModalDeCredencial';
 
 export type PropsCartaoDeCredencial = {
   readonly tipo: TipoDeCredencial;

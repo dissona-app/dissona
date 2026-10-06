@@ -2,11 +2,11 @@
 
 import { useFormStatus } from 'react-dom';
 
-import { Etiqueta } from '@/componentes/base/Etiqueta';
-import { tempoRelativo } from '@/lib/formato';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
+import { tempoRelativo } from '@dissona/nucleo/lib/formato';
 import { lerDispositivo } from '@/modulos/conta/agente';
 import type { SessaoAtiva } from '@/modulos/conta/consultas';
-import { CONTA } from '@/textos/prototipo';
+import { CONTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './PainelDeSessoes.module.css';
 

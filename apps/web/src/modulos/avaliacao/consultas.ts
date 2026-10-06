@@ -14,8 +14,8 @@ import 'server-only';
  * não houvesse envio nenhum.
  */
 
-import { lerConfiguracao, lerConfiguracoes } from '@/lib/configuracao';
-import { paraStringDecimal } from '@/lib/claves';
+import { lerConfiguracao, lerConfiguracoes } from '@dissona/nucleo/lib/configuracao';
+import { paraStringDecimal } from '@dissona/nucleo/lib/claves';
 import { buscarItem, servicosDoEnvio } from '@/modulos/fila/repositorio';
 import type { ItemDaFila, ServicoContratado } from '@/modulos/fila/tipos';
 
@@ -36,9 +36,13 @@ import type {
   ItemDoHistorico,
   RegrasDaAvaliacao,
   Remuneracao,
-} from './tipos';
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
 
-export type { AvaliacaoEmEdicao, Criterio, RegrasDaAvaliacao } from './tipos';
+export type {
+  AvaliacaoEmEdicao,
+  Criterio,
+  RegrasDaAvaliacao,
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 /** O rascunho vazio de um envio que ainda não foi aberto. */
 function rascunhoVazio(envioId: string): AvaliacaoEmEdicao {

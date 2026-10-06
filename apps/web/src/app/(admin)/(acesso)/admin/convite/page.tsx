@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { AceiteDeConvite } from '@/componentes/equipe/AceiteDeConvite';
-import type { EstadoDoAceite } from '@/componentes/equipe/AceiteDeConvite';
-import { ROTA } from '@/lib/guarda-rota';
-import { usuarioAtual } from '@/lib/supabase/servidor';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { AceiteDeConvite } from '@dissona/nucleo/componentes/equipe/AceiteDeConvite';
+import type { EstadoDoAceite } from '@dissona/nucleo/componentes/equipe/AceiteDeConvite';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
 import { concluirAceiteDoConvite } from '@/modulos/equipe/acoes';
 
 export const metadata: Metadata = {

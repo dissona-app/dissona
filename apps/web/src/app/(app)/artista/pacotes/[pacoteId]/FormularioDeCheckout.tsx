@@ -3,15 +3,15 @@
 import type { FormEvent } from 'react';
 import { useActionState, useEffect, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { Campo } from '@/componentes/base/Campo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
 import { Grupo } from '@/componentes/base/Grupo';
 import { Painel } from '@/componentes/base/Painel';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { cpfValido, mascararCpf, mascararTelefone, telefoneValido } from '@/lib/mascaras';
 import { luhnValido } from '@/modulos/claves/esquemas';
 import type {
@@ -21,7 +21,7 @@ import type {
   ResultadoSimulado,
 } from '@/modulos/claves/tipos';
 import type { CartaoSalvo } from '@/modulos/claves/consultas';
-import { CARTAO_SALVO, CHECKOUT as TEXTOS } from '@/textos/prototipo';
+import { CARTAO_SALVO, CHECKOUT as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDeCheckout.module.css';
 

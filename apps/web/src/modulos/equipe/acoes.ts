@@ -11,17 +11,17 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { falha, falhaDeCampos, sucesso } from '@/lib/acoes';
-import type { FalhaDeAcao, ResultadoDeAcao } from '@/lib/acoes';
-import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { origemDaRequisicao } from '@/lib/origem';
-import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
-import { usuarioAtual } from '@/lib/supabase/servidor';
-import { resolverArquivoDoFormulario } from '@/lib/supabase/upload-de-perfil';
-import type { MotivoDeArquivo } from '@/lib/supabase/upload-de-perfil';
-import { esquemaNovaSenha, motivosPorCampo } from '@/modulos/autenticacao/esquemas';
+import { falha, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { FalhaDeAcao, ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@dissona/nucleo/lib/arquivos';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { origemDaRequisicao } from '@dissona/nucleo/lib/origem';
+import { urlDoAdmin } from '@dissona/nucleo/lib/rotas-admin-servidor';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
+import { resolverArquivoDoFormulario } from '@dissona/nucleo/lib/supabase/upload-de-perfil';
+import type { MotivoDeArquivo } from '@dissona/nucleo/lib/supabase/upload-de-perfil';
+import { esquemaNovaSenha, motivosPorCampo } from '@dissona/nucleo/modulos/autenticacao/esquemas';
 
 import {
   esquemaAlterarAcesso,
@@ -29,7 +29,7 @@ import {
   esquemaConvite,
   esquemaDadosPessoais,
   esquemaMatriz,
-} from './esquemas';
+} from '@dissona/nucleo/modulos/equipe/esquemas';
 import {
   aceitarConviteDaEquipe,
   alterarAcessoDoMembro,
@@ -37,11 +37,11 @@ import {
   convidarMembro,
   gravarMatrizDePermissoes,
   salvarMeusDados,
-} from './servico';
-import type { FalhaDeEquipe } from './servico';
-import type { CelulaParaGravar } from './repositorio';
-import { ehNivel, rotuloDoPapel } from './tipos';
-import type { PapelAdmin } from './tipos';
+} from '@dissona/nucleo/modulos/equipe/servico';
+import type { FalhaDeEquipe } from '@dissona/nucleo/modulos/equipe/servico';
+import type { CelulaParaGravar } from '@dissona/nucleo/modulos/equipe/repositorio';
+import { ehNivel, rotuloDoPapel } from '@dissona/nucleo/modulos/equipe/tipos';
+import type { DadosDoConvite, PapelAdmin } from '@dissona/nucleo/modulos/equipe/tipos';
 
 /**
  * As duas negações de permissão, traduzidas para código de erro.
@@ -57,13 +57,6 @@ function traduzirFalha(resultado: FalhaDeEquipe): FalhaDeAcao {
 }
 
 /* -------------------------------------------------------------- convite --- */
-
-export type DadosDoConvite = {
-  readonly email: string;
-  readonly link: string;
-  /** A conta já existia no Auth — o convite vale, e a tela explica isso. */
-  readonly jaTinhaConta: boolean;
-};
 
 /**
  * Convida um membro (27.3).

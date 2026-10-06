@@ -2,14 +2,18 @@
 
 import { useActionState, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BarraProgresso } from '@/componentes/base/BarraProgresso';
 import { CampoNota, NOTA_MAXIMA } from '@/componentes/base/CampoNota';
 import { Painel } from '@/componentes/base/Painel';
-import type { ResultadoDeAcao } from '@/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { mediaObjetiva, mediasPorGrupo } from '@/modulos/avaliacao/servico';
-import type { AvaliacaoEmEdicao, Criterio, RegrasDaAvaliacao } from '@/modulos/avaliacao/tipos';
-import { AVALIAR } from '@/textos/avaliacao';
+import type {
+  AvaliacaoEmEdicao,
+  Criterio,
+  RegrasDaAvaliacao,
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
+import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 
 import { AcoesDaAvaliacao } from './AcoesDaAvaliacao';
 import { ID_DO_FORMULARIO } from './MolduraDaAvaliacao';

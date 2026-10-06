@@ -2,11 +2,11 @@
 
 import { useActionState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { erroGeralDe } from '@/textos/erros';
-import { ONBOARDING } from '@/textos/prototipo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { ONBOARDING } from '@dissona/nucleo/textos/prototipo';
 
 import { useEstadoDoTour } from './estado-do-tour';
 import estilos from './TourDeOnboarding.module.css';

@@ -2,11 +2,11 @@
 
 import { useCallback, useRef, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Player } from '@/componentes/base/Player';
 import type { EstadoEscuta } from '@/lib/escuta';
 import { registrarEscutaMedida } from '@/modulos/avaliacao/acoes';
-import { AVALIAR } from '@/textos/avaliacao';
+import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 
 import estilos from './PlayerComMedicao.module.css';
 

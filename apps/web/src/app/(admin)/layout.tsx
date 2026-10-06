@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { ProvedorDeBaseDoAdmin } from '@/componentes/shell/BaseDoAdmin';
-import { baseDoAdminDaRequisicao } from '@/lib/rotas-admin-servidor';
+import { ProvedorDeBaseDoAdmin } from '@dissona/nucleo/componentes/shell/BaseDoAdmin';
+import { baseDoAdminDaRequisicao } from '@dissona/nucleo/lib/rotas-admin-servidor';
 
 /**
  * `(admin)` — a raiz do ambiente administrativo, dividida em dois grupos:

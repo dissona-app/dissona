@@ -11,7 +11,7 @@ import { Passo5Servicos } from '@/componentes/curador/passos/Passo5Servicos';
 import { Passo6Credenciais } from '@/componentes/curador/passos/Passo6Credenciais';
 import { Passo7Bio } from '@/componentes/curador/passos/Passo7Bio';
 import { Passo8Revisao } from '@/componentes/curador/passos/Passo8Revisao';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import {
   enviarCadastro,
   pularPasso,
@@ -25,8 +25,8 @@ import {
   voltarPasso,
 } from '@/modulos/curador/acoes';
 import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
-import type { PassoDoCadastro } from '@/modulos/curador/tipos';
-import { ehPasso, TOTAL_DE_PASSOS } from '@/modulos/curador/tipos';
+import type { PassoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { ehPasso, TOTAL_DE_PASSOS } from '@dissona/nucleo/modulos/curador/tipos';
 
 export const metadata: Metadata = {
   title: 'Cadastro de curador · Dissona',

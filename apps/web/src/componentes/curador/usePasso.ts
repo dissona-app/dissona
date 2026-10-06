@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 
-import type { FalhaDeAcao, ResultadoDeAcao } from '@/lib/acoes';
+import type { FalhaDeAcao, ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 
 export type EstadoDoPasso = {
   /** Passar direto para `<form action>`. */

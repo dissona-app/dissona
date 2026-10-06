@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { CampoDeFoto } from '@/componentes/base/CampoDeFoto';
-import { CodigoErro } from '@/lib/erros';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { erroGeralDe } from '@/textos/erros';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { CampoDeFoto } from '@dissona/nucleo/componentes/base/CampoDeFoto';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import estilos from './Passos.module.css';

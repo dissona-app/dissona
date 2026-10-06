@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { paraStringDecimal } from '@/lib/dinheiro';
-import { lerPermissao, ModuloAdmin } from '@/modulos/admin/permissoes';
-import { lerParaEdicao } from '@/modulos/pacote/consultas';
-import { formatarQuantidade } from '@/modulos/pacote/formato';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { paraStringDecimal } from '@dissona/nucleo/lib/dinheiro';
+import { lerPermissao, ModuloAdmin } from '@dissona/nucleo/modulos/admin/permissoes';
+import { lerParaEdicao } from '@dissona/nucleo/modulos/pacote/consultas';
+import { formatarQuantidade } from '@dissona/nucleo/modulos/pacote/formato';
 
 import { FormularioDePacote } from '../FormularioDePacote';
 

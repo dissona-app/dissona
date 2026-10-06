@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
 
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
-import { rotaDoPasso } from '@/modulos/curador/servico';
+import { rotaDoPasso } from '@dissona/nucleo/modulos/curador/servico';
 
 /**
  * `/curador/cadastro` — a retomada.

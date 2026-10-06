@@ -3,18 +3,18 @@
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
-import { CampoDeFoto } from '@/componentes/base/CampoDeFoto';
-import { IconeOlho } from '@/componentes/autenticacao/IconeOlho';
-import type { Banner } from '@/componentes/autenticacao/FormularioDeLogin';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { erroGeralDe } from '@/textos/erros';
-import { CADASTRAR } from '@/textos/prototipo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
+import { CampoDeFoto } from '@dissona/nucleo/componentes/base/CampoDeFoto';
+import { IconeOlho } from '@dissona/nucleo/componentes/autenticacao/IconeOlho';
+import type { Banner } from '@dissona/nucleo/componentes/autenticacao/FormularioDeLogin';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { CADASTRAR } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDeContaDoCurador.module.css';
 

@@ -2,9 +2,9 @@
 
 import { useFormStatus } from 'react-dom';
 
-import { Botao } from '@/componentes/base/Botao';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { AVALIAR } from '@/textos/avaliacao';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 
 import estilos from './AcoesDaAvaliacao.module.css';
 

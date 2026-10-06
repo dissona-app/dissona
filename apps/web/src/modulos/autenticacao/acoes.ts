@@ -12,21 +12,21 @@
 
 import { redirect } from 'next/navigation';
 
-import { falha, falhaDeCampos, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { conferirArquivo, FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
-import { CodigoErro } from '@/lib/erros';
-import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
-import { origemDaRequisicao } from '@/lib/origem';
-import { Papel } from '@/lib/papeis';
-import { baseDoAdminDaRequisicao, urlDoAdmin } from '@/lib/rotas-admin-servidor';
+import { falha, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { conferirArquivo, FOTO_MAX_BYTES, FOTO_TIPOS } from '@dissona/nucleo/lib/arquivos';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ENTRAR_PADRAO, ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { origemDaRequisicao } from '@dissona/nucleo/lib/origem';
+import { Papel } from '@dissona/nucleo/lib/papeis';
+import { baseDoAdminDaRequisicao, urlDoAdmin } from '@dissona/nucleo/lib/rotas-admin-servidor';
 /*
  * Módulo 12, a partir da autenticação: `/curador/cadastrar` **é** o passo 1 do
  * wizard sem sessão, e gravar a foto e avançar o passo é trabalho de lá. A
  * direção `acoes → servico` está respeitada, e é o mesmo salto cruzado que
  * `claves/servico` faz em `pacote/servico`.
  */
-import { salvarDadosBasicos } from '@/modulos/curador/servico';
+import { salvarDadosBasicos } from '@dissona/nucleo/modulos/curador/servico';
 
 import {
   esquemaCadastro,
@@ -38,7 +38,7 @@ import {
   esquemaPapelEscolhivel,
   esquemaProvedorSocial,
   motivosPorCampo,
-} from './esquemas';
+} from '@dissona/nucleo/modulos/autenticacao/esquemas';
 import {
   cadastrar as cadastrarNoProduto,
   concluirOnboarding,
@@ -51,9 +51,9 @@ import {
   reenviarLinkDeVerificacao,
   registrarAmbienteEmUso,
   selecionarPapel,
-} from './servico';
-import { encerrarSessao } from './repositorio';
-import type { PapelEscolhivel } from './repositorio';
+} from '@dissona/nucleo/modulos/autenticacao/servico';
+import { encerrarSessao } from '@dissona/nucleo/modulos/autenticacao/repositorio';
+import type { PapelEscolhivel } from '@dissona/nucleo/modulos/autenticacao/repositorio';
 
 /**
  * Um módulo `'use server'` só pode exportar função assíncrona, então os

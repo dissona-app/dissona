@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { lerPermissao, ModuloAdmin } from '@/modulos/admin/permissoes';
-import { lerValorDaClave } from '@/modulos/pacote/consultas';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { lerPermissao, ModuloAdmin } from '@dissona/nucleo/modulos/admin/permissoes';
+import { lerValorDaClave } from '@dissona/nucleo/modulos/pacote/consultas';
 
 import { FormularioDePacote } from '../FormularioDePacote';
 

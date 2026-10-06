@@ -2,17 +2,17 @@
 
 import { useActionState, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Checkbox } from '@/componentes/base/Checkbox';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import { Painel } from '@/componentes/base/Painel';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { SELECAO as TEXTOS } from '@/textos/prototipo';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { SELECAO as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './SelecaoDeCuradores.module.css';
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { esquemaLinkOpcional } from '@/lib/link';
-import { GENEROS_DO_ARTISTA } from '@/textos/prototipo';
+import { esquemaLinkOpcional } from '@dissona/nucleo/lib/link';
+import { GENEROS_DO_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import { MAXIMO_DA_BIO, MAXIMO_DE_GENEROS } from './tipos';
 

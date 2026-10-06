@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import type { ServicoDoCurador } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
+import type { ServicoDoCurador } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './passos/Passos.module.css';
 

@@ -1,5 +1,5 @@
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import type { PassoDoCadastro } from '@/modulos/curador/tipos';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import type { PassoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
 
 /**
  * O que todo passo do wizard recebe.

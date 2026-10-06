@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
-import { useHrefDoAdmin } from '@/componentes/shell/BaseDoAdmin';
-import { ROTA } from '@/lib/guarda-rota';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
+import { useHrefDoAdmin } from '@dissona/nucleo/componentes/shell/BaseDoAdmin';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { atualizarPacote, criarPacote } from '@/modulos/pacote/acoes';
-import { ADMIN_PACOTE_FORMULARIO } from '@/textos/prototipo';
+import { ADMIN_PACOTE_FORMULARIO } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDePacote.module.css';
 

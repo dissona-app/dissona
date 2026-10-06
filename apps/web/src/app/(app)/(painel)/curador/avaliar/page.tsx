@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
 
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import { Painel } from '@/componentes/base/Painel';
 import { TabelaDoHistorico } from '@/componentes/curador/TabelaDoHistorico';
 import type { LinhaDoHistorico } from '@/componentes/curador/TabelaDoHistorico';
-import * as dinheiro from '@/lib/dinheiro';
-import { formatarData, formatarNumero } from '@/lib/formato';
-import { ROTA } from '@/lib/guarda-rota';
+import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
+import { formatarData, formatarNumero } from '@dissona/nucleo/lib/formato';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerHistorico } from '@/modulos/avaliacao/consultas';
-import { PASSO_NO_INDICADOR, passoDoNumero } from '@/modulos/avaliacao/tipos';
-import type { ItemDoHistorico } from '@/modulos/avaliacao/tipos';
-import { AVALIAR, HISTORICO as TEXTOS } from '@/textos/avaliacao';
+import { PASSO_NO_INDICADOR, passoDoNumero } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import type { ItemDoHistorico } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import { AVALIAR, HISTORICO as TEXTOS } from '@dissona/nucleo/textos/avaliacao';
 
 import estilos from './pagina.module.css';
 

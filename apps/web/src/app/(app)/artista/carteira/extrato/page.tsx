@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 
-import { Abas } from '@/componentes/base/Abas';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
+import { Abas } from '@dissona/nucleo/componentes/base/Abas';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import { Painel } from '@/componentes/base/Painel';
-import * as claves from '@/lib/claves';
-import { formatarData } from '@/lib/formato';
-import { ROTA } from '@/lib/guarda-rota';
+import * as claves from '@dissona/nucleo/lib/claves';
+import { formatarData } from '@dissona/nucleo/lib/formato';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerExtrato } from '@/modulos/claves/consultas';
 import { FILTROS_DO_EXTRATO, ehFiltroDoExtrato } from '@/modulos/claves/tipos';
-import { CARTEIRA as TEXTOS } from '@/textos/prototipo';
+import { CARTEIRA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

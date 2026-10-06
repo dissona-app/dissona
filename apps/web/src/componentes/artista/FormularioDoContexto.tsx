@@ -3,16 +3,16 @@
 import { useActionState, useState } from 'react';
 
 import { AreaTexto } from '@/componentes/base/AreaTexto';
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Chips } from '@/componentes/base/Chips';
 import { Painel } from '@/componentes/base/Painel';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { ROTA } from '@/lib/guarda-rota';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import type { FaixaEmEdicao } from '@/modulos/faixa/tipos';
-import { erroGeralDe } from '@/textos/erros';
-import { ENVIAR as TEXTOS, GENEROS_DO_ARTISTA } from '@/textos/prototipo';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { ENVIAR as TEXTOS, GENEROS_DO_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDoContexto.module.css';
 

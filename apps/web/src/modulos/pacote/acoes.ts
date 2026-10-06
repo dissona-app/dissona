@@ -16,17 +16,21 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { executar, falha, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { lerConfiguracao } from '@/lib/configuracao';
-import { CodigoErro, falhar } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { lerPermissao, ModuloAdmin } from '@/modulos/admin/permissoes';
+import { executar, falha, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { lerConfiguracao } from '@dissona/nucleo/lib/configuracao';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { lerPermissao, ModuloAdmin } from '@dissona/nucleo/modulos/admin/permissoes';
 
-import { esquemaAlternarAtivo, esquemaDadosDePacote, esquemaIdDePacote } from './esquemas';
-import * as repositorio from './repositorio';
-import { base, descontoDerivado, validarDados } from './servico';
-import type { DadosDePacote } from './tipos';
+import {
+  esquemaAlternarAtivo,
+  esquemaDadosDePacote,
+  esquemaIdDePacote,
+} from '@dissona/nucleo/modulos/pacote/esquemas';
+import * as repositorio from '@dissona/nucleo/modulos/pacote/repositorio';
+import { base, descontoDerivado, validarDados } from '@dissona/nucleo/modulos/pacote/servico';
+import type { DadosDePacote } from '@dissona/nucleo/modulos/pacote/tipos';
 
 /** Interno: `revalidatePath` pede o destino do rewrite, não o endereço do subdomínio. */
 const CAMINHO_LISTA = ROTA.ADMIN_PACOTES;

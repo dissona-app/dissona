@@ -3,16 +3,16 @@
 import Image from 'next/image';
 import { useActionState, useRef, useState, useTransition } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
 import { Grupo } from '@/componentes/base/Grupo';
 import { Painel } from '@/componentes/base/Painel';
-import type { FalhaDeAcao, ResultadoDeAcao } from '@/lib/acoes';
-import { criarClienteNavegador } from '@/lib/supabase/cliente';
+import type { FalhaDeAcao, ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { criarClienteNavegador } from '@dissona/nucleo/lib/supabase/cliente';
 import type { FaixaEmEdicao, LimitesDeUpload, MetadadosDetectados } from '@/modulos/faixa/tipos';
-import { erroGeralDe } from '@/textos/erros';
-import { ENVIAR as TEXTOS } from '@/textos/prototipo';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { ENVIAR as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDaFaixa.module.css';
 

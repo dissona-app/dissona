@@ -9,14 +9,14 @@ import 'server-only';
  * situação: ele a deixa estourar como `DS013`, que a View traduz.
  */
 
-import { CodigoErro, falhar } from '@/lib/erros';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
 import {
   metadadosDoObjeto as lerMetadadosDoObjeto,
   type ObjetoNoStorage,
-} from '@/lib/supabase/armazenamento';
-import { estourarSeErro } from '@/lib/supabase/erros';
-import { criarClienteServidor } from '@/lib/supabase/servidor';
-import type { Database } from '@/lib/supabase/tipos-bd';
+} from '@dissona/nucleo/lib/supabase/armazenamento';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
+import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 import { lerMetadados } from './servico';
 import type { FaixaEmEdicao, MetadadosDetectados } from './tipos';

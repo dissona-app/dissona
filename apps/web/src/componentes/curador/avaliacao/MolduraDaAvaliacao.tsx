@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 
-import { Botao } from '@/componentes/base/Botao';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { Passos } from '@/componentes/base/Passos';
-import { PASSO_NO_INDICADOR } from '@/modulos/avaliacao/tipos';
-import type { PassoDaAvaliacao } from '@/modulos/avaliacao/tipos';
-import { AVALIAR } from '@/textos/avaliacao';
+import { PASSO_NO_INDICADOR } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import type { PassoDaAvaliacao } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 
 import estilos from './MolduraDaAvaliacao.module.css';
 

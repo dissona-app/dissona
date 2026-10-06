@@ -2,15 +2,15 @@
 
 import { useActionState, useEffect } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
-import { Modal } from '@/componentes/base/Modal';
-import { Selecao } from '@/componentes/base/Selecao';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import type { CanalDoCurador } from '@/modulos/curador/tipos';
-import { erroGeralDe } from '@/textos/erros';
-import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@/textos/curador';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
+import { Modal } from '@dissona/nucleo/componentes/base/Modal';
+import { Selecao } from '@dissona/nucleo/componentes/base/Selecao';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import type { CanalDoCurador } from '@dissona/nucleo/modulos/curador/tipos';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './ModalDeMidia.module.css';
 

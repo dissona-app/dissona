@@ -16,9 +16,9 @@ import 'server-only';
  * `handle`, e falhar antes de tocar `perfil_artista` deixa menos rastro.
  */
 
-import { CodigoErro, falhar } from '@/lib/erros';
-import { estourarSeErro } from '@/lib/supabase/erros';
-import { criarClienteServidor } from '@/lib/supabase/servidor';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
+import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
 
 import type { DadosDoPerfil, PerfilDoArtista } from './tipos';
 

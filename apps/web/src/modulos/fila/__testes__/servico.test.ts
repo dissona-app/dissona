@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { paraClaves } from '@/lib/claves';
+import { paraClaves } from '@dissona/nucleo/lib/claves';
 
 import {
   contarPrazoCurto,

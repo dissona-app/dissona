@@ -2,9 +2,9 @@ import 'server-only';
 
 /** Leituras da Carteira (5) e do Extrato (5.3) para Server Components. */
 
-import type { Claves } from '@/lib/claves';
-import type { Centavos } from '@/lib/dinheiro';
-import { lerConfiguracao } from '@/lib/configuracao';
+import type { Claves } from '@dissona/nucleo/lib/claves';
+import type { Centavos } from '@dissona/nucleo/lib/dinheiro';
+import { lerConfiguracao } from '@dissona/nucleo/lib/configuracao';
 
 import { lerMovimentacoes, lerSaldo } from './repositorio';
 import { adquiridas, comSaldoAcumulado, ultimas, usadas } from './servico';

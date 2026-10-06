@@ -1,12 +1,15 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { MolduraDaClasse } from '@/componentes/curador/MolduraDaClasse';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
-import { credenciaisComprovadas, seriaCandidatoAPrata } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO, CURADOR_CLASSIFICACAO } from '@/textos/curador';
+import {
+  credenciaisComprovadas,
+  seriaCandidatoAPrata,
+} from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO, CURADOR_CLASSIFICACAO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './pagina.module.css';
 

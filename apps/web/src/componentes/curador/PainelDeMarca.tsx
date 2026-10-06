@@ -1,5 +1,5 @@
-import { Marca } from '@/componentes/base/Marca';
-import { CURADOR_CADASTRO } from '@/textos/curador';
+import { Marca } from '@dissona/nucleo/componentes/base/Marca';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './PainelDeMarca.module.css';
 

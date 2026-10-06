@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 
 import { BotoesSociais } from '@/componentes/autenticacao/BotoesSociais';
 import { FormularioDeCadastro } from '@/componentes/autenticacao/FormularioDeCadastro';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { cadastrar, entrarComProvedor } from '@/modulos/autenticacao/acoes';
-import { CADASTRAR_ARTISTA } from '@/textos/prototipo';
+import { CADASTRAR_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

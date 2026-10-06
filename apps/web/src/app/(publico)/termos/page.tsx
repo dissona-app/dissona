@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { ROTA } from '@/lib/guarda-rota';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 
 import estilos from '../DocumentoLegal.module.css';
 

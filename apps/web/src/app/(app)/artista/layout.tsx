@@ -1,10 +1,13 @@
 import type { ReactNode } from 'react';
 
 import { CartaoDeSaldo } from '@/componentes/shell/CartaoDeSaldo';
-import { Shell } from '@/componentes/shell/Shell';
-import { Papel } from '@/lib/papeis';
+import { Shell } from '@dissona/nucleo/componentes/shell/Shell';
+import { Papel } from '@dissona/nucleo/lib/papeis';
 import { registrarAmbiente, sair } from '@/modulos/autenticacao/acoes';
-import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
+import {
+  lerContextoDaSessao,
+  lerIdentidadeDaSessao,
+} from '@dissona/nucleo/modulos/autenticacao/consultas';
 import { lerSaldoDisponivel } from '@/modulos/claves/consultas';
 
 /**

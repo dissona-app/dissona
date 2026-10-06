@@ -2,13 +2,13 @@
 
 import { useActionState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
 import type { CartaoSalvo } from '@/modulos/claves/consultas';
-import { erroGeralDe } from '@/textos/erros';
-import { CARTAO_SALVO as TEXTOS } from '@/textos/prototipo';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { CARTAO_SALVO as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import { CartaoDeConta } from './CartaoDeConta';
 import estilos from './CartaoSalvoNaConta.module.css';

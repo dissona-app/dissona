@@ -3,15 +3,15 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Campo } from '@/componentes/base/Campo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Campo } from '@dissona/nucleo/componentes/base/Campo';
 import { Checkbox } from '@/componentes/base/Checkbox';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro } from '@/lib/erros';
-import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
-import { erroGeralDe } from '@/textos/erros';
-import { CONFIRMAR_SOCIAL } from '@/textos/prototipo';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ENTRAR_PADRAO, ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { CONFIRMAR_SOCIAL } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './ConfirmacaoDeCadastro.module.css';
 

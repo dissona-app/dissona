@@ -3,13 +3,13 @@ import { notFound } from 'next/navigation';
 
 import { SelecaoDeCuradores } from '@/componentes/artista/SelecaoDeCuradores';
 import type { CuradorNaLista } from '@/componentes/artista/SelecaoDeCuradores';
-import * as claves from '@/lib/claves';
+import * as claves from '@dissona/nucleo/lib/claves';
 import { lerFaixaDoPasso } from '@/modulos/faixa/consultas';
 import { confirmarSelecaoDeCuradores } from '@/modulos/selecao/acoes';
 import { listarDisponiveis } from '@/modulos/selecao/repositorio';
 import { podeReceberEnvio } from '@/modulos/selecao/servico';
 import { SERVICO_OBRIGATORIO } from '@/modulos/selecao/tipos';
-import { CARTEIRA } from '@/textos/prototipo';
+import { CARTEIRA } from '@dissona/nucleo/textos/prototipo';
 
 export const metadata: Metadata = {
   title: 'Escolher curadores',

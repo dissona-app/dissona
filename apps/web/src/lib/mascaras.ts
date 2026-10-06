@@ -5,7 +5,7 @@
  * está ativa no banco — isso é a validação do Asaas, na R2.
  */
 
-import { CodigoErro, falhar } from './erros';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
 
 function apenasDigitos(valor: string): string {
   return valor.replace(/[^0-9]/g, '');

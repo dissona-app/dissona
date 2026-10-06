@@ -1,9 +1,9 @@
-import { Abas } from '@/componentes/base/Abas';
-import { Aviso } from '@/componentes/base/Aviso';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { ROTA } from '@/lib/guarda-rota';
-import { Papel } from '@/lib/papeis';
+import { Abas } from '@dissona/nucleo/componentes/base/Abas';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { Papel } from '@dissona/nucleo/lib/papeis';
 import {
   encerrarSessaoDeOutroDispositivo,
   excluirMinhaConta,
@@ -13,10 +13,10 @@ import {
 } from '@/modulos/conta/acoes';
 import type { CartaoSalvo } from '@/modulos/claves/consultas';
 import type { SessaoAtiva } from '@/modulos/conta/consultas';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
 import { alternarCanalDeEvento, definirIdiomaDaConta } from '@/modulos/preferencias/acoes';
 import type { Preferencias } from '@/modulos/preferencias/consultas';
-import { CONTA } from '@/textos/prototipo';
+import { CONTA } from '@dissona/nucleo/textos/prototipo';
 
 import { CartaoSalvoNaConta } from './CartaoSalvoNaConta';
 

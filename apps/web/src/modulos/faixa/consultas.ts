@@ -2,7 +2,7 @@ import 'server-only';
 
 /** Leituras do envio (3) para Server Components. */
 
-import { lerConfiguracoes } from '@/lib/configuracao';
+import { lerConfiguracoes } from '@dissona/nucleo/lib/configuracao';
 
 import { buscar } from './repositorio';
 import { passoAlcancado, podeAbrir } from './servico';

@@ -1,6 +1,6 @@
 'use client';
 
-import { ONBOARDING } from '@/textos/prototipo';
+import { ONBOARDING } from '@dissona/nucleo/textos/prototipo';
 
 import { useEstadoDoTour } from './estado-do-tour';
 import estilos from './NavegadorDoTour.module.css';

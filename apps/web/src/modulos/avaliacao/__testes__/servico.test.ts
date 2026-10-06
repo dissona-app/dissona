@@ -13,7 +13,11 @@ import {
   proximoPasso,
   truncarNota,
 } from '../servico';
-import type { AvaliacaoEmEdicao, Criterio, RegrasDaAvaliacao } from '../tipos';
+import type {
+  AvaliacaoEmEdicao,
+  Criterio,
+  RegrasDaAvaliacao,
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 /**
  * Regra da avaliação (14).

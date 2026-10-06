@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Painel } from '@/componentes/base/Painel';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { buscar } from '@/modulos/faixa/repositorio';
-import { ENVIAR } from '@/textos/prototipo';
+import { ENVIAR } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

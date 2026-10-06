@@ -1,9 +1,9 @@
 'use client';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { erroGeralDe } from '@/textos/erros';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { ListaDeServicos } from '../ListaDeServicos';

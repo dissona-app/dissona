@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 
-import * as dinheiro from '@/lib/dinheiro';
+import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
 import { checkoutSimulado } from '@/modulos/claves/pagamento';
-import { formatarDesconto, formatarQuantidade, temDesconto } from '@/modulos/pacote/formato';
-import { lerVitrine } from '@/modulos/pacote/consultas';
-import { PACOTES as TEXTOS } from '@/textos/prototipo';
+import {
+  formatarDesconto,
+  formatarQuantidade,
+  temDesconto,
+} from '@dissona/nucleo/modulos/pacote/formato';
+import { lerVitrine } from '@dissona/nucleo/modulos/pacote/consultas';
+import { PACOTES as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import { TelaDePacotes } from './TelaDePacotes';
 

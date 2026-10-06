@@ -1,10 +1,10 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { adminEmSubdominio } from './lib/ambiente';
+import { adminEmSubdominio } from '@dissona/nucleo/lib/ambiente';
 import { decidirNoHost } from './lib/decisao-por-host';
-import type { LeituraDePapeis } from './lib/papeis';
-import { lerContextoSessao } from './lib/papeis';
+import type { LeituraDePapeis } from '@dissona/nucleo/lib/papeis';
+import { lerContextoSessao } from '@dissona/nucleo/lib/papeis';
 import type { SessaoDaRequisicao } from './lib/supabase/middleware';
 import { renovarSessao } from './lib/supabase/middleware';
 

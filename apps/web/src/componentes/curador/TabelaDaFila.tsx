@@ -2,10 +2,10 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { Etiqueta } from '@/componentes/base/Etiqueta';
-import { Tabela } from '@/componentes/base/Tabela';
-import type { ColunaTabela } from '@/componentes/base/Tabela';
-import { FILA as TEXTOS } from '@/textos/prototipo';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
+import { Tabela } from '@dissona/nucleo/componentes/base/Tabela';
+import type { ColunaTabela } from '@dissona/nucleo/componentes/base/Tabela';
+import { FILA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './TabelaDaFila.module.css';
 

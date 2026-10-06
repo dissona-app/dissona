@@ -1,10 +1,10 @@
 'use client';
 
 import { Aviso, Chips } from '@/componentes/base';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
-import { TEMPO_DE_ATUACAO } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { erroGeralDe } from '@/textos/erros';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { TEMPO_DE_ATUACAO } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { Segmentado } from '../Segmentado';

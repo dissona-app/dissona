@@ -3,18 +3,18 @@
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
-import { Modal } from '@/componentes/base/Modal';
-import { Tabela } from '@/componentes/base/Tabela';
-import type { ColunaTabela } from '@/componentes/base/Tabela';
-import { useHrefDoAdmin } from '@/componentes/shell/BaseDoAdmin';
-import { ROTA } from '@/lib/guarda-rota';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
+import { Modal } from '@dissona/nucleo/componentes/base/Modal';
+import { Tabela } from '@dissona/nucleo/componentes/base/Tabela';
+import type { ColunaTabela } from '@dissona/nucleo/componentes/base/Tabela';
+import { useHrefDoAdmin } from '@dissona/nucleo/componentes/shell/BaseDoAdmin';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { alternarAtivo, excluirPacote } from '@/modulos/pacote/acoes';
-import { ADMIN_PACOTE_EXCLUIR, ADMIN_PACOTES } from '@/textos/prototipo';
+import { ADMIN_PACOTE_EXCLUIR, ADMIN_PACOTES } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './ListaDePacotes.module.css';
 

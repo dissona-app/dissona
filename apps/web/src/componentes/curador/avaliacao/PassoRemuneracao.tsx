@@ -1,15 +1,15 @@
-import { Aviso } from '@/componentes/base/Aviso';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Painel } from '@/componentes/base/Painel';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import * as dinheiro from '@/lib/dinheiro';
-import { ROTA } from '@/lib/guarda-rota';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import type { TelaDaRemuneracao } from '@/modulos/avaliacao/consultas';
-import type { OpcionaisCumpridos } from '@/modulos/avaliacao/tipos';
+import type { OpcionaisCumpridos } from '@dissona/nucleo/modulos/avaliacao/tipos';
 import { opcionaisCumpridos } from '@/modulos/avaliacao/servico';
-import { AVALIAR } from '@/textos/avaliacao';
-import { FILA } from '@/textos/prototipo';
+import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
+import { FILA } from '@dissona/nucleo/textos/prototipo';
 
 import { BotaoConcluir } from './BotaoConcluir';
 import estilos from './PassoRemuneracao.module.css';

@@ -1,10 +1,10 @@
-import { Aviso } from '@/componentes/base/Aviso';
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Painel } from '@/componentes/base/Painel';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { rotuloDaFonte } from '@/modulos/faixa/servico';
 import type { FaixaEmEdicao } from '@/modulos/faixa/tipos';
-import { ENVIAR as TEXTOS } from '@/textos/prototipo';
+import { ENVIAR as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './Revisao.module.css';
 

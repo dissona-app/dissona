@@ -14,8 +14,8 @@
  * Pura, como `decidirAcesso`: a matriz inteira é testável sem servidor.
  */
 
-import type { ContextoDeAcesso } from './guarda-rota';
-import { decidirAcesso } from './guarda-rota';
+import type { ContextoDeAcesso } from '@dissona/nucleo/lib/guarda-rota';
+import { decidirAcesso } from '@dissona/nucleo/lib/guarda-rota';
 import {
   ehCaminhoDoAdmin,
   ehHostDoAdmin,
@@ -24,7 +24,7 @@ import {
   paraExterno,
   paraInterno,
   passaDiretoNoHostDoAdmin,
-} from './rotas-admin';
+} from '@dissona/nucleo/lib/rotas-admin';
 
 export type ContextoDoHost = ContextoDeAcesso & {
   readonly host: string;

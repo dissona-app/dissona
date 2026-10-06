@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { ENTRAR_PADRAO } from '@/lib/guarda-rota';
+import { ENTRAR_PADRAO } from '@dissona/nucleo/lib/guarda-rota';
 
 /**
  * Homepage pública — módulo 26, R5.

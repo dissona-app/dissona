@@ -1,8 +1,8 @@
 'use client';
 
 import { CampoNota } from '@/componentes/base/CampoNota';
-import type { Criterio } from '@/modulos/avaliacao/tipos';
-import { AVALIAR } from '@/textos/avaliacao';
+import type { Criterio } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 
 import estilos from './NotaDoCriterio.module.css';
 

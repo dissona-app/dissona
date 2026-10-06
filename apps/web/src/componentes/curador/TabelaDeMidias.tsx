@@ -2,14 +2,14 @@
 
 import { useActionState, useCallback, useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
-import { Modal } from '@/componentes/base/Modal';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import type { CanalDoCurador } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@/textos/curador';
-import { mensagemDaFalha } from '@/textos/erros';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
+import { Modal } from '@dissona/nucleo/componentes/base/Modal';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import type { CanalDoCurador } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@dissona/nucleo/textos/curador';
+import { mensagemDaFalha } from '@dissona/nucleo/textos/erros';
 
 import { ModalDeMidia } from './ModalDeMidia';
 import estilos from './TabelaDeMidias.module.css';

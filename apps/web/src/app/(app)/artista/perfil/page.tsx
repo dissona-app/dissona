@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { VitrineDoPerfil } from '@/componentes/artista/VitrineDoPerfil';
-import { ROTA } from '@/lib/guarda-rota';
-import { urlPublicaDoAvatar } from '@/lib/supabase/armazenamento';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { urlPublicaDoAvatar } from '@dissona/nucleo/lib/supabase/armazenamento';
 import { lerVitrineDoArtista } from '@/modulos/artista/consultas';
-import { ARTISTA_VITRINE } from '@/textos/prototipo';
+import { ARTISTA_VITRINE } from '@dissona/nucleo/textos/prototipo';
 
 export const metadata: Metadata = {
   title: ARTISTA_VITRINE.titulo,

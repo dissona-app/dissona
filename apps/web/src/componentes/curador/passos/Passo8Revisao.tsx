@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { ROTA } from '@/lib/guarda-rota';
-import { esquemaLink } from '@/lib/link';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
-import { credenciaisComprovadas, rotuloDoTempo } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { erroGeralDe } from '@/textos/erros';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { esquemaLink } from '@dissona/nucleo/lib/link';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { credenciaisComprovadas, rotuloDoTempo } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';

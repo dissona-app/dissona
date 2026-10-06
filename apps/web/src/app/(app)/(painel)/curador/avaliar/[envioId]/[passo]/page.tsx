@@ -7,7 +7,7 @@ import { PassoNotas } from '@/componentes/curador/avaliacao/PassoNotas';
 import { PassoOutras } from '@/componentes/curador/avaliacao/PassoOutras';
 import { PassoRemuneracao } from '@/componentes/curador/avaliacao/PassoRemuneracao';
 import { PassoSubjetiva } from '@/componentes/curador/avaliacao/PassoSubjetiva';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import {
   concluirAvaliacao,
   salvarEscolhaDeCompartilhamento,
@@ -17,7 +17,7 @@ import {
 } from '@/modulos/avaliacao/acoes';
 import { lerAvaliacao, lerRemuneracao } from '@/modulos/avaliacao/consultas';
 import { passoAnterior } from '@/modulos/avaliacao/servico';
-import { ehPassoDaAvaliacao } from '@/modulos/avaliacao/tipos';
+import { ehPassoDaAvaliacao } from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 export const metadata: Metadata = {
   title: 'Avaliação',

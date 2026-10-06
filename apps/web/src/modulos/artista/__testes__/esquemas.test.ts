@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CURADOR_CADASTRO, GENEROS_DO_ARTISTA } from '@/textos/prototipo';
+import { CURADOR_CADASTRO, GENEROS_DO_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import { esquemaDadosDoPerfil } from '../esquemas';
 import { MAXIMO_DA_BIO, MAXIMO_DE_GENEROS } from '../tipos';

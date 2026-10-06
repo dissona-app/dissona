@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { esquemaLinkOpcional } from '@/lib/link';
-import { GENEROS_DO_ARTISTA } from '@/textos/prototipo';
+import { esquemaLinkOpcional } from '@dissona/nucleo/lib/link';
+import { GENEROS_DO_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 /**
  * Validação dos três passos do envio.

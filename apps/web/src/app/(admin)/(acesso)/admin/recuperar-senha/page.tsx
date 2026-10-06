@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
-import { FormularioDeRecuperacao } from '@/componentes/autenticacao/FormularioDeRecuperacao';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
-import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
+import { FormularioDeRecuperacao } from '@dissona/nucleo/componentes/autenticacao/FormularioDeRecuperacao';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { urlDoAdmin } from '@dissona/nucleo/lib/rotas-admin-servidor';
 import { recuperarSenhaAdmin } from '@/modulos/autenticacao/acoes';
-import { SEGUNDOS_DE_COOLDOWN_DE_ENVIO } from '@/modulos/autenticacao/servico';
+import { SEGUNDOS_DE_COOLDOWN_DE_ENVIO } from '@dissona/nucleo/modulos/autenticacao/servico';
 
 export const metadata: Metadata = {
   title: 'Esqueci minha senha · Dissona',

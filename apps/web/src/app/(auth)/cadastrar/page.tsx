@@ -3,10 +3,10 @@ import type { Metadata } from 'next';
 import { BotoesSociais } from '@/componentes/autenticacao/BotoesSociais';
 import { FormularioDeCadastro } from '@/componentes/autenticacao/FormularioDeCadastro';
 import { ComoFunciona } from '@/componentes/autenticacao/ComoFunciona';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ENTRAR_PADRAO, ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { cadastrar, entrarComProvedor } from '@/modulos/autenticacao/acoes';
-import { CADASTRAR } from '@/textos/prototipo';
+import { CADASTRAR } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

@@ -8,7 +8,7 @@
  * repositório enquanto o repositório precisa da regra de sobreposição.
  */
 
-import { CodigoErro, falhar } from '@/lib/erros';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
 
 import type { EscolhaDeEvento, EventoDoCatalogo, PreferenciaDeEvento } from './tipos';
 

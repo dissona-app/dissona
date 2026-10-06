@@ -1,11 +1,11 @@
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { Painel } from '@/componentes/base/Painel';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
-import { ROTA } from '@/lib/guarda-rota';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
-import { CURADOR_PERFIL as TEXTOS } from '@/textos/conta';
-import { CURADOR_CADASTRO } from '@/textos/curador';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_PERFIL as TEXTOS } from '@dissona/nucleo/textos/conta';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './PerfilDoCurador.module.css';
 

@@ -3,7 +3,7 @@
 import type { MouseEvent, ReactNode } from 'react';
 import { useId, useRef } from 'react';
 
-import { useDialogo } from '@/hooks/useDialogo';
+import { useDialogo } from '@dissona/nucleo/hooks/useDialogo';
 
 import estilos from './Gaveta.module.css';
 

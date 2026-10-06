@@ -13,7 +13,7 @@
  * Os cookies do Supabase são por host: a sessão do admin só vale aqui.
  */
 
-import { ehCaminhoDoAdmin, hostDoAdmin, paraExterno } from '../../apps/web/src/lib/rotas-admin';
+import { ehCaminhoDoAdmin, hostDoAdmin, paraExterno } from '@dissona/nucleo/lib/rotas-admin';
 
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3100';
 

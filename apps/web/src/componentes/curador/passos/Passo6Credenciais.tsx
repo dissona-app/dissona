@@ -2,17 +2,17 @@
 
 import { useState } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { CodigoErro } from '@/lib/erros';
-import { ANEXO_MAX_BYTES, ANEXO_TIPOS } from '@/modulos/curador/esquemas';
-import type { EstadoDoCadastro } from '@/modulos/curador/tipos';
-import { CREDENCIAL_POR_ANEXO } from '@/modulos/curador/tipos';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { erroGeralDe } from '@/textos/erros';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { CodigoErro } from '@dissona/nucleo/lib/erros';
+import { ANEXO_MAX_BYTES, ANEXO_TIPOS } from '@dissona/nucleo/modulos/curador/esquemas';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
+import { CREDENCIAL_POR_ANEXO } from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 
 import { AcoesDoPasso } from '../AcoesDoPasso';
 import { usePasso } from '../usePasso';
-import { useUploadDireto } from '@/componentes/base/useUploadDireto';
+import { useUploadDireto } from '@dissona/nucleo/componentes/base/useUploadDireto';
 import estilos from './Passos.module.css';
 import type { PropsDoPasso } from './tipos';
 

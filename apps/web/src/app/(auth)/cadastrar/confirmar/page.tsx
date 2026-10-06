@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { ConfirmacaoDeCadastro } from '@/componentes/autenticacao/ConfirmacaoDeCadastro';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
-import { usuarioAtual } from '@/lib/supabase/servidor';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ENTRAR_PADRAO, ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
 import { confirmarCadastro, sair } from '@/modulos/autenticacao/acoes';
 
 export const metadata: Metadata = {

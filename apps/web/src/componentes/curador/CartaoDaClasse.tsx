@@ -1,10 +1,13 @@
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
-import { ROTA } from '@/lib/guarda-rota';
-import { SituacaoCurador } from '@/lib/papeis';
-import type { ClasseCurador, SituacaoCurador as Situacao } from '@/modulos/curador/tipos';
-import { CURADOR_MANUTENCAO } from '@/textos/curador';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { SituacaoCurador } from '@dissona/nucleo/lib/papeis';
+import type {
+  ClasseCurador,
+  SituacaoCurador as Situacao,
+} from '@dissona/nucleo/modulos/curador/tipos';
+import { CURADOR_MANUTENCAO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './CartaoDaClasse.module.css';
 

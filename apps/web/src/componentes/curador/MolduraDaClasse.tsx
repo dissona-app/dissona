@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { OndasDeFundo } from '@/componentes/autenticacao/OndasDeFundo';
+import { OndasDeFundo } from '@dissona/nucleo/componentes/autenticacao/OndasDeFundo';
 
 import estilos from './MolduraDaClasse.module.css';
 

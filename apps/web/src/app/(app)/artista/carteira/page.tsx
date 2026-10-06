@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import * as claves from '@/lib/claves';
-import * as dinheiro from '@/lib/dinheiro';
-import { formatarData } from '@/lib/formato';
-import { ROTA } from '@/lib/guarda-rota';
+import * as claves from '@dissona/nucleo/lib/claves';
+import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
+import { formatarData } from '@dissona/nucleo/lib/formato';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerCarteira } from '@/modulos/claves/consultas';
-import { CARTEIRA } from '@/textos/prototipo';
+import { CARTEIRA } from '@dissona/nucleo/textos/prototipo';
 
 import { TelaDaCarteira } from './TelaDaCarteira';
 

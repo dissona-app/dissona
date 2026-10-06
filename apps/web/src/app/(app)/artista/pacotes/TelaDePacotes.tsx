@@ -1,8 +1,8 @@
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Cartao } from '@/componentes/base/Cartao';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
-import { ROTA } from '@/lib/guarda-rota';
-import { PACOTES as TEXTOS } from '@/textos/prototipo';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { PACOTES as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './TelaDePacotes.module.css';
 

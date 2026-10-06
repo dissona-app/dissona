@@ -1,11 +1,15 @@
 import type { Metadata } from 'next';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { formatar as formatarDinheiro } from '@/lib/dinheiro';
-import { lerPermissao, ModuloAdmin } from '@/modulos/admin/permissoes';
-import { lerListaDaEquipe } from '@/modulos/pacote/consultas';
-import { formatarDesconto, formatarQuantidade, temDesconto } from '@/modulos/pacote/formato';
-import { ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '@/textos/prototipo';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { formatar as formatarDinheiro } from '@dissona/nucleo/lib/dinheiro';
+import { lerPermissao, ModuloAdmin } from '@dissona/nucleo/modulos/admin/permissoes';
+import { lerListaDaEquipe } from '@dissona/nucleo/modulos/pacote/consultas';
+import {
+  formatarDesconto,
+  formatarQuantidade,
+  temDesconto,
+} from '@dissona/nucleo/modulos/pacote/formato';
+import { ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '@dissona/nucleo/textos/prototipo';
 
 import { ListaDePacotes } from './ListaDePacotes';
 import type { LinhaDePacote } from './ListaDePacotes';

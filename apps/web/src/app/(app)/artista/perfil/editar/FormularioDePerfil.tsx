@@ -12,12 +12,12 @@ import {
   Chips,
   Painel,
 } from '@/componentes/base';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { ROTA } from '@/lib/guarda-rota';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { MAXIMO_DA_BIO, MAXIMO_DE_GENEROS } from '@/modulos/artista/tipos';
 import type { PerfilDoArtista } from '@/modulos/artista/tipos';
-import { erroGeralDe } from '@/textos/erros';
-import { ARTISTA_PERFIL as TEXTOS, GENEROS_DO_ARTISTA } from '@/textos/prototipo';
+import { erroGeralDe } from '@dissona/nucleo/textos/erros';
+import { ARTISTA_PERFIL as TEXTOS, GENEROS_DO_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDePerfil.module.css';
 

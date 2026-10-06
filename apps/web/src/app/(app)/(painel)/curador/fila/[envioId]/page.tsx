@@ -1,19 +1,19 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { IniciarAvaliacao } from '@/componentes/curador/IniciarAvaliacao';
 import { PlayerComMedicao } from '@/componentes/curador/avaliacao/PlayerComMedicao';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { Painel } from '@/componentes/base/Painel';
-import * as claves from '@/lib/claves';
-import { formatarData, tempoRelativo } from '@/lib/formato';
-import { ROTA } from '@/lib/guarda-rota';
+import * as claves from '@dissona/nucleo/lib/claves';
+import { formatarData, tempoRelativo } from '@dissona/nucleo/lib/formato';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { iniciarAvaliacaoDoEnvio } from '@/modulos/fila/acoes';
 import { lerDetalhe } from '@/modulos/fila/consultas';
 import { horasRestantes } from '@/modulos/fila/servico';
-import { CURADOR_CADASTRO } from '@/textos/curador';
-import { CARTEIRA, FILA as TEXTOS } from '@/textos/prototipo';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
+import { CARTEIRA, FILA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

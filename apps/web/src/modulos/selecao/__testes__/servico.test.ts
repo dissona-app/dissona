@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { deClavesInteiras, paraClaves } from '@/lib/claves';
+import { deClavesInteiras, paraClaves } from '@dissona/nucleo/lib/claves';
 
 import {
   comServicoObrigatorio,

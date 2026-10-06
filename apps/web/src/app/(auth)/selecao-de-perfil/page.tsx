@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 import { EscolhaDePerfil } from '@/componentes/autenticacao/EscolhaDePerfil';
-import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
-import { ROTA } from '@/lib/guarda-rota';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { selecionarPerfil } from '@/modulos/autenticacao/acoes';
 
 export const metadata: Metadata = {

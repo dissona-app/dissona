@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { Abas } from '@/componentes/base/Abas';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
-import { ConviteDeMembro } from '@/componentes/equipe/ConviteDeMembro';
-import { DadosDoMembro } from '@/componentes/equipe/DadosDoMembro';
-import { ListaDaEquipe } from '@/componentes/equipe/ListaDaEquipe';
-import { MatrizDePermissoes } from '@/componentes/equipe/MatrizDePermissoes';
-import { ROTA } from '@/lib/guarda-rota';
-import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
-import { urlPublicaDoAvatar } from '@/lib/supabase/armazenamento';
-import { lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
-import { lerPermissao, ModuloAdmin } from '@/modulos/admin/permissoes';
+import { Abas } from '@dissona/nucleo/componentes/base/Abas';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
+import { ConviteDeMembro } from '@dissona/nucleo/componentes/equipe/ConviteDeMembro';
+import { DadosDoMembro } from '@dissona/nucleo/componentes/equipe/DadosDoMembro';
+import { ListaDaEquipe } from '@dissona/nucleo/componentes/equipe/ListaDaEquipe';
+import { MatrizDePermissoes } from '@dissona/nucleo/componentes/equipe/MatrizDePermissoes';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { urlDoAdmin } from '@dissona/nucleo/lib/rotas-admin-servidor';
+import { urlPublicaDoAvatar } from '@dissona/nucleo/lib/supabase/armazenamento';
+import { lerIdentidadeDaSessao } from '@dissona/nucleo/modulos/autenticacao/consultas';
+import { lerPermissao, ModuloAdmin } from '@dissona/nucleo/modulos/admin/permissoes';
 import { trocarEmail, trocarSenha } from '@/modulos/conta/acoes';
 import {
   alterarAcesso,
@@ -25,8 +25,8 @@ import {
   lerEquipeDaConta,
   lerMatrizDePermissoes,
   lerMeusDadosDeMembro,
-} from '@/modulos/equipe/servico';
-import { EQUIPE } from '@/textos/prototipo';
+} from '@dissona/nucleo/modulos/equipe/servico';
+import { EQUIPE } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './pagina.module.css';
 

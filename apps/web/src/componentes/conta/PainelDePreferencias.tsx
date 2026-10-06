@@ -2,15 +2,15 @@
 
 import { useState, useTransition } from 'react';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { Grupo } from '@/componentes/base/Grupo';
 import { Painel } from '@/componentes/base/Painel';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import type { Papel } from '@/lib/papeis';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import type { Papel } from '@dissona/nucleo/lib/papeis';
 import type { Canal, Idioma, PreferenciaDeEvento } from '@/modulos/preferencias/tipos';
 import { IDIOMAS } from '@/modulos/preferencias/tipos';
-import { PREFERENCIAS as TEXTOS } from '@/textos/conta';
+import { PREFERENCIAS as TEXTOS } from '@dissona/nucleo/textos/conta';
 
 import estilos from './PainelDePreferencias.module.css';
 

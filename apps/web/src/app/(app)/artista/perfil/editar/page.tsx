@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { ROTA } from '@/lib/guarda-rota';
-import { urlPublicaDoAvatar } from '@/lib/supabase/armazenamento';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { urlPublicaDoAvatar } from '@dissona/nucleo/lib/supabase/armazenamento';
 import { salvarPerfilDoArtista } from '@/modulos/artista/acoes';
 import { lerPerfilDoArtista } from '@/modulos/artista/consultas';
-import { ARTISTA_PERFIL } from '@/textos/prototipo';
+import { ARTISTA_PERFIL } from '@dissona/nucleo/textos/prototipo';
 
 import { FormularioDePerfil } from './FormularioDePerfil';
 

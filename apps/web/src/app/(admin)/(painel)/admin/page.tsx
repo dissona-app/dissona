@@ -1,5 +1,5 @@
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
-import { PAINEIS } from '@/textos/prototipo';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
+import { PAINEIS } from '@dissona/nucleo/textos/prototipo';
 
 /**
  * Dashboard administrativo — módulo 24, R4.

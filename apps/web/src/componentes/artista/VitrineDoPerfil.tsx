@@ -1,13 +1,13 @@
-import { BotaoLink } from '@/componentes/base/BotaoLink';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
-import { Etiqueta } from '@/componentes/base/Etiqueta';
-import type { TomEtiqueta } from '@/componentes/base/Etiqueta';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
+import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
+import type { TomEtiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { Painel } from '@/componentes/base/Painel';
-import { iniciaisDe } from '@/lib/iniciais';
-import { ROTA } from '@/lib/guarda-rota';
+import { iniciaisDe } from '@dissona/nucleo/lib/iniciais';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import type { Vitrine } from '@/modulos/artista/consultas';
 import type { StatusNaVitrine } from '@/modulos/artista/servico';
-import { ARTISTA_VITRINE as TEXTOS } from '@/textos/prototipo';
+import { ARTISTA_VITRINE as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './VitrineDoPerfil.module.css';
 

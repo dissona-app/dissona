@@ -30,11 +30,11 @@ import 'server-only';
  * primária é o id do evento, e um `false` de volta significa entrega repetida.
  */
 
-import { criarClienteServidor } from '@/lib/supabase/servidor';
-import { criarClienteDeServico } from '@/lib/supabase/servico';
-import { estourarSeErro } from '@/lib/supabase/erros';
+import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
+import { criarClienteDeServico } from '@dissona/nucleo/lib/supabase/servico';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
 
-import type { Database } from '@/lib/supabase/tipos-bd';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 import type { MeioPagamento } from './tipos';
 

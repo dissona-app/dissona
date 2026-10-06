@@ -5,9 +5,9 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { executar, sucesso } from '@/lib/acoes';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { ROTA } from '@/lib/guarda-rota';
+import { executar, sucesso } from '@dissona/nucleo/lib/acoes';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 
 import { iniciarAvaliacao } from './repositorio';
 

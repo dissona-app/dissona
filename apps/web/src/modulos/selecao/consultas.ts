@@ -2,9 +2,9 @@ import 'server-only';
 
 /** Leituras da seleção e do status do envio (3.3). */
 
-import { estourarSeErro } from '@/lib/supabase/erros';
-import { criarClienteServidor } from '@/lib/supabase/servidor';
-import type { Database } from '@/lib/supabase/tipos-bd';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
+import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 import { nomesDeCuradores } from './repositorio';
 

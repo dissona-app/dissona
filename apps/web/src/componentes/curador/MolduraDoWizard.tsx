@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { OndasDeFundo } from '@/componentes/autenticacao/OndasDeFundo';
-import { CURADOR_CADASTRO } from '@/textos/curador';
+import { OndasDeFundo } from '@dissona/nucleo/componentes/autenticacao/OndasDeFundo';
+import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './MolduraDoWizard.module.css';
 import { OndasDoPainel } from './OndasDoPainel';

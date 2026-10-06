@@ -13,12 +13,12 @@ import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { executar, falha, falhaDeCampos, sucesso } from '@/lib/acoes';
-import { caminhoEhDoUsuario } from '@/lib/armazenamento';
-import type { ResultadoDeAcao } from '@/lib/acoes';
-import { CodigoErro, falhar } from '@/lib/erros';
-import { ROTA } from '@/lib/guarda-rota';
-import { usuarioAtual } from '@/lib/supabase/servidor';
+import { executar, falha, falhaDeCampos, sucesso } from '@dissona/nucleo/lib/acoes';
+import { caminhoEhDoUsuario } from '@dissona/nucleo/lib/armazenamento';
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
 
 import { lerLimitesDeUpload } from './consultas';
 import { detectarPorLink } from './deteccao';

@@ -14,10 +14,10 @@ import 'server-only';
  * tente setar `situacao = 'concluida'` por fora.
  */
 
-import { CodigoErro, falhar } from '@/lib/erros';
-import { estourarSeErro } from '@/lib/supabase/erros';
-import { criarClienteServidor, usuarioAtual } from '@/lib/supabase/servidor';
-import type { Database } from '@/lib/supabase/tipos-bd';
+import { CodigoErro, falhar } from '@dissona/nucleo/lib/erros';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
+import { criarClienteServidor, usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
+import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 import type {
   AvaliacaoEmEdicao,
@@ -28,7 +28,7 @@ import type {
   NotaDeCriterio,
   OpcionaisCumpridos,
   Remuneracao,
-} from './tipos';
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 /** O catálogo dos 11, do seed da `0008`. Legível por qualquer autenticado. */
 export async function listarCriterios(): Promise<readonly Criterio[]> {

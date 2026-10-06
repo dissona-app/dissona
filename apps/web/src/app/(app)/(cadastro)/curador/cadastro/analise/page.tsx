@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { Aviso } from '@/componentes/base/Aviso';
-import { Botao } from '@/componentes/base/Botao';
+import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
+import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { MolduraDaClasse } from '@/componentes/curador/MolduraDaClasse';
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { sair } from '@/modulos/autenticacao/acoes';
 import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
-import { CURADOR_CLASSIFICACAO } from '@/textos/curador';
+import { CURADOR_CLASSIFICACAO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './pagina.module.css';
 

@@ -2,8 +2,11 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { TelaDeConta, ehAbaDeConta } from '@/componentes/conta/TelaDeConta';
-import { ROTA } from '@/lib/guarda-rota';
-import { lerContextoDaSessao, lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import {
+  lerContextoDaSessao,
+  lerIdentidadeDaSessao,
+} from '@dissona/nucleo/modulos/autenticacao/consultas';
 import { removerCartaoSalvo } from '@/modulos/claves/acoes';
 import { lerCartaoSalvo } from '@/modulos/claves/consultas';
 import { lerSessoesDaConta } from '@/modulos/conta/consultas';

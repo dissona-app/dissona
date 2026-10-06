@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { ROTA } from '@/lib/guarda-rota';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerAvaliacao } from '@/modulos/avaliacao/consultas';
-import { passoDoNumero } from '@/modulos/avaliacao/tipos';
+import { passoDoNumero } from '@dissona/nucleo/modulos/avaliacao/tipos';
 
 /**
  * A retomada — `/curador/avaliar/<envioId>` sem passo.

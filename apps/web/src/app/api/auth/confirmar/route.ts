@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { ROTA } from '@/lib/guarda-rota';
-import { origemDaRequisicao } from '@/lib/origem';
-import { destinoSeguro, esquemaPapel } from '@/modulos/autenticacao/esquemas';
-import { marcarRecuperacaoEmCurso } from '@/modulos/autenticacao/marcador-de-recuperacao';
-import { concluirVerificacaoDeEmail, selecionarPapel } from '@/modulos/autenticacao/servico';
-import { confirmarPorToken, trocarCodigoPorSessao } from '@/modulos/autenticacao/repositorio';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { origemDaRequisicao } from '@dissona/nucleo/lib/origem';
+import { destinoSeguro, esquemaPapel } from '@dissona/nucleo/modulos/autenticacao/esquemas';
+import { marcarRecuperacaoEmCurso } from '@dissona/nucleo/modulos/autenticacao/marcador-de-recuperacao';
+import {
+  concluirVerificacaoDeEmail,
+  selecionarPapel,
+} from '@dissona/nucleo/modulos/autenticacao/servico';
+import {
+  confirmarPorToken,
+  trocarCodigoPorSessao,
+} from '@dissona/nucleo/modulos/autenticacao/repositorio';
 
 /**
  * Onde os links de e-mail do Supabase Auth aterrissam.

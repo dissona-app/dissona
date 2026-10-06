@@ -1,9 +1,9 @@
-import { BotaoLink } from '@/componentes/base/BotaoLink';
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Cartao } from '@/componentes/base/Cartao';
-import { EstadoVazio } from '@/componentes/base/EstadoVazio';
+import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import { Painel } from '@/componentes/base/Painel';
-import { ROTA } from '@/lib/guarda-rota';
-import { CARTEIRA as TEXTOS } from '@/textos/prototipo';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { CARTEIRA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './TelaDaCarteira.module.css';
 

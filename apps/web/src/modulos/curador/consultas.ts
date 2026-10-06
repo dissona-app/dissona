@@ -7,12 +7,12 @@ import 'server-only';
  * do mesmo objeto. A revisão do passo 8 precisa dele inteiro.
  */
 
-import { criarClienteServidor } from '@/lib/supabase/servidor';
-import { usuarioAtual } from '@/lib/supabase/servidor';
-import { estourarSeErro } from '@/lib/supabase/erros';
+import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
+import { usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
+import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
 
-import { lerEstadoDoCadastro } from './repositorio';
-import type { EstadoDoCadastro } from './tipos';
+import { lerEstadoDoCadastro } from '@dissona/nucleo/modulos/curador/repositorio';
+import type { EstadoDoCadastro } from '@dissona/nucleo/modulos/curador/tipos';
 
 /**
  * O estado do wizard, criando a linha de `perfil_curador` se ela não existir.
