@@ -271,9 +271,7 @@ async function concluirCadastro(
  * `resend` do Supabase distingue os casos, e propagar a distinção transformaria
  * esta tela num oráculo de contas cadastradas.
  */
-export async function reenviarVerificacao(
-  dadosDoFormulario: FormData,
-): Promise<ResultadoDeAcao> {
+export async function reenviarVerificacao(dadosDoFormulario: FormData): Promise<ResultadoDeAcao> {
   const analise = esquemaEmail.safeParse({ email: dadosDoFormulario.get('email') });
   if (!analise.success) {
     return falha(CodigoErro.ENTRADA_INVALIDA, 'email', {

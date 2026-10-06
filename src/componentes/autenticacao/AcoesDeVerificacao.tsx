@@ -68,9 +68,7 @@ export function AcoesDeVerificacao({
         <h1 className={estilos.titulo}>{VERIFICAR_EMAIL.titulo}</h1>
         <p className={estilos.texto}>
           {VERIFICAR_EMAIL.textoAntes}
-          <strong className={estilos.endereco}>
-            {email ?? VERIFICAR_EMAIL.emailDesconhecido}
-          </strong>
+          <strong className={estilos.endereco}>{email ?? VERIFICAR_EMAIL.emailDesconhecido}</strong>
           {VERIFICAR_EMAIL.textoDepois}
         </p>
       </div>

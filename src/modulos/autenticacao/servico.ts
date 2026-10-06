@@ -240,8 +240,7 @@ export async function reenviarLinkDeVerificacao(
 }
 
 export type ResultadoDeConfirmacao =
-  | { readonly estado: 'ok'; readonly destino: string }
-  | { readonly estado: 'token_invalido' };
+  { readonly estado: 'ok'; readonly destino: string } | { readonly estado: 'token_invalido' };
 
 /**
  * Conclui a verificação de e-mail vinda do link (RF-004).
@@ -331,8 +330,7 @@ export async function redefinirSenhaComLink(novaSenha: string): Promise<Resultad
 /* ------------------------------------- seleção de perfil e onboarding ----- */
 
 export type ResultadoDeSelecao =
-  | { readonly estado: 'ok'; readonly destino: string }
-  | { readonly estado: 'sem_sessao' };
+  { readonly estado: 'ok'; readonly destino: string } | { readonly estado: 'sem_sessao' };
 
 /**
  * Seleção de perfil no primeiro acesso (1.4).

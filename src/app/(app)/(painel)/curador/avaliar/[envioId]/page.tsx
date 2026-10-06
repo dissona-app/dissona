@@ -27,9 +27,7 @@ export default async function PaginaDaAvaliacao({
   // o esconde, e distinguir os dois casos revelaria que ele existe.
   if (tela === null) notFound();
 
-  const passo = tela.avaliacao.concluida
-    ? 'remuneracao'
-    : passoDoNumero(tela.avaliacao.passoAtual);
+  const passo = tela.avaliacao.concluida ? 'remuneracao' : passoDoNumero(tela.avaliacao.passoAtual);
 
   redirect(`${ROTA.CURADOR_AVALIAR}/${envioId}/${passo}`);
 }

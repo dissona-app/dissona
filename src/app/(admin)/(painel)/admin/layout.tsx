@@ -25,10 +25,7 @@ import { lerIdentidadeDaSessao, lerPapeisDaSessao } from '@/modulos/autenticacao
  * pelo ambiente do artista.
  */
 export default async function LayoutPainelAdmin({ children }: { children: ReactNode }) {
-  const [papeis, identidade] = await Promise.all([
-    lerPapeisDaSessao(),
-    lerIdentidadeDaSessao(),
-  ]);
+  const [papeis, identidade] = await Promise.all([lerPapeisDaSessao(), lerIdentidadeDaSessao()]);
 
   return (
     <Shell

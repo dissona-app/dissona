@@ -81,9 +81,7 @@ export function MenuDaConta({ identidade, acaoDeSair, papelAtivo, papeis }: Prop
   const podeTrocar = outro !== undefined && papeis.filter((papel) => papel !== 'admin').length > 1;
 
   const itens: readonly ItemMenu[] = [
-    ...(podeTrocar && outro !== undefined
-      ? [{ rotulo: outro.rotulo, href: outro.href }]
-      : []),
+    ...(podeTrocar && outro !== undefined ? [{ rotulo: outro.rotulo, href: outro.href }] : []),
     { rotulo: conta.rotulo, href: conta.href, separadorAntes: podeTrocar },
     ...(papelAtivo === 'artista'
       ? [{ rotulo: MENU_DA_CONTA.reverOnboarding, href: `${ROTA.ONBOARDING}?rever=1` }]

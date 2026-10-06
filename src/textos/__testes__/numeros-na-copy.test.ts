@@ -122,7 +122,11 @@ const AMARRAS: readonly Amarra[] = [
   // prazo_devolucao_dias
   { onde: 'FILA.nota', frase: FILA.nota, esperado: `${PRAZO_DEVOLUCAO} dias` },
   { onde: 'FILA.notaNoPrazo', frase: FILA.notaNoPrazo, esperado: `${PRAZO_DEVOLUCAO} dias` },
-  { onde: 'STATUS_DO_ENVIO.nota', frase: STATUS_DO_ENVIO.nota, esperado: `${PRAZO_DEVOLUCAO} dias` },
+  {
+    onde: 'STATUS_DO_ENVIO.nota',
+    frase: STATUS_DO_ENVIO.nota,
+    esperado: `${PRAZO_DEVOLUCAO} dias`,
+  },
   {
     onde: 'CARTEIRA.notaDevolucao',
     frase: CARTEIRA.notaDevolucao,

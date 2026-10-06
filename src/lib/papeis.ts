@@ -128,7 +128,5 @@ export function temPapel(leitura: LeituraDePapeis, papel: Papel): boolean {
  */
 export function contaAtiva(leitura: LeituraDePapeis): boolean {
   if (leitura.estado !== 'ok') return false;
-  return (
-    leitura.situacao === SituacaoConta.ATIVA || leitura.situacao === SituacaoConta.DESATIVADA
-  );
+  return leitura.situacao === SituacaoConta.ATIVA || leitura.situacao === SituacaoConta.DESATIVADA;
 }

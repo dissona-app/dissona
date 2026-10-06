@@ -275,7 +275,12 @@ export async function composicao(page: Page): Promise<readonly string[]> {
  */
 export type DivergenciaDeComposicao =
   | { readonly tipo: 'ausente'; readonly texto: string; readonly lado: 'protótipo' | 'aplicação' }
-  | { readonly tipo: 'fora de ordem'; readonly texto: string; readonly indicePrototipo: number; readonly indiceAplicacao: number };
+  | {
+      readonly tipo: 'fora de ordem';
+      readonly texto: string;
+      readonly indicePrototipo: number;
+      readonly indiceAplicacao: number;
+    };
 
 export function divergenciasDeComposicao(
   doPrototipo: readonly string[],

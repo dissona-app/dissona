@@ -26,7 +26,11 @@ export type AmbienteDeAutenticacao = 'artista' | 'curador' | 'admin';
 export type PropsMoldura = {
   readonly ambiente?: AmbienteDeAutenticacao;
   /** Chamada acima do card — só a tela 1 (artista/curador) tem. */
-  readonly chamada?: { readonly overline: string; readonly titulo: string; readonly subtitulo?: string };
+  readonly chamada?: {
+    readonly overline: string;
+    readonly titulo: string;
+    readonly subtitulo?: string;
+  };
   /** Provas sociais do pé — idem. */
   readonly provas?: readonly string[];
   readonly linksDeRodape: readonly LinkDeRodape[];

@@ -237,10 +237,7 @@ for (const cenario of CENARIOS) {
      * do artista) em vez do seu próprio `clamp(44px,5.6vh,60px)`.
      */
     test('altura do logotipo igual à do protótipo', async ({ page, context }) => {
-      test.skip(
-        cenario.semChecagemDeAncoras !== undefined,
-        cenario.semChecagemDeAncoras,
-      );
+      test.skip(cenario.semChecagemDeAncoras !== undefined, cenario.semChecagemDeAncoras);
 
       const doPrototipo = await context.newPage();
       await abrirPrototipo(doPrototipo, cenario.prototipo, cenario.props);
