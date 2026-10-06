@@ -158,8 +158,8 @@ streams. Os segredos do runtime vêm de `apps/*/.dev.vars` (gitignored, formato
 do `.env.local`):
 
 ```sh
-(cd apps/web && NEXT_PUBLIC_URL_ADMIN=http://admin.localhost:8788 pnpm cf:build && pnpm exec wrangler dev --port 8787)
-(cd apps/admin && NEXT_PUBLIC_URL_SITE=http://localhost:8787 pnpm cf:build && pnpm exec wrangler dev --port 8788 --inspector-port 9230)
+(cd apps/web && NEXT_PUBLIC_URL_ADMIN=http://admin.localhost:8788 pnpm build && pnpm exec wrangler dev --port 8787)
+(cd apps/admin && NEXT_PUBLIC_URL_SITE=http://localhost:8787 pnpm build && pnpm exec wrangler dev --port 8788 --inspector-port 9230)
 BASE_URL=http://localhost:8787 BASE_URL_ADMIN=http://admin.localhost:8788 pnpm e2e
 ```
 
