@@ -10,6 +10,7 @@
   "packageManager": "pnpm@11.5.2",
   "scripts": {
     "dev": "pnpm --filter @dissona/web dev",
+    "dev:admin": "pnpm --filter @dissona/admin dev",
     "build": "pnpm -r --filter \"./apps/**\" build",
     "start": "pnpm --filter @dissona/web start",
     "lint": "eslint",

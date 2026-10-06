@@ -37,15 +37,17 @@ Arquitetura, camadas e convenções: [`docs/architecture.md`](docs/architecture.
 ```bash
 pnpm install
 
-# copie e preencha as variáveis de ambiente
-cp .env.example .env.local
+# copie e preencha as variáveis de ambiente — um arquivo só, na raiz;
+# o postinstall liga apps/*/.env.local a ele
+cp .env.example .env.local && pnpm install
 
-pnpm dev               # http://localhost:3000
+pnpm dev               # site (apps/web)    — http://localhost:3000
+pnpm dev:admin         # painel (apps/admin) — http://admin.localhost:3001
 ```
 
 O app sobe sem banco local: as variáveis de `.env.local` apontam para o projeto Supabase de desenvolvimento.
 
-Artista, curador e páginas públicas ficam em `http://localhost:3000`; o **admin**, em `http://admin.localhost:3000` (`/entrar`, `/equipe`, `/pacotes`…), como em produção fica em `admin.dissona.com.br`. O navegador resolve `*.localhost` sozinho. Com `ADMIN_EM_SUBDOMINIO=true` no `.env.local`, o endereço antigo `localhost:3000/admin/...` redireciona para lá; sem ela, o admin continua respondendo também em `/admin/...`. Ver [arquitetura §3](docs/architecture.md).
+O repositório é um monorepo pnpm: **`apps/web`** (público, artista e curador), **`apps/admin`** (o painel administrativo, `admin.dissona.com.br` em produção) e **`packages/nucleo`** (o código que os dois usam). O painel roda em `admin.localhost`, e não em `localhost`, porque cookie não distingue porta: o `admin.` mantém as sessões dos dois apps separadas, como em produção. O navegador resolve `*.localhost` sozinho. Ver [arquitetura §3](docs/architecture.md).
 
 ### Banco
 
@@ -64,7 +66,7 @@ Para a stack local, com Docker rodando:
 ```bash
 pnpm supabase start
 pnpm db:reset          # reconstrói o banco a partir de supabase/migrations/
-pnpm db:tipos          # regenera lib/supabase/tipos-bd.ts
+pnpm db:tipos          # regenera packages/nucleo/lib/supabase/tipos-bd.ts
 ```
 
 ⚠️ **`supabase db reset --linked` apaga o banco remoto**, que hoje é compartilhado entre Preview e Production ([#25](docs/open-questions.md#25-projetos-dedicados-de-staging-e-produção)).
@@ -85,7 +87,7 @@ pnpm db:tipos          # regenera lib/supabase/tipos-bd.ts
 | `pnpm e2e:navegadores` | Instala o Chromium do Playwright (uma vez) |
 | `pnpm db:reset` | Reconstrói o banco local do zero |
 | `pnpm db:push` | Aplica as migrations pendentes no projeto linkado |
-| `pnpm db:tipos` | Regenera `lib/supabase/tipos-bd.ts` |
+| `pnpm db:tipos` | Regenera `packages/nucleo/lib/supabase/tipos-bd.ts` |
 
 **Antes de considerar qualquer task pronta:** `pnpm typecheck && pnpm lint && pnpm test && pnpm build`. A lista completa está na [Definition of Done](docs/architecture.md#10-definition-of-done).
 
@@ -134,13 +136,13 @@ pnpm e2e:semear && pnpm e2e
 
 ### Contra produção
 
-Há um só projeto Supabase e um só projeto Vercel enquanto o produto está em
+Há um só projeto Supabase e dois projetos Vercel (`dissona` para `apps/web`,
+`dissona-admin` para `apps/admin`) enquanto o produto está em
 desenvolvimento, então apontar a suíte para produção não arrisca dado de
 ninguém — e prova o que o servidor local **não** prova:
 
 ```sh
-npx vercel --prod --yes --scope fraktal      # publica o que está no diretório
-BASE_URL=https://dissona.com.br pnpm e2e
+BASE_URL=https://dissona.com.br BASE_URL_ADMIN=https://admin.dissona.com.br pnpm e2e
 ```
 
 O que só produção pega é o teto de **~4,5 MB de corpo de request** das funções
