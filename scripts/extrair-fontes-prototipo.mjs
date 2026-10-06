@@ -41,10 +41,12 @@ import { basename, join } from 'node:path';
 import * as prettier from 'prettier';
 
 const ORIGEM = 'docs/R2';
-const DESTINO_FONTES = 'public/fontes';
-const DESTINO_CSS = 'src/estilos/fontes.css';
+const DESTINO_FONTES = 'packages/nucleo/estilos/fontes';
+const DESTINO_CSS = 'packages/nucleo/estilos/fontes.css';
 /** Caminho público das fontes, como o CSS gerado as referencia. */
-const BASE_URL = '/fontes';
+// Relativo ao CSS: o bundler do Next emite o arquivo, e cada app deixa de
+// precisar de `public/fontes`.
+const BASE_URL = './fontes';
 
 /**
  * Nome do subset a partir do `unicode-range`.

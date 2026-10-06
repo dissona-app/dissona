@@ -1,0 +1,171 @@
+/* Tela 21.1 — criar e editar pacote. */
+
+.tela {
+  width: 100%;
+  max-width: 720px;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 16px);
+}
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-semibold);
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.voltar:hover {
+  color: var(--dsn-purple-500);
+  text-decoration: underline;
+}
+
+/*
+ * O card. No protótipo este bloco perdeu o contêiner na exportação — sobrou um
+ * `<div style="width: 1124px; height: 389px">` solto, medida do editor de
+ * design que vazou para o HTML. Aqui o card é o card, com a moldura que a tela
+ * 21 usa na tabela.
+ */
+.card {
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-3xl);
+  background: var(--dsn-surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 18px);
+  padding: clamp(16px, 2.4vh, 24px);
+}
+
+.trio {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.8vh, 18px);
+}
+
+/* Faixa de derivados: preço por Clave, desconto aplicado e economia. */
+.derivados {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--dsn-space-6);
+  padding: clamp(12px, 1.8vh, 16px) var(--dsn-space-8);
+  background: var(--dsn-purple-050);
+  border-radius: var(--dsn-radius-lg);
+}
+
+.derivado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.derivadoRotulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: var(--dsn-tracking-label);
+  color: var(--dsn-ink-500);
+  text-transform: uppercase;
+}
+
+.derivadoValor {
+  font-size: 22px;
+  font-weight: var(--dsn-weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--dsn-tracking-tighter);
+}
+
+/* O primeiro derivado é o número que decide a compra — em roxo, destacado. */
+.derivadoDestaque {
+  color: var(--dsn-purple-600);
+}
+
+/* Alternância "Pacote ativo". */
+.alternancia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dsn-space-8);
+  padding: clamp(11px, 1.6vh, 15px) var(--dsn-space-8);
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: var(--dsn-radius-lg);
+}
+
+.alternanciaTextos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-1);
+  min-width: 0;
+}
+
+.alternanciaTitulo {
+  font-size: var(--dsn-text-sm);
+  font-weight: var(--dsn-weight-semibold);
+}
+
+.alternanciaDescricao {
+  font-size: var(--dsn-text-xs);
+  line-height: var(--dsn-leading-normal);
+  color: var(--dsn-ink-500);
+}
+
+.interruptor {
+  appearance: none;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  border: none;
+  border-radius: var(--dsn-radius-full);
+  padding: 2px;
+  display: flex;
+  cursor: pointer;
+  background: var(--dsn-track);
+  transition: background var(--dsn-duration-base);
+}
+
+.interruptorLigado {
+  background: var(--dsn-purple-500);
+}
+
+.interruptor:focus-visible {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.botaoDoInterruptor {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--dsn-radius-circle);
+  background: var(--dsn-surface);
+  box-shadow: 0 1px 3px rgb(27 18 38 / 28%);
+  transition: transform var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.botaoDoInterruptorLigado {
+  transform: translateX(20px);
+}
+
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dsn-space-6);
+  padding: clamp(12px, 1.8vh, 16px) clamp(16px, 2.4vh, 24px);
+  border-top: var(--dsn-border-width) solid var(--dsn-border);
+  background: var(--dsn-surface-alt);
+}
+
+.notaRodape {
+  font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}

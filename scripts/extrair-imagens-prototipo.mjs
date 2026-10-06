@@ -28,9 +28,9 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
 const ORIGEM = 'docs/R2';
-const DESTINO_MARCA = 'public/marca';
+const DESTINO_MARCA = 'packages/nucleo/marca';
 /** O favicon vive aqui pela convenção de `icon.png` do App Router do Next. */
-const DESTINO_ICONE = 'src/app/icon.png';
+const DESTINO_ICONE = 'apps/web/src/app/icon.png';
 
 /**
  * Os três assets, identificados pelo SHA-256 do PNG.

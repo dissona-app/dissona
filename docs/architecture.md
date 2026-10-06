@@ -23,7 +23,7 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 
 | Decisão | Escolha | Por quê |
 |---|---|---|
-| Aplicação | **Monolito modular** em Next.js (App Router) | 74h de escopo na V1; separar frontend/backend dobraria a superfície de deploy e de contrato sem ganho |
+| Aplicação | **Monolito modular** em Next.js (App Router), em **dois apps** — `apps/web` (público, artista, curador) e `apps/admin` (painel) — sobre um pacote comum, `packages/nucleo` | 74h de escopo na V1; separar frontend/backend dobraria a superfície de deploy e de contrato sem ganho. O admin é app próprio por decisão do cliente (2026-10-06): deploy, domínio e sessão separados do produto |
 | Autorização | **RLS no PostgreSQL**, não só no código | Marketplace com dinheiro e dados de terceiros; a regra precisa valer também para acesso direto ao banco |
 | Dinheiro | **Inteiros em centavos** (`bigint`), nunca ponto flutuante | Rateio de 50%, percentuais por classe e descontos progressivos não toleram erro de arredondamento |
 | Saldo de Claves | **Ledger append-only** + view derivada | Estorno, devolução por SLA e conciliação exigem histórico; saldo denormalizado diverge |
@@ -51,7 +51,7 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 
 > **Versões resolvidas na R0:** Next 16.3.4 · React 19.2.8 · TypeScript 5.9 · pnpm 11.5.2 · Vitest 5.
 
-> **Node 24.** O Node 20 saiu de suporte em abril de 2026. A versão fica travada em três lugares que precisam concordar: `.nvmrc`, `engines.node` no `package.json` e a configuração de runtime da Vercel.
+> **Node 24.** O Node 20 saiu de suporte em abril de 2026. A versão fica travada em três lugares que precisam concordar: `.nvmrc`, `engines.node` no `package.json` e o `NODE_VERSION` dos builds no Cloudflare (o runtime dos Workers é o `workerd`, com `nodejs_compat`).
 
 > **Sem Tailwind.** Os tokens do Design System foram extraídos dos protótipos da R2 como valores literais; CSS Modules + custom properties preservam esses valores sem uma camada de tradução no meio.
 
@@ -65,7 +65,7 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 | **Supabase Edge Functions** | Webhooks do gateway, jobs agendados (`pg_cron` dispara, Edge executa) e **um caminho de requisição**: o `userinfo` do provider do SoundCloud, que não podia viver no Next — ver §2.3 |
 | **Supabase CLI** | Migrations versionadas em `supabase/migrations/`, geração de tipos |
 
-**Um projeto Supabase, em desenvolvimento.** `dissona` · ref `fhqcibjzmowcjkdrqyvi` · região `us-west-2` · Postgres 17. Ele serve o Preview e a Production da Vercel enquanto o produto não tem usuário real. Projetos dedicados de staging e produção entram antes do beta — ver [open-questions #25](open-questions.md#25-projetos-dedicados-de-staging-e-produção).
+**Um projeto Supabase, em desenvolvimento.** `dissona` · ref `fhqcibjzmowcjkdrqyvi` · região `us-west-2` · Postgres 17. Ele serve os previews e a produção dos Workers enquanto o produto não tem usuário real. Projetos dedicados de staging e produção entram antes do beta — ver [open-questions #25](open-questions.md#25-projetos-dedicados-de-staging-e-produção).
 
 Nenhuma alteração de schema fora de migration versionada.
 
@@ -108,52 +108,55 @@ A faixa `0001`–`0010` está reservada por release ([modelo de dados §11](data
 
 ## 3. Estrutura de pastas
 
+Monorepo pnpm (`pnpm-workspace.yaml`): dois apps Next.js e um pacote comum. Continua **sem backend separado** — cada app é o seu próprio backend, por Server Components e Server Actions.
+
 ```
 dissona/
-├── src/
-│   ├── app/
-│   │   ├── (publico)/          # Homepage, termos, política — sem sessão
-│   │   ├── (auth)/             # Login, cadastro, recuperação, verificação, seleção de perfil
-│   │   ├── (app)/              # Ambiente autenticado — artista e curador
-│   │   │   ├── artista/
-│   │   │   └── curador/
-│   │   ├── (admin)/            # Ambiente admin — login próprio e painel
-│   │   └── api/                # Route handlers: webhooks, callbacks de OAuth próprio
-│   ├── componentes/
-│   │   ├── base/               # Botao, Campo, Cartao, Modal, Tabela... (Design System)
-│   │   ├── artista/
-│   │   ├── curador/
-│   │   └── admin/
-│   ├── modulos/                # Um diretório por domínio
-│   │   ├── autenticacao/
-│   │   ├── curador/
-│   │   ├── faixa/
-│   │   ├── claves/
-│   │   ├── avaliacao/
-│   │   ├── financeiro/
-│   │   ├── notificacao/
-│   │   └── admin/
-│   ├── lib/
-│   │   ├── supabase/           # cliente.ts, servidor.ts, middleware.ts, tipos-bd.ts
-│   │   ├── configuracao/       # leitura tipada da tabela `configuracao`
-│   │   ├── dinheiro.ts         # centavos, formatação, arredondamento
-│   │   ├── claves.ts           # conversão Clave ↔ real, desconto de pacote
-│   │   ├── formato.ts          # datas, números, prazos
-│   │   ├── mascaras.ts         # CPF, telefone, chave Pix
-│   │   └── erros.ts            # códigos de erro tipados
-│   ├── estilos/
-│   │   ├── tokens.css          # tokens do Design System
-│   │   └── global.css
-│   ├── hooks/
-│   ├── tipos/
-│   └── middleware.ts           # sessão + guarda de papel por route group
+├── apps/
+│   ├── web/                    # @dissona/web — dissona.com.br
+│   │   └── src/
+│   │       ├── app/
+│   │       │   ├── (publico)/  # Homepage, termos, política — sem sessão
+│   │       │   ├── (auth)/     # Login, cadastro, recuperação, verificação, seleção de perfil
+│   │       │   ├── (app)/      # Ambiente autenticado — artista e curador
+│   │       │   ├── (admin)/    # Admin antigo — sai na fase 2 (ver §3.2)
+│   │       │   └── api/        # Route handlers: callback OAuth, confirmação, webhooks
+│   │       ├── componentes/    # artista/, curador/, conta/, autenticacao/ do produto
+│   │       ├── modulos/        # Server Actions (acoes.ts) e módulos só do produto
+│   │       ├── lib/            # decisao-por-host, escuta, mascaras…
+│   │       └── middleware.ts   # sessão + guarda de papel
+│   └── admin/                  # @dissona/admin — admin.dissona.com.br
+│       └── src/
+│           ├── app/
+│           │   ├── (acesso)/   # entrar, recuperar-senha, redefinir-senha, convite, onboarding, verificar-email
+│           │   ├── (painel)/   # /, equipe, pacotes — com o Shell
+│           │   └── api/auth/confirmar/
+│           ├── acoes/          # Server Actions do painel
+│           ├── lib/            # decisao.ts (guarda), rotas.ts (rotas limpas)
+│           └── middleware.ts
+├── packages/
+│   └── nucleo/                 # @dissona/nucleo — tudo que os dois apps usam
+│       ├── lib/                # supabase/ (tipos-bd.ts), guarda-rota, papeis, dinheiro, erros…
+│       ├── modulos/            # servico, repositorio, consultas, esquemas, tipos — sem 'use server'
+│       ├── componentes/        # base/ (Design System), shell/, autenticacao/, conta/, equipe/
+│       ├── estilos/            # tokens.css, global.css, fontes.css + fontes/*.woff2
+│       ├── marca/              # logotipos (importados pelo Marca.tsx)
+│       ├── textos/
+│       └── hooks/
 ├── supabase/
 │   ├── migrations/             # 0001_*.sql ... numeradas por release
-│   ├── seeds/
 │   └── functions/              # Edge Functions
-├── e2e/                        # Playwright — cenários do Guia de Testes
+├── e2e/                        # Playwright — os dois apps (web :3100, admin :3101)
+├── scripts/
 └── docs/
 ```
+
+Regras do monorepo:
+
+- **Server actions só nos apps.** `'use server'`, `redirect` e `revalidatePath` dependem de rota, e rota é de app. O pacote tem serviço, repositório, consultas, esquemas, tipos e componentes; a action de cada app é fina e chama o mesmo serviço.
+- **Import do pacote por nome**, também dentro dele: `@dissona/nucleo/lib/dinheiro`. O `@/*` de cada app aponta só para o próprio `src/`.
+- **Um `.env.local`, na raiz.** O `postinstall` (`scripts/ligar-env.mjs`) liga `apps/*/.env.local` a ele, porque o Next só lê o da pasta do app.
+- **Fontes e marca vêm do pacote**, por import (CSS `url()` relativo e `import` de PNG): nenhum app depende do `public/` para isso.
 
 ### 3.1 Anatomia de um módulo
 
@@ -190,13 +193,12 @@ O sitemap do [PRD §6.1](PRD.md) nomeia telas, não caminhos. Os slugs abaixo fo
 
 O login do admin fica **dentro** de `(admin)` e não exige sessão — é login próprio, sem social e sem autocadastro.
 
-**O admin mora em subdomínio próprio.** Em produção o endereço é `https://admin.dissona.com.br/entrar`, e não `dissona.com.br/admin/entrar`. Os arquivos **não** saíram de `(admin)/.../admin/*`: o caminho da tabela acima é o **interno**, e o middleware reescreve o caminho limpo do subdomínio para ele ([`lib/rotas-admin.ts`](../src/lib/rotas-admin.ts), [`lib/decisao-por-host.ts`](../src/lib/decisao-por-host.ts)). Daí três regras:
+**O admin é um app próprio** (`apps/admin`), em `https://admin.dissona.com.br`, com rotas limpas reais: `/entrar`, `/recuperar-senha`, `/redefinir-senha`, `/convite`, `/onboarding`, `/verificar-email`, `/`, `/equipe`, `/pacotes`, `/pacotes/novo`, `/pacotes/<id>`. Os caminhos `ROTA.ADMIN*` do pacote continuam **internos** (`/admin/equipe`) — é sobre eles que a matriz de acesso (`decidirAcesso`) raciocina; o painel traduz na entrada e na saída ([`apps/admin/src/lib/decisao.ts`](../apps/admin/src/lib/decisao.ts), [`rotas.ts`](../apps/admin/src/lib/rotas.ts)).
 
-- A guarda de rota e os `revalidatePath` usam o caminho **interno** — o `revalidatePath` pede o destino do rewrite.
-- Toda URL do admin que **sai** para o navegador passa por `urlDoAdmin` (servidor) ou `useHrefDoAdmin` (cliente). `ROTA.ADMIN*` cru num `href` funciona no modo caminho e só sobrevive ao subdomínio porque o middleware o corrige com um 308.
-- O modo é decidido pelo **host**: em `admin.*` a base é vazia; em qualquer outro, é `/admin`, como antes. `ADMIN_EM_SUBDOMINIO=true` faz o host principal mandar o `/admin` para `admin.` (308). Desligada — Previews da Vercel, cujo domínio por branch não tem subdomínio —, o admin segue em `/admin/...`.
-
-No subdomínio passam direto, sem reescrita, `/api/*`, `/termos`, `/privacidade`, `/onboarding` e `/verificar-email`: os cookies do Supabase são **por host**, então a sessão do admin só existe em `admin.` e as telas compartilhadas que ele usa têm de responder ali. É também o que separa as sessões: entrar no site principal não abre o painel.
+- **Sessões separadas.** O cookie do Supabase é por host: entrar no site não abre o painel, e vice-versa. Por isso o painel tem o próprio `/api/auth/confirmar` (recuperação de senha e troca de e-mail voltam para ele) e serve o onboarding e a verificação de e-mail do admin.
+- **Termos e Privacidade** moram no site; o painel redireciona (`NEXT_PUBLIC_URL_SITE`).
+- **O site manda o `/admin` antigo ao painel** quando `ADMIN_EM_SUBDOMINIO=true` (308 para `NEXT_PUBLIC_URL_ADMIN` + caminho limpo). Em desenvolvimento o painel é `http://admin.localhost:3001` — o `admin.` separa os cookies, que não distinguem porta.
+- **Fase 2** (depois do painel validado em produção): sai do web o `(admin)` antigo, com `rotas-admin`, `decisao-por-host`, `BaseDoAdmin` e os ramos de admin do shell; os módulos só do admin (`equipe`, `admin`, `pacote/esquemas`, `componentes/equipe`) descem do pacote para `apps/admin`.
 
 ---
 
@@ -329,11 +331,22 @@ Segredo do `pg_net` vem do Vault, nunca inline — `cron.job.command` é legíve
 
 ## 9. Ambientes e deploy
 
-**Hospedagem: Vercel.** Um projeto, **Production Branch = `main`**. Produção em **`https://dissona.com.br`**, que é o domínio canônico; `https://dissona.vercel.app` continua respondendo como alias. O admin responde em **`https://admin.dissona.com.br`** (domínio adicionado ao mesmo projeto, `CNAME admin → cname.vercel-dns.com`, e `ADMIN_EM_SUBDOMINIO=true` no escopo Production — ver §3).
+**Hospedagem: Cloudflare Workers**, pelo adaptador [OpenNext](https://opennext.js.org/cloudflare) (`@opennextjs/cloudflare`), desde 2026-10-06 — antes era a Vercel. Um Worker por app, os dois do repositório `dissona-app/dissona`, com deploy pelo **Workers Builds** (integração Git do Cloudflare):
 
-Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `pdx1` que a R0 havia sugerido. O efeito é uma troca: melhor tempo de resposta para o usuário brasileiro, e ~120 ms a mais em cada ida ao banco, que está em `us-west-2`. Como o `middleware.ts` faz um `getUser()` por requisição, essa ida acontece em toda navegação. Vale revisar junto da pendência [#25](open-questions.md), quando os projetos dedicados forem provisionados.
+| Worker | Root directory | Domínio | Build variables | Runtime (Variables and Secrets) |
+|---|---|---|---|---|
+| `dissona-web` | `apps/web` | **`https://dissona.com.br`** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_URL_ADMIN=https://admin.dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret), `PAGAMENTO_SIMULADO`, `ASAAS_*` quando o Asaas ligar, e as duas `NEXT_PUBLIC_SUPABASE_*` |
+| `dissona-admin` | `apps/admin` | **`https://admin.dissona.com.br`** | as duas `NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_URL_SITE=https://dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret) e as duas `NEXT_PUBLIC_SUPABASE_*` |
 
-⚠️ O **Site URL** do Supabase Auth precisa ser **`https://dissona.com.br`**, e com `https://`. Com `http://`, os links dos e-mails de verificação e recuperação saem inseguros, e a Vercel responde `308` para o `https` — o que pode fazer o redirect de OAuth não casar com a allow list.
+- **Comandos do Workers Builds**, nos dois: build `pnpm exec opennextjs-cloudflare build`, deploy `pnpm exec opennextjs-cloudflare deploy`, branch não-produção `pnpm exec opennextjs-cloudflare upload`. Localmente: `pnpm deploy:web` / `pnpm deploy:admin` (exige `wrangler login`).
+- **O que está no código** (`apps/*/wrangler.jsonc`): nome do Worker, `nodejs_compat`, assets, **domínio próprio** (`routes` com `custom_domain` — o deploy liga o domínio sozinho, desde que a zona `dissona.com.br` esteja ativa na conta), `ADMIN_EM_SUBDOMINIO=true` no web, *Smart Placement* e logs. `keep_vars: true` preserva o que foi definido no painel — sem ele, cada deploy apagaria essas variáveis.
+- **DNS:** a zona `dissona.com.br` mora no Cloudflare (nameservers trocados no Registro.br). Os domínios dos Workers não precisam de registro manual.
+- **Plano: Workers Paid.** O gratuito limita cada requisição a **10 ms de CPU**, e a renderização no servidor de uma página Next passa disso. Os Workers ficam em ~2,6 MiB (web) e ~2,1 MiB (admin) comprimidos.
+- **Região:** *Smart Placement* põe o Worker perto do Supabase (`us-west-2`), porque o middleware faz um `getUser()` por requisição — rodar perto do visitante e longe do banco pagaria essa ida em toda navegação. Vale revisar junto da pendência [#25](open-questions.md).
+- **Diferença de runtime que já mordeu:** o `fetch` dos Workers só aceita `redirect: 'follow' | 'manual'`. Com `'error'` a chamada lança (era o que calava a detecção de faixa por link). O E2E inteiro passa contra o runtime local (`opennextjs-cloudflare build` + `wrangler dev`, com `BASE_URL`/`BASE_URL_ADMIN`).
+- **Segredos locais do runtime:** `apps/*/.dev.vars` (gitignored), no mesmo formato do `.env.local`.
+
+⚠️ O **Site URL** do Supabase Auth precisa ser **`https://dissona.com.br`**, e com `https://`. Com `http://`, os links dos e-mails de verificação e recuperação saem inseguros, e a borda responde `308` para o `https` — o que pode fazer o redirect de OAuth não casar com a allow list.
 
 ⚠️ E as **Redirect URLs** têm de listar **toda** origem que o app usa, porque `origemDaRequisicao()` deriva o `redirectTo` do cabeçalho da requisição (ver [`lib/origem.ts`](../src/lib/origem.ts)):
 
@@ -341,28 +354,27 @@ Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `p
 |---|---|
 | Produção | `https://dissona.com.br/**` |
 | Admin em produção | `https://admin.dissona.com.br/**` |
-| Alias da Vercel | `https://dissona.vercel.app/**` |
-| Preview | o curinga do projeto, `https://dissona-*.vercel.app/**` |
-| Local | `http://localhost:3000/**` · `http://admin.localhost:3000/**` |
-| E2E local | `http://localhost:3100/**` · `http://admin.localhost:3100/**` |
+| Preview dos Workers | `https://*.workers.dev/**` |
+| Local | `http://localhost:3000/**` · `http://admin.localhost:3001/**` |
+| E2E local | `http://localhost:3100/**` · `http://admin.localhost:3101/**` |
 
-O `/**` não é decoração: sem ele só a raiz casa, e os destinos reais são `/api/auth/callback`, `/api/auth/confirmar` e o convite da equipe — `admin.<domínio>/convite` no subdomínio, `/admin/convite` no modo caminho.
+O `/**` não é decoração: sem ele só a raiz casa, e os destinos reais são `/api/auth/callback`, `/api/auth/confirmar` e o convite da equipe — `admin.dissona.com.br/convite`.
 
 Falhar nisso **não dá erro**. O GoTrue descarta em silêncio um `redirect_to` fora da lista e usa o Site URL no lugar — o `code` do OAuth chega na home e o login não acontece. Foi o que quebrou o login com Google e com Facebook em produção. A guarda de rota hoje encaminha um `?code=` que caia em `/` para o callback ([`lib/guarda-rota.ts`](../src/lib/guarda-rota.ts)), mas isso é rede de proteção, não substituto da configuração.
 
 | Ambiente | App | Supabase | Gatilho |
 |---|---|---|---|
 | Local | `pnpm dev` | Supabase CLI local (`supabase start`) | — |
-| Preview | Vercel Preview | projeto `dissona` | push em qualquer branch / PR |
-| Produção | Vercel Production | projeto `dissona` — **provisório** | merge em `main` |
+| Preview | versão do Worker (`*.workers.dev`) | projeto `dissona` | push em qualquer branch / PR |
+| Produção | Workers `dissona-web` e `dissona-admin` | projeto `dissona` — **provisório** | merge em `main` |
 
 **CI obrigatório:** `typecheck` → `lint` → `test` → `build`, no GitHub Actions, em todo PR e em `main`. O **E2E** roda depois, num job próprio que só dispara se a qualidade passou.
 
-Hoje a suíte sobe o próprio servidor na **porta 3100**, e não na 3000: se outro projeto estiver servindo a porta padrão, reusar o que está lá faz a suíte testar o app errado. Quando a Vercel estiver conectada, definir `BASE_URL` com a URL do Preview do PR desliga o `webServer` do Playwright sozinho.
+Hoje a suíte sobe os dois apps — o site na **porta 3100** e o painel em **`admin.localhost:3101`** —, e não nas portas de desenvolvimento: se outro projeto estiver servindo a porta padrão, reusar o que está lá faz a suíte testar o app errado. Definir `BASE_URL` (e `BASE_URL_ADMIN`) desliga o `webServer` do Playwright: é assim que a suíte roda contra um preview, contra o runtime local do Cloudflare ou contra produção.
 
-Segredos por escopo da Vercel (Production e Preview): chaves Supabase, credenciais OAuth, chave e webhook do Asaas, provedor de e-mail, chaves Spotify e YouTube. Nada de segredo em arquivo versionado — `.env.local` e `.mcp.json` estão no `.gitignore`.
+Segredos no painel de cada Worker (Variables and Secrets): chaves Supabase, credenciais OAuth, chave e webhook do Asaas, provedor de e-mail, chaves Spotify e YouTube. Nada de segredo em arquivo versionado — `.env.local` e `.mcp.json` estão no `.gitignore`.
 
-⚠️ **`NEXT_PUBLIC_*` é embutida no build, não lida em tempo de execução.** Acrescentar a variável na Vercel **não** conserta um deploy já construído sem ela: é preciso **redeployar**. Foi exatamente o que derrubou o primeiro deploy da R0 com `MIDDLEWARE_INVOCATION_FAILED` em todas as rotas.
+⚠️ **`NEXT_PUBLIC_*` é embutida no build, não lida em tempo de execução.** Acrescentar a variável no painel **não** conserta um deploy já construído sem ela: é preciso **redeployar**. Foi exatamente o que derrubou o primeiro deploy da R0 com `MIDDLEWARE_INVOCATION_FAILED` em todas as rotas.
 
 O `middleware.ts` degrada em vez de cair quando não consegue renovar a sessão: rota pública continua servida, rota autenticada redireciona para o login, e o motivo vai para o log da função. Uma variável faltando não deve tirar `/termos` do ar.
 

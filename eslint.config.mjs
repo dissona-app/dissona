@@ -8,6 +8,8 @@ const eslintConfig = defineConfig([
   ...nextTs,
   prettier,
   {
+    // Monorepo: o plugin do Next procura `pages`/`app` em cada app.
+    settings: { next: { rootDir: ['apps/*/'] } },
     rules: {
       // architecture.md §8: TypeScript strict, sem `any`.
       '@typescript-eslint/no-explicit-any': 'error',
@@ -21,11 +23,13 @@ const eslintConfig = defineConfig([
     rules: { 'no-console': 'off' },
   },
   globalIgnores([
-    '.next/**',
-    'out/**',
-    'build/**',
-    'next-env.d.ts',
-    'src/lib/supabase/tipos-bd.ts',
+    '**/.next/**',
+    '**/.open-next/**',
+    '**/.wrangler/**',
+    '**/out/**',
+    '**/build/**',
+    '**/next-env.d.ts',
+    '**/lib/supabase/tipos-bd.ts',
     'docs/**',
     // Entrypoint de Edge Function: runtime Deno, com `Deno.serve` e import por
     // URL. O `userinfo.ts` ao lado continua sob o lint — é código nosso, puro.

@@ -18,7 +18,7 @@ Plataforma web de marketplace bilateral que conecta artistas independentes a cur
 | Formulários e validação | React Hook Form + Zod (schema único cliente/servidor) |
 | Banco, auth, storage, jobs | Supabase — Postgres 17, RLS, Auth, Storage, Edge Functions |
 | Testes | Vitest 5 (unitário) · Playwright (E2E) |
-| Hospedagem | Vercel — Production Branch `main`, funções em `pdx1` |
+| Hospedagem | Cloudflare Workers via OpenNext — um Worker por app, deploy pelo Workers Builds a partir de `main` |
 
 Arquitetura, camadas e convenções: [`docs/architecture.md`](docs/architecture.md).
 
@@ -37,15 +37,17 @@ Arquitetura, camadas e convenções: [`docs/architecture.md`](docs/architecture.
 ```bash
 pnpm install
 
-# copie e preencha as variáveis de ambiente
-cp .env.example .env.local
+# copie e preencha as variáveis de ambiente — um arquivo só, na raiz;
+# o postinstall liga apps/*/.env.local a ele
+cp .env.example .env.local && pnpm install
 
-pnpm dev               # http://localhost:3000
+pnpm dev               # site (apps/web)    — http://localhost:3000
+pnpm dev:admin         # painel (apps/admin) — http://admin.localhost:3001
 ```
 
 O app sobe sem banco local: as variáveis de `.env.local` apontam para o projeto Supabase de desenvolvimento.
 
-Artista, curador e páginas públicas ficam em `http://localhost:3000`; o **admin**, em `http://admin.localhost:3000` (`/entrar`, `/equipe`, `/pacotes`…), como em produção fica em `admin.dissona.com.br`. O navegador resolve `*.localhost` sozinho. Com `ADMIN_EM_SUBDOMINIO=true` no `.env.local`, o endereço antigo `localhost:3000/admin/...` redireciona para lá; sem ela, o admin continua respondendo também em `/admin/...`. Ver [arquitetura §3](docs/architecture.md).
+O repositório é um monorepo pnpm: **`apps/web`** (público, artista e curador), **`apps/admin`** (o painel administrativo, `admin.dissona.com.br` em produção) e **`packages/nucleo`** (o código que os dois usam). O painel roda em `admin.localhost`, e não em `localhost`, porque cookie não distingue porta: o `admin.` mantém as sessões dos dois apps separadas, como em produção. O navegador resolve `*.localhost` sozinho. Ver [arquitetura §3](docs/architecture.md).
 
 ### Banco
 
@@ -64,7 +66,7 @@ Para a stack local, com Docker rodando:
 ```bash
 pnpm supabase start
 pnpm db:reset          # reconstrói o banco a partir de supabase/migrations/
-pnpm db:tipos          # regenera lib/supabase/tipos-bd.ts
+pnpm db:tipos          # regenera packages/nucleo/lib/supabase/tipos-bd.ts
 ```
 
 ⚠️ **`supabase db reset --linked` apaga o banco remoto**, que hoje é compartilhado entre Preview e Production ([#25](docs/open-questions.md#25-projetos-dedicados-de-staging-e-produção)).
@@ -85,7 +87,7 @@ pnpm db:tipos          # regenera lib/supabase/tipos-bd.ts
 | `pnpm e2e:navegadores` | Instala o Chromium do Playwright (uma vez) |
 | `pnpm db:reset` | Reconstrói o banco local do zero |
 | `pnpm db:push` | Aplica as migrations pendentes no projeto linkado |
-| `pnpm db:tipos` | Regenera `lib/supabase/tipos-bd.ts` |
+| `pnpm db:tipos` | Regenera `packages/nucleo/lib/supabase/tipos-bd.ts` |
 
 **Antes de considerar qualquer task pronta:** `pnpm typecheck && pnpm lint && pnpm test && pnpm build`. A lista completa está na [Definition of Done](docs/architecture.md#10-definition-of-done).
 
@@ -134,25 +136,32 @@ pnpm e2e:semear && pnpm e2e
 
 ### Contra produção
 
-Há um só projeto Supabase e um só projeto Vercel enquanto o produto está em
+Há um só projeto Supabase e dois Workers (`dissona-web` para `apps/web`,
+`dissona-admin` para `apps/admin`) enquanto o produto está em
 desenvolvimento, então apontar a suíte para produção não arrisca dado de
 ninguém — e prova o que o servidor local **não** prova:
 
 ```sh
-npx vercel --prod --yes --scope fraktal      # publica o que está no diretório
-BASE_URL=https://dissona.com.br pnpm e2e
+BASE_URL=https://dissona.com.br BASE_URL_ADMIN=https://admin.dissona.com.br pnpm e2e
 ```
 
-O que só produção pega é o teto de **~4,5 MB de corpo de request** das funções
-serverless da Vercel, que nenhuma opção de `next.config.ts` levanta. É a razão
-de o áudio da faixa (RF-036) e o anexo de credencial do curador subirem do
-navegador **direto ao Storage**, com a Server Action recebendo só o caminho — e
+O áudio da faixa (RF-036) e o anexo de credencial do curador sobem do
+navegador **direto ao Storage**, com a Server Action recebendo só o caminho —
 `b5-enviar-por-arquivo` e `e3-credenciais-e-bio` são os cenários que o exercitam,
-com 6 MB cada.
+com 6 MB cada. A decisão vem da Vercel (teto de ~4,5 MB de corpo), e continua
+certa no Cloudflare: o arquivo não atravessa o Worker.
 
-⚠️ Use o **domínio**, nunca a URL crua de um deployment ou de um Preview: elas
-estão atrás da Deployment Protection da Vercel e redirecionam para
-`vercel.com/login`, então o Playwright não as alcança.
+### Contra o runtime do Cloudflare, local
+
+Prova o que o Node não prova — o `workerd`, com as diferenças de `fetch` e de
+streams. Os segredos do runtime vêm de `apps/*/.dev.vars` (gitignored, formato
+do `.env.local`):
+
+```sh
+(cd apps/web && NEXT_PUBLIC_URL_ADMIN=http://admin.localhost:8788 pnpm cf:build && pnpm exec wrangler dev --port 8787)
+(cd apps/admin && NEXT_PUBLIC_URL_SITE=http://localhost:8787 pnpm cf:build && pnpm exec wrangler dev --port 8788 --inspector-port 9230)
+BASE_URL=http://localhost:8787 BASE_URL_ADMIN=http://admin.localhost:8788 pnpm e2e
+```
 
 O Playwright lê `E2E_SENHA` de `.env.local` por
 [`e2e/setup/ambiente.ts`](e2e/setup/ambiente.ts) — o Next carrega esse arquivo
@@ -172,10 +181,10 @@ nome; o rodapé de `dados-e2e.sql` traz o comando de varredura. Não use
 | Ambiente | App | Supabase | Gatilho |
 |---|---|---|---|
 | Local | `pnpm dev` | Supabase CLI local | — |
-| Preview | Vercel Preview | projeto `dissona` | push em branch / PR |
-| Produção | Vercel Production | projeto `dissona` — provisório | merge em `main` |
+| Preview | versão do Worker (`*.workers.dev`) | projeto `dissona` | push em branch / PR |
+| Produção | Workers `dissona-web` e `dissona-admin` | projeto `dissona` — provisório | merge em `main` |
 
-Segredos ficam nas env vars da Vercel, por escopo. `.env.local` e `.mcp.json` estão no `.gitignore` — **nunca** comite nenhum dos dois.
+Segredos ficam no painel de cada Worker (Variables and Secrets). Deploy e domínios: [arquitetura §9](docs/architecture.md). `.env.local` e `.mcp.json` estão no `.gitignore` — **nunca** comite nenhum dos dois.
 
 ---
 

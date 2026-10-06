@@ -3,8 +3,8 @@ node_modules/
 .pnpm-store/
 
 # Next.js
-/.next/
-/out/
+.next/
+out/
 next-env.d.ts
 *.tsbuildinfo
 
@@ -41,3 +41,8 @@ Thumbs.db
 
 .vercel
 .env*
+
+# Cloudflare (OpenNext/Wrangler)
+.open-next/
+.wrangler/
+.dev.vars*

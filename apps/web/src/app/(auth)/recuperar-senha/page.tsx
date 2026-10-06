@@ -1,0 +1,30 @@
+import type { Metadata } from 'next';
+
+import { FormularioDeRecuperacao } from '@dissona/nucleo/componentes/autenticacao/FormularioDeRecuperacao';
+import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { ENTRAR_PADRAO, ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { recuperarSenha } from '@/modulos/autenticacao/acoes';
+import { SEGUNDOS_DE_COOLDOWN_DE_ENVIO } from '@dissona/nucleo/modulos/autenticacao/servico';
+
+export const metadata: Metadata = {
+  title: 'Esqueci minha senha · Dissona',
+  description: 'Receba um link para definir uma senha nova.',
+};
+
+/** Tela 1.2 — recuperação de senha de artista e curador. */
+export default function Pagina() {
+  return (
+    <MolduraDeAutenticacao
+      linksDeRodape={[
+        { rotulo: 'Termos', href: ROTA.TERMOS },
+        { rotulo: 'Privacidade', href: ROTA.PRIVACIDADE },
+      ]}
+    >
+      <FormularioDeRecuperacao
+        acao={recuperarSenha}
+        hrefDoLogin={ENTRAR_PADRAO}
+        segundosDeCooldown={SEGUNDOS_DE_COOLDOWN_DE_ENVIO}
+      />
+    </MolduraDeAutenticacao>
+  );
+}

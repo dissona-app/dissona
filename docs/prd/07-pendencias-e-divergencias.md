@@ -1404,28 +1404,25 @@ leva ao login com `proximo=/admin/convite?token=…`, e esse destino é a única
 exceção de `entrarComoAdministrador`: a conta entra e volta ao aceite. Quem
 decide se o convite vale continua sendo `aceitar_convite_admin`.
 
-## Admin em subdomínio próprio · 2026-10-06
+## Admin em app próprio · 2026-10-06
 
-Decisão do cliente: o admin sai de `dissona.com.br/admin/...` e vai para
+Decisão do cliente: o admin é **código e deploy separados** — `apps/admin`, em
 **`admin.dissona.com.br`**, com URLs limpas (`/entrar`, `/equipe`, `/pacotes`).
-Artista, curador e páginas públicas continuam em `dissona.com.br`.
+Artista, curador e páginas públicas continuam em `dissona.com.br` (`apps/web`).
+O código comum foi para `packages/nucleo`. Substitui a primeira versão do mesmo
+dia, que servia o admin pelo mesmo app via subdomínio.
 
 Os protótipos não falam de domínio, então não há divergência de tela — o que
-muda é endereço. A implementação não move arquivo nenhum: o middleware
-reescreve o caminho limpo para o interno `/admin/...` (`lib/rotas-admin.ts`,
-`lib/decisao-por-host.ts`), e toda URL que sai do admin é traduzida.
-
-Três consequências que valem registro:
+muda é endereço e deploy. Consequências que valem registro:
 
 1. **Sessões separadas.** Os cookies do Supabase são por host: entrar no site
-   principal não abre o painel, e vice-versa. É desejado — o painel não herda
-   a sessão de quem só navegava como artista.
-2. **Conta bloqueada no admin volta ao login do admin.** Antes ia ao login do
-   artista, o que agora seria trocar de host.
-3. **Previews da Vercel seguem no modo caminho** (`/admin/...`): o domínio por
-   branch não tem subdomínio. Quem decide é `ADMIN_EM_SUBDOMINIO`, ligada só em
-   Production.
+   não abre o painel, e vice-versa. Quem já tem conta e foi convidado entra
+   pelo login do painel a partir do próprio convite.
+2. **Conta bloqueada no admin volta ao login do admin**, e não ao do artista.
+3. **Termos e Privacidade** ficam no site; o painel aponta para lá.
+4. **Fase 2** pendente: o admin antigo ainda existe dentro do `apps/web` até o
+   painel ser validado em produção (ver BACKLOG).
 
 Pendente: as rotas de notificação semeadas na `0005` (`rota_destino`
 `/admin/...`) são internas. Nenhuma tela as renderiza ainda (central de
-notificações é R5); quando renderizar, passar por `paraExterno`.
+notificações é R5); quando renderizar, no painel elas passam por `rota()`.
