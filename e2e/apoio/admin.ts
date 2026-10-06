@@ -1,30 +1,35 @@
 /**
- * O admin em subdomínio próprio (`src/lib/rotas-admin.ts`).
+ * O painel administrativo é um app próprio (`apps/admin`).
  *
- * A suíte sobe o servidor com `ADMIN_EM_SUBDOMINIO=true` (`playwright.config.ts`),
- * então o admin mora em `admin.localhost:3100` — e o Chromium resolve
- * `*.localhost` sem configuração nenhuma. Contra produção, `BASE_URL` é
- * `https://dissona.com.br` e o admin, `https://admin.dissona.com.br`.
+ * Local, a suíte o sobe em `admin.localhost:3101` (`playwright.config.ts`): o
+ * `admin.` separa os cookies de sessão do site, porque cookie não distingue
+ * porta — e o Chromium resolve `*.localhost` sem configuração. Contra
+ * produção, `BASE_URL_ADMIN` (ou `admin.` + o host de `BASE_URL`).
  *
- * Os specs continuam escrevendo o caminho **interno** (`/admin/equipe`), que é
- * o mesmo de `ROTA`: quem traduz é `noAdmin`. Assim o teste diz qual tela abre,
- * e não como o endereço dela é soletrado.
- *
- * Os cookies do Supabase são por host: a sessão do admin só vale aqui.
+ * Os specs continuam escrevendo o caminho **interno** (`/admin/equipe`), o
+ * mesmo de `ROTA`: quem traduz para a rota limpa do painel é `noAdmin`. Assim
+ * o teste diz qual tela abre, e não como o endereço dela é soletrado.
  */
 
 import { ehCaminhoDoAdmin, hostDoAdmin, paraExterno } from '@dissona/nucleo/lib/rotas-admin';
 
-const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3100';
+function urlDoPainel(): string {
+  const explicita = process.env.BASE_URL_ADMIN;
+  if (explicita !== undefined && explicita !== '') return explicita.replace(/\/$/, '');
 
-const base = new URL(BASE_URL);
+  const base = process.env.BASE_URL;
+  if (base === undefined || base === '') return 'http://admin.localhost:3101';
 
-/** `http://admin.localhost:3100`, sem barra final. */
-export const URL_ADMIN = `${base.protocol}//${hostDoAdmin(base.host)}`;
+  const url = new URL(base);
+  return `${url.protocol}//${hostDoAdmin(url.host)}`;
+}
 
-export const HOST_ADMIN = hostDoAdmin(base.host);
+/** `http://admin.localhost:3101`, sem barra final. */
+export const URL_ADMIN = urlDoPainel();
 
-/** Caminho interno (`/admin/equipe?aba=dados`) → URL absoluta no subdomínio. */
+export const HOST_ADMIN = new URL(URL_ADMIN).host;
+
+/** Caminho interno (`/admin/equipe?aba=dados`) → URL absoluta no painel. */
 export function noAdmin(caminhoInterno: string): string {
   return `${URL_ADMIN}${paraExterno(caminhoInterno, '')}`;
 }
@@ -34,8 +39,8 @@ function escapar(texto: string): string {
 }
 
 /**
- * A URL de uma tela do admin, para `toHaveURL`/`waitForURL`: o caminho limpo
- * no host do admin, seguido de query ou de nada.
+ * A URL de uma tela do painel, para `toHaveURL`/`waitForURL`: o caminho limpo
+ * no host do painel, seguido de query ou de nada.
  */
 export function telaDoAdmin(
   caminhoLimpo: string,
@@ -47,7 +52,7 @@ export function telaDoAdmin(
 
 /**
  * Para tabelas de cenário que misturam ambientes: caminho do admin vai ao
- * subdomínio, o resto segue relativo ao `baseURL`.
+ * painel, o resto segue relativo ao `baseURL`.
  */
 export function enderecoDe(caminhoInterno: string): string {
   return ehCaminhoDoAdmin(caminhoInterno) ? noAdmin(caminhoInterno) : caminhoInterno;

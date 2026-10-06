@@ -5,15 +5,15 @@ import { entrarComoAdmin } from '../apoio/sessao';
 import { ADMIN_ENTRAR } from '../apoio/textos';
 
 /**
- * O admin em `admin.<domínio>` (`src/lib/rotas-admin.ts`).
+ * O painel administrativo como app próprio (`apps/admin`, admin.dissona.com.br).
  *
- * O resto da suíte já roda o admin no subdomínio; este arquivo prova o que é
- * próprio da separação: o endereço antigo muda de lugar, o subdomínio não
- * serve o site principal, e a sessão de um host não vale no outro.
+ * O resto da suíte já roda o admin no painel; este arquivo prova o que é
+ * próprio da separação: o endereço antigo do site muda de lugar, o painel não
+ * serve o site, e a sessão de um não vale no outro.
  */
-test.describe('admin em subdomínio', () => {
+test.describe('painel administrativo separado', () => {
   test(
-    'o endereço antigo do admin muda de lugar com 308, preservando a query',
+    'o endereço antigo do admin no site vai ao painel com 308, preservando a query',
     { tag: ['@RF-028'] },
     async ({ request }) => {
       const resposta = await request.get('/admin/equipe?aba=dados', { maxRedirects: 0 });
@@ -22,23 +22,19 @@ test.describe('admin em subdomínio', () => {
     },
   );
 
-  test(
-    'o subdomínio serve o login do admin no caminho limpo',
-    { tag: ['@RF-028'] },
-    async ({ page }) => {
-      await page.goto(`${URL_ADMIN}/entrar`);
-      await expect(page).toHaveURL(telaDoAdmin('/entrar', { exato: true }));
-      await expect(page.getByRole('button', { name: ADMIN_ENTRAR.enviar })).toBeVisible();
-    },
-  );
+  test('o painel serve o login no caminho limpo', { tag: ['@RF-028'] }, async ({ page }) => {
+    await page.goto(`${URL_ADMIN}/entrar`);
+    await expect(page).toHaveURL(telaDoAdmin('/entrar', { exato: true }));
+    await expect(page.getByRole('button', { name: ADMIN_ENTRAR.enviar })).toBeVisible();
+  });
 
-  test('o subdomínio não serve o ambiente do artista', { tag: ['@RF-028'] }, async ({ page }) => {
+  test('o painel não serve o ambiente do artista', { tag: ['@RF-028'] }, async ({ page }) => {
     await page.goto(`${URL_ADMIN}/artista`);
     await expect(page).toHaveURL(telaDoAdmin('/entrar'));
   });
 
   test(
-    'a sessão do admin vale só no subdomínio',
+    'a sessão do admin vale só no painel',
     { tag: ['@RF-028'] },
     async ({ page, context, baseURL }) => {
       await entrarComoAdmin(page);
@@ -54,12 +50,13 @@ test.describe('admin em subdomínio', () => {
   );
 
   test(
-    'o rodapé das telas do admin abre as páginas legais no próprio subdomínio',
+    'o rodapé das telas do admin abre as páginas legais do site',
     { tag: ['@RF-028'] },
-    async ({ page }) => {
+    async ({ page, baseURL }) => {
+      // O painel não duplica Termos e Privacidade: aponta para o site.
       await page.goto(noAdmin('/admin/entrar'));
       await page.getByRole('link', { name: 'Privacidade', exact: true }).click();
-      await expect(page).toHaveURL(`${URL_ADMIN}/privacidade`);
+      await expect(page).toHaveURL(`${baseURL ?? ''}/privacidade`);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     },
   );

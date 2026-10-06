@@ -30,6 +30,9 @@ carregarEnvLocal();
  */
 const PORTA = 3100;
 const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORTA}`;
+const PORTA_ADMIN = 3101;
+// Mesmo critério de `e2e/apoio/admin.ts`.
+const URL_ADMIN = process.env.BASE_URL_ADMIN ?? `http://admin.localhost:${PORTA_ADMIN}`;
 const noCI = process.env.CI === 'true' || process.env.CI === '1';
 
 export default defineConfig({
@@ -84,19 +87,29 @@ export default defineConfig({
   workers: noCI ? 2 : undefined,
   reporter: noCI ? [['github'], ['html', { open: 'never' }]] : [['list']],
 
-  // Sobe o servidor só quando a suíte roda contra o local.
+  // Sobe os dois apps só quando a suíte roda contra o local.
   ...(process.env.BASE_URL === undefined
     ? {
-        webServer: {
-          command: `pnpm --filter @dissona/web build && pnpm --filter @dissona/web start --port ${PORTA}`,
-          url: BASE_URL,
-          // Nunca reusar: um servidor alheio na porta silenciaria a suite.
-          reuseExistingServer: false,
-          // O admin roda em `admin.localhost:3100`, como em produção roda em
-          // `admin.dissona.com.br` — ver `e2e/apoio/admin.ts`.
-          env: { ADMIN_EM_SUBDOMINIO: 'true' },
-          timeout: 240_000,
-        },
+        webServer: [
+          {
+            command: `pnpm --filter @dissona/web build && pnpm --filter @dissona/web start --port ${PORTA}`,
+            url: BASE_URL,
+            // Nunca reusar: um servidor alheio na porta silenciaria a suite.
+            reuseExistingServer: false,
+            // O `/admin` antigo do site vai para o painel separado.
+            env: { ADMIN_EM_SUBDOMINIO: 'true', NEXT_PUBLIC_URL_ADMIN: URL_ADMIN },
+            timeout: 240_000,
+          },
+          {
+            // O painel administrativo (`apps/admin`) em `admin.localhost`: o
+            // `admin.` separa os cookies de sessão, que não distinguem porta.
+            command: `pnpm --filter @dissona/admin build && pnpm --filter @dissona/admin start --port ${PORTA_ADMIN}`,
+            url: URL_ADMIN,
+            reuseExistingServer: false,
+            env: { NEXT_PUBLIC_URL_SITE: BASE_URL },
+            timeout: 240_000,
+          },
+        ],
       }
     : {}),
 });
