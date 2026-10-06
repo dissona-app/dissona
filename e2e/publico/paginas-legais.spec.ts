@@ -73,8 +73,13 @@ test.describe('páginas legais', () => {
   test('cada documento tem link de volta para a home', async ({ page }) => {
     for (const caminho of ['/termos', '/privacidade']) {
       await page.goto(caminho);
-      await page.getByRole('link', { name: '← Voltar' }).click();
-      await expect(page).toHaveURL(/\/$/);
+      // O link aponta para a home; o destino final é o login padrão, porque a
+      // home ainda redireciona para ele (R5). Conferir a URL logo depois do
+      // clique corria com esse redirect e falhava uma vez em três.
+      const voltar = page.getByRole('link', { name: '← Voltar' });
+      await expect(voltar).toHaveAttribute('href', '/');
+      await voltar.click();
+      await expect(page).toHaveURL(/\/artista\/entrar$/);
     }
   });
 });
