@@ -1,3 +1,14 @@
 import { defineCloudflareConfig } from '@opennextjs/cloudflare';
 
-export default defineCloudflareConfig({});
+/**
+ * `buildCommand` explícito porque o script `build` deste app **é** o build do
+ * OpenNext (`opennextjs-cloudflare build`): sem isto o OpenNext chamaria
+ * `pnpm build` de novo, em laço. Assim os comandos padrão do Workers Builds
+ * (`pnpm run build` + `npx wrangler deploy`) funcionam sem ajuste no painel.
+ */
+const configuracao = {
+  ...defineCloudflareConfig({}),
+  buildCommand: 'pnpm exec next build',
+};
+
+export default configuracao;
