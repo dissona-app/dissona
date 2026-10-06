@@ -143,7 +143,9 @@ export function MolduraDeAutenticacao({
         <div className={estilos.rodapeLinha}>
           <span>© {ANO} Dissona</span>
           {linksDeRodape.map((link) => (
-            <span key={link.href} className={estilos.rodapeLinha}>
+            // Rótulo, e não href: "Segurança" e "Privacidade" do admin apontam
+            // para a mesma rota.
+            <span key={link.rotulo} className={estilos.rodapeLinha}>
               <span className={estilos.separador} aria-hidden="true">
                 ·
               </span>

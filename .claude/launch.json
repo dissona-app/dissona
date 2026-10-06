@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dissona",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "prototipos-r2",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4100",
+        "--directory",
+        "docs/R2"
+      ],
+      "port": 4100
+    }
+  ]
+}
