@@ -1,0 +1,25 @@
+// Deploy no Cloudflare Workers via OpenNext — ver docs/architecture.md §9.
+// Segredos (SUPABASE_SERVICE_ROLE_KEY, ASAAS_*) e as variáveis de build
+// (NEXT_PUBLIC_*) ficam no painel do Cloudflare, nunca aqui.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dissona-web",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "dissona-web" }],
+  // O banco está em us-west-2 e o middleware faz um getUser() por requisição:
+  // o Smart Placement põe o worker perto do Supabase, e não do visitante.
+  "placement": { "mode": "smart" },
+  "observability": { "enabled": true },
+  // Preserva as variáveis definidas no painel (PAGAMENTO_SIMULADO etc.): sem
+  // isto, cada deploy apagaria o que não está neste arquivo.
+  "keep_vars": true,
+  "vars": { "ADMIN_EM_SUBDOMINIO": "true" },
+  // Domínio próprio: a zona dissona.com.br precisa estar ativa na conta.
+  "routes": [{ "pattern": "dissona.com.br", "custom_domain": true }],
+}

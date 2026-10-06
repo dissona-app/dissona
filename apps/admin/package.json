@@ -7,13 +7,20 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@dissona/nucleo": "workspace:*",
+    "@opennextjs/cloudflare": "^1.20.8",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "wrangler": "^4.147.0"
   }
 }

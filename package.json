@@ -32,7 +32,9 @@
     "e2e:relatorio": "playwright show-report",
     "e2e:semear": "node scripts/repor-cenarios-e2e.mjs",
     "rastreabilidade": "node scripts/matriz-rastreabilidade.mjs",
-    "postinstall": "node scripts/ligar-env.mjs"
+    "postinstall": "node scripts/ligar-env.mjs",
+    "deploy:web": "pnpm --filter @dissona/web cf:deploy",
+    "deploy:admin": "pnpm --filter @dissona/admin cf:deploy"
   },
   "devDependencies": {
     "@dissona/nucleo": "workspace:*",

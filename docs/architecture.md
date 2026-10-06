@@ -51,7 +51,7 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 
 > **Versões resolvidas na R0:** Next 16.3.4 · React 19.2.8 · TypeScript 5.9 · pnpm 11.5.2 · Vitest 5.
 
-> **Node 24.** O Node 20 saiu de suporte em abril de 2026. A versão fica travada em três lugares que precisam concordar: `.nvmrc`, `engines.node` no `package.json` e a configuração de runtime da Vercel.
+> **Node 24.** O Node 20 saiu de suporte em abril de 2026. A versão fica travada em três lugares que precisam concordar: `.nvmrc`, `engines.node` no `package.json` e o `NODE_VERSION` dos builds no Cloudflare (o runtime dos Workers é o `workerd`, com `nodejs_compat`).
 
 > **Sem Tailwind.** Os tokens do Design System foram extraídos dos protótipos da R2 como valores literais; CSS Modules + custom properties preservam esses valores sem uma camada de tradução no meio.
 
@@ -65,7 +65,7 @@ Papéis são **acumuláveis** na mesma conta (artista + curador). O admin é pap
 | **Supabase Edge Functions** | Webhooks do gateway, jobs agendados (`pg_cron` dispara, Edge executa) e **um caminho de requisição**: o `userinfo` do provider do SoundCloud, que não podia viver no Next — ver §2.3 |
 | **Supabase CLI** | Migrations versionadas em `supabase/migrations/`, geração de tipos |
 
-**Um projeto Supabase, em desenvolvimento.** `dissona` · ref `fhqcibjzmowcjkdrqyvi` · região `us-west-2` · Postgres 17. Ele serve o Preview e a Production da Vercel enquanto o produto não tem usuário real. Projetos dedicados de staging e produção entram antes do beta — ver [open-questions #25](open-questions.md#25-projetos-dedicados-de-staging-e-produção).
+**Um projeto Supabase, em desenvolvimento.** `dissona` · ref `fhqcibjzmowcjkdrqyvi` · região `us-west-2` · Postgres 17. Ele serve os previews e a produção dos Workers enquanto o produto não tem usuário real. Projetos dedicados de staging e produção entram antes do beta — ver [open-questions #25](open-questions.md#25-projetos-dedicados-de-staging-e-produção).
 
 Nenhuma alteração de schema fora de migration versionada.
 
@@ -331,18 +331,22 @@ Segredo do `pg_net` vem do Vault, nunca inline — `cron.job.command` é legíve
 
 ## 9. Ambientes e deploy
 
-**Hospedagem: Vercel.** Dois projetos do mesmo repositório, ambos com **Production Branch = `main`**:
+**Hospedagem: Cloudflare Workers**, pelo adaptador [OpenNext](https://opennext.js.org/cloudflare) (`@opennextjs/cloudflare`), desde 2026-10-06 — antes era a Vercel. Um Worker por app, os dois do repositório `dissona-app/dissona`, com deploy pelo **Workers Builds** (integração Git do Cloudflare):
 
-| Projeto | Root Directory | Domínio | Variáveis próprias |
-|---|---|---|---|
-| `dissona` | `apps/web` | **`https://dissona.com.br`** (canônico; `dissona.vercel.app` como alias) | `NEXT_PUBLIC_URL_ADMIN=https://admin.dissona.com.br`, `ADMIN_EM_SUBDOMINIO=true` (Production) |
-| `dissona-admin` | `apps/admin` | **`https://admin.dissona.com.br`** (`CNAME admin → cname.vercel-dns.com`) | `NEXT_PUBLIC_URL_SITE=https://dissona.com.br` |
+| Worker | Root directory | Domínio | Build variables | Runtime (Variables and Secrets) |
+|---|---|---|---|---|
+| `dissona-web` | `apps/web` | **`https://dissona.com.br`** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_URL_ADMIN=https://admin.dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret), `PAGAMENTO_SIMULADO`, `ASAAS_*` quando o Asaas ligar, e as duas `NEXT_PUBLIC_SUPABASE_*` |
+| `dissona-admin` | `apps/admin` | **`https://admin.dissona.com.br`** | as duas `NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_URL_SITE=https://dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret) e as duas `NEXT_PUBLIC_SUPABASE_*` |
 
-Os dois precisam das chaves Supabase (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`). Em ambos, ligar *Skip deployments when there are no changes to the root directory or its dependencies*: a Vercel conhece o workspace e não reconstrói o app que nada tocou. A Vercel instala da raiz do monorepo, pelo lockfile, mesmo com o Root Directory num app.
+- **Comandos do Workers Builds**, nos dois: build `pnpm exec opennextjs-cloudflare build`, deploy `pnpm exec opennextjs-cloudflare deploy`, branch não-produção `pnpm exec opennextjs-cloudflare upload`. Localmente: `pnpm deploy:web` / `pnpm deploy:admin` (exige `wrangler login`).
+- **O que está no código** (`apps/*/wrangler.jsonc`): nome do Worker, `nodejs_compat`, assets, **domínio próprio** (`routes` com `custom_domain` — o deploy liga o domínio sozinho, desde que a zona `dissona.com.br` esteja ativa na conta), `ADMIN_EM_SUBDOMINIO=true` no web, *Smart Placement* e logs. `keep_vars: true` preserva o que foi definido no painel — sem ele, cada deploy apagaria essas variáveis.
+- **DNS:** a zona `dissona.com.br` mora no Cloudflare (nameservers trocados no Registro.br). Os domínios dos Workers não precisam de registro manual.
+- **Plano: Workers Paid.** O gratuito limita cada requisição a **10 ms de CPU**, e a renderização no servidor de uma página Next passa disso. Os Workers ficam em ~2,6 MiB (web) e ~2,1 MiB (admin) comprimidos.
+- **Região:** *Smart Placement* põe o Worker perto do Supabase (`us-west-2`), porque o middleware faz um `getUser()` por requisição — rodar perto do visitante e longe do banco pagaria essa ida em toda navegação. Vale revisar junto da pendência [#25](open-questions.md).
+- **Diferença de runtime que já mordeu:** o `fetch` dos Workers só aceita `redirect: 'follow' | 'manual'`. Com `'error'` a chamada lança (era o que calava a detecção de faixa por link). O E2E inteiro passa contra o runtime local (`opennextjs-cloudflare build` + `wrangler dev`, com `BASE_URL`/`BASE_URL_ADMIN`).
+- **Segredos locais do runtime:** `apps/*/.dev.vars` (gitignored), no mesmo formato do `.env.local`.
 
-Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `pdx1` que a R0 havia sugerido. O efeito é uma troca: melhor tempo de resposta para o usuário brasileiro, e ~120 ms a mais em cada ida ao banco, que está em `us-west-2`. Como o `middleware.ts` faz um `getUser()` por requisição, essa ida acontece em toda navegação. Vale revisar junto da pendência [#25](open-questions.md), quando os projetos dedicados forem provisionados.
-
-⚠️ O **Site URL** do Supabase Auth precisa ser **`https://dissona.com.br`**, e com `https://`. Com `http://`, os links dos e-mails de verificação e recuperação saem inseguros, e a Vercel responde `308` para o `https` — o que pode fazer o redirect de OAuth não casar com a allow list.
+⚠️ O **Site URL** do Supabase Auth precisa ser **`https://dissona.com.br`**, e com `https://`. Com `http://`, os links dos e-mails de verificação e recuperação saem inseguros, e a borda responde `308` para o `https` — o que pode fazer o redirect de OAuth não casar com a allow list.
 
 ⚠️ E as **Redirect URLs** têm de listar **toda** origem que o app usa, porque `origemDaRequisicao()` deriva o `redirectTo` do cabeçalho da requisição (ver [`lib/origem.ts`](../src/lib/origem.ts)):
 
@@ -350,8 +354,7 @@ Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `p
 |---|---|
 | Produção | `https://dissona.com.br/**` |
 | Admin em produção | `https://admin.dissona.com.br/**` |
-| Alias da Vercel | `https://dissona.vercel.app/**` |
-| Preview | o curinga do projeto, `https://dissona-*.vercel.app/**` |
+| Preview dos Workers | `https://*.workers.dev/**` |
 | Local | `http://localhost:3000/**` · `http://admin.localhost:3001/**` |
 | E2E local | `http://localhost:3100/**` · `http://admin.localhost:3101/**` |
 
@@ -362,16 +365,16 @@ Falhar nisso **não dá erro**. O GoTrue descarta em silêncio um `redirect_to` 
 | Ambiente | App | Supabase | Gatilho |
 |---|---|---|---|
 | Local | `pnpm dev` | Supabase CLI local (`supabase start`) | — |
-| Preview | Vercel Preview | projeto `dissona` | push em qualquer branch / PR |
-| Produção | Vercel Production | projeto `dissona` — **provisório** | merge em `main` |
+| Preview | versão do Worker (`*.workers.dev`) | projeto `dissona` | push em qualquer branch / PR |
+| Produção | Workers `dissona-web` e `dissona-admin` | projeto `dissona` — **provisório** | merge em `main` |
 
 **CI obrigatório:** `typecheck` → `lint` → `test` → `build`, no GitHub Actions, em todo PR e em `main`. O **E2E** roda depois, num job próprio que só dispara se a qualidade passou.
 
-Hoje a suíte sobe os dois apps — o site na **porta 3100** e o painel em **`admin.localhost:3101`** —, e não nas portas de desenvolvimento: se outro projeto estiver servindo a porta padrão, reusar o que está lá faz a suíte testar o app errado. Quando a Vercel estiver conectada, definir `BASE_URL` com a URL do Preview do PR desliga o `webServer` do Playwright sozinho.
+Hoje a suíte sobe os dois apps — o site na **porta 3100** e o painel em **`admin.localhost:3101`** —, e não nas portas de desenvolvimento: se outro projeto estiver servindo a porta padrão, reusar o que está lá faz a suíte testar o app errado. Definir `BASE_URL` (e `BASE_URL_ADMIN`) desliga o `webServer` do Playwright: é assim que a suíte roda contra um preview, contra o runtime local do Cloudflare ou contra produção.
 
-Segredos por escopo da Vercel (Production e Preview): chaves Supabase, credenciais OAuth, chave e webhook do Asaas, provedor de e-mail, chaves Spotify e YouTube. Nada de segredo em arquivo versionado — `.env.local` e `.mcp.json` estão no `.gitignore`.
+Segredos no painel de cada Worker (Variables and Secrets): chaves Supabase, credenciais OAuth, chave e webhook do Asaas, provedor de e-mail, chaves Spotify e YouTube. Nada de segredo em arquivo versionado — `.env.local` e `.mcp.json` estão no `.gitignore`.
 
-⚠️ **`NEXT_PUBLIC_*` é embutida no build, não lida em tempo de execução.** Acrescentar a variável na Vercel **não** conserta um deploy já construído sem ela: é preciso **redeployar**. Foi exatamente o que derrubou o primeiro deploy da R0 com `MIDDLEWARE_INVOCATION_FAILED` em todas as rotas.
+⚠️ **`NEXT_PUBLIC_*` é embutida no build, não lida em tempo de execução.** Acrescentar a variável no painel **não** conserta um deploy já construído sem ela: é preciso **redeployar**. Foi exatamente o que derrubou o primeiro deploy da R0 com `MIDDLEWARE_INVOCATION_FAILED` em todas as rotas.
 
 O `middleware.ts` degrada em vez de cair quando não consegue renovar a sessão: rota pública continua servida, rota autenticada redireciona para o login, e o motivo vai para o log da função. Uma variável faltando não deve tirar `/termos` do ar.
 

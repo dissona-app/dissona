@@ -7,7 +7,7 @@ import type { NextConfig } from 'next';
  * `<input type="file">` — o áudio da faixa (RF-036), a foto do curador e o
  * anexo de credencial — vão do navegador **direto ao Supabase Storage**, e a
  * Server Action recebe só o caminho. Era o que faltava para o envio sobreviver
- * ao deploy: uma função serverless da Vercel aceita ~4,5 MB de corpo de request,
+ * ao deploy: uma função serverless da Vercel (a hospedagem de então) aceitava ~4,5 MB de corpo de request,
  * e nenhuma opção daqui levanta esse teto.
  *
  * Estes números cobrem, então, o **caminho sem JavaScript**: sem hidratação o

@@ -29,8 +29,10 @@ export async function detectarPorLink(link: string): Promise<MetadadosDetectados
       signal: AbortSignal.timeout(TEMPO_MAXIMO_MS),
       cache: 'no-store',
       // O host já foi conferido em `enderecoDoOembed`; um redirect para outro
-      // lugar não é seguido.
-      redirect: 'error',
+      // lugar não é seguido. `manual`, e não `error`: o `fetch` do Cloudflare
+      // Workers só aceita `follow` e `manual`, e com `error` a chamada lançava
+      // — a detecção falhava calada. Um 3xx não é `ok`, e cai no `null` abaixo.
+      redirect: 'manual',
       headers: { accept: 'application/json' },
     });
     if (!resposta.ok) return null;
