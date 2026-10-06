@@ -121,17 +121,17 @@ const ADMIN: readonly GrupoNavegacao[] = [
     itens: [
       {
         rotulo: ADMIN_NAVEGACAO.curadoresEArtistas,
-        caminho: `${ROTA.ADMIN}/usuarios`,
+        caminho: ROTA.ADMIN_USUARIOS,
         release: 3,
       },
-      { rotulo: ADMIN_NAVEGACAO.pacotes, caminho: `${ROTA.ADMIN}/pacotes`, release: 2 },
+      { rotulo: ADMIN_NAVEGACAO.pacotes, caminho: ROTA.ADMIN_PACOTES, release: 2 },
     ],
   },
   {
     titulo: ADMIN_NAVEGACAO.grupoOperacao,
     itens: [
-      { rotulo: ADMIN_NAVEGACAO.financeiro, caminho: `${ROTA.ADMIN}/financeiro`, release: 5 },
-      { rotulo: ADMIN_NAVEGACAO.moderacao, caminho: `${ROTA.ADMIN}/moderacao`, release: 3 },
+      { rotulo: ADMIN_NAVEGACAO.financeiro, caminho: ROTA.ADMIN_FINANCEIRO, release: 5 },
+      { rotulo: ADMIN_NAVEGACAO.moderacao, caminho: ROTA.ADMIN_MODERACAO, release: 3 },
     ],
   },
   {

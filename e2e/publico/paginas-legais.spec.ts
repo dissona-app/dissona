@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { noAdmin, telaDoAdmin } from '../apoio/admin';
+
 /**
  * Páginas legais e navegação pública — TASK-008.
  *
@@ -71,8 +73,13 @@ test.describe('páginas legais', () => {
   test('cada documento tem link de volta para a home', async ({ page }) => {
     for (const caminho of ['/termos', '/privacidade']) {
       await page.goto(caminho);
-      await page.getByRole('link', { name: '← Voltar' }).click();
-      await expect(page).toHaveURL(/\/$/);
+      // O link aponta para a home; o destino final é o login padrão, porque a
+      // home ainda redireciona para ele (R5). Conferir a URL logo depois do
+      // clique corria com esse redirect e falhava uma vez em três.
+      const voltar = page.getByRole('link', { name: '← Voltar' });
+      await expect(voltar).toHaveAttribute('href', '/');
+      await voltar.click();
+      await expect(page).toHaveURL(/\/artista\/entrar$/);
     }
   });
 });
@@ -84,12 +91,14 @@ test.describe('guarda de rota', () => {
   });
 
   test('o painel admin sem sessão manda para o login próprio do admin', async ({ page }) => {
+    // Pelo endereço antigo, no host principal: vai ao subdomínio e, sem
+    // sessão, ao login — com o destino já na forma limpa.
     await page.goto('/admin');
-    await expect(page).toHaveURL(/\/admin\/entrar\?proximo=%2Fadmin$/);
+    await expect(page).toHaveURL(telaDoAdmin('/entrar?proximo=%2F', { exato: true }));
   });
 
   test('o login do admin é aberto', async ({ page }) => {
-    await page.goto('/admin/entrar');
-    await expect(page).toHaveURL(/\/admin\/entrar$/);
+    await page.goto(noAdmin('/admin/entrar'));
+    await expect(page).toHaveURL(telaDoAdmin('/entrar', { exato: true }));
   });
 });

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-import { ultimoPedidoDe } from '../apoio/banco';
+import { limparCartoesSalvos, ultimoPedidoDe } from '../apoio/banco';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
 import { CARTAO_SALVO, CARTEIRA, CHECKOUT, PACOTES } from '../apoio/textos';
@@ -158,6 +158,12 @@ async function ultimaCobrancaPix(): Promise<CobrancaDoSandbox> {
 test.describe.configure({ mode: 'serial' });
 
 test.describe('B2 · Comprar Claves', () => {
+  // Os testes de cartão digitam o número; um cartão salvo de rodada anterior
+  // esconderia o campo.
+  test.beforeEach(async () => {
+    await limparCartoesSalvos(PERSONA.ARTISTA_COMPRA.email);
+  });
+
   test('a vitrine lista os pacotes com preço por Clave', { tag: ['@RF-043'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.ARTISTA_COMPRA);
     await page.goto('/artista/pacotes');
@@ -304,10 +310,13 @@ test.describe('B2 · Comprar Claves', () => {
         JSON.stringify(pedido),
         'nenhum campo de `pedido_clave` pode conter o número do cartão',
       ).not.toContain(digitos);
-      expect(
-        (pedido as { provedor_cobranca_id?: string } | null)?.provedor_cobranca_id,
-        'o que se guarda é a referência da cobrança no gateway, não o cartão',
-      ).toBeTruthy();
+      // Só o Asaas devolve referência de cobrança; o simulador não tem gateway.
+      if (ASAAS) {
+        expect(
+          (pedido as { provedor_cobranca_id?: string } | null)?.provedor_cobranca_id,
+          'o que se guarda é a referência da cobrança no gateway, não o cartão',
+        ).toBeTruthy();
+      }
     },
   );
 

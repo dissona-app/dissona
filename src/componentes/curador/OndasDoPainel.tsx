@@ -43,12 +43,7 @@ const CAMADA_B: readonly Eco[] = [
 
 function Camada({ ecos, classe }: { readonly ecos: readonly Eco[]; readonly classe?: string }) {
   return (
-    <svg
-      className={classe}
-      viewBox="0 0 2400 900"
-      preserveAspectRatio="none"
-      focusable="false"
-    >
+    <svg className={classe} viewBox="0 0 2400 900" preserveAspectRatio="none" focusable="false">
       {ecos.map((eco, indice) => (
         <path
           key={indice}

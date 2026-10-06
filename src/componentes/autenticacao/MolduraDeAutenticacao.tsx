@@ -26,7 +26,11 @@ export type AmbienteDeAutenticacao = 'artista' | 'curador' | 'admin';
 export type PropsMoldura = {
   readonly ambiente?: AmbienteDeAutenticacao;
   /** Chamada acima do card — só a tela 1 (artista/curador) tem. */
-  readonly chamada?: { readonly overline: string; readonly titulo: string; readonly subtitulo?: string };
+  readonly chamada?: {
+    readonly overline: string;
+    readonly titulo: string;
+    readonly subtitulo?: string;
+  };
   /** Provas sociais do pé — idem. */
   readonly provas?: readonly string[];
   readonly linksDeRodape: readonly LinkDeRodape[];
@@ -143,7 +147,9 @@ export function MolduraDeAutenticacao({
         <div className={estilos.rodapeLinha}>
           <span>© {ANO} Dissona</span>
           {linksDeRodape.map((link) => (
-            <span key={link.href} className={estilos.rodapeLinha}>
+            // Rótulo, e não href: "Segurança" e "Privacidade" do admin apontam
+            // para a mesma rota.
+            <span key={link.rotulo} className={estilos.rodapeLinha}>
               <span className={estilos.separador} aria-hidden="true">
                 ·
               </span>

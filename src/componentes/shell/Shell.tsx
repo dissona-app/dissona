@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 
 import type { Papel } from '@/lib/papeis';
 
+import { useCaminhoInterno } from './BaseDoAdmin';
 import { MenuDaConta } from './MenuDaConta';
 import type { IdentidadeExibida } from './MenuDaConta';
 import { Navegacao } from './Navegacao';
@@ -119,7 +120,7 @@ export function Shell({
   children,
 }: PropsShell) {
   const ehAdmin = papelAtivo === 'admin';
-  const caminho = usePathname();
+  const caminho = useCaminhoInterno()(usePathname());
   const doCaminho = tituloDoCaminho(caminho, papelAtivo);
   const tituloExibido = titulo ?? doCaminho.titulo;
   const subtituloExibido = subtitulo ?? doCaminho.sublegenda;

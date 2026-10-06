@@ -8,6 +8,7 @@ import { Marca } from '@/componentes/base/Marca';
 import { ROTA } from '@/lib/guarda-rota';
 import type { Papel } from '@/lib/papeis';
 
+import { useCaminhoInterno, useHrefDoAdmin } from './BaseDoAdmin';
 import estilos from './Navegacao.module.css';
 import { NAVEGACAO, NOME_AMBIENTE } from './navegacao-por-ambiente';
 
@@ -20,12 +21,18 @@ export type PropsNavegacao = {
 };
 
 export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
-  const caminhoAtual = usePathname();
+  // As tabelas da navegação são internas (`/admin/...`); no subdomínio do
+  // admin o navegador vê o caminho limpo, e os dois lados são traduzidos.
+  const caminhoAtual = useCaminhoInterno()(usePathname());
+  const hrefDoAdmin = useHrefDoAdmin();
   const grupos = NAVEGACAO[papel];
 
   return (
     <aside className={estilos.aside}>
-      <Link className={estilos.marca} href={ROTA.HOME}>
+      <Link
+        className={estilos.marca}
+        href={papel === 'admin' ? hrefDoAdmin(ROTA.ADMIN) : ROTA.HOME}
+      >
         <Marca variante="branca" altura="clamp(28px, 3.8vh, 34px)" />
       </Link>
 
@@ -59,7 +66,7 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                         className={[estilos.item, ativo ? estilos.ativo : undefined]
                           .filter(Boolean)
                           .join(' ')}
-                        href={item.caminho}
+                        href={hrefDoAdmin(item.caminho)}
                         aria-current={ativo ? 'page' : undefined}
                       >
                         {item.rotulo}

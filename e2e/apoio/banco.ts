@@ -361,6 +361,36 @@ export async function ultimoPedidoDe(email: string): Promise<Record<string, unkn
 }
 
 /**
+ * Apaga os cartões salvos de uma conta de artista.
+ *
+ * Restauração de fixture. A compra aprovada com cartão novo **guarda** o token
+ * (`0007e`) — o simulador também —, e o checkout passa a abrir no cartão salvo,
+ * sem o campo de número. Sem a limpeza, a segunda rodada de B2 falha em
+ * "Informe um número de cartão válido." como se a validação tivesse sumido.
+ */
+export async function limparCartoesSalvos(email: string): Promise<void> {
+  const perfilId = await perfilPorEmail(email);
+  if (perfilId === null) return;
+
+  const supabase = clienteDeServico();
+
+  const { data: artista, error: erroDoArtista } = await supabase
+    .from('perfil_artista')
+    .select('id')
+    .eq('perfil_id', perfilId)
+    .maybeSingle();
+  estourar(`limparCartoesSalvos("${email}") · perfil_artista`, erroDoArtista);
+  if (artista === null) return;
+
+  const { error } = await supabase
+    .from('cartao_salvo')
+    .delete()
+    .eq('perfil_artista_id', artista.id);
+
+  estourar(`limparCartoesSalvos("${email}")`, error);
+}
+
+/**
  * O ambiente em uso gravado no perfil (RF-008).
  *
  * `RegistrarAmbiente` grava num `useEffect`, **depois** da pintura, e só quando

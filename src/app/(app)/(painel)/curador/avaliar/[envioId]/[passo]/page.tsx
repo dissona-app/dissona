@@ -70,11 +70,7 @@ export default async function PaginaDoPassoDaAvaliacao({
         passo="remuneracao"
         concluida={tela.avaliacao.concluida}
       >
-        <PassoRemuneracao
-          tela={tela}
-          voltarPara={`${raiz}/${anterior}`}
-          acao={concluirAvaliacao}
-        />
+        <PassoRemuneracao tela={tela} voltarPara={`${raiz}/${anterior}`} acao={concluirAvaliacao} />
       </MolduraDaAvaliacao>
     );
   }

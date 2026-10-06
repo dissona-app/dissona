@@ -8,6 +8,7 @@ import { ADMIN_NAVEGACAO, MENU_DA_CONTA } from '@/textos/prototipo';
 
 import { MenuAjuda } from './MenuAjuda';
 import type { ItemMenu } from './MenuAjuda';
+import { useHrefDoAdmin } from './BaseDoAdmin';
 import estilos from './MenuDaConta.module.css';
 
 export type IdentidadeExibida = {
@@ -75,16 +76,15 @@ const OUTRO_AMBIENTE: Partial<Record<Papel, { readonly href: string; readonly ro
  *    (open-questions #9). Registrado em `07-pendencias-e-divergencias.md`.
  */
 export function MenuDaConta({ identidade, acaoDeSair, papelAtivo, papeis }: PropsMenuDaConta) {
+  const hrefDoAdmin = useHrefDoAdmin();
   const conta = CONTA_DO_AMBIENTE[papelAtivo];
   const outro = OUTRO_AMBIENTE[papelAtivo];
   // O admin não entra na troca: é papel à parte, com login próprio (RF-008).
   const podeTrocar = outro !== undefined && papeis.filter((papel) => papel !== 'admin').length > 1;
 
   const itens: readonly ItemMenu[] = [
-    ...(podeTrocar && outro !== undefined
-      ? [{ rotulo: outro.rotulo, href: outro.href }]
-      : []),
-    { rotulo: conta.rotulo, href: conta.href, separadorAntes: podeTrocar },
+    ...(podeTrocar && outro !== undefined ? [{ rotulo: outro.rotulo, href: outro.href }] : []),
+    { rotulo: conta.rotulo, href: hrefDoAdmin(conta.href), separadorAntes: podeTrocar },
     ...(papelAtivo === 'artista'
       ? [{ rotulo: MENU_DA_CONTA.reverOnboarding, href: `${ROTA.ONBOARDING}?rever=1` }]
       : []),

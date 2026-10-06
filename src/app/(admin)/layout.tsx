@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
 
+import { ProvedorDeBaseDoAdmin } from '@/componentes/shell/BaseDoAdmin';
+import { baseDoAdminDaRequisicao } from '@/lib/rotas-admin-servidor';
+
 /**
  * `(admin)` — a raiz do ambiente administrativo, dividida em dois grupos:
  *
@@ -11,7 +14,12 @@ import type { ReactNode } from 'react';
  * sessão via a navegação do painel em volta do formulário de login — com a
  * sidebar, o menu da conta e todo o resto. Route group não afeta URL, então o caminho
  * `/admin/entrar` continua o mesmo; só o layout que o envolve mudou.
+ *
+ * Aqui também nasce a base do admin para o cliente (`lib/rotas-admin.ts`): no
+ * subdomínio os links saem sem o `/admin`.
  */
-export default function LayoutAdmin({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+export default async function LayoutAdmin({ children }: { children: ReactNode }) {
+  return (
+    <ProvedorDeBaseDoAdmin base={await baseDoAdminDaRequisicao()}>{children}</ProvedorDeBaseDoAdmin>
+  );
 }

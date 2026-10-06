@@ -8,6 +8,7 @@ import { DadosDoMembro } from '@/componentes/equipe/DadosDoMembro';
 import { ListaDaEquipe } from '@/componentes/equipe/ListaDaEquipe';
 import { MatrizDePermissoes } from '@/componentes/equipe/MatrizDePermissoes';
 import { ROTA } from '@/lib/guarda-rota';
+import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
 import { urlPublicaDoAvatar } from '@/lib/supabase/armazenamento';
 import { lerIdentidadeDaSessao } from '@/modulos/autenticacao/consultas';
 import { lerPermissao, ModuloAdmin } from '@/modulos/admin/permissoes';
@@ -83,7 +84,7 @@ export default async function Pagina({
 
   // A guarda de rota já exige o papel `admin`; chegar aqui sem sessão é sessão
   // perdida entre o middleware e o render.
-  if (identidade === null) redirect(ROTA.ADMIN_ENTRAR);
+  if (identidade === null) redirect(await urlDoAdmin(ROTA.ADMIN_ENTRAR));
 
   const abasVisiveis = permissao.podeLer ? ABAS : ABAS.filter((aba) => aba.chave === 'dados');
   const aba = ehAba(bruta) && abasVisiveis.some((cada) => cada.chave === bruta) ? bruta : 'dados';
@@ -99,7 +100,7 @@ export default async function Pagina({
         <Abas
           abas={abasVisiveis}
           ativa={aba}
-          caminho={ROTA.ADMIN_EQUIPE}
+          caminho={await urlDoAdmin(ROTA.ADMIN_EQUIPE)}
           rotulo={EQUIPE.abasRotulo}
         />
       ) : null}

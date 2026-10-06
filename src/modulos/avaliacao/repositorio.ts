@@ -535,10 +535,7 @@ export async function listarHistorico(): Promise<readonly ItemDoHistorico[]> {
   // O ganho também filtra pelo curador: `tem_permissao('financeiro')` abre a
   // tabela inteira ao admin.
   const [faixas, ganhos] = await Promise.all([
-    view
-      .from('fila_do_curador')
-      .select('envio_id, titulo, artista')
-      .in('envio_id', envioIds),
+    view.from('fila_do_curador').select('envio_id, titulo, artista').in('envio_id', envioIds),
     concluidas.length === 0
       ? Promise.resolve({ data: [], error: null })
       : supabase

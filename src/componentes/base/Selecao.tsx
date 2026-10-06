@@ -56,10 +56,7 @@ export function Selecao({
 
   return (
     <div className={estilos.envolvente}>
-      <label
-        className={rotuloOculto ? 'dsn-apenas-leitor' : estilos.rotulo}
-        htmlFor={id}
-      >
+      <label className={rotuloOculto ? 'dsn-apenas-leitor' : estilos.rotulo} htmlFor={id}>
         {rotulo}
       </label>
 

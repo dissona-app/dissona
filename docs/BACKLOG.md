@@ -189,6 +189,7 @@ então ficam marcados como pendentes até a passada manual.
 Nada disto é versionável (`config.toml` só tem `project_id`), e nada disto o
 código pode contornar:
 
+- [ ] **Admin em `admin.dissona.com.br`** — código pronto (`lib/rotas-admin.ts`); falta, nesta ordem: domínio `admin.dissona.com.br` no projeto da Vercel, `CNAME admin → cname.vercel-dns.com` no DNS, `ADMIN_EM_SUBDOMINIO=true` no escopo Production, e as Redirect URLs `https://admin.dissona.com.br/**`, `http://admin.localhost:3000/**`, `http://localhost:3100/**` e `http://admin.localhost:3100/**` no Supabase. Sem a flag, a produção segue servindo o admin em `/admin/...`, então o deploy é seguro antes disso
 - [ ] *Confirm email* ligado; **Site URL `https://dissona.com.br`** e Redirect URLs de local, Preview e produção — inclui `/admin/convite`, que é onde o `inviteUserByEmail` devolve a pessoa. É o item que derrubou o login com Google e Facebook; a lista exata está em [architecture.md §9](architecture.md#9-ambientes-e-deploy)
 - [ ] Templates de e-mail reescritos para `{{ .TokenHash }}` apontando para `/api/auth/confirmar` — sem isso o link do Supabase não fecha sessão no fluxo SSR/PKCE
 - [ ] **Convite da equipe para conta nova** — `inviteUserByEmail` devolve os tokens no fragmento `#`, que o servidor não vê, e `/api/auth/confirmar` não tem ramo `type=invite`. Quem ainda não tem conta chega ao aceite sem sessão e sem senha. Depende do template acima; o caso de quem **já tem** conta foi resolvido no QA D-087 (07-pendencias, 2026-09-28)

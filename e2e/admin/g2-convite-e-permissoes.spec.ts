@@ -3,9 +3,10 @@ import { expect, test } from '@playwright/test';
 import { clienteDeServico } from '../apoio/banco';
 import { apagarContaEfemera, criarContaEfemera } from '../apoio/contas';
 import type { ContaEfemera } from '../apoio/contas';
+import { HOST_ADMIN, noAdmin, telaDoAdmin, URL_ADMIN } from '../apoio/admin';
 import { gerarLinkDeEmail } from '../apoio/email';
 import { PERSONA, senhaDeTeste } from '../apoio/personas';
-import { entrarComCredenciais, entrarComoAdmin } from '../apoio/sessao';
+import { entrarComoAdmin } from '../apoio/sessao';
 import { ADMIN_ENTRAR, EQUIPE, SENHA } from '../apoio/textos';
 
 /**
@@ -47,7 +48,7 @@ test.describe('G2 · Convite, aceite e permissões', () => {
     'a recuperação de senha do admin responde de forma neutra',
     { tag: ['@RF-029'] },
     async ({ page }) => {
-      await page.goto('/admin/recuperar-senha');
+      await page.goto(noAdmin('/admin/recuperar-senha'));
       await page
         .getByLabel(SENHA.rotuloEmail, { exact: true })
         .fill('e2e_ef_nao_existe@e2e.dissona.local');
@@ -61,10 +62,14 @@ test.describe('G2 · Convite, aceite e permissões', () => {
     'o link de recuperação leva à redefinição do admin',
     { tag: ['@RF-029'] },
     async ({ page }) => {
-      const link = await gerarLinkDeEmail('recovery', PERSONA.ADMIN_SUPORTE.email);
-      await page.goto(link.caminho);
+      // Como o e-mail do admin sai: emitido no subdomínio, com o `proximo`
+      // limpo — e `/redefinir-senha`, ali, é a tela do admin.
+      const link = await gerarLinkDeEmail('recovery', PERSONA.ADMIN_SUPORTE.email, {
+        proximo: '/redefinir-senha',
+      });
+      await page.goto(`${URL_ADMIN}${link.caminho}`);
 
-      await page.waitForURL(/redefinir-senha/);
+      await page.waitForURL(telaDoAdmin('/redefinir-senha'));
       await expect(page.getByRole('heading', { name: SENHA.redefinirTitulo })).toBeVisible();
     },
   );
@@ -87,7 +92,7 @@ test.describe('G2 · Convite, aceite e permissões', () => {
       descartaveis.push(convidada);
 
       await entrarComoAdmin(page);
-      await page.goto('/admin/equipe?aba=equipe');
+      await page.goto(noAdmin('/admin/equipe?aba=equipe'));
 
       await page.getByRole('button', { name: EQUIPE.equipe.convidar }).click();
 
@@ -137,7 +142,7 @@ test.describe('G2 · Convite, aceite e permissões', () => {
       descartaveis.push(convidada);
 
       await entrarComoAdmin(page);
-      await page.goto('/admin/equipe?aba=equipe');
+      await page.goto(noAdmin('/admin/equipe?aba=equipe'));
       await page.getByRole('button', { name: EQUIPE.equipe.convidar }).click();
 
       const dialogo = page.getByRole('dialog');
@@ -146,14 +151,24 @@ test.describe('G2 · Convite, aceite e permissões', () => {
       await expect(page.getByLabel(EQUIPE.convite.linkTitulo)).toBeVisible({ timeout: 30_000 });
       const link = await page.getByLabel(EQUIPE.convite.linkTitulo).inputValue();
 
-      // A pessoa convidada, noutro contexto: ela entra com a própria conta e abre
-      // o link. É o caminho real — o convite não cria sessão.
+      // A pessoa convidada, noutro contexto: abre o link e entra com a própria
+      // conta pelo login do admin, que a devolve ao convite. É o caminho real
+      // — o convite não cria sessão, e a sessão do site principal não vale no
+      // subdomínio (os cookies são por host).
       const contexto = await browser.newContext();
       try {
         const convidado = await contexto.newPage();
-        await entrarComCredenciais(convidado, convidada.email);
 
-        await convidado.goto(new URL(link).pathname + new URL(link).search);
+        // O link sai no subdomínio do admin — é ele que o e-mail leva.
+        expect(new URL(link).host).toBe(HOST_ADMIN);
+        await convidado.goto(link);
+
+        await convidado.getByRole('link', { name: EQUIPE.aceite.irAoLogin }).click();
+        await convidado.waitForURL(telaDoAdmin('/entrar'));
+        await convidado.getByLabel(ADMIN_ENTRAR.rotuloEmail, { exact: true }).fill(convidada.email);
+        await convidado.getByLabel(ADMIN_ENTRAR.rotuloSenha, { exact: true }).fill(senhaDeTeste());
+        await convidado.getByRole('button', { name: ADMIN_ENTRAR.enviar }).click();
+        await convidado.waitForURL((url) => url.href === link);
 
         // O aceite **não** é automático, e não é só um clique: a tela pede a
         // senha. É o que separa "abri um link" de "aceitei entrar para a
@@ -214,7 +229,7 @@ test.describe('G2 · Convite, aceite e permissões', () => {
       descartaveis.push(convidada);
 
       await entrarComoAdmin(page);
-      await page.goto('/admin/equipe?aba=equipe');
+      await page.goto(noAdmin('/admin/equipe?aba=equipe'));
       await page.getByRole('button', { name: EQUIPE.equipe.convidar }).click();
 
       const dialogo = page.getByRole('dialog');
@@ -226,13 +241,14 @@ test.describe('G2 · Convite, aceite e permissões', () => {
       const contexto = await browser.newContext();
       try {
         const convidado = await contexto.newPage();
-        await convidado.goto(link.pathname + link.search);
+        expect(link.host).toBe(HOST_ADMIN);
+        await convidado.goto(link.href);
 
         await expect(
           convidado.getByRole('heading', { name: EQUIPE.aceite.tituloSemSessao }),
         ).toBeVisible();
         await convidado.getByRole('link', { name: EQUIPE.aceite.irAoLogin }).click();
-        await convidado.waitForURL(/\/admin\/entrar/);
+        await convidado.waitForURL(telaDoAdmin('/entrar'));
 
         await convidado.getByLabel(ADMIN_ENTRAR.rotuloEmail, { exact: true }).fill(convidada.email);
         await convidado.getByLabel(ADMIN_ENTRAR.rotuloSenha, { exact: true }).fill(senhaDeTeste());
@@ -240,7 +256,8 @@ test.describe('G2 · Convite, aceite e permissões', () => {
 
         // A volta é ao convite, com o token — e não "Conta sem acesso".
         await convidado.waitForURL(
-          (url) => url.pathname === link.pathname && url.search === link.search,
+          (url) =>
+            url.host === link.host && url.pathname === link.pathname && url.search === link.search,
         );
 
         const senhaNova = `E2e-${Math.random().toString(36).slice(2, 10)}-9`;
@@ -278,7 +295,7 @@ test.describe('G2 · Convite, aceite e permissões', () => {
     { tag: ['@RF-034'] },
     async ({ page }) => {
       await entrarComoAdmin(page);
-      await page.goto('/admin/equipe?aba=papeis');
+      await page.goto(noAdmin('/admin/equipe?aba=papeis'));
 
       await expect(page.getByText(EQUIPE.abas.papeis).first()).toBeVisible();
 
@@ -290,7 +307,7 @@ test.describe('G2 · Convite, aceite e permissões', () => {
   );
 
   test('o login do admin não aceita quem não existe', { tag: ['@RF-028'] }, async ({ page }) => {
-    await page.goto('/admin/entrar');
+    await page.goto(noAdmin('/admin/entrar'));
     await page
       .getByLabel(ADMIN_ENTRAR.rotuloEmail, { exact: true })
       .fill('e2e_ef_ninguem@e2e.dissona.local');
