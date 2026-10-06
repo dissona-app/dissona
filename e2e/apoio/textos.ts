@@ -10,7 +10,7 @@
  * certa é "a tela mudou de propósito?" — e não "qual string atualizar aqui",
  * porque não há string nenhuma aqui para atualizar.
  */
-export * from '../../src/textos/prototipo';
+export * from '../../apps/web/src/textos/prototipo';
 
 /**
  * Os blocos que `prototipo.ts` **não** reexporta.
@@ -20,4 +20,4 @@ export * from '../../src/textos/prototipo';
  * preferências e do perfil do curador teriam de escrever copy literal, que é
  * exatamente o que este arquivo existe para evitar.
  */
-export { CURADOR_PERFIL, PREFERENCIAS } from '../../src/textos/conta';
+export { CURADOR_PERFIL, PREFERENCIAS } from '../../apps/web/src/textos/conta';

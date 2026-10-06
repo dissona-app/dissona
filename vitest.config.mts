@@ -11,7 +11,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
-    include: ['src/**/*.{test,spec}.{ts,tsx}', 'supabase/functions/**/*.test.ts'],
+    include: [
+      'apps/*/src/**/*.{test,spec}.{ts,tsx}',
+      'packages/*/src/**/*.{test,spec}.{ts,tsx}',
+      'supabase/functions/**/*.test.ts',
+    ],
     exclude: ['e2e/**', 'node_modules/**'],
   },
 });

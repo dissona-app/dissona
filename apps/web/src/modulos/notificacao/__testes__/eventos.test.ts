@@ -120,7 +120,8 @@ describe('cobertura dos eventos de R1 e R2', () => {
       .filter((nome) => nome.endsWith('.sql') && !nome.includes('_0005_'))
       .map((nome) => readFileSync(join(MIGRATIONS, nome), 'utf8')),
     ...['tipos.ts', 'servico.ts'].map((nome) =>
-      readFileSync(join(process.cwd(), 'src', 'modulos', 'notificacao', nome), 'utf8'),
+      // Relativo a este arquivo: o Vitest roda da raiz do monorepo.
+      readFileSync(join(import.meta.dirname, '..', nome), 'utf8'),
     ),
   ].join('\n');
 

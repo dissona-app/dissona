@@ -192,7 +192,9 @@ function lerOutrasProvas() {
   const porRequisito = new Map();
   const arquivos = [
     ...arquivosEm('supabase/testes', (nome) => nome.endsWith('.testes.sql')),
-    ...arquivosEm('src', (nome) => nome.endsWith('.test.ts') || nome.endsWith('.test.tsx')),
+    ...['apps', 'packages'].flatMap((raiz) =>
+      arquivosEm(raiz, (nome) => nome.endsWith('.test.ts') || nome.endsWith('.test.tsx')),
+    ),
   ];
 
   for (const caminho of arquivos) {

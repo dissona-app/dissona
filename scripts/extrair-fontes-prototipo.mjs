@@ -41,8 +41,8 @@ import { basename, join } from 'node:path';
 import * as prettier from 'prettier';
 
 const ORIGEM = 'docs/R2';
-const DESTINO_FONTES = 'public/fontes';
-const DESTINO_CSS = 'src/estilos/fontes.css';
+const DESTINO_FONTES = 'apps/web/public/fontes';
+const DESTINO_CSS = 'apps/web/src/estilos/fontes.css';
 /** Caminho público das fontes, como o CSS gerado as referencia. */
 const BASE_URL = '/fontes';
 

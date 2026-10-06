@@ -22,7 +22,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const PROJETO = 'fhqcibjzmowcjkdrqyvi';
-const DESTINO = 'src/lib/supabase/tipos-bd.ts';
+const DESTINO = 'apps/web/src/lib/supabase/tipos-bd.ts';
 
 function falhar(mensagem) {
   console.error(`\n✖ ${mensagem}\n`);

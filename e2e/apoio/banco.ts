@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-import type { Database } from '../../src/lib/supabase/tipos-bd';
+import type { Database } from '../../apps/web/src/lib/supabase/tipos-bd';
 
 import { DOMINIO_E2E, PREFIXO_E2E } from './personas';
 

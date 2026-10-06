@@ -88,7 +88,7 @@ export default defineConfig({
   ...(process.env.BASE_URL === undefined
     ? {
         webServer: {
-          command: `pnpm build && pnpm start --port ${PORTA}`,
+          command: `pnpm --filter @dissona/web build && pnpm --filter @dissona/web start --port ${PORTA}`,
           url: BASE_URL,
           // Nunca reusar: um servidor alheio na porta silenciaria a suite.
           reuseExistingServer: false,

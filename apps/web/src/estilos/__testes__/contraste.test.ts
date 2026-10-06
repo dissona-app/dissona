@@ -17,7 +17,8 @@ import { describe, expect, it } from 'vitest';
  * motivo — o que não é medido volta.
  */
 
-const TOKENS = readFileSync(join(process.cwd(), 'src', 'estilos', 'tokens.css'), 'utf8');
+// Relativo a este arquivo, e não ao `cwd`: o Vitest roda da raiz do monorepo.
+const TOKENS = readFileSync(join(import.meta.dirname, '..', 'tokens.css'), 'utf8');
 
 /** O valor de um token, lido do CSS. Falha alto: token que sumiu é erro. */
 function token(nome: string): string {
