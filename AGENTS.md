@@ -70,6 +70,7 @@ Estas já estão implícitas na arquitetura, mas ficam explícitas porque são o
 - **Erros:** códigos tipados em `lib/erros.ts`; a tradução para texto acontece **na View**, nunca no serviço.
 - **Live region por tom:** `Aviso` dá `role="alert"` a `erro` e `alerta`, e `role="status"` a `info` e `sucesso`. No E2E, sucesso se localiza por `getByRole('status')` — `getByRole('alert')` só acha erro.
 - **Autorização em três camadas, todas obrigatórias:** RLS no banco, guarda de rota no middleware, checagem no serviço.
+- **Admin em subdomínio (`admin.dissona.com.br`):** os arquivos continuam em `(admin)/.../admin/*` e `ROTA.ADMIN*` é o caminho **interno**. Toda URL do admin que vai ao navegador — `href`, `redirect`, `router.push`, `?proximo=`, link de e-mail — passa por `urlDoAdmin` (servidor, `lib/rotas-admin-servidor.ts`) ou `useHrefDoAdmin` (cliente, `componentes/shell/BaseDoAdmin.tsx`). `revalidatePath` e a guarda de rota ficam no interno. No E2E, `noAdmin()`/`telaDoAdmin()` de `e2e/apoio/admin.ts`. Ver [arquitetura §3](docs/architecture.md).
 
 ---
 

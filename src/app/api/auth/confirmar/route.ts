@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { ROTA } from '@/lib/guarda-rota';
+import { origemDaRequisicao } from '@/lib/origem';
 import { destinoSeguro, esquemaPapel } from '@/modulos/autenticacao/esquemas';
 import { marcarRecuperacaoEmCurso } from '@/modulos/autenticacao/marcador-de-recuperacao';
 import { concluirVerificacaoDeEmail, selecionarPapel } from '@/modulos/autenticacao/servico';
@@ -28,7 +29,11 @@ import { confirmarPorToken, trocarCodigoPorSessao } from '@/modulos/autenticacao
  * da conta, que é o comportamento correto — a sessão já foi criada.
  */
 export async function GET(requisicao: NextRequest) {
-  const { searchParams, origin } = requisicao.nextUrl;
+  const { searchParams } = requisicao.nextUrl;
+  // A origem vem do cabeçalho `host`, e não de `nextUrl.origin`: atrás do
+  // `next start` aquela é o endereço em que o servidor escuta, e a volta do
+  // e-mail emitido no subdomínio do admin cairia no host principal.
+  const origin = await origemDaRequisicao();
 
   const tokenHash = searchParams.get('token_hash');
   const codigo = searchParams.get('code');

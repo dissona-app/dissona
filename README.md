@@ -45,6 +45,8 @@ pnpm dev               # http://localhost:3000
 
 O app sobe sem banco local: as variáveis de `.env.local` apontam para o projeto Supabase de desenvolvimento.
 
+Artista, curador e páginas públicas ficam em `http://localhost:3000`; o **admin**, em `http://admin.localhost:3000` (`/entrar`, `/equipe`, `/pacotes`…), como em produção fica em `admin.dissona.com.br`. O navegador resolve `*.localhost` sozinho. Com `ADMIN_EM_SUBDOMINIO=true` no `.env.local`, o endereço antigo `localhost:3000/admin/...` redireciona para lá; sem ela, o admin continua respondendo também em `/admin/...`. Ver [arquitetura §3](docs/architecture.md).
+
 ### Banco
 
 O caminho padrão é o **MCP do Supabase** — `apply_migration` para aplicar, `list_migrations` e `get_advisors` para conferir, `generate_typescript_types` para os tipos. Não exige Docker nem `supabase login`.

@@ -10,6 +10,7 @@ import {
   fonteRenderizada,
   relatorio,
 } from '../apoio/prototipo';
+import { enderecoDe } from '../apoio/admin';
 import type { Excecao, Prototipo, PropsDoPrototipo } from '../apoio/prototipo';
 import { entrarComo, entrarComoAdmin } from '../apoio/sessao';
 
@@ -201,7 +202,7 @@ for (const cenario of CENARIOS) {
       if (cenario.admin === true) await entrarComoAdmin(page, cenario.persona);
       else await entrarComo(page, cenario.persona);
 
-      await page.goto(cenario.rota);
+      await page.goto(enderecoDe(cenario.rota));
       await page.locator('h1').first().waitFor();
 
       // O ponteiro fica onde o último clique o deixou, e o hover de um cartão
@@ -238,7 +239,7 @@ for (const cenario of CENARIOS) {
       if (cenario.admin === true) await entrarComoAdmin(page, cenario.persona);
       else await entrarComo(page, cenario.persona);
 
-      await page.goto(cenario.rota);
+      await page.goto(enderecoDe(cenario.rota));
       await page.locator('h1').first().waitFor();
 
       const noPrototipo = await fonteRenderizada(doPrototipo, 'h1');

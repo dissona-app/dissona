@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+import { noAdmin } from '../apoio/admin';
 import { PERSONA } from '../apoio/personas';
 import { abrirPacotes, entrarComoAdmin } from '../apoio/sessao';
 import { ADMIN_PACOTES } from '../apoio/textos';
@@ -125,7 +126,7 @@ test.describe('A1 · Lista de pacotes', () => {
    */
   test('quem não tem o módulo vê a negativa, e não uma lista vazia', async ({ page }) => {
     await entrarComoAdmin(page, PERSONA.ADMIN_SUPORTE);
-    await page.goto('/admin/pacotes');
+    await page.goto(noAdmin('/admin/pacotes'));
 
     await expect(page.getByRole('table')).toHaveCount(0);
     await expect(page.getByText(/Sem acesso a Pacotes de Claves/i)).toBeVisible();

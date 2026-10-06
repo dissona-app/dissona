@@ -92,6 +92,9 @@ export default defineConfig({
           url: BASE_URL,
           // Nunca reusar: um servidor alheio na porta silenciaria a suite.
           reuseExistingServer: false,
+          // O admin roda em `admin.localhost:3100`, como em produção roda em
+          // `admin.dissona.com.br` — ver `e2e/apoio/admin.ts`.
+          env: { ADMIN_EM_SUBDOMINIO: 'true' },
           timeout: 240_000,
         },
       }

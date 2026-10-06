@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { ENTRAR_PADRAO } from '@/lib/guarda-rota';
+import { origemDaRequisicao } from '@/lib/origem';
 import { destinoSeguro } from '@/modulos/autenticacao/esquemas';
 import { trocarCodigoPorSessao } from '@/modulos/autenticacao/repositorio';
 
@@ -21,7 +22,11 @@ import { trocarCodigoPorSessao } from '@/modulos/autenticacao/repositorio';
  * uma falha de entrada, e o lugar de tentar de novo é a tela de entrar.
  */
 export async function GET(requisicao: NextRequest) {
-  const { searchParams, origin } = requisicao.nextUrl;
+  const { searchParams } = requisicao.nextUrl;
+  // A origem vem do cabeçalho `host`, e não de `nextUrl.origin`: atrás do
+  // `next start` aquela é o endereço em que o servidor escuta, e a volta do
+  // e-mail emitido no subdomínio do admin cairia no host principal.
+  const origin = await origemDaRequisicao();
 
   const codigo = searchParams.get('code');
   const erroDoProvedor = searchParams.get('error');

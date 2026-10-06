@@ -1403,3 +1403,29 @@ conta sem papel `admin`. E o papel só nasce no aceite: um laço. Agora o botão
 leva ao login com `proximo=/admin/convite?token=…`, e esse destino é a única
 exceção de `entrarComoAdministrador`: a conta entra e volta ao aceite. Quem
 decide se o convite vale continua sendo `aceitar_convite_admin`.
+
+## Admin em subdomínio próprio · 2026-10-06
+
+Decisão do cliente: o admin sai de `dissona.com.br/admin/...` e vai para
+**`admin.dissona.com.br`**, com URLs limpas (`/entrar`, `/equipe`, `/pacotes`).
+Artista, curador e páginas públicas continuam em `dissona.com.br`.
+
+Os protótipos não falam de domínio, então não há divergência de tela — o que
+muda é endereço. A implementação não move arquivo nenhum: o middleware
+reescreve o caminho limpo para o interno `/admin/...` (`lib/rotas-admin.ts`,
+`lib/decisao-por-host.ts`), e toda URL que sai do admin é traduzida.
+
+Três consequências que valem registro:
+
+1. **Sessões separadas.** Os cookies do Supabase são por host: entrar no site
+   principal não abre o painel, e vice-versa. É desejado — o painel não herda
+   a sessão de quem só navegava como artista.
+2. **Conta bloqueada no admin volta ao login do admin.** Antes ia ao login do
+   artista, o que agora seria trocar de host.
+3. **Previews da Vercel seguem no modo caminho** (`/admin/...`): o domínio por
+   branch não tem subdomínio. Quem decide é `ADMIN_EM_SUBDOMINIO`, ligada só em
+   Production.
+
+Pendente: as rotas de notificação semeadas na `0005` (`rota_destino`
+`/admin/...`) são internas. Nenhuma tela as renderiza ainda (central de
+notificações é R5); quando renderizar, passar por `paraExterno`.

@@ -83,7 +83,9 @@ export async function middleware(requisicao: NextRequest) {
     return reescrita;
   }
 
-  const origem = decisao.host === undefined ? url.origin : `${url.protocol}//${decisao.host}`;
+  // Do cabeçalho, como `origem.ts`: `url.origin` atrás do `next start` é o
+  // endereço de escuta, e não o host que o navegador pediu.
+  const origem = `${url.protocol}//${decisao.host ?? host}`;
   const redirecionamento = NextResponse.redirect(
     new URL(decisao.para, origem),
     decisao.permanente ? 308 : 307,

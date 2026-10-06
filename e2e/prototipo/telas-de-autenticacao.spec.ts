@@ -10,6 +10,7 @@ import {
   fonteRenderizada,
   relatorio,
 } from '../apoio/prototipo';
+import { enderecoDe } from '../apoio/admin';
 import type { Excecao, Prototipo, PropsDoPrototipo } from '../apoio/prototipo';
 
 /**
@@ -179,7 +180,7 @@ for (const cenario of CENARIOS) {
       await abrirPrototipo(doPrototipo, cenario.prototipo, cenario.props);
       if (cenario.depois !== undefined) await cenario.depois(doPrototipo);
 
-      await page.goto(cenario.rota);
+      await page.goto(enderecoDe(cenario.rota));
       await page.locator('h1').first().waitFor();
 
       const esperado = await digitaisDeTexto(doPrototipo);
@@ -214,7 +215,7 @@ for (const cenario of CENARIOS) {
       await abrirPrototipo(doPrototipo, cenario.prototipo, cenario.props);
       if (cenario.depois !== undefined) await cenario.depois(doPrototipo);
 
-      await page.goto(cenario.rota);
+      await page.goto(enderecoDe(cenario.rota));
       await page.locator('h1').first().waitFor();
 
       // A fonte usada, e não a declarada: `--dsn-font-sans` sempre nomeou Inter
@@ -243,7 +244,7 @@ for (const cenario of CENARIOS) {
       await abrirPrototipo(doPrototipo, cenario.prototipo, cenario.props);
       if (cenario.depois !== undefined) await cenario.depois(doPrototipo);
 
-      await page.goto(cenario.rota);
+      await page.goto(enderecoDe(cenario.rota));
       await page.locator('h1').first().waitFor();
 
       const seletores = { marca: 'img[alt="Dissona"]' };

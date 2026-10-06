@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { telaDoAdmin } from '../apoio/admin';
 import { auditoriaDe, pacotePorNome, perfilPorEmail } from '../apoio/banco';
 import { nomeUnico, PERSONA } from '../apoio/personas';
 import { abrirPacotes } from '../apoio/sessao';
@@ -71,7 +72,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
     await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloDesconto).fill('12,5');
     await page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar }).click();
 
-    await expect(page).toHaveURL(/\/admin\/pacotes/);
+    await expect(page).toHaveURL(telaDoAdmin('/pacotes'));
     // A confirmação do protótipo, no pé da tabela.
     await expect(page.getByText(ADMIN_PACOTE_FORMULARIO.flashCriado)).toBeVisible();
 
@@ -106,7 +107,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
 
       await expect(page.getByText(ADMIN_PACOTE_FORMULARIO.erroNomeVazio)).toBeVisible();
       // Continua no formulário: a URL não mudou, e nenhum pacote foi criado.
-      await expect(page).toHaveURL(/\/admin\/pacotes\/novo/);
+      await expect(page).toHaveURL(telaDoAdmin('/pacotes/novo'));
     });
 
     test('quantidade zero não salva', async ({ page }, info) => {
@@ -121,7 +122,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
       await page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar }).click();
 
       await expect(page.getByText(ADMIN_PACOTE_FORMULARIO.erroQuantidadeInvalida)).toBeVisible();
-      await expect(page).toHaveURL(/\/admin\/pacotes\/novo/);
+      await expect(page).toHaveURL(telaDoAdmin('/pacotes/novo'));
     });
 
     /**
@@ -145,7 +146,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
       await page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar }).click();
 
       await expect(page.getByText(ADMIN_PACOTE_FORMULARIO.erroValorAcimaDaBase)).toBeVisible();
-      await expect(page).toHaveURL(/\/admin\/pacotes\/novo/);
+      await expect(page).toHaveURL(telaDoAdmin('/pacotes/novo'));
     });
   });
 

@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+import { HOST_ADMIN, noAdmin } from './admin';
 import { PERSONA, senhaDeTeste } from './personas';
 import type { Persona } from './personas';
 import { ADMIN_ENTRAR, ENTRAR } from './textos';
@@ -17,7 +18,7 @@ import { ADMIN_ENTRAR, ENTRAR } from './textos';
  * Custa ~1 s por cenário. Vale.
  */
 export async function entrarComoAdmin(page: Page, persona: Persona = PERSONA.ADMIN) {
-  await page.goto('/admin/entrar');
+  await page.goto(noAdmin('/admin/entrar'));
 
   // `exact: true` nos dois. Sem isso, `getByLabel('Senha')` casa também com o
   // botão "Mostrar senha" do próprio campo — `getByLabel` faz correspondência
@@ -35,7 +36,7 @@ export async function entrarComoAdmin(page: Page, persona: Persona = PERSONA.ADM
   // /admin/entrar", que diz o que aconteceu. `not.toHaveURL` só dizia que a
   // URL não mudou, e o mesmo sintoma serviria para credencial errada, redirect
   // quebrado e servidor lento.
-  await page.waitForURL(/\/admin(?!\/entrar)/);
+  await page.waitForURL((url) => url.host === HOST_ADMIN && url.pathname !== '/entrar');
 }
 
 /**
@@ -47,7 +48,7 @@ export async function entrarComoAdmin(page: Page, persona: Persona = PERSONA.ADM
  */
 export async function abrirPacotes(page: Page, persona: Persona = PERSONA.ADMIN) {
   await entrarComoAdmin(page, persona);
-  await page.goto('/admin/pacotes');
+  await page.goto(noAdmin('/admin/pacotes'));
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Pacotes de Claves');
 }
 

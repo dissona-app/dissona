@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Page, TestInfo } from '@playwright/test';
 
+import { telaDoAdmin, URL_ADMIN } from '../apoio/admin';
 import { auditoriaDe, pacotePorNome } from '../apoio/banco';
 import { nomeUnico } from '../apoio/personas';
 import { abrirPacotes } from '../apoio/sessao';
@@ -47,7 +48,7 @@ async function criarPacote(page: Page, info: TestInfo, rotulo: string): Promise<
   // Espera a volta para a lista **antes** de procurar a linha. Sem isso, um
   // salvamento lento faz a busca acontecer ainda no formulário, e a falha diz
   // "linha não encontrada" quando o que houve foi espera insuficiente.
-  await page.waitForURL(/\/admin\/pacotes(\?|$)/);
+  await page.waitForURL(telaDoAdmin('/pacotes'));
   await expect(page.getByRole('row').filter({ hasText: nome })).toBeVisible();
   return nome;
 }
@@ -172,7 +173,9 @@ test.describe('A3 · Editar / ativar / excluir', () => {
         .click();
       await expect(page.getByText(ADMIN_PACOTES.flashExcluido(nome))).toBeVisible();
 
-      const resposta = await page.goto(url ?? '/admin/pacotes');
+      // O `href` é o caminho limpo do subdomínio; relativo, ele resolveria
+      // contra o host principal e o 404 viria por motivo errado.
+      const resposta = await page.goto(`${URL_ADMIN}${url ?? '/pacotes'}`);
       expect(resposta?.status()).toBe(404);
     },
   );

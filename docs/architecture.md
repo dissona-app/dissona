@@ -190,6 +190,14 @@ O sitemap do [PRD §6.1](PRD.md) nomeia telas, não caminhos. Os slugs abaixo fo
 
 O login do admin fica **dentro** de `(admin)` e não exige sessão — é login próprio, sem social e sem autocadastro.
 
+**O admin mora em subdomínio próprio.** Em produção o endereço é `https://admin.dissona.com.br/entrar`, e não `dissona.com.br/admin/entrar`. Os arquivos **não** saíram de `(admin)/.../admin/*`: o caminho da tabela acima é o **interno**, e o middleware reescreve o caminho limpo do subdomínio para ele ([`lib/rotas-admin.ts`](../src/lib/rotas-admin.ts), [`lib/decisao-por-host.ts`](../src/lib/decisao-por-host.ts)). Daí três regras:
+
+- A guarda de rota e os `revalidatePath` usam o caminho **interno** — o `revalidatePath` pede o destino do rewrite.
+- Toda URL do admin que **sai** para o navegador passa por `urlDoAdmin` (servidor) ou `useHrefDoAdmin` (cliente). `ROTA.ADMIN*` cru num `href` funciona no modo caminho e só sobrevive ao subdomínio porque o middleware o corrige com um 308.
+- O modo é decidido pelo **host**: em `admin.*` a base é vazia; em qualquer outro, é `/admin`, como antes. `ADMIN_EM_SUBDOMINIO=true` faz o host principal mandar o `/admin` para `admin.` (308). Desligada — Previews da Vercel, cujo domínio por branch não tem subdomínio —, o admin segue em `/admin/...`.
+
+No subdomínio passam direto, sem reescrita, `/api/*`, `/termos`, `/privacidade`, `/onboarding` e `/verificar-email`: os cookies do Supabase são **por host**, então a sessão do admin só existe em `admin.` e as telas compartilhadas que ele usa têm de responder ali. É também o que separa as sessões: entrar no site principal não abre o painel.
+
 ---
 
 ## 4. Camadas e responsabilidades
@@ -321,7 +329,7 @@ Segredo do `pg_net` vem do Vault, nunca inline — `cron.job.command` é legíve
 
 ## 9. Ambientes e deploy
 
-**Hospedagem: Vercel.** Um projeto, **Production Branch = `main`**. Produção em **`https://dissona.com.br`**, que é o domínio canônico; `https://dissona.vercel.app` continua respondendo como alias.
+**Hospedagem: Vercel.** Um projeto, **Production Branch = `main`**. Produção em **`https://dissona.com.br`**, que é o domínio canônico; `https://dissona.vercel.app` continua respondendo como alias. O admin responde em **`https://admin.dissona.com.br`** (domínio adicionado ao mesmo projeto, `CNAME admin → cname.vercel-dns.com`, e `ADMIN_EM_SUBDOMINIO=true` no escopo Production — ver §3).
 
 Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `pdx1` que a R0 havia sugerido. O efeito é uma troca: melhor tempo de resposta para o usuário brasileiro, e ~120 ms a mais em cada ida ao banco, que está em `us-west-2`. Como o `middleware.ts` faz um `getUser()` por requisição, essa ida acontece em toda navegação. Vale revisar junto da pendência [#25](open-questions.md), quando os projetos dedicados forem provisionados.
 
@@ -332,11 +340,13 @@ Região das funções: **`gru1`** (São Paulo). Foi a escolha feita, e não o `p
 | Origem | Entrada na allow list |
 |---|---|
 | Produção | `https://dissona.com.br/**` |
+| Admin em produção | `https://admin.dissona.com.br/**` |
 | Alias da Vercel | `https://dissona.vercel.app/**` |
 | Preview | o curinga do projeto, `https://dissona-*.vercel.app/**` |
-| Local | `http://localhost:3000/**` |
+| Local | `http://localhost:3000/**` · `http://admin.localhost:3000/**` |
+| E2E local | `http://localhost:3100/**` · `http://admin.localhost:3100/**` |
 
-O `/**` não é decoração: sem ele só a raiz casa, e os destinos reais são `/api/auth/callback`, `/api/auth/confirmar` e `/admin/convite`.
+O `/**` não é decoração: sem ele só a raiz casa, e os destinos reais são `/api/auth/callback`, `/api/auth/confirmar` e o convite da equipe — `admin.<domínio>/convite` no subdomínio, `/admin/convite` no modo caminho.
 
 Falhar nisso **não dá erro**. O GoTrue descarta em silêncio um `redirect_to` fora da lista e usa o Site URL no lugar — o `code` do OAuth chega na home e o login não acontece. Foi o que quebrou o login com Google e com Facebook em produção. A guarda de rota hoje encaminha um `?code=` que caia em `/` para o callback ([`lib/guarda-rota.ts`](../src/lib/guarda-rota.ts)), mas isso é rede de proteção, não substituto da configuração.
 
