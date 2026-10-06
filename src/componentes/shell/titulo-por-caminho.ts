@@ -36,23 +36,23 @@ export type TituloDeModulo = {
 /** Rota exata → título. Consultado antes das regras de prefixo. */
 const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   [ROTA.ADMIN]: { titulo: 'Painel administrativo', sublegenda: 'Visão geral da plataforma.' },
-  [`${ROTA.ADMIN}/usuarios`]: {
+  [ROTA.ADMIN_USUARIOS]: {
     titulo: 'Curadores e artistas',
     sublegenda: 'Usuários, aprovações e promoções.',
   },
-  [`${ROTA.ADMIN}/pacotes`]: {
+  [ROTA.ADMIN_PACOTES]: {
     titulo: 'Pacotes de Claves',
     sublegenda: 'Pacotes que o artista compra.',
   },
-  [`${ROTA.ADMIN}/pacotes/novo`]: {
+  [ROTA.ADMIN_PACOTES_NOVO]: {
     titulo: 'Novo pacote',
     sublegenda: 'Defina a quantidade, o valor e o desconto.',
   },
-  [`${ROTA.ADMIN}/financeiro`]: {
+  [ROTA.ADMIN_FINANCEIRO]: {
     titulo: 'Financeiro da plataforma',
     sublegenda: 'Receita, repasses e conciliação.',
   },
-  [`${ROTA.ADMIN}/moderacao`]: {
+  [ROTA.ADMIN_MODERACAO]: {
     titulo: 'Moderação e antifraude',
     sublegenda: 'Denúncias, logs e bloqueios.',
   },
@@ -162,7 +162,7 @@ const SUBLEGENDA_DA_AVALIACAO: Readonly<Record<PassoDaAvaliacao, string>> = {
  */
 const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
   [
-    `${ROTA.ADMIN}/pacotes/`,
+    `${ROTA.ADMIN_PACOTES}/`,
     { titulo: 'Editar pacote', sublegenda: 'Defina a quantidade, o valor e o desconto.' },
   ],
   // Os passos 2 e 3 do envio — `/artista/enviar/<faixaId>/<passo>`. O título é

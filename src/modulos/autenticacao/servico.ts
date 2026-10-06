@@ -14,6 +14,8 @@ import 'server-only';
 
 import { ambienteDoUsuario, inicioDoUsuario, ROTA } from '@/lib/guarda-rota';
 import { contaAtiva, lerContextoSessao, Papel, SituacaoConta } from '@/lib/papeis';
+import type { BaseDoAdmin } from '@/lib/rotas-admin';
+import { paraExterno, paraInterno, PREFIXO_ADMIN } from '@/lib/rotas-admin';
 import { criarClienteServidor, usuarioAtual } from '@/lib/supabase/servidor';
 import { notificar, notificarEquipeAdmin } from '@/modulos/notificacao/servico';
 import { EventoNotificacao } from '@/modulos/notificacao/tipos';
@@ -115,6 +117,8 @@ export async function entrarComoAdministrador(
   email: string,
   senha: string,
   proximo?: string,
+  /** `''` no subdomínio do admin: o `proximo` chega limpo e o destino sai limpo. */
+  base: BaseDoAdmin = PREFIXO_ADMIN,
 ): Promise<ResultadoDeEntrada> {
   const resultado = await autenticar(email, senha);
 
@@ -129,10 +133,13 @@ export async function entrarComoAdministrador(
     return { estado: 'conta_bloqueada' };
   }
 
-  const destino = destinoSeguro(proximo, ROTA.ADMIN);
+  // A exceção do convite raciocina sobre o caminho interno; o destino sai na
+  // forma que o navegador deste host entende.
+  const interno = paraInterno(destinoSeguro(proximo, ROTA.ADMIN), base);
+  const destino = paraExterno(interno, base);
 
   if (contexto.estado !== 'ok' || !contexto.papeis.includes(Papel.ADMIN)) {
-    if (contexto.estado === 'ok' && levaAoAceiteDeConvite(destino)) {
+    if (contexto.estado === 'ok' && levaAoAceiteDeConvite(interno)) {
       return { estado: 'ok', destino };
     }
     await encerrarSessao();

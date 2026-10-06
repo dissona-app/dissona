@@ -8,6 +8,7 @@ import { BotaoLink } from '@/componentes/base/BotaoLink';
 import { Campo } from '@/componentes/base/Campo';
 import { MedidorDeSenha } from '@/componentes/base/MedidorDeSenha';
 import { IconeOlho } from '@/componentes/autenticacao/IconeOlho';
+import { useHrefDoAdmin } from '@/componentes/shell/BaseDoAdmin';
 import type { ResultadoDeAcao } from '@/lib/acoes';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
@@ -57,6 +58,7 @@ export type PropsAceiteDeConvite = {
  * e o convite dá acesso administrativo.
  */
 export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeConvite) {
+  const hrefDoAdmin = useHrefDoAdmin();
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => acao(dados),
     null,
@@ -89,7 +91,7 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
         <span className={estilos.overline}>{TEXTOS.overline}</span>
         <h1 className={estilos.titulo}>{TEXTOS.sucessoTitulo}</h1>
         <p className={estilos.texto}>{TEXTOS.sucessoTexto}</p>
-        <BotaoLink href={ROTA.ADMIN} blocoInteiro>
+        <BotaoLink href={hrefDoAdmin(ROTA.ADMIN)} blocoInteiro>
           {TEXTOS.irAoPainel}
         </BotaoLink>
       </div>
@@ -102,7 +104,7 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
         <span className={estilos.overline}>{TEXTOS.overline}</span>
         <h1 className={estilos.titulo}>{TEXTOS.tituloSemToken}</h1>
         <p className={estilos.texto}>{TEXTOS.textoSemToken}</p>
-        <BotaoLink href={ROTA.ADMIN_ENTRAR} variante="secundario" blocoInteiro>
+        <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_ENTRAR)} variante="secundario" blocoInteiro>
           {TEXTOS.irAoLogin}
         </BotaoLink>
       </div>
@@ -116,14 +118,14 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
     // O login volta para cá **com o token**. Sem o `proximo`, a pessoa ainda
     // sem papel `admin` era recusada pelo login administrativo, que desfaz a
     // sessão — e o convite ficava inalcançável.
-    const voltaAoConvite = `${ROTA.ADMIN_CONVITE}?token=${encodeURIComponent(token)}`;
+    const voltaAoConvite = hrefDoAdmin(`${ROTA.ADMIN_CONVITE}?token=${encodeURIComponent(token)}`);
     return (
       <div className={estilos.cabecalho}>
         <span className={estilos.overline}>{TEXTOS.overline}</span>
         <h1 className={estilos.titulo}>{TEXTOS.tituloSemSessao}</h1>
         <p className={estilos.texto}>{TEXTOS.textoSemSessao}</p>
         <BotaoLink
-          href={`${ROTA.ADMIN_ENTRAR}?proximo=${encodeURIComponent(voltaAoConvite)}`}
+          href={`${hrefDoAdmin(ROTA.ADMIN_ENTRAR)}?proximo=${encodeURIComponent(voltaAoConvite)}`}
           blocoInteiro
         >
           {TEXTOS.irAoLogin}
@@ -140,7 +142,7 @@ export function AceiteDeConvite({ estadoInicial, acao, token }: PropsAceiteDeCon
         <span className={estilos.overline}>{TEXTOS.overline}</span>
         <h1 className={estilos.titulo}>{TEXTOS.tituloInvalido}</h1>
         <p className={estilos.texto}>{TEXTOS.textoInvalido}</p>
-        <BotaoLink href={ROTA.ADMIN_ENTRAR} variante="secundario" blocoInteiro>
+        <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_ENTRAR)} variante="secundario" blocoInteiro>
           {TEXTOS.irAoLogin}
         </BotaoLink>
       </div>

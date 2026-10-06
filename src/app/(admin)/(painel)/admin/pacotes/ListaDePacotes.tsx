@@ -11,6 +11,7 @@ import { Etiqueta } from '@/componentes/base/Etiqueta';
 import { Modal } from '@/componentes/base/Modal';
 import { Tabela } from '@/componentes/base/Tabela';
 import type { ColunaTabela } from '@/componentes/base/Tabela';
+import { useHrefDoAdmin } from '@/componentes/shell/BaseDoAdmin';
 import { ROTA } from '@/lib/guarda-rota';
 import { alternarAtivo, excluirPacote } from '@/modulos/pacote/acoes';
 import { ADMIN_PACOTE_EXCLUIR, ADMIN_PACOTES } from '@/textos/prototipo';
@@ -51,8 +52,6 @@ export type PropsLista = {
   readonly podeEscrever: boolean;
 };
 
-const CAMINHO = `${ROTA.ADMIN}/pacotes`;
-
 export function ListaDePacotes({
   linhas,
   confirmacaoInicial = null,
@@ -60,6 +59,7 @@ export function ListaDePacotes({
   baseDaClave,
   podeEscrever,
 }: PropsLista) {
+  const hrefDoAdmin = useHrefDoAdmin();
   const [pendente, iniciar] = useTransition();
   const [aExcluir, setAExcluir] = useState<LinhaDePacote | null>(null);
 
@@ -158,7 +158,7 @@ export function ListaDePacotes({
             "Editar" navega, então é `<a>`: preserva Ctrl+clique e "abrir em
             nova aba", que numa tela de gestão são gestos usados de verdade.
           */}
-          <Link className={estilos.acao} href={`${CAMINHO}/${linha.id}`}>
+          <Link className={estilos.acao} href={hrefDoAdmin(`${ROTA.ADMIN_PACOTES}/${linha.id}`)}>
             {ADMIN_PACOTES.editar}
           </Link>
 
@@ -215,7 +215,7 @@ export function ListaDePacotes({
         </div>
 
         {podeEscrever ? (
-          <BotaoLink href={`${CAMINHO}/novo`} tamanho="denso">
+          <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_PACOTES_NOVO)} tamanho="denso">
             {ADMIN_PACOTES.novo}
           </BotaoLink>
         ) : null}
@@ -236,7 +236,7 @@ export function ListaDePacotes({
               descricao={ADMIN_PACOTES.vazioDescricao}
               acao={
                 podeEscrever ? (
-                  <BotaoLink href={`${CAMINHO}/novo`} tamanho="denso">
+                  <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_PACOTES_NOVO)} tamanho="denso">
                     {ADMIN_PACOTES.novo}
                   </BotaoLink>
                 ) : undefined

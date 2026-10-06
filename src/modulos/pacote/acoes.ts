@@ -28,7 +28,8 @@ import * as repositorio from './repositorio';
 import { base, descontoDerivado, validarDados } from './servico';
 import type { DadosDePacote } from './tipos';
 
-const CAMINHO_LISTA = `${ROTA.ADMIN}/pacotes`;
+/** Interno: `revalidatePath` pede o destino do rewrite, não o endereço do subdomínio. */
+const CAMINHO_LISTA = ROTA.ADMIN_PACOTES;
 
 /**
  * `revalidatePath` na lista **e** na Carteira do artista.

@@ -19,6 +19,7 @@ import { CodigoErro } from '@/lib/erros';
 import { ENTRAR_PADRAO, ROTA } from '@/lib/guarda-rota';
 import { origemDaRequisicao } from '@/lib/origem';
 import { Papel } from '@/lib/papeis';
+import { baseDoAdminDaRequisicao, urlDoAdmin } from '@/lib/rotas-admin-servidor';
 /*
  * Módulo 12, a partir da autenticação: `/curador/cadastrar` **é** o passo 1 do
  * wizard sem sessão, e gravar a foto e avançar o passo é trabalho de lá. A
@@ -107,7 +108,12 @@ export async function entrarComoAdmin(dadosDoFormulario: FormData): Promise<Resu
   if (!entrada.ok) return entrada.falha;
 
   const { email, senha, proximo } = entrada.credenciais;
-  const resultado = await entrarComoAdministrador(email, senha, proximo);
+  const resultado = await entrarComoAdministrador(
+    email,
+    senha,
+    proximo,
+    await baseDoAdminDaRequisicao(),
+  );
 
   if (resultado.estado === 'sem_acesso_admin') {
     return falha(CodigoErro.PAPEL_AUSENTE, undefined, { papel: Papel.ADMIN });
@@ -292,7 +298,7 @@ export async function sair(): Promise<never> {
 
 export async function sairDoAdmin(): Promise<never> {
   await encerrarSessao();
-  redirect(ROTA.ADMIN_ENTRAR);
+  redirect(await urlDoAdmin(ROTA.ADMIN_ENTRAR));
 }
 
 /**
@@ -330,7 +336,9 @@ export async function recuperarSenha(dadosDoFormulario: FormData): Promise<Resul
 }
 
 export async function recuperarSenhaAdmin(dadosDoFormulario: FormData): Promise<ResultadoDeAcao> {
-  return pedirLinkDeRecuperacao(dadosDoFormulario, ROTA.ADMIN_REDEFINIR_SENHA);
+  // No subdomínio, `/redefinir-senha` — o `/api/auth/confirmar` devolve para o
+  // `proximo` no mesmo host, e lá ele é a tela do admin.
+  return pedirLinkDeRecuperacao(dadosDoFormulario, await urlDoAdmin(ROTA.ADMIN_REDEFINIR_SENHA));
 }
 
 /**
@@ -396,7 +404,8 @@ export async function encerrarOnboarding(): Promise<ResultadoDeAcao> {
   const resultado = await concluirOnboarding();
   if (resultado.estado === 'sem_sessao') return falha(CodigoErro.NAO_AUTENTICADO);
 
-  redirect(resultado.destino);
+  // O admin vê o tour no subdomínio, e o painel dele lá é `/`, não `/admin`.
+  redirect(await urlDoAdmin(resultado.destino));
 }
 
 /**

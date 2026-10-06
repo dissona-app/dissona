@@ -17,6 +17,7 @@ import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@/lib/arquivos';
 import { CodigoErro } from '@/lib/erros';
 import { ROTA } from '@/lib/guarda-rota';
 import { origemDaRequisicao } from '@/lib/origem';
+import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
 import { usuarioAtual } from '@/lib/supabase/servidor';
 import { resolverArquivoDoFormulario } from '@/lib/supabase/upload-de-perfil';
 import type { MotivoDeArquivo } from '@/lib/supabase/upload-de-perfil';
@@ -82,11 +83,13 @@ export async function convidarMembroDaEquipe(
     return falhaDeCampos(CodigoErro.ENTRADA_INVALIDA, motivosPorCampo(analise.error.issues));
   }
 
-  const origem = await origemDaRequisicao();
+  // Emitido do subdomínio, o link sai `admin.<domínio>/convite`; no modo
+  // caminho, `<domínio>/admin/convite`.
+  const linkDoConvite = `${await origemDaRequisicao()}${await urlDoAdmin(ROTA.ADMIN_CONVITE)}`;
   const resultado = await convidarMembro(
     analise.data.email,
     analise.data.papel as PapelAdmin,
-    `${origem}${ROTA.ADMIN_CONVITE}`,
+    linkDoConvite,
   );
 
   if (resultado.estado === 'sem_sessao' || resultado.estado === 'sem_permissao') {
@@ -98,7 +101,7 @@ export async function convidarMembroDaEquipe(
 
   return sucesso({
     email: analise.data.email,
-    link: `${origem}${ROTA.ADMIN_CONVITE}?token=${encodeURIComponent(resultado.token)}`,
+    link: `${linkDoConvite}?token=${encodeURIComponent(resultado.token)}`,
     jaTinhaConta: resultado.jaTinhaConta,
   });
 }

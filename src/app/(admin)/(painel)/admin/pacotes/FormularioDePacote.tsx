@@ -7,6 +7,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { Aviso } from '@/componentes/base/Aviso';
 import { Botao } from '@/componentes/base/Botao';
 import { Campo } from '@/componentes/base/Campo';
+import { useHrefDoAdmin } from '@/componentes/shell/BaseDoAdmin';
 import { ROTA } from '@/lib/guarda-rota';
 import { atualizarPacote, criarPacote } from '@/modulos/pacote/acoes';
 import { ADMIN_PACOTE_FORMULARIO } from '@/textos/prototipo';
@@ -31,8 +32,6 @@ export type PropsFormulario = {
   readonly podeEscrever: boolean;
 };
 
-const CAMINHO = `${ROTA.ADMIN}/pacotes`;
-
 /**
  * Tela 21.1 — os três campos que se recalculam.
  *
@@ -54,6 +53,7 @@ export function FormularioDePacote({
   podeEscrever,
 }: PropsFormulario) {
   const router = useRouter();
+  const lista = useHrefDoAdmin()(ROTA.ADMIN_PACOTES);
   const [pendente, iniciar] = useTransition();
 
   const [nome, setNome] = useState(iniciais.nome);
@@ -111,7 +111,7 @@ export function FormularioDePacote({
       if (resultado.ok) {
         // A confirmação aparece na lista, que é para onde a tela volta — como
         // no protótipo (`this.go('pacotes'); this.flash(...)`).
-        router.push(`${CAMINHO}?salvo=${pacoteId === null ? 'criado' : 'atualizado'}`);
+        router.push(`${lista}?salvo=${pacoteId === null ? 'criado' : 'atualizado'}`);
         return;
       }
 
@@ -122,7 +122,7 @@ export function FormularioDePacote({
 
   return (
     <div className={estilos.tela}>
-      <Link className={estilos.voltar} href={CAMINHO}>
+      <Link className={estilos.voltar} href={lista}>
         <IconeVoltar />
         {ADMIN_PACOTE_FORMULARIO.voltar}
       </Link>
@@ -230,7 +230,7 @@ export function FormularioDePacote({
           <Botao onClick={salvar} carregando={pendente} disabled={!podeEscrever} tamanho="denso">
             {ADMIN_PACOTE_FORMULARIO.salvar}
           </Botao>
-          <Botao variante="ghost" onClick={() => router.push(CAMINHO)}>
+          <Botao variante="ghost" onClick={() => router.push(lista)}>
             {ADMIN_PACOTE_FORMULARIO.cancelar}
           </Botao>
           <span className={estilos.notaRodape}>{ADMIN_PACOTE_FORMULARIO.notaRodape}</span>

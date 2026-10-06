@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { FormularioDeLogin } from '@/componentes/autenticacao/FormularioDeLogin';
 import { MolduraDeAutenticacao } from '@/componentes/autenticacao/MolduraDeAutenticacao';
 import { ROTA } from '@/lib/guarda-rota';
+import { urlDoAdmin } from '@/lib/rotas-admin-servidor';
 import { entrarComoAdmin } from '@/modulos/autenticacao/acoes';
 import { ADMIN_ENTRAR } from '@/textos/prototipo';
 
@@ -53,7 +54,7 @@ export default async function Pagina({
           rotuloSenha: ADMIN_ENTRAR.rotuloSenha,
           placeholderSenha: ADMIN_ENTRAR.placeholderSenha,
           esqueciSenha: ADMIN_ENTRAR.esqueciSenha,
-          hrefEsqueciSenha: ROTA.ADMIN_RECUPERAR_SENHA,
+          hrefEsqueciSenha: await urlDoAdmin(ROTA.ADMIN_RECUPERAR_SENHA),
           mostrarSenha: ADMIN_ENTRAR.mostrarSenha,
           ocultarSenha: ADMIN_ENTRAR.ocultarSenha,
           enviar: ADMIN_ENTRAR.enviar,
