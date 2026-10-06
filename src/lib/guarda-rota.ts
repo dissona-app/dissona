@@ -8,6 +8,10 @@
  * Lembrete de camadas (§5.2): esta é a **segunda** das três camadas de
  * autorização. Ela evita renderizar tela que o usuário não pode ver; a
  * fronteira real é a RLS no banco.
+ *
+ * Os caminhos do admin aqui são os **internos** (`/admin/...`). No subdomínio
+ * `admin.` o navegador vê outro endereço; a tradução fica em
+ * `decisao-por-host.ts` e `rotas-admin.ts`, e nunca entra nesta matriz.
  */
 
 import type { LeituraDePapeis } from './papeis';
@@ -94,6 +98,13 @@ export const ROTA = {
   /** "Conta e equipe" (27.1) — `equipe` é o nome da rota no protótipo do admin. */
   ADMIN_EQUIPE: '/admin/equipe',
   ADMIN_CONVITE: '/admin/convite',
+  /** Pacotes de Claves (21) e o formulário de criação (21.1). */
+  ADMIN_PACOTES: '/admin/pacotes',
+  ADMIN_PACOTES_NOVO: '/admin/pacotes/novo',
+  /** Itens da sidebar de releases futuras — rota reservada, tela ainda não existe. */
+  ADMIN_USUARIOS: '/admin/usuarios',
+  ADMIN_FINANCEIRO: '/admin/financeiro',
+  ADMIN_MODERACAO: '/admin/moderacao',
   API_AUTH_CALLBACK: '/api/auth/callback',
   API_AUTH_CONFIRMAR: '/api/auth/confirmar',
   /** Webhook do Asaas: sem sessão — quem autentica é o header `asaas-access-token`. */
@@ -292,6 +303,9 @@ function ehLoginDeUsuario(caminho: string): boolean {
  * `ENTRAR_PADRAO`.
  */
 function loginDoCaminho(caminho: string): string {
+  // O admin tem login próprio, e desde o subdomínio é outro host: mandar a
+  // conta bloqueada ao login do artista a tiraria do endereço em que estava.
+  if (ehOuEstaSob(caminho, ROTA.ADMIN)) return ROTA.ADMIN_ENTRAR;
   if (ehOuEstaSob(caminho, ROTA.CURADOR)) return ROTA.CURADOR_ENTRAR;
   if (ehOuEstaSob(caminho, ROTA.ARTISTA)) return ROTA.ARTISTA_ENTRAR;
   return ENTRAR_PADRAO;

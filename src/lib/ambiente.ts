@@ -99,3 +99,21 @@ export function temChaveDeServico(): boolean {
 export function pagamentoSimulado(): boolean {
   return process.env.PAGAMENTO_SIMULADO !== 'false';
 }
+
+/**
+ * O admin mora em `admin.<domínio>`?
+ *
+ * **Desligado por padrão**, e ligado por `ADMIN_EM_SUBDOMINIO=true` — ao
+ * contrário de `soundcloudLigado`, porque o subdomínio depende de DNS e de
+ * domínio na Vercel: ligado onde ele não existe (um Preview, cujo domínio por
+ * branch não tem `admin.`), o `/admin` redirecionaria para um endereço que não
+ * resolve. Desligado, o admin segue servido em `/admin/...` — e quem abrir o
+ * subdomínio diretamente é atendido do mesmo jeito, porque o modo é decidido
+ * pelo host (`lib/rotas-admin.ts`).
+ *
+ * O que a flag decide é só uma coisa: se o host principal **manda** o `/admin`
+ * para `admin.`.
+ */
+export function adminEmSubdominio(): boolean {
+  return process.env.ADMIN_EM_SUBDOMINIO === 'true';
+}

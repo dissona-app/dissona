@@ -244,7 +244,7 @@ describe('conta bloqueada', () => {
     const casos: readonly (readonly [string, string])[] = [
       ['/artista/carteira', ROTA.ARTISTA_ENTRAR],
       [ROTA.CURADOR, ROTA.CURADOR_ENTRAR],
-      ['/admin/pacotes', ROTA.ARTISTA_ENTRAR],
+      ['/admin/pacotes', ROTA.ADMIN_ENTRAR],
       [ROTA.ONBOARDING, ROTA.ARTISTA_ENTRAR],
     ];
     for (const [caminho, login] of casos) {

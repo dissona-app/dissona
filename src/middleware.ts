@@ -1,8 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { adminEmSubdominio } from './lib/ambiente';
+import { decidirNoHost } from './lib/decisao-por-host';
 import type { LeituraDePapeis } from './lib/papeis';
-import { decidirAcesso } from './lib/guarda-rota';
 import { lerContextoSessao } from './lib/papeis';
 import type { SessaoDaRequisicao } from './lib/supabase/middleware';
 import { renovarSessao } from './lib/supabase/middleware';
@@ -13,8 +14,9 @@ const SEM_SESSAO: LeituraDePapeis = { estado: 'sem_sessao' };
  * Renova a sessão e aplica a guarda de papel por route group.
  *
  * A resposta devolvida por `renovarSessao` carrega os cookies renovados — todo
- * caminho de saída daqui tem de partir dela, inclusive os redirecionamentos,
- * senão o usuário é deslogado no meio da navegação.
+ * caminho de saída daqui tem de partir dela, inclusive os redirecionamentos e a
+ * reescrita do subdomínio do admin, senão o usuário é deslogado no meio da
+ * navegação.
  *
  * **Degrada em vez de cair.** Se a configuração do Supabase estiver ausente ou
  * o serviço indisponível, não há como renovar sessão — mas isso não é razão
@@ -25,6 +27,9 @@ const SEM_SESSAO: LeituraDePapeis = { estado: 'sem_sessao' };
  *
  * Aprendido na prática: sem esta guarda, um deploy sem as env vars devolvia
  * `MIDDLEWARE_INVOCATION_FAILED` em **todas** as rotas.
+ *
+ * O host entra na decisão desde o subdomínio do admin (`lib/rotas-admin.ts`):
+ * em `admin.` o caminho limpo é reescrito para o interno `/admin/...`.
  */
 export async function middleware(requisicao: NextRequest) {
   let sessao: SessaoDaRequisicao | null = null;
@@ -50,16 +55,39 @@ export async function middleware(requisicao: NextRequest) {
     }
   }
 
-  const decisao = decidirAcesso({
-    caminho: requisicao.nextUrl.pathname,
-    codigoDeAutenticacao: requisicao.nextUrl.searchParams.get('code'),
+  const url = requisicao.nextUrl;
+  const host =
+    requisicao.headers.get('x-forwarded-host') ?? requisicao.headers.get('host') ?? url.host;
+
+  const decisao = decidirNoHost({
+    host,
+    caminho: url.pathname,
+    busca: url.search,
+    codigoDeAutenticacao: url.searchParams.get('code'),
     leitura,
+    subdominioLigado: adminEmSubdominio(),
   });
 
   if (decisao.tipo === 'seguir') return resposta;
 
-  const destino = new URL(decisao.para, requisicao.nextUrl.origin);
-  const redirecionamento = NextResponse.redirect(destino);
+  if (decisao.tipo === 'reescrever') {
+    const reescrita = NextResponse.rewrite(
+      new URL(`${decisao.caminho}${url.search}`, requisicao.url),
+      {
+        request: { headers: requisicao.headers },
+      },
+    );
+    for (const cookie of resposta.cookies.getAll()) {
+      reescrita.cookies.set(cookie);
+    }
+    return reescrita;
+  }
+
+  const origem = decisao.host === undefined ? url.origin : `${url.protocol}//${decisao.host}`;
+  const redirecionamento = NextResponse.redirect(
+    new URL(decisao.para, origem),
+    decisao.permanente ? 308 : 307,
+  );
   // Transporta os cookies renovados para a resposta de redirecionamento.
   for (const cookie of resposta.cookies.getAll()) {
     redirecionamento.cookies.set(cookie);
