@@ -6,7 +6,9 @@ import { defineCloudflareConfig } from '@opennextjs/cloudflare';
  * `pnpm build` de novo, em laço. Assim os comandos padrão do Workers Builds
  * (`pnpm run build` + `npx wrangler deploy`) funcionam sem ajuste no painel.
  */
-export default {
+const configuracao = {
   ...defineCloudflareConfig({}),
   buildCommand: 'pnpm exec next build',
 };
+
+export default configuracao;
