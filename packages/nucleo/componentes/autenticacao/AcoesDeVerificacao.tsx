@@ -20,6 +20,13 @@ export type PropsAcoesDeVerificacao = {
   readonly email: string | undefined;
   /** `true` quando o link chegou expirado ou já usado (`?erro=token`). */
   readonly tokenInvalido: boolean;
+  /** O login de "Já confirmei, continuar". O painel administrativo passa o dele. */
+  readonly hrefDoLogin?: string;
+  /**
+   * Onde corrigir o endereço. `null` esconde a frase: no painel não existe
+   * cadastro — a conta nasce por convite.
+   */
+  readonly hrefDeCorrecao?: string | null;
 };
 
 const ESTADO_INICIAL: ResultadoDeAcao | null = null;
@@ -44,6 +51,8 @@ export function AcoesDeVerificacao({
   acaoDeReenvio,
   email,
   tokenInvalido,
+  hrefDoLogin = ENTRAR_PADRAO,
+  hrefDeCorrecao = ROTA.CADASTRAR,
 }: PropsAcoesDeVerificacao) {
   const [resultado, reenviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
     async (_anterior, dados) => acaoDeReenvio(dados),
@@ -80,7 +89,7 @@ export function AcoesDeVerificacao({
       ) : null}
 
       <div className={estilos.acoes}>
-        <BotaoLink href={ENTRAR_PADRAO} blocoInteiro>
+        <BotaoLink href={hrefDoLogin} blocoInteiro>
           {VERIFICAR_EMAIL.continuar}
         </BotaoLink>
 
@@ -109,13 +118,15 @@ export function AcoesDeVerificacao({
         </form>
       </div>
 
-      <p className={estilos.rodape}>
-        {VERIFICAR_EMAIL.naoChegouAntes}
-        <Link className={estilos.rodapeLink} href={ROTA.CADASTRAR}>
-          {VERIFICAR_EMAIL.corrigirEndereco}
-        </Link>
-        {VERIFICAR_EMAIL.naoChegouDepois}
-      </p>
+      {hrefDeCorrecao !== null ? (
+        <p className={estilos.rodape}>
+          {VERIFICAR_EMAIL.naoChegouAntes}
+          <Link className={estilos.rodapeLink} href={hrefDeCorrecao}>
+            {VERIFICAR_EMAIL.corrigirEndereco}
+          </Link>
+          {VERIFICAR_EMAIL.naoChegouDepois}
+        </p>
+      ) : null}
     </>
   );
 }

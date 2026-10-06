@@ -1,0 +1,8 @@
+/* Conta e equipe (27). `max-width:1000px` é o do protótipo do admin. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 20px);
+  max-width: 1000px;
+}

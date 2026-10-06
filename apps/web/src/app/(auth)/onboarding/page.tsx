@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 
 import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
-import { NavegadorDoTour } from '@/componentes/autenticacao/NavegadorDoTour';
-import { ProvedorDoTour } from '@/componentes/autenticacao/estado-do-tour';
-import { TourDeOnboarding } from '@/componentes/autenticacao/TourDeOnboarding';
-import type { PassoDoTour } from '@/componentes/autenticacao/TourDeOnboarding';
+import { NavegadorDoTour } from '@dissona/nucleo/componentes/autenticacao/NavegadorDoTour';
+import { ProvedorDoTour } from '@dissona/nucleo/componentes/autenticacao/estado-do-tour';
+import { TourDeOnboarding } from '@dissona/nucleo/componentes/autenticacao/TourDeOnboarding';
+import type { PassoDoTour } from '@dissona/nucleo/componentes/autenticacao/TourDeOnboarding';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { Papel } from '@dissona/nucleo/lib/papeis';
 import { encerrarOnboarding } from '@/modulos/autenticacao/acoes';

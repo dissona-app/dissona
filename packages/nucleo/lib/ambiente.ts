@@ -117,3 +117,36 @@ export function pagamentoSimulado(): boolean {
 export function adminEmSubdominio(): boolean {
   return process.env.ADMIN_EM_SUBDOMINIO === 'true';
 }
+
+/**
+ * Onde mora o **outro** app — o admin é um deploy separado (`apps/admin`), e
+ * os dois precisam mandar gente um para o outro: o web leva o `/admin` antigo
+ * e a conta só de admin para o painel; o admin leva Termos, Privacidade e o
+ * que não é dele para o site.
+ *
+ * `NEXT_PUBLIC_` porque o valor é embutido no build e lido também no
+ * middleware. Sem a variável: em desenvolvimento, os endereços locais
+ * (`localhost:3000` e `admin.localhost:3001` — o `admin.` mantém os cookies
+ * de sessão separados, já que cookie não distingue porta); em produção, os
+ * domínios oficiais.
+ */
+function urlPublica(valor: string | undefined, local: string, producao: string): string {
+  if (valor !== undefined && valor.trim() !== '') return valor.replace(/\/$/, '');
+  return process.env.NODE_ENV === 'production' ? producao : local;
+}
+
+export function urlDoSite(): string {
+  return urlPublica(
+    process.env.NEXT_PUBLIC_URL_SITE,
+    'http://localhost:3000',
+    'https://dissona.com.br',
+  );
+}
+
+export function urlDoPainelAdmin(): string {
+  return urlPublica(
+    process.env.NEXT_PUBLIC_URL_ADMIN,
+    'http://admin.localhost:3001',
+    'https://admin.dissona.com.br',
+  );
+}

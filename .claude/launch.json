@@ -2,11 +2,18 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "Dissona — Artista · Curador · Admin",
+      "name": "Dissona Web — Artista · Curador",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev"],
+      "runtimeArgs": ["--filter", "@dissona/web", "dev"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "Dissona Admin",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@dissona/admin", "exec", "next", "dev", "--port", "3001"],
+      "port": 3001,
+      "url": "http://admin.localhost:3001"
     },
     {
       "name": "Protótipos R2",

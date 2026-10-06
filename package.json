@@ -30,7 +30,8 @@
     "e2e:navegadores": "playwright install --with-deps chromium",
     "e2e:relatorio": "playwright show-report",
     "e2e:semear": "node scripts/repor-cenarios-e2e.mjs",
-    "rastreabilidade": "node scripts/matriz-rastreabilidade.mjs"
+    "rastreabilidade": "node scripts/matriz-rastreabilidade.mjs",
+    "postinstall": "node scripts/ligar-env.mjs"
   },
   "devDependencies": {
     "@dissona/nucleo": "workspace:*",

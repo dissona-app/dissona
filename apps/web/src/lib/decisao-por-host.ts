@@ -32,6 +32,11 @@ export type ContextoDoHost = ContextoDeAcesso & {
   readonly busca: string;
   /** `ADMIN_EM_SUBDOMINIO=true`: o host principal manda o `/admin` para `admin.`. */
   readonly subdominioLigado: boolean;
+  /**
+   * O host do painel administrativo, quando ele é um deploy próprio
+   * (`apps/admin`, `NEXT_PUBLIC_URL_ADMIN`). Sem ele, `admin.<host>`.
+   */
+  readonly hostDoPainel?: string;
 };
 
 export type DecisaoNoHost =
@@ -84,12 +89,15 @@ function traduzir(destino: string, contexto: ContextoDoHost): DecisaoNoHost {
     return {
       tipo: 'redirecionar',
       para: externoComProximo(destino),
-      host: hostDoAdmin(contexto.host),
+      host: contexto.hostDoPainel ?? hostDoAdmin(contexto.host),
       permanente: false,
     };
   }
   return { tipo: 'redirecionar', para: destino, permanente: false };
 }
+
+/** No destino que vai para o painel, o `?proximo=` também perde o `/admin`. */
+export { externoComProximo as paraExternoComProximo };
 
 export function decidirNoHost(contexto: ContextoDoHost): DecisaoNoHost {
   const { caminho, busca, host, subdominioLigado } = contexto;
@@ -116,7 +124,7 @@ export function decidirNoHost(contexto: ContextoDoHost): DecisaoNoHost {
     return {
       tipo: 'redirecionar',
       para: `${paraExterno(caminho, '')}${busca}`,
-      host: hostDoAdmin(host),
+      host: contexto.hostDoPainel ?? hostDoAdmin(host),
       permanente: true,
     };
   }

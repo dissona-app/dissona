@@ -1,12 +1,12 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { adminEmSubdominio } from '@dissona/nucleo/lib/ambiente';
+import { adminEmSubdominio, urlDoPainelAdmin } from '@dissona/nucleo/lib/ambiente';
 import { decidirNoHost } from './lib/decisao-por-host';
 import type { LeituraDePapeis } from '@dissona/nucleo/lib/papeis';
 import { lerContextoSessao } from '@dissona/nucleo/lib/papeis';
-import type { SessaoDaRequisicao } from './lib/supabase/middleware';
-import { renovarSessao } from './lib/supabase/middleware';
+import type { SessaoDaRequisicao } from '@dissona/nucleo/lib/supabase/middleware';
+import { renovarSessao } from '@dissona/nucleo/lib/supabase/middleware';
 
 const SEM_SESSAO: LeituraDePapeis = { estado: 'sem_sessao' };
 
@@ -59,6 +59,9 @@ export async function middleware(requisicao: NextRequest) {
   const host =
     requisicao.headers.get('x-forwarded-host') ?? requisicao.headers.get('host') ?? url.host;
 
+  // O painel é um deploy próprio (`apps/admin`): o `/admin` antigo vai para lá.
+  const painel = new URL(urlDoPainelAdmin());
+
   const decisao = decidirNoHost({
     host,
     caminho: url.pathname,
@@ -66,6 +69,7 @@ export async function middleware(requisicao: NextRequest) {
     codigoDeAutenticacao: url.searchParams.get('code'),
     leitura,
     subdominioLigado: adminEmSubdominio(),
+    hostDoPainel: painel.host,
   });
 
   if (decisao.tipo === 'seguir') return resposta;
@@ -85,7 +89,8 @@ export async function middleware(requisicao: NextRequest) {
 
   // Do cabeçalho, como `origem.ts`: `url.origin` atrás do `next start` é o
   // endereço de escuta, e não o host que o navegador pediu.
-  const origem = `${url.protocol}//${decisao.host ?? host}`;
+  const origem =
+    decisao.host === painel.host ? painel.origin : `${url.protocol}//${decisao.host ?? host}`;
   const redirecionamento = NextResponse.redirect(
     new URL(decisao.para, origem),
     decisao.permanente ? 308 : 307,
