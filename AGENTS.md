@@ -48,7 +48,7 @@ Estas já estão implícitas na arquitetura, mas ficam explícitas porque são o
 
 - **Sem Tailwind.** CSS Modules + custom properties. Os tokens do Design System foram extraídos dos protótipos como valores literais e não devem passar por uma camada de tradução.
 - **Sem backend separado.** Monolito modular em Next.js — Server Components e Server Actions. Não crie `apps/api`, Express ou Fastify.
-- **Monorepo de dois apps e um pacote, e só isso.** `apps/web` (público, artista, curador), `apps/admin` (painel, `admin.dissona.com.br`) e `packages/nucleo` (código comum). Não crie outro app nem outro pacote sem decisão de produto. **Server actions só nos apps** — o pacote não tem `'use server'`, `redirect` nem `revalidatePath`. Ver [arquitetura §3](docs/architecture.md).
+- **Monorepo de dois apps e um pacote, e só isso.** `apps/web` (público, artista, curador), `apps/admin` (painel, `painel.dissona.com.br`) e `packages/nucleo` (código comum). Não crie outro app nem outro pacote sem decisão de produto. **Server actions só nos apps** — o pacote não tem `'use server'`, `redirect` nem `revalidatePath`. Ver [arquitetura §3](docs/architecture.md).
 - **Sem Prisma, Drizzle ou qualquer ORM.** Migrations em SQL versionado pelo Supabase CLI; tipos gerados em `packages/nucleo/lib/supabase/tipos-bd.ts`, **nunca escritos à mão**.
 - **Sem S3, sem Redis, sem broker.** Supabase Storage; `pg_cron` agenda e Edge Functions executam.
 - **Sem `any`.** TypeScript `strict`.

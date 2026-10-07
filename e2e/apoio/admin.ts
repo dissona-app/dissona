@@ -4,14 +4,14 @@
  * Local, a suíte o sobe em `admin.localhost:3101` (`playwright.config.ts`): o
  * `admin.` separa os cookies de sessão do site, porque cookie não distingue
  * porta — e o Chromium resolve `*.localhost` sem configuração. Contra
- * produção, `BASE_URL_ADMIN` (ou `admin.` + o host de `BASE_URL`).
+ * produção, `BASE_URL_ADMIN` (`https://painel.dissona.com.br`).
  *
  * Os specs continuam escrevendo o caminho **interno** (`/admin/equipe`), o
  * mesmo de `ROTA`: quem traduz para a rota limpa do painel é `noAdmin`. Assim
  * o teste diz qual tela abre, e não como o endereço dela é soletrado.
  */
 
-import { ehCaminhoDoAdmin, hostDoAdmin, paraExterno } from '@dissona/nucleo/lib/rotas-admin';
+import { ehCaminhoDoAdmin, paraExterno } from '@dissona/nucleo/lib/rotas-admin';
 
 function urlDoPainel(): string {
   const explicita = process.env.BASE_URL_ADMIN;
@@ -20,8 +20,12 @@ function urlDoPainel(): string {
   const base = process.env.BASE_URL;
   if (base === undefined || base === '') return 'http://admin.localhost:3101';
 
-  const url = new URL(base);
-  return `${url.protocol}//${hostDoAdmin(url.host)}`;
+  // Fora do local o painel não segue um padrão de host (em produção é
+  // `painel.dissona.com.br`): o endereço tem de vir explícito.
+  throw new Error(
+    'BASE_URL_ADMIN não está definida. Contra um ambiente remoto, informe o painel junto: ' +
+      'BASE_URL=https://dissona.com.br BASE_URL_ADMIN=https://painel.dissona.com.br pnpm e2e',
+  );
 }
 
 /** `http://admin.localhost:3101`, sem barra final. */

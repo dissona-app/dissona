@@ -47,7 +47,7 @@ pnpm dev:admin         # painel (apps/admin) — http://admin.localhost:3001
 
 O app sobe sem banco local: as variáveis de `.env.local` apontam para o projeto Supabase de desenvolvimento.
 
-O repositório é um monorepo pnpm: **`apps/web`** (público, artista e curador), **`apps/admin`** (o painel administrativo, `admin.dissona.com.br` em produção) e **`packages/nucleo`** (o código que os dois usam). O painel roda em `admin.localhost`, e não em `localhost`, porque cookie não distingue porta: o `admin.` mantém as sessões dos dois apps separadas, como em produção. O navegador resolve `*.localhost` sozinho. Ver [arquitetura §3](docs/architecture.md).
+O repositório é um monorepo pnpm: **`apps/web`** (público, artista e curador), **`apps/admin`** (o painel administrativo, `painel.dissona.com.br` em produção) e **`packages/nucleo`** (o código que os dois usam). O painel roda em `admin.localhost`, e não em `localhost`, porque cookie não distingue porta: o `admin.` mantém as sessões dos dois apps separadas, como em produção. O navegador resolve `*.localhost` sozinho. Ver [arquitetura §3](docs/architecture.md).
 
 ### Banco
 
@@ -142,7 +142,7 @@ desenvolvimento, então apontar a suíte para produção não arrisca dado de
 ninguém — e prova o que o servidor local **não** prova:
 
 ```sh
-BASE_URL=https://dissona.com.br BASE_URL_ADMIN=https://admin.dissona.com.br pnpm e2e
+BASE_URL=https://dissona.com.br BASE_URL_ADMIN=https://painel.dissona.com.br pnpm e2e
 ```
 
 O áudio da faixa (RF-036) e o anexo de credencial do curador sobem do

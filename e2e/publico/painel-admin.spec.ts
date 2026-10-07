@@ -5,7 +5,7 @@ import { entrarComoAdmin } from '../apoio/sessao';
 import { ADMIN_ENTRAR } from '../apoio/textos';
 
 /**
- * O painel administrativo como app próprio (`apps/admin`, admin.dissona.com.br).
+ * O painel administrativo como app próprio (`apps/admin`, painel.dissona.com.br).
  *
  * O resto da suíte já roda o admin no painel; este arquivo prova o que é
  * próprio da separação: o endereço antigo do site muda de lugar, o painel não

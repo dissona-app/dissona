@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Raiz do painel administrativo — app próprio, em `admin.dissona.com.br`.
+ * Raiz do painel administrativo — app próprio, em `painel.dissona.com.br`.
  *
  * Base `''` para o shell compartilhado: as tabelas de navegação e de título do
  * pacote usam o caminho interno (`/admin/equipe`), e aqui o endereço real é

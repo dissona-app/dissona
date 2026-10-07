@@ -2,7 +2,7 @@
   "name": "@dissona/admin",
   "version": "0.1.0",
   "private": true,
-  "description": "Dissona — painel administrativo (admin.dissona.com.br).",
+  "description": "Dissona — painel administrativo (painel.dissona.com.br).",
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "opennextjs-cloudflare build",
