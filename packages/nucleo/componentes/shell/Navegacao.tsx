@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link, { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
@@ -69,19 +69,27 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                         href={hrefDoAdmin(item.caminho)}
                         aria-current={ativo ? 'page' : undefined}
                       >
-                        {item.rotulo}
+                        <span className={estilos.rotulo}>{item.rotulo}</span>
+                        <IndicadorDeNavegacao />
                       </Link>
                     ) : (
                       // Item de release futura: visível para dar noção do
                       // produto inteiro, mas não navegável. `aria-disabled`
                       // em vez de remover do DOM, para a navegação não mudar
-                      // de forma a cada entrega.
+                      // de forma a cada entrega. O selo "Em breve" é o aviso
+                      // visível — só o `title` parecia um botão quebrado.
                       <span
-                        className={estilos.item}
+                        className={[estilos.item, estilos.indisponivel].join(' ')}
                         aria-disabled="true"
                         title={item.motivo ?? `Disponível na Release ${item.release}`}
                       >
-                        {item.rotulo}
+                        <span className={estilos.rotulo}>{item.rotulo}</span>
+                        <span className={estilos.emBreve} aria-hidden="true">
+                          Em breve
+                        </span>
+                        <span className="dsn-apenas-leitor">
+                          {` — ${item.motivo ?? `disponível na Release ${item.release}`}`}
+                        </span>
                       </span>
                     )}
                   </li>
@@ -95,4 +103,14 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
       {rodape !== undefined ? <div className={estilos.rodape}>{rodape}</div> : null}
     </aside>
   );
+}
+
+/**
+ * O retorno imediato do clique: enquanto a rota seguinte carrega, o item
+ * clicado mostra um spinner. Complementa o `loading.tsx` de cada ambiente, que
+ * cuida do miolo; este cuida de onde a pessoa acabou de clicar.
+ */
+function IndicadorDeNavegacao() {
+  const { pending } = useLinkStatus();
+  return pending ? <span className={estilos.pendente} aria-hidden="true" /> : null;
 }

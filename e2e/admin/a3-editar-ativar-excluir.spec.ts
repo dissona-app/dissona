@@ -175,8 +175,16 @@ test.describe('A3 · Editar / ativar / excluir', () => {
 
       // O `href` é o caminho limpo do subdomínio; relativo, ele resolveria
       // contra o host principal e o 404 viria por motivo errado.
-      const resposta = await page.goto(`${URL_ADMIN}${url ?? '/pacotes'}`);
-      expect(resposta?.status()).toBe(404);
+      await page.goto(`${URL_ADMIN}${url ?? '/pacotes'}`);
+
+      // A tela de não encontrado, e nenhum formulário de edição. O status HTTP
+      // não serve de prova aqui: com o `loading.tsx` do painel a resposta já
+      // começou (200) quando o `notFound()` dispara, e o Next entrega o 404
+      // dentro do stream — com `noindex` — em vez de trocar o status.
+      await expect(page.getByRole('heading', { name: '404' })).toBeVisible();
+      await expect(page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar })).toHaveCount(
+        0,
+      );
     },
   );
 
