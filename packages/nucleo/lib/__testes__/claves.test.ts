@@ -101,7 +101,11 @@ describe('formatação', () => {
     expect(paraStringDecimal(250n)).toBe('2.50');
     expect(paraStringDecimal(100n)).toBe('1.00');
     expect(semNbsp(formatar(250n))).toBe('2,50');
-    expect(semNbsp(formatar(150000n))).toBe('1.500,00');
+    expect(semNbsp(formatar(150000n))).toBe('1.500');
+    expect(semNbsp(formatar(21600n))).toBe('216');
+    expect(semNbsp(formatar(0n))).toBe('0');
+    expect(semNbsp(formatar(-100n))).toBe('-1');
+    expect(semNbsp(formatar(650n))).toBe('6,50');
   });
 });
 
