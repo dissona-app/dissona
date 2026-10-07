@@ -20,6 +20,10 @@
   // isto, cada deploy apagaria o que não está neste arquivo.
   "keep_vars": true,
   "vars": { "ADMIN_EM_SUBDOMINIO": "true" },
+  // Endereço `*.workers.dev` ligado: dá para testar o Worker antes do domínio
+  // próprio (e se ele cair), sem depender do DNS.
+  "workers_dev": true,
+  "preview_urls": true,
   // Domínio próprio: a zona dissona.com.br precisa estar ativa na conta.
   "routes": [{ "pattern": "dissona.com.br", "custom_domain": true }],
 }
