@@ -24,6 +24,7 @@ import {
   esquemaTrocaDeSenha,
 } from '@dissona/nucleo/modulos/conta/esquemas';
 import {
+  encerrarTodasAsOutras,
   encerrarUmaSessao,
   excluirConta,
   exportarDados,
@@ -118,6 +119,16 @@ export async function encerrarSessaoDeOutroDispositivo(dadosDoFormulario: FormDa
 
   // A lista tem de refletir a remoção. Não importa se a RPC devolveu `false`
   // (sessão já expirada): nos dois casos a lista atual está desatualizada.
+  revalidarConta();
+}
+
+/**
+ * Encerra todas as sessões da conta menos esta — o atalho do painel quando a
+ * lista passa de cinco. `void` pelo mesmo motivo da ação acima: é um `<form>`
+ * puro, e a confirmação é a lista revalidada.
+ */
+export async function encerrarOutrasSessoesDaConta(): Promise<void> {
+  await encerrarTodasAsOutras();
   revalidarConta();
 }
 

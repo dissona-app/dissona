@@ -114,6 +114,11 @@ export async function encerrarUmaSessao(sessaoId: string): Promise<boolean> {
   return encerrarSessaoPorId(sessaoId);
 }
 
+/** Todas as sessões da conta menos esta — o atalho para quando a lista é longa. */
+export async function encerrarTodasAsOutras(): Promise<void> {
+  await encerrarOutrasSessoes();
+}
+
 /* ------------------------------------------------- exclusão de conta ------ */
 
 export type ResultadoDaExportacao =

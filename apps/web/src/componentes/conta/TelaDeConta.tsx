@@ -5,6 +5,7 @@ import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { Papel } from '@dissona/nucleo/lib/papeis';
 import {
+  encerrarOutrasSessoesDaConta,
   encerrarSessaoDeOutroDispositivo,
   excluirMinhaConta,
   exportarDadosDaConta,
@@ -192,7 +193,11 @@ export function TelaDeConta({
             acao={trocarSenha}
           />
 
-          <PainelDeSessoes sessoes={sessoes} acaoDeEncerrar={encerrarSessaoDeOutroDispositivo} />
+          <PainelDeSessoes
+            sessoes={sessoes}
+            acaoDeEncerrar={encerrarSessaoDeOutroDispositivo}
+            acaoDeEncerrarOutras={encerrarOutrasSessoesDaConta}
+          />
 
           <CartaoDeExclusao
             acaoDeExportar={exportarDadosDaConta}

@@ -13,7 +13,24 @@ import estilos from './PainelDeSessoes.module.css';
 export type PropsPainelDeSessoes = {
   readonly sessoes: readonly SessaoAtiva[];
   readonly acaoDeEncerrar: (dados: FormData) => Promise<void>;
+  readonly acaoDeEncerrarOutras: () => Promise<void>;
 };
+
+/**
+ * Quantas linhas o painel mostra. A lista inteira podia passar de mil — cada
+ * login abre uma sessão, e elas só expiram com o refresh token —, e um painel
+ * que serve para reconhecer acesso indevido precisa caber na tela. O resto
+ * vira contagem, com o atalho de encerrar todas.
+ */
+const LIMITE_DE_LINHAS = 5;
+
+/** A atual primeiro; depois, da vista mais recentemente para a mais antiga. */
+function ordenar(sessoes: readonly SessaoAtiva[]): readonly SessaoAtiva[] {
+  return [...sessoes].sort((a, b) => {
+    if (a.atual !== b.atual) return a.atual ? -1 : 1;
+    return b.vistoEm.localeCompare(a.vistoEm);
+  });
+}
 
 /**
  * "Sessões ativas" (7.4 / 17.4 / 27.1).
@@ -32,7 +49,15 @@ export type PropsPainelDeSessoes = {
  * servidor congelaria o texto no momento do render, e uma página aberta por
  * uma hora mostraria "agora" para uma sessão que já não é.
  */
-export function PainelDeSessoes({ sessoes, acaoDeEncerrar }: PropsPainelDeSessoes) {
+export function PainelDeSessoes({
+  sessoes,
+  acaoDeEncerrar,
+  acaoDeEncerrarOutras,
+}: PropsPainelDeSessoes) {
+  const visiveis = ordenar(sessoes).slice(0, LIMITE_DE_LINHAS);
+  const ocultas = sessoes.length - visiveis.length;
+  const outras = sessoes.filter((sessao) => !sessao.atual).length;
+
   return (
     <div className={estilos.base}>
       <span className={estilos.overline}>{CONTA.sessoesTitulo}</span>
@@ -41,7 +66,7 @@ export function PainelDeSessoes({ sessoes, acaoDeEncerrar }: PropsPainelDeSessoe
         <p className={estilos.vazio}>{CONTA.sessoesVazias}</p>
       ) : (
         <ul className={estilos.lista}>
-          {sessoes.map((sessao) => (
+          {visiveis.map((sessao) => (
             <li key={sessao.id} className={estilos.linha}>
               <div className={estilos.textos}>
                 <span className={estilos.dispositivo}>{rotuloDoDispositivo(sessao)}</span>
@@ -60,7 +85,25 @@ export function PainelDeSessoes({ sessoes, acaoDeEncerrar }: PropsPainelDeSessoe
           ))}
         </ul>
       )}
+
+      {ocultas > 0 ? <p className={estilos.ocultas}>{CONTA.sessoesOcultas(ocultas)}</p> : null}
+
+      {outras > 1 ? (
+        <form action={acaoDeEncerrarOutras} className={estilos.encerrarOutras}>
+          <BotaoDeEncerrarOutras />
+        </form>
+      ) : null}
     </div>
+  );
+}
+
+function BotaoDeEncerrarOutras() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button type="submit" className={estilos.encerrar} disabled={pending}>
+      {pending ? CONTA.encerrandoOutrasSessoes : CONTA.encerrarOutrasSessoes}
+    </button>
   );
 }
 
