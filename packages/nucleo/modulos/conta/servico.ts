@@ -26,6 +26,7 @@ import {
   conferirSenhaAtual,
   desativarConta,
   encerrarSessaoPorId,
+  encerrarSessoesPorIds,
   guardarExportacao,
   lerDadosParaExportacao,
   lerSessoes,
@@ -112,6 +113,17 @@ export async function lerSessoesDaConta(): Promise<readonly SessaoAtiva[]> {
 
 export async function encerrarUmaSessao(sessaoId: string): Promise<boolean> {
   return encerrarSessaoPorId(sessaoId);
+}
+
+/** Um grupo de sessões (mesmo dispositivo e IP) de uma vez. */
+export async function encerrarSessoes(sessoes: readonly string[]): Promise<number> {
+  if (sessoes.length === 0) return 0;
+  return encerrarSessoesPorIds(sessoes);
+}
+
+/** Todas as sessões da conta menos esta — o atalho para quando a lista é longa. */
+export async function encerrarTodasAsOutras(): Promise<void> {
+  await encerrarOutrasSessoes();
 }
 
 /* ------------------------------------------------- exclusão de conta ------ */

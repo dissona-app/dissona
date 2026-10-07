@@ -90,3 +90,13 @@
   color: var(--dsn-ink-400);
   cursor: default;
 }
+
+.ocultas {
+  margin: var(--dsn-space-6) 0 0;
+  font-size: var(--dsn-text-sm);
+  color: var(--dsn-ink-500);
+}
+
+.encerrarOutras {
+  margin-top: var(--dsn-space-6);
+}

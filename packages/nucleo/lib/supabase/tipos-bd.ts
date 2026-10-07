@@ -1648,6 +1648,10 @@ export type Database = {
         Args: { p_sessao_id: string }
         Returns: boolean
       }
+      encerrar_sessoes_da_conta: {
+        Args: { p_sessoes: string[] }
+        Returns: number
+      }
       enviar_avaliacao: {
         Args: {
           p_compartilhamento?: Json

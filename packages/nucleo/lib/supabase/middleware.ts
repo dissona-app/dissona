@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { ambiente } from '@dissona/nucleo/lib/ambiente';
+import { cabecalhosDoVisitante } from '@dissona/nucleo/lib/supabase/origem-do-visitante';
 import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
 export type SessaoDaRequisicao = {
@@ -29,6 +30,7 @@ export async function renovarSessao(requisicao: NextRequest): Promise<SessaoDaRe
     ambiente.supabase.url,
     ambiente.supabase.chavePublica,
     {
+      global: { headers: cabecalhosDoVisitante(requisicao.headers) },
       cookies: {
         getAll() {
           return requisicao.cookies.getAll();

@@ -88,6 +88,14 @@ export const CONTA = {
   encerrarSessao: 'Encerrar',
   encerrandoSessao: 'Encerrando…',
   sessoesVazias: 'Nenhuma outra sessão ativa.',
+  /** Derivado: o protótipo mostra três linhas e não prevê lista longa. */
+  sessoesOcultas: (quantos: number) =>
+    quantos === 1
+      ? 'E mais 1 dispositivo com acesso mais antigo.'
+      : `E mais ${quantos} dispositivos com acesso mais antigo.`,
+  sessoesNoGrupo: (quantas: number) => `${quantas} sessões`,
+  encerrarOutrasSessoes: 'Encerrar todas as outras sessões',
+  encerrandoOutrasSessoes: 'Encerrando…',
   /**
    * **Divergência registrada.** O protótipo mostra "Chrome · São Paulo", e
    * `auth.sessions` guarda `ip`, não cidade. Resolver o IP exigiria um serviço
