@@ -42,6 +42,21 @@ export async function lerSessoes(): Promise<readonly SessaoAtiva[]> {
   }));
 }
 
+/**
+ * Encerra um lote de sessões da conta — o "Encerrar" de uma linha agrupada do
+ * painel. A RPC ignora a sessão atual e ids de outra conta (`0001e`).
+ */
+export async function encerrarSessoesPorIds(sessoes: readonly string[]): Promise<number> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase.rpc('encerrar_sessoes_da_conta', {
+    p_sessoes: [...sessoes],
+  });
+  estourarSeErro(error);
+
+  return data ?? 0;
+}
+
 /** `false` quando não havia o que encerrar — sessão já expirada, por exemplo. */
 export async function encerrarSessaoPorId(sessaoId: string): Promise<boolean> {
   const supabase = await criarClienteServidor();

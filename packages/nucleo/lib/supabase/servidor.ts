@@ -11,15 +11,19 @@ import 'server-only';
  */
 
 import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import { ambiente } from '../ambiente';
+import { cabecalhosDoVisitante } from './origem-do-visitante';
 import type { Database } from './tipos-bd';
 
 export async function criarClienteServidor() {
   const armazem = await cookies();
+  // Navegador e IP de quem fez a requisição: é o que o Auth grava na sessão.
+  const visitante = cabecalhosDoVisitante(await headers());
 
   return createServerClient<Database>(ambiente.supabase.url, ambiente.supabase.chavePublica, {
+    global: { headers: visitante },
     cookies: {
       getAll() {
         return armazem.getAll();

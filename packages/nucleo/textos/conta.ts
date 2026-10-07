@@ -89,8 +89,11 @@ export const CONTA = {
   encerrandoSessao: 'Encerrando…',
   sessoesVazias: 'Nenhuma outra sessão ativa.',
   /** Derivado: o protótipo mostra três linhas e não prevê lista longa. */
-  sessoesOcultas: (quantas: number) =>
-    quantas === 1 ? 'E mais 1 sessão mais antiga.' : `E mais ${quantas} sessões mais antigas.`,
+  sessoesOcultas: (quantos: number) =>
+    quantos === 1
+      ? 'E mais 1 dispositivo com acesso mais antigo.'
+      : `E mais ${quantos} dispositivos com acesso mais antigo.`,
+  sessoesNoGrupo: (quantas: number) => `${quantas} sessões`,
   encerrarOutrasSessoes: 'Encerrar todas as outras sessões',
   encerrandoOutrasSessoes: 'Encerrando…',
   /**

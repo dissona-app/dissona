@@ -25,7 +25,7 @@ import {
 } from '@dissona/nucleo/modulos/conta/esquemas';
 import {
   encerrarTodasAsOutras,
-  encerrarUmaSessao,
+  encerrarSessoes,
   excluirConta,
   exportarDados,
   trocarEmailDaConta,
@@ -112,10 +112,15 @@ export async function trocarEmail(dadosDoFormulario: FormData): Promise<Resultad
  * própria lista renderizou. Sai em silêncio, e a revalidação corrige a lista.
  */
 export async function encerrarSessaoDeOutroDispositivo(dadosDoFormulario: FormData): Promise<void> {
-  const analise = esquemaSessao.safeParse({ sessaoId: dadosDoFormulario.get('sessaoId') });
-  if (!analise.success) return;
+  // Uma linha do painel pode agrupar várias sessões do mesmo dispositivo e IP:
+  // o formulário traz um `sessaoId` por sessão, e todas saem de uma vez.
+  const ids = dadosDoFormulario
+    .getAll('sessaoId')
+    .map((bruto) => esquemaSessao.safeParse({ sessaoId: bruto }))
+    .flatMap((analise) => (analise.success ? [analise.data.sessaoId] : []));
+  if (ids.length === 0) return;
 
-  await encerrarUmaSessao(analise.data.sessaoId);
+  await encerrarSessoes(ids);
 
   // A lista tem de refletir a remoção. Não importa se a RPC devolveu `false`
   // (sessão já expirada): nos dois casos a lista atual está desatualizada.
