@@ -1407,7 +1407,7 @@ decide se o convite vale continua sendo `aceitar_convite_admin`.
 ## Admin em app próprio · 2026-10-06
 
 Decisão do cliente: o admin é **código e deploy separados** — `apps/admin`, em
-**`admin.dissona.com.br`**, com URLs limpas (`/entrar`, `/equipe`, `/pacotes`).
+**`painel.dissona.com.br`**, com URLs limpas (`/entrar`, `/equipe`, `/pacotes`).
 Artista, curador e páginas públicas continuam em `dissona.com.br` (`apps/web`).
 O código comum foi para `packages/nucleo`. Substitui a primeira versão do mesmo
 dia, que servia o admin pelo mesmo app via subdomínio.

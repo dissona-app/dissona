@@ -125,7 +125,7 @@ dissona/
 │   │       ├── modulos/        # Server Actions (acoes.ts) e módulos só do produto
 │   │       ├── lib/            # decisao-por-host, escuta, mascaras…
 │   │       └── middleware.ts   # sessão + guarda de papel
-│   └── admin/                  # @dissona/admin — admin.dissona.com.br
+│   └── admin/                  # @dissona/admin — painel.dissona.com.br
 │       └── src/
 │           ├── app/
 │           │   ├── (acesso)/   # entrar, recuperar-senha, redefinir-senha, convite, onboarding, verificar-email
@@ -193,7 +193,7 @@ O sitemap do [PRD §6.1](PRD.md) nomeia telas, não caminhos. Os slugs abaixo fo
 
 O login do admin fica **dentro** de `(admin)` e não exige sessão — é login próprio, sem social e sem autocadastro.
 
-**O admin é um app próprio** (`apps/admin`), em `https://admin.dissona.com.br`, com rotas limpas reais: `/entrar`, `/recuperar-senha`, `/redefinir-senha`, `/convite`, `/onboarding`, `/verificar-email`, `/`, `/equipe`, `/pacotes`, `/pacotes/novo`, `/pacotes/<id>`. Os caminhos `ROTA.ADMIN*` do pacote continuam **internos** (`/admin/equipe`) — é sobre eles que a matriz de acesso (`decidirAcesso`) raciocina; o painel traduz na entrada e na saída ([`apps/admin/src/lib/decisao.ts`](../apps/admin/src/lib/decisao.ts), [`rotas.ts`](../apps/admin/src/lib/rotas.ts)).
+**O admin é um app próprio** (`apps/admin`), em `https://painel.dissona.com.br`, com rotas limpas reais: `/entrar`, `/recuperar-senha`, `/redefinir-senha`, `/convite`, `/onboarding`, `/verificar-email`, `/`, `/equipe`, `/pacotes`, `/pacotes/novo`, `/pacotes/<id>`. Os caminhos `ROTA.ADMIN*` do pacote continuam **internos** (`/admin/equipe`) — é sobre eles que a matriz de acesso (`decidirAcesso`) raciocina; o painel traduz na entrada e na saída ([`apps/admin/src/lib/decisao.ts`](../apps/admin/src/lib/decisao.ts), [`rotas.ts`](../apps/admin/src/lib/rotas.ts)).
 
 - **Sessões separadas.** O cookie do Supabase é por host: entrar no site não abre o painel, e vice-versa. Por isso o painel tem o próprio `/api/auth/confirmar` (recuperação de senha e troca de e-mail voltam para ele) e serve o onboarding e a verificação de e-mail do admin.
 - **Termos e Privacidade** moram no site; o painel redireciona (`NEXT_PUBLIC_URL_SITE`).
@@ -335,11 +335,11 @@ Segredo do `pg_net` vem do Vault, nunca inline — `cron.job.command` é legíve
 
 | Worker | Root directory | Domínio | Build variables | Runtime (Variables and Secrets) |
 |---|---|---|---|---|
-| `dissona-web` | `apps/web` | **`https://dissona.com.br`** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_URL_ADMIN=https://admin.dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret), `PAGAMENTO_SIMULADO`, `ASAAS_*` quando o Asaas ligar, e as duas `NEXT_PUBLIC_SUPABASE_*` |
-| `dissona-admin` | `apps/admin` | **`https://admin.dissona.com.br`** | as duas `NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_URL_SITE=https://dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret) e as duas `NEXT_PUBLIC_SUPABASE_*` |
+| `dissona-web` | `apps/web` | **`https://dissona.com.br`** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_URL_ADMIN=https://painel.dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret), `PAGAMENTO_SIMULADO`, `ASAAS_*` quando o Asaas ligar, e as duas `NEXT_PUBLIC_SUPABASE_*` |
+| `dissona-admin` | `apps/admin` | **`https://painel.dissona.com.br`** | as duas `NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_URL_SITE=https://dissona.com.br`, `NODE_VERSION=24` | `SUPABASE_SERVICE_ROLE_KEY` (secret) e as duas `NEXT_PUBLIC_SUPABASE_*` |
 
 - **Comandos do Workers Builds**: os padrões servem — `pnpm run build` (o `build` de cada app **é** o `opennextjs-cloudflare build`, que chama `next build` por `buildCommand` no `open-next.config.ts`) e `npx wrangler deploy` (que detecta o OpenNext). Branch não-produção: `pnpm exec opennextjs-cloudflare upload`. Localmente: `pnpm deploy:web` / `pnpm deploy:admin` (exige `wrangler login`).
-- **O que está no código** (`apps/*/wrangler.jsonc`): nome do Worker, `nodejs_compat`, assets, **domínio próprio** (`routes` com `custom_domain`; o deploy liga o domínio sozinho. Fica **fora** do arquivo enquanto a zona `dissona.com.br` não estiver ativa na conta — senão todo deploy falha com *Can't infer zone* — e volta no mesmo commit em que a zona ativar; nunca pelo painel, que o deploy seguinte desfaz). Até lá, os Workers respondem em `*.workers.dev`, `ADMIN_EM_SUBDOMINIO=true` no web, *Smart Placement* e logs. `keep_vars: true` preserva o que foi definido no painel — sem ele, cada deploy apagaria essas variáveis.
+- **O que está no código** (`apps/*/wrangler.jsonc`): nome do Worker, `nodejs_compat`, assets, **domínio próprio** (`routes` com `custom_domain`: `dissona.com.br` no web, `painel.dissona.com.br` no painel). O domínio fica **no arquivo**, nunca só no painel do Cloudflare: o deploy desfaz o que só existe lá. Os Workers também respondem em `*.workers.dev`, `ADMIN_EM_SUBDOMINIO=true` no web, *Smart Placement* e logs. `keep_vars: true` preserva o que foi definido no painel — sem ele, cada deploy apagaria essas variáveis.
 - **DNS:** a zona `dissona.com.br` mora no Cloudflare (nameservers trocados no Registro.br). Os domínios dos Workers não precisam de registro manual.
 - **Plano: Workers Paid.** O gratuito limita cada requisição a **10 ms de CPU**, e a renderização no servidor de uma página Next passa disso. Os Workers ficam em ~2,6 MiB (web) e ~2,1 MiB (admin) comprimidos.
 - **Região:** *Smart Placement* põe o Worker perto do Supabase (`us-west-2`), porque o middleware faz um `getUser()` por requisição — rodar perto do visitante e longe do banco pagaria essa ida em toda navegação. Vale revisar junto da pendência [#25](open-questions.md).
@@ -353,12 +353,12 @@ Segredo do `pg_net` vem do Vault, nunca inline — `cron.job.command` é legíve
 | Origem | Entrada na allow list |
 |---|---|
 | Produção | `https://dissona.com.br/**` |
-| Admin em produção | `https://admin.dissona.com.br/**` |
+| Admin em produção | `https://painel.dissona.com.br/**` |
 | Preview dos Workers | `https://*.workers.dev/**` |
 | Local | `http://localhost:3000/**` · `http://admin.localhost:3001/**` |
 | E2E local | `http://localhost:3100/**` · `http://admin.localhost:3101/**` |
 
-O `/**` não é decoração: sem ele só a raiz casa, e os destinos reais são `/api/auth/callback`, `/api/auth/confirmar` e o convite da equipe — `admin.dissona.com.br/convite`.
+O `/**` não é decoração: sem ele só a raiz casa, e os destinos reais são `/api/auth/callback`, `/api/auth/confirmar` e o convite da equipe — `painel.dissona.com.br/convite`.
 
 Falhar nisso **não dá erro**. O GoTrue descarta em silêncio um `redirect_to` fora da lista e usa o Site URL no lugar — o `code` do OAuth chega na home e o login não acontece. Foi o que quebrou o login com Google e com Facebook em produção. A guarda de rota hoje encaminha um `?code=` que caia em `/` para o callback ([`lib/guarda-rota.ts`](../src/lib/guarda-rota.ts)), mas isso é rede de proteção, não substituto da configuração.
 

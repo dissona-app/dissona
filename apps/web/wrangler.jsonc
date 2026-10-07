@@ -24,10 +24,8 @@
   // próprio (e se ele cair), sem depender do DNS.
   "workers_dev": true,
   "preview_urls": true,
-  // Domínio próprio (dissona.com.br): volta para cá, como
-  //   "routes": [{ "pattern": "dissona.com.br", "custom_domain": true }]
-  // assim que a zona dissona.com.br estiver ativa na conta. Antes disso o deploy
-  // inteiro falha ("Can't infer zone"). E tem de ser aqui, e não no painel: o
-  // wrangler trata este arquivo como a fonte da verdade e remove no deploy o
-  // domínio que só existe no painel.
+  // Domínio próprio. Tem de estar aqui, e não só no painel: o wrangler trata
+  // este arquivo como a fonte da verdade e remove no deploy o domínio que só
+  // existe no painel. Exige a zona dissona.com.br ativa na conta.
+  "routes": [{ "pattern": "dissona.com.br", "custom_domain": true }],
 }

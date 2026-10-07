@@ -147,6 +147,6 @@ export function urlDoPainelAdmin(): string {
   return urlPublica(
     process.env.NEXT_PUBLIC_URL_ADMIN,
     'http://admin.localhost:3001',
-    'https://admin.dissona.com.br',
+    'https://painel.dissona.com.br',
   );
 }
