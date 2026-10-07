@@ -181,7 +181,7 @@ test.describe('A3 · Editar / ativar / excluir', () => {
       // não serve de prova aqui: com o `loading.tsx` do painel a resposta já
       // começou (200) quando o `notFound()` dispara, e o Next entrega o 404
       // dentro do stream — com `noindex` — em vez de trocar o status.
-      await expect(page.getByRole('heading', { name: '404' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Página não encontrada' })).toBeVisible();
       await expect(page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar })).toHaveCount(
         0,
       );
