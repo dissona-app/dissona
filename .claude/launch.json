@@ -16,6 +16,12 @@
       "url": "http://admin.localhost:3001"
     },
     {
+      "name": "Dissona Web — build de produção",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@dissona/web", "exec", "next", "start", "--port", "3200"],
+      "port": 3200
+    },
+    {
       "name": "Protótipos R2",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4100", "--directory", "docs/R2"],

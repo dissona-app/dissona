@@ -1,0 +1,59 @@
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-8);
+  padding-block: var(--dsn-space-4);
+}
+
+.titulo,
+.linha,
+.bloco {
+  border-radius: var(--dsn-radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--dsn-purple-100) 0%,
+    var(--dsn-surface-alt) 50%,
+    var(--dsn-purple-100) 100%
+  );
+  background-size: 200% 100%;
+  animation: brilho 1.4s ease-in-out infinite;
+}
+
+.titulo {
+  width: min(320px, 60%);
+  height: 28px;
+}
+
+.linha {
+  width: min(520px, 85%);
+  height: 14px;
+}
+
+.blocos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--dsn-space-8);
+}
+
+.bloco {
+  height: 120px;
+  border-radius: var(--dsn-radius-xl);
+}
+
+@keyframes brilho {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* Movimento reduzido: o esqueleto fica, o brilho para. */
+@media (prefers-reduced-motion: reduce) {
+  .titulo,
+  .linha,
+  .bloco {
+    animation: none;
+  }
+}

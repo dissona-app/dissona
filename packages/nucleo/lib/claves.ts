@@ -70,11 +70,19 @@ export function paraStringDecimal(claves: Claves): string {
   return `${negativo ? '-' : ''}${inteiro}.${resto.toString().padStart(2, '0')}`;
 }
 
-/** Formata para exibição: `250n` → `"2,50"`. Sem sufixo — a View escolhe. */
+/**
+ * Formata para exibição, sem sufixo — a View escolhe.
+ *
+ * Inteiro sai **sem** casas (`21600n` → `"216"`), como o protótipo escreve
+ * ("6 Claves", "30 Claves"); fração sai com as duas (`650n` → `"6,50"`). Nunca
+ * `"6,5"`: meia casa decimal parece erro de digitação num valor de moeda, e
+ * nunca arredondar para inteiro, que mostraria um saldo que a conta não tem.
+ */
 export function formatar(claves: Claves, locale = 'pt-BR'): string {
+  const casas = claves % CENTESIMOS === 0n ? 0 : 2;
   return new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: casas,
+    maximumFractionDigits: casas,
   }).format(paraStringDecimal(claves) as unknown as number);
 }
 
