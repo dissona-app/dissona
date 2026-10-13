@@ -729,3 +729,27 @@ export async function limiteDeUploadMb(): Promise<number> {
   }
   return valor;
 }
+
+/**
+ * Tira da vitrine os pacotes que o cenário criou: exclusão lógica, pelo nome
+ * exato que `nomeUnico()` gerou.
+ *
+ * O projeto Supabase é o mesmo de produção (open-questions #25): sem isto, cada
+ * execução da suíte — e o CI roda a cada push — deixava pacotes `e2e_…` ativos
+ * na Carteira de quem usa o site de verdade. Em 13/10/2026 eram 238.
+ *
+ * Falha em silêncio, como `apagarContaEfemera`: limpeza que derruba a suíte é
+ * pior que lixo.
+ */
+export async function excluirPacotesDeTeste(nomes: readonly string[]): Promise<void> {
+  if (nomes.length === 0) return;
+  try {
+    await clienteDeServico()
+      .from('pacote_clave')
+      .update({ ativo: false, excluido_em: new Date().toISOString() })
+      .in('nome', nomes)
+      .is('excluido_em', null);
+  } catch {
+    // Silêncio deliberado — ver acima.
+  }
+}

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Page, TestInfo } from '@playwright/test';
 
 import { telaDoAdmin, URL_ADMIN } from '../apoio/admin';
-import { auditoriaDe, pacotePorNome } from '../apoio/banco';
+import { auditoriaDe, excluirPacotesDeTeste, pacotePorNome } from '../apoio/banco';
 import { nomeUnico } from '../apoio/personas';
 import { abrirPacotes } from '../apoio/sessao';
 import { ADMIN_PACOTE_EXCLUIR, ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '../apoio/textos';
@@ -35,9 +35,17 @@ import { ADMIN_PACOTE_EXCLUIR, ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '..
  * já tem prova em `supabase/testes/0007b_pacote_exclusao.testes.sql`.
  */
 
+/** Os pacotes deste arquivo, para o `afterAll` tirar da vitrine. */
+const criados: string[] = [];
+
+test.afterAll(async () => {
+  await excluirPacotesDeTeste(criados);
+});
+
 /** Cria um pacote pela própria tela e devolve o nome. */
 async function criarPacote(page: Page, info: TestInfo, rotulo: string): Promise<string> {
   const nome = nomeUnico(rotulo, info.workerIndex);
+  criados.push(nome);
 
   await page.getByRole('link', { name: ADMIN_PACOTES.novo }).click();
   await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloNome).fill(nome);
