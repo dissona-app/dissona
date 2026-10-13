@@ -3,7 +3,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { join } from 'node:path';
 
 import { test } from '@playwright/test';
-import type { Page, Response } from '@playwright/test';
+import type { Locator, Page, Response } from '@playwright/test';
 
 import { clienteDeServico } from '../e2e/apoio/banco';
 
@@ -245,11 +245,7 @@ export function registrarDesvio(url: string, caminho: string): void {
  * registra o desvio e abre o endereço do link direto — é o que a pessoa faz
  * ao clicar de novo ou recarregar.
  */
-export async function clicarLink(
-  page: Page,
-  link: import('@playwright/test').Locator,
-  destino: RegExp,
-): Promise<void> {
+export async function clicarLink(page: Page, link: Locator, destino: RegExp): Promise<void> {
   const href = await link.getAttribute('href');
   await link.click();
   try {

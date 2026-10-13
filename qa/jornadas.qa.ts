@@ -165,7 +165,7 @@ test('Jornada 1 · Admin → Artista: pacote publicado e comprado', async ({ bro
     await expect(admin.getByRole('textbox', { name: 'E-mail corporativo' })).toHaveValue(
       conta.admin.email,
     );
-    await admin.getByRole('link', { name: 'Equipe', exact: true }).click();
+    await clicarLink(admin, admin.getByRole('link', { name: 'Equipe', exact: true }), /aba=equipe/);
     await expect(admin.getByText(conta.admin.nome).first()).toBeVisible();
   });
 
@@ -429,17 +429,15 @@ test('Jornada 3 · Admin → Curador: candidato a Prata em análise', async ({ b
   const prata = await novaPagina(browser, J);
   const admin = await novaPagina(browser, J);
 
-  let minimo = 0;
-  await etapa(prata, J, 'Curador entra e vê quantas credenciais a Prata exige', async () => {
+  await etapa(prata, J, 'Curador entra e é levado ao cadastro', async () => {
     await entrarNoSite(prata, conta.prata, 'curador');
-    await irPara(prata, '/curador/cadastro/6');
-    const contagem = await prata.getByText(/\d+ de \d+ necessárias/).innerText();
-    minimo = Number(/(\d+) de (\d+) necessárias/.exec(contagem)?.[2] ?? '0');
-    expect(minimo).toBeGreaterThan(0);
+    await expect(prata).toHaveURL(/\/curador\/cadastro/);
   });
 
-  await etapa(prata, J, `Curador conclui o cadastro com credenciais comprovadas`, async () => {
-    await percorrerWizard(prata, { credenciais: minimo });
+  await etapa(prata, J, 'Curador conclui o cadastro com credenciais comprovadas', async () => {
+    // Todas as credenciais com link: passa do limiar de Prata, e Ouro não sai
+    // do cadastro — é por convite ou desempenho.
+    await percorrerWizard(prata, { credenciais: 99 });
     await expect(
       prata.getByRole('heading', { name: CURADOR_CLASSIFICACAO.tituloPrata, exact: true }),
     ).toBeVisible();
