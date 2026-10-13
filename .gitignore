@@ -46,3 +46,6 @@ Thumbs.db
 .open-next/
 .wrangler/
 .dev.vars*
+
+# QA de aceite — capturas, log e as senhas das contas qa_*
+/qa/resultado/

@@ -35,7 +35,8 @@
     "postinstall": "node scripts/ligar-env.mjs",
     "deploy:web": "pnpm --filter @dissona/web cf:deploy",
     "deploy:admin": "pnpm --filter @dissona/admin cf:deploy",
-    "apresentacao": "node scripts/apresentacao.mjs"
+    "apresentacao": "node scripts/apresentacao.mjs",
+    "qa": "playwright test -c qa/playwright.config.ts"
   },
   "devDependencies": {
     "@dissona/nucleo": "workspace:*",
