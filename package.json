@@ -34,7 +34,8 @@
     "rastreabilidade": "node scripts/matriz-rastreabilidade.mjs",
     "postinstall": "node scripts/ligar-env.mjs",
     "deploy:web": "pnpm --filter @dissona/web cf:deploy",
-    "deploy:admin": "pnpm --filter @dissona/admin cf:deploy"
+    "deploy:admin": "pnpm --filter @dissona/admin cf:deploy",
+    "apresentacao": "node scripts/apresentacao.mjs"
   },
   "devDependencies": {
     "@dissona/nucleo": "workspace:*",
