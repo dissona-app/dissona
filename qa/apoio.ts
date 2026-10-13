@@ -180,7 +180,10 @@ export function vigiar5xx(page: Page, jornada: string): void {
     const status = resposta.status();
     if (status < 500) return;
     const url = new URL(resposta.url());
-    if (!url.host.endsWith('dissona.com.br')) return;
+    const alvos = [process.env.BASE_URL, process.env.BASE_URL_ADMIN].map(
+      (u) => new URL(u ?? 'http://x').host,
+    );
+    if (!alvos.includes(url.host)) return;
     appendFileSync(
       FALHAS_5XX,
       JSON.stringify({
