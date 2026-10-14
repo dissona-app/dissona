@@ -40,7 +40,11 @@ do Artista coincidem.
 ## Fase 1 — feita em 14/10/2026 (antes das 10h)
 
 - Artista: Escolher curador (cartões largos), Status do envio (andamento em barras), Extrato, Pagamento (título).
-- Curador: Detalhe da faixa (13.1), moldura da avaliação com o cartão da faixa, Notas e feedback.
+- Artista: Contexto (passo 2) e Revisar, com o cartão da faixa e o vinil.
+- Curador: Detalhe da faixa (13.1), moldura da avaliação com o cartão da faixa, Notas e feedback,
+  Meu cadastro (vitrine no topo).
+- Conferidas sem mudança: Conta do curador (mesmas abas e cartões; o aprovado não tem a aba
+  Perfil, e os dados de recebimento seguem "próxima entrega" até o Pix existir).
 
 ## Fase 1 — pendente
 
@@ -51,8 +55,6 @@ animação).
 ### Artista
 
 - [ ] Detalhes por link e por mp3 (passo 1, estado com a faixa detectada)
-- [ ] Contexto (passo 2)
-- [ ] Revisar
 - [ ] Editar cadastro (capa do perfil, que o aprovado tem)
 - [ ] Configurações (abas)
 
@@ -60,8 +62,6 @@ animação).
 
 - [ ] Avaliação: notas, subjetiva, compartilhamento, outras e remuneração
 - [ ] Carteira
-- [ ] Meu cadastro
-- [ ] Conta
 
 ### Admin
 
