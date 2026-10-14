@@ -112,10 +112,13 @@ export function ListaDePacotes({
             </div>
           </div>
 
+          {/* Protótipo aprovado: o CTA da faixa escura é sem caixa-alta, 14px. */}
           {podeEscrever ? (
-            <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_PACOTES_NOVO)} tamanho="denso">
-              {ADMIN_PACOTES.novo}
-            </BotaoLink>
+            <span data-botoes="frase">
+              <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_PACOTES_NOVO)} tamanho="sm">
+                {ADMIN_PACOTES.novo}
+              </BotaoLink>
+            </span>
           ) : null}
         </div>
 

@@ -251,7 +251,8 @@
 }
 
 .cartaoTitulo {
-  font-size: var(--dsn-text-sm);
+  /* 14px no wizard; o Meu cadastro desce para 13,5px (protótipo aprovado). */
+  font-size: var(--servico-titulo, var(--dsn-text-sm));
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-ink);
 }

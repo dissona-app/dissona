@@ -30,7 +30,7 @@
 /* Rótulo do protótipo: nome em caixa normal, 13px, peso 600. */
 .base label {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: normal;
   text-transform: none;
   color: var(--dsn-ink);

@@ -189,6 +189,7 @@
 
 .quantidadeNumero {
   font-family: var(--dsn-font-display);
+  text-transform: uppercase;
   font-size: 34px;
   line-height: 1;
   color: #140d1a;

@@ -84,9 +84,12 @@ export function ConviteDeMembro({ acao }: PropsConviteDeMembro) {
 
   return (
     <>
-      <Botao tamanho="denso" onClick={() => setAberto(true)}>
-        {EQUIPE.equipe.convidar}
-      </Botao>
+      {/* Protótipo aprovado: o CTA da faixa escura é sem caixa-alta, 14px. */}
+      <span data-botoes="frase">
+        <Botao tamanho="sm" onClick={() => setAberto(true)}>
+          {EQUIPE.equipe.convidar}
+        </Botao>
+      </span>
 
       <Modal
         aberto={aberto}

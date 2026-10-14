@@ -64,7 +64,7 @@ export function MolduraDaAvaliacao({
   // cartão da faixa preso à esquerda e o passo à direita.
   const capa = envioId === undefined ? null : capaDoEnvio(envioId);
   return (
-    <div className={estilos.base}>
+    <div className={estilos.base} data-botoes="frase">
       <div className={estilos.topo}>
         <div className={estilos.passos}>
           <Passos passos={[...AVALIAR.passos]} atual={atual} rotulo="Etapas da avaliação" />
@@ -72,7 +72,7 @@ export function MolduraDaAvaliacao({
         {concluida ? null : (
           <Botao
             type="submit"
-            variante="ghost"
+            variante="neutro"
             tamanho="sm"
             form={ID_DO_FORMULARIO}
             name="destino"

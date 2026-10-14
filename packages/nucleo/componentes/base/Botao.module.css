@@ -232,6 +232,10 @@
   font-size: var(--dsn-text-base);
 }
 
+:global([data-botoes='frase']) .neutro {
+  font-size: var(--dsn-text-xs);
+}
+
 :global([data-botoes='compacto']) .sm {
   font-size: var(--dsn-text-xs);
 }

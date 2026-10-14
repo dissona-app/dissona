@@ -13,6 +13,8 @@ import {
 import { enderecoDe } from '../apoio/admin';
 import type { Excecao, Prototipo, PropsDoPrototipo } from '../apoio/prototipo';
 import { entrarComo, entrarComoAdmin } from '../apoio/sessao';
+import { FAIXA_DO_C3 } from '../apoio/avaliacao';
+import { envioDaFaixa } from '../apoio/banco';
 
 /**
  * Paridade visual das telas da R2 com o protótipo aprovado (30/09/2026).
@@ -29,7 +31,8 @@ type Cenario = {
   readonly nome: string;
   readonly prototipo: Prototipo;
   readonly props: PropsDoPrototipo;
-  readonly rota: string;
+  /** A rota, ou como chegar nela quando depende de um id do seed. */
+  readonly rota: string | (() => Promise<string>);
   readonly persona: Persona;
   readonly admin?: boolean;
   readonly excecoes?: readonly Excecao[];
@@ -97,6 +100,24 @@ const CENARIOS: readonly Cenario[] = [
     persona: PERSONA.CURADOR_BRONZE,
   },
   {
+    nome: 'meu perfil do curador',
+    prototipo: PROTOTIPO.CURADOR,
+    props: { telaInicial: 'Meu perfil' },
+    rota: '/curador/meu-cadastro',
+    persona: PERSONA.CURADOR_MANUTENCAO,
+  },
+  {
+    nome: 'avaliação · notas objetivas',
+    prototipo: PROTOTIPO.CURADOR,
+    props: { telaInicial: 'Avaliação' },
+    rota: async () => {
+      const envio = await envioDaFaixa(FAIXA_DO_C3);
+      if (envio === null) throw new Error('Rode o seed: falta o envio da faixa do C3.');
+      return `/curador/avaliar/${envio.id}/notas`;
+    },
+    persona: PERSONA.CURADOR_BRONZE,
+  },
+  {
     nome: 'pacotes do admin',
     prototipo: PROTOTIPO.ADMIN,
     props: { telaInicial: 'Pacotes de Claves' },
@@ -107,7 +128,11 @@ const CENARIOS: readonly Cenario[] = [
 ];
 
 for (const cenario of CENARIOS) {
-  test.describe(`${cenario.nome} (${cenario.rota})`, () => {
+  const rotulo = typeof cenario.rota === 'string' ? cenario.rota : 'rota do seed';
+  const rotaDe = async (): Promise<string> =>
+    typeof cenario.rota === 'string' ? cenario.rota : cenario.rota();
+
+  test.describe(`${cenario.nome} (${rotulo})`, () => {
     test('tipografia igual à do protótipo em todo texto pareado', async ({
       page,
       context,
@@ -118,7 +143,7 @@ for (const cenario of CENARIOS) {
       if (cenario.admin === true) await entrarComoAdmin(page, cenario.persona);
       else await entrarComo(page, cenario.persona);
 
-      await page.goto(enderecoDe(cenario.rota));
+      await page.goto(enderecoDe(await rotaDe()));
       await page.locator('h1').first().waitFor();
 
       // O ponteiro fica onde o último clique o deixou, e o hover de um cartão
@@ -155,7 +180,7 @@ for (const cenario of CENARIOS) {
       if (cenario.admin === true) await entrarComoAdmin(page, cenario.persona);
       else await entrarComo(page, cenario.persona);
 
-      await page.goto(enderecoDe(cenario.rota));
+      await page.goto(enderecoDe(await rotaDe()));
       await page.locator('h1').first().waitFor();
 
       const noPrototipo = await fonteRenderizada(doPrototipo, 'h1');
