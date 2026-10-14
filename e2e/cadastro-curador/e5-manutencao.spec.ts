@@ -45,7 +45,14 @@ const MIDIA_EDITADA = 'e2e_Mídia renomeada';
 
 /** A classe declarada pela tela, para comparar antes e depois. */
 async function classeNaTela(pagina: Page): Promise<string> {
-  return pagina.getByText(CURADOR_MANUTENCAO.classeOverline).first().locator('..').innerText();
+  // `textContent`, e não `innerText`: o segundo depende do CSS (caixa-alta e
+  // quebras de linha), e a primeira leitura podia vir antes de ele aplicar.
+  const texto = await pagina
+    .getByText(CURADOR_MANUTENCAO.classeOverline)
+    .first()
+    .locator('..')
+    .textContent();
+  return (texto ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
 // O cenário insere mídia a cada execução. Sem a limpeza, a segunda rodada
