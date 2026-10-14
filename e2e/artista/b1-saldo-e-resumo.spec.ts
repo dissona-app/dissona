@@ -56,7 +56,9 @@ test.describe('B1 · Saldo e resumo', () => {
     await page.goto('/artista/carteira');
 
     for (const card of Object.values(CARTEIRA.resumo)) {
-      await expect(page.getByText(card.rotulo, { exact: true }), card.rotulo).toBeVisible();
+      // `.first()`: o rótulo do cartão se repete no selo de tipo das últimas
+      // movimentações (protótipo aprovado).
+      await expect(page.getByText(card.rotulo, { exact: true }).first(), card.rotulo).toBeVisible();
       await expect(page.getByText(card.descricao), card.descricao).toBeVisible();
     }
   });

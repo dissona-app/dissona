@@ -183,7 +183,7 @@ test('Jornada 1 · Admin → Artista: pacote publicado e comprado', async ({ bro
       registrarDesvio('salvar pacote: sem a confirmação na tela', new URL(admin.url()).pathname);
       await irPara(admin, noAdmin('/admin/pacotes'));
     }
-    const linha = admin.getByRole('row').filter({ hasText: NOME_DO_PACOTE });
+    const linha = admin.getByRole('listitem').filter({ hasText: NOME_DO_PACOTE });
     await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
     await expect(linha).toContainText(ADMIN_PACOTES.subNaCarteira);
   });
@@ -490,7 +490,7 @@ test('Jornada 4 · Admin → Artista: pacote desativado sai da vitrine', async (
   await etapa(admin, J, 'Admin desativa o pacote QA', async () => {
     await entrarNoPainel(admin, conta.admin);
     await irPara(admin, noAdmin('/admin/pacotes'));
-    const linha = admin.getByRole('row').filter({ hasText: NOME_DO_PACOTE });
+    const linha = admin.getByRole('listitem').filter({ hasText: NOME_DO_PACOTE });
     await linha.getByRole('button', { name: ADMIN_PACOTES.desativar }).click();
     await expect(admin.getByText(ADMIN_PACOTES.flashDesativado(NOME_DO_PACOTE))).toBeVisible();
     await expect(linha).toContainText(ADMIN_PACOTES.subForaDaCarteira);

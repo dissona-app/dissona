@@ -15,15 +15,20 @@ import { ADMIN_PACOTES } from '../apoio/textos';
  * "4 de 4 pacotes visíveis" num catálogo de 3 ativos e 4 pacotes, que é
  * justamente o número que a nota de rodapé promete distinguir.
  */
+// A lista do protótipo aprovado é uma grade de cartões, um item por pacote.
+function grade(page: Page) {
+  return page.getByRole('list', { name: ADMIN_PACOTES.titulo });
+}
+
 function linhasAtivas(page: Page) {
-  return page
-    .getByRole('row')
+  return grade(page)
+    .getByRole('listitem')
     .filter({ has: page.getByText(ADMIN_PACOTES.statusAtivo, { exact: true }) });
 }
 
 function linhasInativas(page: Page) {
-  return page
-    .getByRole('row')
+  return grade(page)
+    .getByRole('listitem')
     .filter({ has: page.getByText(ADMIN_PACOTES.statusInativo, { exact: true }) });
 }
 
@@ -48,33 +53,23 @@ function linhasInativas(page: Page) {
  * em vez de um navegador.
  */
 test.describe('A1 · Lista de pacotes', () => {
-  test('a tabela traz as seis colunas e as três ações', { tag: ['@RF-050'] }, async ({ page }) => {
+  test('cada pacote é um cartão com as três ações', { tag: ['@RF-050'] }, async ({ page }) => {
     await abrirPacotes(page);
 
-    const tabela = page.getByRole('table', { name: ADMIN_PACOTES.titulo });
+    const cartoes = grade(page).getByRole('listitem');
+    await expect(cartoes.first()).toBeVisible();
 
-    for (const coluna of Object.values(ADMIN_PACOTES.colunas)) {
-      await expect(
-        tabela.getByRole('columnheader', { name: coluna, exact: true }),
-        `coluna "${coluna}"`,
-      ).toBeVisible();
-    }
-
-    const linhas = tabela.getByRole('row');
-    // Cabeçalho + ao menos um pacote. O número exato não entra: o catálogo é
-    // dado compartilhado, e prender o teste a "quatro linhas" o faria falhar
-    // no dia em que alguém criar um pacote de verdade.
-    await expect(linhas).not.toHaveCount(1);
-
-    const primeira = linhas.nth(1);
-    await expect(primeira.getByRole('link', { name: ADMIN_PACOTES.editar })).toBeVisible();
+    const primeiro = cartoes.first();
+    await expect(primeiro).toContainText(ADMIN_PACOTES.colunas.valor);
+    await expect(primeiro).toContainText(ADMIN_PACOTES.colunas.porClave);
+    await expect(primeiro.getByRole('link', { name: ADMIN_PACOTES.editar })).toBeVisible();
     await expect(
-      primeira.getByRole('button', {
+      primeiro.getByRole('button', {
         name: new RegExp(`${ADMIN_PACOTES.ativar}|${ADMIN_PACOTES.desativar}`),
       }),
     ).toBeVisible();
     await expect(
-      primeira.getByRole('button', { name: new RegExp(`^${ADMIN_PACOTES.excluir}:`) }),
+      primeiro.getByRole('button', { name: new RegExp(`^${ADMIN_PACOTES.excluir}:`) }),
     ).toBeVisible();
   });
 
@@ -105,8 +100,7 @@ test.describe('A1 · Lista de pacotes', () => {
     async ({ page }) => {
       await abrirPacotes(page);
 
-      const tabela = page.getByRole('table', { name: ADMIN_PACOTES.titulo });
-      const total = (await tabela.getByRole('row').count()) - 1;
+      const total = await grade(page).getByRole('listitem').count();
       const ativos = await linhasAtivas(page).count();
 
       // O texto é recomposto pela mesma função que a tela usa, e os números
@@ -128,7 +122,7 @@ test.describe('A1 · Lista de pacotes', () => {
     await entrarComoAdmin(page, PERSONA.ADMIN_SUPORTE);
     await page.goto(noAdmin('/admin/pacotes'));
 
-    await expect(page.getByRole('table')).toHaveCount(0);
+    await expect(page.getByRole('list', { name: ADMIN_PACOTES.titulo })).toHaveCount(0);
     await expect(page.getByText(/Sem acesso a Pacotes de Claves/i)).toBeVisible();
     await expect(page.getByRole('link', { name: ADMIN_PACOTES.novo })).toHaveCount(0);
   });

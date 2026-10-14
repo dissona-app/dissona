@@ -87,7 +87,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
     // A confirmação do protótipo, no pé da tabela.
     await expect(page.getByText(ADMIN_PACOTE_FORMULARIO.flashCriado)).toBeVisible();
 
-    const linha = page.getByRole('row').filter({ hasText: nome });
+    const linha = page.getByRole('listitem').filter({ hasText: nome });
     await expect(linha).toBeVisible();
     // Nasce ativo — é o padrão do formulário, e a copy da alternância promete
     // que "Ativo aparece na Carteira do artista na hora em que você salva".
@@ -180,7 +180,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
     await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloDesconto).fill('5');
     await page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar }).click();
 
-    await expect(page.getByRole('row').filter({ hasText: nome })).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: nome })).toBeVisible();
 
     const pacoteId = await pacotePorNome(nome);
     expect(pacoteId, `o pacote "${nome}" precisa existir no banco`).not.toBeNull();

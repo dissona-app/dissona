@@ -1,4 +1,4 @@
-/* Tela 21 — lista de pacotes de Claves (`docs/R2/extraido/Admin.html`). */
+/* 21 · Pacotes de Claves — valores literais da tela do protótipo aprovado. */
 
 .tela {
   width: 100%;
@@ -7,176 +7,316 @@
   gap: clamp(10px, 1.6vh, 16px);
 }
 
+.moldura {
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* A faixa escura da tabela de preços. */
 .topo {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dsn-space-8);
+  gap: 14px 20px;
+  padding: clamp(14px, 2.2vh, 20px) clamp(14px, 2vh, 22px);
+  background: #140d1a;
 }
 
 .contexto {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.overline {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c6b4de;
+}
+
+.contextoLinha {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--dsn-space-4) var(--dsn-space-9);
+  gap: 6px 18px;
   min-width: 0;
 }
 
 .base {
-  font-size: var(--dsn-text-xs);
-  line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink-500);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #c6b4de;
 }
 
 .resumo {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-700);
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .pontoAtivo {
-  width: var(--dsn-space-3);
-  height: var(--dsn-space-3);
-  border-radius: var(--dsn-radius-circle);
-  background: var(--dsn-success-dot);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7fe0ae;
   flex: none;
 }
 
-/*
- * O card que envolve a tabela. O protótipo desenha a "tabela" com CSS Grid, e
- * aqui ela é uma `<table>` de verdade, pelo componente `Tabela` do Design
- * System: dado tabular precisa de `<th scope="col">` e de `<caption>` para ser
- * navegável por leitor de tela, e uma grade de `<div>` não é.
- */
-.moldura {
-  border: var(--dsn-border-width) solid var(--dsn-border);
-  border-radius: var(--dsn-radius-3xl);
-  background: var(--dsn-surface);
+/* ------------------------------------------------------------- a grade */
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: clamp(14px, 2vh, 20px) clamp(14px, 2vh, 22px);
+  list-style: none;
+  border-bottom: 1px solid #efeaf2;
+  background: #faf8fc;
+}
+
+.vazio {
+  padding: 24px 22px;
+  border-bottom: 1px solid #efeaf2;
+}
+
+.cartao {
   display: flex;
   flex-direction: column;
+  border: 1px solid #e5deea;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(20, 13, 26, 0.04);
   overflow: hidden;
 }
 
-.rodapeDaTabela {
-  padding: clamp(11px, 1.8vh, 15px) clamp(16px, 2.4vh, 24px);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--dsn-space-5) var(--dsn-space-8);
-  border-top: var(--dsn-border-width) solid var(--dsn-border);
-}
-
-.nota {
-  font-size: var(--dsn-text-xs);
-  line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink-500);
-}
-
-/* Linha de pacote inativo, esmaecida — `opacity: 0.62` no protótipo. */
-.inativo {
+.cartaoInativo {
   opacity: 0.62;
+}
+
+.cartaoCorpo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 16px 14px;
+}
+
+.cartaoTopo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .nomeCelula {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-1);
+  gap: 2px;
   min-width: 0;
 }
 
 .nome {
-  font-size: var(--dsn-text-sm);
-  font-weight: var(--dsn-weight-semibold);
+  font-size: 15px;
+  font-weight: 600;
+  color: #140d1a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.sub {
-  font-size: var(--dsn-text-2xs);
-  color: var(--dsn-ink-500);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6e6478;
 }
 
-/* Desconto zero fica cinza; com desconto, verde. */
+.statusPonto {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+  background: #b9b2c6;
+}
+
+.statusAtivo {
+  color: #1e7a4a;
+}
+
+.statusAtivo .statusPonto {
+  background: #2fa565;
+}
+
+.comDesconto,
 .semDesconto {
-  color: var(--dsn-ink-500);
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 9px;
+  border-radius: 2px;
 }
 
 .comDesconto {
-  color: var(--dsn-success-fg);
+  color: #1e7a4a;
+  background: #e6f5ed;
+}
+
+.semDesconto {
+  color: #6e6478;
+  background: #f2edf5;
+}
+
+.quantidade {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.quantidadeNumero {
+  font-family: var(--dsn-font-display);
+  font-size: 34px;
+  line-height: 1;
+  color: #140d1a;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.quantidadeUnidade {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6e6478;
+}
+
+.valores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid #efeaf2;
+}
+
+.valores dt {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #6e6478;
+}
+
+.valores dd {
+  margin: 2px 0 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.valor {
+  font-size: 14px;
+  font-weight: 600;
+  color: #140d1a;
 }
 
 .porClave {
-  color: var(--dsn-ink-700);
+  font-size: 14px;
+  color: #3a3242;
+}
+
+.sub {
+  font-size: 12px;
+  color: #6e6478;
 }
 
 .acoes {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0;
-  margin-right: -6px;
-  min-width: 0;
+  gap: 2px;
+  padding: 6px 10px;
+  margin-top: auto;
+  border-top: 1px solid #efeaf2;
 }
 
 .acao {
   appearance: none;
   font-family: inherit;
-  font-size: var(--dsn-text-xs);
-  font-weight: var(--dsn-weight-semibold);
-  color: var(--dsn-purple-600);
+  font-size: 13px;
+  font-weight: 600;
+  color: #5b2e8f;
   background: transparent;
   border: none;
-  padding: 7px var(--dsn-space-3);
-  border-radius: var(--dsn-radius-lg);
+  padding: 7px 8px;
+  border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;
-  transition: background var(--dsn-duration-base);
+  transition: background 200ms;
 }
 
 .acao:hover {
-  background: var(--dsn-purple-050);
+  background: #f2edf5;
   text-decoration: none;
 }
 
 .acao:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
-/* "Desativar" em laranja escuro; "Ativar" em roxo. */
 .acaoDesativar {
-  color: var(--dsn-orange-800);
+  color: #8c3a2c;
 }
 
 .acaoExcluir {
   appearance: none;
-  display: flex;
-  align-items: center;
   font-family: inherit;
-  color: var(--dsn-orange-800);
+  color: #8c3a2c;
   background: transparent;
   border: none;
-  padding: 7px var(--dsn-space-3);
-  border-radius: var(--dsn-radius-lg);
+  padding: 7px 8px;
+  margin-left: auto;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background var(--dsn-duration-base);
+  display: flex;
+  align-items: center;
+  transition: background 200ms;
 }
 
 .acaoExcluir:hover {
-  background: var(--dsn-danger-bg);
+  background: #fdece8;
 }
 
 .acaoExcluir:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ------------------------------------------------------------- rodapé */
+
+.rodapeDaTabela {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: clamp(11px, 1.8vh, 15px) clamp(16px, 2.4vh, 24px);
+}
+
+.nota {
+  font-size: 13px;
+  color: #6e6478;
 }
 
 /* Confirmação de exclusão — o overline saiu para o `Modal`. */
