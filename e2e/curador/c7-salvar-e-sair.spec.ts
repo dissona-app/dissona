@@ -5,6 +5,7 @@ import {
   avancar,
   CRITERIOS_OBRIGATORIOS,
   preencherObrigatorios,
+  cartaoDaFila,
 } from '../apoio/avaliacao';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
@@ -111,7 +112,7 @@ test.describe('C7 · Salvar e sair', { tag: ['@RF-068'] }, () => {
     // avaliação" — a mesma porta serve para começar e para retomar, que é o
     // que o comentário de `iniciarAvaliacao` em `fila/repositorio.ts` explica.
     await page.goto('/curador/fila');
-    const linha = page.getByRole('row').filter({ hasText: FAIXA_DO_C7 });
+    const linha = cartaoDaFila(page, FAIXA_DO_C7);
     await linha.getByRole('link').first().click();
     await page.getByRole('button', { name: FILA.iniciarAvaliacao }).click();
 

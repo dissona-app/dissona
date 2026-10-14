@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 
-import { TabelaDaFila } from '@/componentes/curador/TabelaDaFila';
+import Link from 'next/link';
+
+import { PrateleirasDaFila } from '@/componentes/curador/PrateleirasDaFila';
 import type { LinhaDaFila } from '@/componentes/curador/TabelaDaFila';
-import { Abas } from '@dissona/nucleo/componentes/base/Abas';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
-import { Painel } from '@/componentes/base/Painel';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerFila } from '@/modulos/fila/consultas';
 import { horasRestantes, statusNaTela } from '@/modulos/fila/servico';
@@ -104,33 +104,40 @@ export default async function PaginaDaFila({
     urgente: horasRestantes(item, agora) < 24,
   }));
 
+  // Layout do protótipo aprovado: abas segmentadas e filtro no topo, e as
+  // faixas em prateleiras de capas ("Ouça primeiro" e "Na sua estante").
   return (
     <div className={estilos.base}>
       <div className={estilos.controles}>
-        <Abas
-          abas={STATUS_DA_FILA.map((chave) => ({ chave, rotulo: TEXTOS.filtros[chave] }))}
-          ativa={status}
-          caminho={ROTA.CURADOR_FILA}
-          parametro="status"
-          rotulo={TEXTOS.filtrosRotulo}
-        />
-        {generos.length > 0 ? <FiltroDeGenero generos={generos} atual={genero} /> : null}
+        <nav className={estilos.abas} aria-label={TEXTOS.filtrosRotulo}>
+          {STATUS_DA_FILA.map((chave) => (
+            <Link
+              key={chave}
+              href={chave === 'todas' ? ROTA.CURADOR_FILA : `${ROTA.CURADOR_FILA}?status=${chave}`}
+              className={[estilos.aba, chave === status ? estilos.abaAtiva : undefined]
+                .filter(Boolean)
+                .join(' ')}
+              aria-current={chave === status ? 'page' : undefined}
+            >
+              {TEXTOS.filtros[chave]}
+            </Link>
+          ))}
+        </nav>
+        <div className={estilos.direita}>
+          <span className={estilos.resumo}>{TEXTOS.resumo(totalNaFila, comPrazoCurto)}</span>
+          {generos.length > 0 ? <FiltroDeGenero generos={generos} atual={genero} /> : null}
+        </div>
       </div>
 
-      <Painel titulo={TEXTOS.titulo} sublegenda={TEXTOS.resumo(totalNaFila, comPrazoCurto)}>
-        <TabelaDaFila
-          linhas={linhas}
-          ordenadaPor={ordem}
-          direcao={direcao}
-          vazio={
-            <EstadoVazio
-              titulo={vazioPorFiltro ? TEXTOS.vazioTitulo : TEXTOS.vazioFilaTitulo}
-              descricao={vazioPorFiltro ? TEXTOS.vazioDescricao : TEXTOS.vazioFilaDescricao}
-            />
-          }
+      {linhas.length === 0 ? (
+        <EstadoVazio
+          titulo={vazioPorFiltro ? TEXTOS.vazioTitulo : TEXTOS.vazioFilaTitulo}
+          descricao={vazioPorFiltro ? TEXTOS.vazioDescricao : TEXTOS.vazioFilaDescricao}
         />
-        <p className={estilos.nota}>{TEXTOS.nota}</p>
-      </Painel>
+      ) : (
+        <PrateleirasDaFila linhas={linhas} />
+      )}
+      <p className={estilos.nota}>{TEXTOS.nota}</p>
     </div>
   );
 }

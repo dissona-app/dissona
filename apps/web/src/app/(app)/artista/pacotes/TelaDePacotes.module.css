@@ -55,8 +55,10 @@
 }
 
 .unidade {
+  font-family: var(--dsn-font-sans);
   font-size: var(--dsn-text-base);
-  font-weight: 400;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--dsn-ink-500);
 }
 

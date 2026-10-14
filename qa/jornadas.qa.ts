@@ -362,7 +362,7 @@ test('Jornada 2 · Artista → Curador: envio, escuta, avaliação e devolutiva'
 
   await etapa(curador, J, 'A faixa chega na fila do curador', async () => {
     await irPara(curador, '/curador/fila');
-    const linha = curador.getByRole('row').filter({ hasText: TITULO_DA_FAIXA });
+    const linha = curador.getByRole('listitem').filter({ hasText: TITULO_DA_FAIXA });
     await expect(linha).toHaveCount(1);
     await clicarLink(curador, linha.getByRole('link').first(), /\/curador\/fila\/.+/);
   });

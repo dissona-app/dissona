@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { cartaoDaFila } from '../apoio/avaliacao';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
 import { FILA } from '../apoio/textos';
@@ -23,67 +24,29 @@ import { FILA } from '../apoio/textos';
  * **vazia**, porque `perfil` é privado e o embed virava inner join com nada.
  */
 test.describe('C1 · Fila de avaliações', () => {
-  test('a tabela traz as cinco colunas', { tag: ['@RF-054'] }, async ({ page }) => {
+  // A Fila do protótipo aprovado é em prateleiras de capas — "Ouça primeiro"
+  // (menos de 24h) e "Na sua estante" —, e não em tabela ordenável.
+  test('a fila mostra as faixas em prateleiras', { tag: ['@RF-054'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
-    const tabela = page.getByRole('table', { name: FILA.titulo });
-
-    for (const coluna of Object.values(FILA.colunas)) {
-      await expect(
-        tabela.getByRole('columnheader', { name: new RegExp(coluna) }),
-        `coluna "${coluna}"`,
-      ).toBeVisible();
-    }
+    const prateleiras = page.getByRole('region', { name: /Ouça primeiro|Na sua estante/ });
+    await expect(prateleiras.first()).toBeVisible();
+    await expect(prateleiras.first().getByRole('listitem').first()).toBeVisible();
   });
 
-  test('lista a faixa com artista e prazo', { tag: ['@RF-054'] }, async ({ page }) => {
+  test('o cartão traz a faixa, o artista e o prazo', { tag: ['@RF-054'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
-    const linhas = page.getByRole('table', { name: FILA.titulo }).getByRole('row');
-    // Cabeçalho + ao menos um envio.
-    await expect(linhas).not.toHaveCount(1);
-
-    const primeira = linhas.nth(1);
-    // O nome do artista é o que a view `0006d` destravou.
-    await expect(primeira).toContainText('E2E Artista');
-    // Prazo no formato do protótipo: "Nh" ou "Nd Nh" ou "Vencido há …".
-    await expect(primeira).toContainText(/\d+h|\d+d|Vencido/);
+    const cartao = cartaoDaFila(page, 'E2E Artista').first();
+    await expect(cartao).toBeVisible();
+    await expect(cartao).toContainText(/\d+h|\d+d|Vencid/);
+    await expect(cartao.getByRole('link')).toHaveAttribute(
+      'href',
+      /\/curador\/fila\/[0-9a-f-]{36}$/,
+    );
   });
-
-  test('as três colunas ordenáveis expõem aria-sort', { tag: ['@RF-054'] }, async ({ page }) => {
-    await entrarComo(page, PERSONA.CURADOR_BRONZE);
-    await page.goto('/curador/fila');
-
-    const tabela = page.getByRole('table', { name: FILA.titulo });
-
-    // RF-054 pede `aria-sort` explicitamente. O padrão é prazo ascendente —
-    // o mais urgente primeiro.
-    await expect(
-      tabela.getByRole('columnheader', { name: new RegExp(FILA.colunas.prazo) }),
-    ).toHaveAttribute('aria-sort', 'ascending');
-  });
-
-  test(
-    'ordenar por prazo inverte e o recorte fica na URL',
-    { tag: ['@RF-054'] },
-    async ({ page }) => {
-      await entrarComo(page, PERSONA.CURADOR_BRONZE);
-      await page.goto('/curador/fila');
-
-      const tabela = page.getByRole('table', { name: FILA.titulo });
-      await tabela
-        .getByRole('columnheader', { name: new RegExp(FILA.colunas.prazo) })
-        .getByRole('button')
-        .click();
-
-      await page.waitForURL(/ordem=prazo&dir=desc|dir=desc/);
-      await expect(
-        tabela.getByRole('columnheader', { name: new RegExp(FILA.colunas.prazo) }),
-      ).toHaveAttribute('aria-sort', 'descending');
-    },
-  );
 
   test('o filtro por status recorta a lista', { tag: ['@RF-055'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);

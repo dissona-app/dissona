@@ -89,7 +89,7 @@ export async function abrirAvaliacao(page: Page, faixa: string): Promise<string>
 export async function abrirPelaFila(page: Page, faixa: string): Promise<string> {
   await page.goto('/curador/fila');
 
-  const linha = page.getByRole('row').filter({ hasText: faixa });
+  const linha = cartaoDaFila(page, faixa);
   await expect(
     linha,
     `a fila precisa listar "${faixa}" — rode supabase/testes/dados-e2e.sql`,
@@ -151,4 +151,14 @@ export async function irAteARemuneracao(page: Page, envioId: string) {
   await avancar(page);
 
   await page.waitForURL(`**/curador/avaliar/${envioId}/remuneracao`);
+}
+
+/**
+ * O cartão de uma faixa na Fila do curador (13).
+ *
+ * A Fila do protótipo aprovado é em prateleiras de capas, e não em tabela: cada
+ * faixa é um item de lista com um link para o detalhe.
+ */
+export function cartaoDaFila(page: Page, faixa: string) {
+  return page.getByRole('listitem').filter({ hasText: faixa });
 }

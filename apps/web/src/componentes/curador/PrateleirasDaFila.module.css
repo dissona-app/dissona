@@ -1,0 +1,252 @@
+/* 13 · Fila — prateleiras; valores literais do protótipo aprovado. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 24px);
+  min-width: 0;
+}
+
+.prateleira {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 14px);
+  min-width: 0;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titulos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  min-width: 0;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(22px, 3.2vh, 28px);
+  line-height: 1.05;
+  color: #140d1a;
+}
+
+.sobretitulo {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6e6478;
+  white-space: nowrap;
+}
+
+.navegacao {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contagem {
+  font-size: 13px;
+  color: #6e6478;
+}
+
+.seta {
+  appearance: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e5deea;
+  background: #ffffff;
+  color: #140d1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background 200ms,
+    border-color 200ms;
+}
+
+.seta:hover {
+  background: #f2edf5;
+  border-color: #d6cbe4;
+}
+
+.trilho {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(160px, 23vh, 260px);
+  gap: clamp(16px, 1.6vw, 24px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 4px 2px 6px;
+  margin: -4px -2px -6px;
+  list-style: none;
+}
+
+.trilho::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cartao:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+.capa {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #140d1a;
+  background-position: center;
+  background-size: cover;
+  box-shadow:
+    0 1px 2px rgba(20, 13, 26, 0.06),
+    0 8px 20px rgba(20, 13, 26, 0.12);
+  transition:
+    transform 220ms cubic-bezier(0.19, 1, 0.22, 1),
+    box-shadow 220ms;
+}
+
+.cartao:hover .capa {
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(20, 13, 26, 0.08),
+    0 14px 28px rgba(20, 13, 26, 0.18);
+}
+
+.capaVeu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.status {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  color: #8c3a2c;
+  background: #fbedea;
+}
+
+.status[data-status='nova'] {
+  color: #5b2e8f;
+  background: #efe7f8;
+}
+
+.status[data-status='em_escuta'] {
+  color: #1e7a4a;
+  background: #e6f5ed;
+}
+
+.prazo {
+  position: absolute;
+  left: 10px;
+  bottom: 12px;
+  max-width: calc(100% - 66px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.prazoUrgente {
+  color: #ffb4a3;
+}
+
+.ouvir {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e35336;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 200ms,
+    background 200ms;
+}
+
+.cartao:hover .ouvir {
+  background: #c4442a;
+  transform: scale(1.06);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.faixa,
+.artista,
+.servico {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faixa {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: #140d1a;
+}
+
+.artista {
+  font-size: 13px;
+  line-height: 1.35;
+  color: #3a3242;
+}
+
+.servico {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #6e6478;
+}

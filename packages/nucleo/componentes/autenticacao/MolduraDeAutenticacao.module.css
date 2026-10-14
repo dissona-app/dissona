@@ -109,6 +109,15 @@
   color: #ffffff;
 }
 
+.chamadaSubtitulo {
+  margin: 0;
+  font-size: clamp(15px, 1.2vw, 19px);
+  line-height: 1.5;
+  color: #e7e3ef;
+  max-width: 560px;
+  text-wrap: pretty;
+}
+
 .linha {
   white-space: nowrap;
 }

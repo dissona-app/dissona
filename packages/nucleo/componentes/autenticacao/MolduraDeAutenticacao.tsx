@@ -40,6 +40,11 @@ export type PropsMoldura = {
   /** Título do cartão de login ("Entrar"), em Anton. Só no login. */
   readonly tituloDoCard?: string;
   /** Provas sociais do pé — idem. */
+  /**
+   * As provas sociais do pé do herói. O protótipo aprovado as traz
+   * **desligadas** (`mostrarProvas: false`), então a moldura não as desenha;
+   * a prop fica para quando o cliente quiser ligá-las.
+   */
   readonly provas?: readonly string[];
   readonly linksDeRodape: readonly LinkDeRodape[];
   /**
@@ -77,7 +82,6 @@ const CLASSE_DO_AMBIENTE: Record<AmbienteDeAutenticacao, string | undefined> = {
 export function MolduraDeAutenticacao({
   ambiente = 'artista',
   chamada,
-  provas,
   linksDeRodape,
   aside,
   tituloDoCard,
@@ -121,21 +125,10 @@ export function MolduraDeAutenticacao({
                   </>
                 )}
               </h1>
+              {chamada.subtitulo !== undefined ? (
+                <p className={estilos.chamadaSubtitulo}>{chamada.subtitulo}</p>
+              ) : null}
             </div>
-            {provas !== undefined && provas.length > 0 ? (
-              <p className={estilos.provas}>
-                {provas.map((prova, indice) => (
-                  <span key={prova}>
-                    {indice > 0 ? (
-                      <span className={estilos.separador} aria-hidden="true">
-                        {' · '}
-                      </span>
-                    ) : null}
-                    {prova}
-                  </span>
-                ))}
-              </p>
-            ) : null}
           </div>
 
           <div className={estilos.cardLogin}>
