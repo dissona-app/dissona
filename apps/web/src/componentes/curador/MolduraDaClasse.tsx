@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { OndasDeFundo } from '@dissona/nucleo/componentes/autenticacao/OndasDeFundo';
+import { OrbitaDeFundo } from '@dissona/nucleo/componentes/autenticacao/OrbitaDeFundo';
 
 import estilos from './MolduraDaClasse.module.css';
 
@@ -38,7 +38,9 @@ export function MolduraDaClasse({
 }: PropsMolduraDaClasse) {
   return (
     <div className={estilos.pagina}>
-      <OndasDeFundo />
+      {/* Classificação, Bronze e Em análise: o fundo escuro com a órbita
+          centrada do protótipo aprovado. */}
+      <OrbitaDeFundo centro="50%" />
 
       <main className={estilos.miolo}>
         <div className={estilos.cartao}>

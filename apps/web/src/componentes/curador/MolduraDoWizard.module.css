@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--dsn-grad-auth-bg);
+  background: #ffffff;
 }
 
 /*
@@ -141,7 +141,9 @@
   justify-content: space-between;
   gap: 24px;
   padding: clamp(28px, 4.6vh, 52px) clamp(26px, 3.2vw, 48px);
-  background: linear-gradient(180deg, #fdfcff 0%, #f7f3fd 55%, #f1ecfa 100%);
+  background: #140d1a;
+  border-right: 1px solid rgba(198, 180, 222, 0.2);
+  overflow: hidden;
   border-right: var(--dsn-border-width) solid #ede8f6;
 }
 

@@ -5,7 +5,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--dsn-grad-auth-bg);
+  background: #140d1a;
+  overflow: hidden;
 }
 
 .miolo {

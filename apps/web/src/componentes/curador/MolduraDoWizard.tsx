@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react';
 
-import { OndasDeFundo } from '@dissona/nucleo/componentes/autenticacao/OndasDeFundo';
+import { OrbitaDeFundo } from '@dissona/nucleo/componentes/autenticacao/OrbitaDeFundo';
 import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './MolduraDoWizard.module.css';
-import { OndasDoPainel } from './OndasDoPainel';
 
 export type PropsMolduraDoWizard = {
   /** 1 a 8. Decide o título, o subtítulo e a barra de progresso. */
@@ -64,8 +63,6 @@ export function MolduraDoWizard({ passo, total, aside, children }: PropsMolduraD
 
   return (
     <div className={estilos.pagina}>
-      <OndasDeFundo />
-
       {progresso}
 
       <main
@@ -133,7 +130,7 @@ function MolduraDividida({
       {progresso}
 
       <aside className={estilos.painelDividido}>
-        <OndasDoPainel />
+        <OrbitaDeFundo centro="50%" />
         {aside}
       </aside>
 
