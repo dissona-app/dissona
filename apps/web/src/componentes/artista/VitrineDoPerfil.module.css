@@ -1,142 +1,283 @@
-/* 7.1 · a vitrine do perfil — cabeçalho, três estatísticas e "Suas faixas". */
+/* 7.1 · Perfil — valores literais da tela "Perfil" do protótipo aprovado. */
 
 .base {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-8);
+  gap: clamp(14px, 2.4vh, 22px);
+}
+
+.cartao {
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(20, 13, 26, 0.04),
+    0 14px 34px rgba(20, 13, 26, 0.07);
+  overflow: hidden;
+}
+
+.capa {
+  position: relative;
+  height: clamp(110px, 15vh, 150px);
+  overflow: hidden;
+  background-color: #140d1a;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.capaVeu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 13, 26, 0.1) 0%, rgba(20, 13, 26, 0.55) 100%);
+}
+
+.capaFaixa {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #5b2e8f 0 25%,
+    #7f47dd 25% 50%,
+    #b780e7 50% 75%,
+    #e35336 75% 100%
+  );
+}
+
+.capaAcoes {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.8vh, 16px);
+  padding: 0 clamp(20px, 2.8vw, 32px) clamp(18px, 2.6vh, 26px);
 }
 
 .identidade {
   display: flex;
   align-items: flex-start;
-  gap: var(--dsn-space-7);
+  gap: 20px;
+  min-width: 0;
 }
 
 .avatar,
 .avatarImagem {
-  width: 72px;
-  height: 72px;
+  position: relative;
+  z-index: 1;
+  width: clamp(96px, 12vh, 116px);
+  height: clamp(96px, 12vh, 116px);
+  margin-top: clamp(-58px, -6vh, -48px);
+  border-radius: 50%;
+  border: 5px solid #ffffff;
+  box-shadow:
+    0 0 0 1px #e5deea,
+    0 10px 24px rgba(20, 13, 26, 0.16);
   flex: none;
-  border-radius: var(--dsn-radius-circle);
 }
 
 .avatar {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--dsn-grad-brand-diag);
-  color: var(--dsn-surface);
-  font-size: var(--dsn-text-md);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-badge);
+  font-size: clamp(28px, 3.4vh, 34px);
+  font-family: var(--dsn-font-display);
+  color: #5b2e8f;
+  line-height: 1;
+  background: #efe7f8;
 }
 
 .avatarImagem {
   object-fit: cover;
+  background: #efe7f8;
 }
 
-/* `flex: 1` com `min-width: 0` para o nome longo truncar em vez de empurrar o
-   botão "Editar cadastro" para fora. */
 .textos {
   display: flex;
-  flex: 1;
-  min-width: 0;
   flex-direction: column;
-  gap: var(--dsn-space-2);
+  gap: 6px;
+  min-width: 0;
+  padding-top: 14px;
+}
+
+.papel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7f47dd;
 }
 
 .nome {
   margin: 0;
-  font-size: var(--dsn-text-lg);
-  font-weight: var(--dsn-weight-bold);
-  letter-spacing: var(--dsn-tracking-tight);
-  color: var(--dsn-ink);
+  font-size: clamp(26px, 3.6vh, 34px);
+  line-height: 1.05;
+  font-family: var(--dsn-font-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #140d1a;
 }
 
 .meta {
   margin: 0;
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+  font-size: 13.5px;
+  color: #6e6478;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .generos {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--dsn-space-3);
-  margin: var(--dsn-space-2) 0 0;
+  gap: 7px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.bio {
-  margin: var(--dsn-space-6) 0 0;
-  font-size: var(--dsn-text-sm);
-  line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink);
+.genero {
+  font-size: 12px;
+  font-weight: 600;
+  color: #140d1a;
+  background: #efe7f8;
+  border: 1px solid #e0d6ec;
+  border-radius: 2px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.bio,
+.bioVazia {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 680px;
   text-wrap: pretty;
 }
 
-.bioVazia {
-  composes: bio;
-  color: var(--dsn-ink-500);
+.bio {
+  color: #3a3242;
 }
 
-/* Três colunas iguais, como o protótipo; empilham quando não cabem. */
+.bioVazia {
+  color: #6e6478;
+}
+
+/* ------------------------------------------------------------- números */
+
 .estatisticas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--dsn-space-6);
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(10px, 1.8vh, 16px);
   margin: 0;
 }
 
 .estatistica {
   display: flex;
-  flex-direction: column-reverse;
-  gap: var(--dsn-space-2);
-  padding: var(--dsn-space-7);
-  border: var(--dsn-border-width) solid var(--dsn-border-faint);
-  border-radius: var(--dsn-radius-xl);
-  background: var(--dsn-surface);
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  padding: clamp(14px, 2.2vh, 20px) clamp(16px, 1.6vw, 22px);
+  background: #ffffff;
 }
 
-/* `column-reverse` no pai: o número aparece **acima** do rótulo, e a ordem do
-   DOM continua `<dt>` antes de `<dd>`, que é o que a lista de definição exige. */
 .estatisticaValor {
   margin: 0;
-  font-size: var(--dsn-text-xl);
-  font-weight: var(--dsn-weight-bold);
+  font-size: clamp(34px, 4.8vh, 44px);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--dsn-tracking-tight);
-  color: var(--dsn-ink);
+  line-height: 1;
+  font-family: var(--dsn-font-display);
+  letter-spacing: 0.01em;
+}
+
+.estatistica[data-cor='roxo'] .estatisticaValor {
+  color: #5b2e8f;
+}
+
+.estatistica[data-cor='violeta'] .estatisticaValor {
+  color: #7f47dd;
+}
+
+.estatistica[data-cor='laranja'] .estatisticaValor {
+  color: #e35336;
 }
 
 .estatisticaRotulo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  font-size: var(--dsn-text-xs);
-  font-weight: var(--dsn-weight-semibold);
-  color: var(--dsn-ink);
+  gap: 3px;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #140d1a;
 }
 
 .estatisticaApoio {
-  font-size: var(--dsn-text-2xs);
-  font-weight: var(--dsn-weight-regular);
-  color: var(--dsn-ink-500);
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #6e6478;
+  line-height: 1.4;
 }
 
-/* "Ver todas" é um `<span>`, e não link: o catálogo é da R4. Mesmo tratamento
-   dos itens de release futura da sidebar. */
+/* ------------------------------------------------------------- faixas */
+
+.lista {
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.listaCabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(14px, 2.2vh, 18px) clamp(18px, 2.2vw, 24px);
+  background: #faf8fc;
+  border-bottom: 1px solid #e5deea;
+}
+
+.listaTitulo {
+  margin: 0;
+  font-size: 18px;
+  color: #140d1a;
+}
+
 .verTodas {
-  font-size: var(--dsn-text-xs);
-  font-weight: var(--dsn-weight-semibold);
-  color: var(--dsn-ink-400);
+  font-size: 13px;
+  font-weight: 600;
+  color: #a9a2b4;
   cursor: not-allowed;
 }
 
+.vazio {
+  padding: clamp(18px, 3vh, 32px) clamp(18px, 2.2vw, 24px);
+}
+
 .faixas {
-  display: flex;
-  flex-direction: column;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -145,31 +286,56 @@
 .faixa {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--dsn-space-6);
-  padding: var(--dsn-space-5) 0;
-  border-bottom: var(--dsn-border-width) solid var(--dsn-border-faint);
+  gap: 14px;
+  padding: clamp(10px, 1.6vh, 14px) clamp(18px, 2.2vw, 24px);
+  border-top: 1px solid #efeaf2;
 }
 
-.faixa:last-child {
-  border-bottom: none;
+.faixa:first-child {
+  border-top: none;
+}
+
+.faixaCapa {
+  width: 44px;
+  height: 44px;
+  border-radius: 3px;
+  flex: none;
+  background: linear-gradient(135deg, #5b2e8f, #b780e7);
+  box-shadow: 0 2px 6px rgba(20, 13, 26, 0.16);
 }
 
 .faixaTextos {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  flex: 1;
   min-width: 0;
 }
 
 .faixaTitulo {
-  font-size: var(--dsn-text-base);
-  font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-snug);
-  color: var(--dsn-ink);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .faixaMeta {
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+  font-size: 12px;
+  color: #6e6478;
+}
+
+.status {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 2px;
+  flex: none;
+  color: #6e6478;
+  background: #f2edf5;
+}
+
+.statusLida {
+  color: #1e7a4a;
+  background: #e6f5ed;
 }

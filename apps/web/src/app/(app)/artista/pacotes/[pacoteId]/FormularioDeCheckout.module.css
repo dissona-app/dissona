@@ -128,8 +128,10 @@
 }
 
 .total {
+  font-family: var(--dsn-font-display);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   font-size: var(--dsn-text-2xl);
-  font-weight: 600;
   color: var(--dsn-purple-600);
   font-variant-numeric: tabular-nums;
 }

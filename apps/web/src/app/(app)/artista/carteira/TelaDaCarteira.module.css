@@ -32,7 +32,9 @@
 .numero {
   margin: var(--dsn-space-2) 0 0;
   font-size: var(--dsn-text-3xl);
-  font-weight: 600;
+  font-family: var(--dsn-font-display);
+  font-weight: 400;
+  letter-spacing: var(--dsn-tracking-display);
   line-height: 1.1;
   color: var(--dsn-purple-600);
 }
@@ -46,7 +48,9 @@
 .numeroMedio {
   margin: var(--dsn-space-2) 0 var(--dsn-space-2);
   font-size: var(--dsn-text-xl);
-  font-weight: 600;
+  font-family: var(--dsn-font-display);
+  font-weight: 400;
+  letter-spacing: var(--dsn-tracking-display);
   color: var(--dsn-ink);
 }
 
@@ -80,7 +84,9 @@
 .paralelo {
   margin: var(--dsn-space-2) 0 0;
   font-size: var(--dsn-text-lg);
-  font-weight: 600;
+  font-family: var(--dsn-font-display);
+  font-weight: 400;
+  letter-spacing: var(--dsn-tracking-display);
   color: var(--dsn-ink);
 }
 

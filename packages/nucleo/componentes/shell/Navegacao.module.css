@@ -206,8 +206,9 @@
 }
 
 .valorSaldo {
-  font-size: var(--dsn-text-md);
-  font-weight: var(--dsn-weight-bold);
+  font-size: 17px;
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   color: var(--dsn-nav-fg);
 }

@@ -26,7 +26,24 @@
   padding: clamp(14px, 2.4vh, 20px) var(--dsn-space-20) clamp(10px, 1.6vh, 14px);
   background: var(--dsn-topbar-bg);
   backdrop-filter: blur(10px);
-  border-bottom: var(--dsn-border-width) solid var(--dsn-border);
+}
+
+/* A faixa de quatro cores no topo do header — protótipo aprovado. */
+.header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    #5b2e8f 0 25%,
+    #7f47dd 25% 50%,
+    #b780e7 50% 75%,
+    #e35336 75% 100%
+  );
 }
 
 .textosHeader {
@@ -38,7 +55,7 @@
 
 .titulo {
   margin: 0;
-  font-size: var(--dsn-text-lg);
+  font-size: 30px;
   font-weight: var(--dsn-weight-bold);
   letter-spacing: var(--dsn-tracking-tight);
   color: var(--dsn-ink);

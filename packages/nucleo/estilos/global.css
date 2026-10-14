@@ -76,12 +76,15 @@ a:hover {
   outline-offset: var(--dsn-focus-offset);
 }
 
-/* Numerais de KPI, saldo e valor: Anton, alinhados por coluna. */
+/*
+ * Numerais em tabela e lista: alinhados por coluna, em Archivo — como no
+ * protótipo aprovado. Os números de destaque (saldo, métricas) usam Anton no
+ * próprio módulo.
+ */
 .dsn-numeral {
-  font-family: var(--dsn-font-display);
-  font-weight: var(--dsn-weight-regular);
+  font-weight: var(--dsn-weight-bold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--dsn-tracking-display);
+  letter-spacing: var(--dsn-tracking-snug);
 }
 
 /*
