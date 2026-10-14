@@ -7,7 +7,6 @@ import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Checkbox } from '@/componentes/base/Checkbox';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
-import { Painel } from '@/componentes/base/Painel';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { CodigoErro } from '@dissona/nucleo/lib/erros';
@@ -107,13 +106,37 @@ export function SelecaoDeCuradores({ faixaId, curadores, acao }: PropsSelecaoDeC
         </Aviso>
       ) : null}
 
-      <Painel titulo={TEXTOS.titulo} sublegenda={TEXTOS.subtitulo}>
-        <ul className={estilos.lista}>
-          {curadores.map((curador) => {
-            const marcado = marcados.includes(curador.id);
-            return (
-              <li key={curador.id} className={estilos.item}>
-                <div className={estilos.cabecalho}>
+      <div className={estilos.cabecalhoDaLista}>
+        <h2 className={estilos.titulo}>{TEXTOS.titulo}</h2>
+        <p className={estilos.subtitulo}>{TEXTOS.subtitulo}</p>
+      </div>
+
+      {/* Protótipo aprovado: cada curador é um cartão largo — identidade,
+          serviços com caixa de marcar e o preço em Claves. */}
+      <div className={estilos.colunas} aria-hidden="true">
+        <span>Curador</span>
+        <span>Serviços oferecidos</span>
+        <span className={estilos.colunaPreco}>Claves</span>
+      </div>
+      <ul className={estilos.lista}>
+        {curadores.map((curador) => {
+          const marcado = marcados.includes(curador.id);
+          return (
+            <li
+              key={curador.id}
+              className={[estilos.item, marcado ? estilos.itemMarcado : undefined]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <div className={estilos.identidade}>
+                <span className={estilos.avatar} aria-hidden="true">
+                  {curador.nome
+                    .split(/\s+/)
+                    .slice(0, 2)
+                    .map((parte) => parte[0]?.toUpperCase() ?? '')
+                    .join('')}
+                </span>
+                <span className={estilos.nomeEClasse}>
                   <Checkbox
                     name="curador"
                     value={curador.id}
@@ -126,31 +149,40 @@ export function SelecaoDeCuradores({ faixaId, curadores, acao }: PropsSelecaoDeC
                       )
                     }
                   >
-                    {curador.nome}
+                    <span className={estilos.nome}>{curador.nome}</span>
                   </Checkbox>
                   <SeloClasse classe={curador.classe} />
-                </div>
+                </span>
+              </div>
 
-                <p className={estilos.servicoBase}>
-                  {TEXTOS.servicoObrigatorio} · {curador.precoBase}
+              <div className={estilos.servicos}>
+                <p className={estilos.servico}>
+                  <span className={estilos.servicoNome}>{TEXTOS.servicoObrigatorio}</span>
+                  <span className={estilos.servicoPreco}>{curador.precoBase}</span>
                 </p>
-
                 {marcado && curador.opcionais.length > 0 ? (
                   <ul className={estilos.opcionais}>
                     {curador.opcionais.map((opcional) => (
                       <li key={opcional.tipo}>
                         <Checkbox name={`servico:${curador.id}`} value={opcional.tipo}>
-                          {opcional.rotulo} · {opcional.preco}
+                          <span className={estilos.servicoNome}>{opcional.rotulo}</span>{' '}
+                          <span className={estilos.servicoPreco}>{opcional.preco}</span>
                         </Checkbox>
                       </li>
                     ))}
                   </ul>
+                ) : curador.opcionais.length > 0 ? (
+                  <p className={estilos.dica}>
+                    + {curador.opcionais.map((opcional) => opcional.rotulo).join(', ')}
+                  </p>
                 ) : null}
-              </li>
-            );
-          })}
-        </ul>
-      </Painel>
+              </div>
+
+              <div className={estilos.preco}>{curador.precoBase}</div>
+            </li>
+          );
+        })}
+      </ul>
 
       <div className={estilos.acoes}>
         <BotaoLink href={`${ROTA.ARTISTA_ENVIAR}/${faixaId}/revisao`} variante="secundario">
