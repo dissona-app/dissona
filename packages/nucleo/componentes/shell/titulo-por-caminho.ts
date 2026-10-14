@@ -165,6 +165,12 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
     `${ROTA.ADMIN_PACOTES}/`,
     { titulo: 'Editar pacote', sublegenda: 'Defina a quantidade, o valor e o desconto.' },
   ],
+  // 5.2 — o checkout de um pacote (`/artista/pacotes/<pacoteId>`): "Pagamento",
+  // como no protótipo aprovado (`caTitulos.checkout`).
+  [
+    `${ROTA.ARTISTA_PACOTES}/`,
+    { titulo: 'Pagamento', sublegenda: 'Confira o pedido e escolha como pagar.' },
+  ],
   // Os passos 2 e 3 do envio — `/artista/enviar/<faixaId>/<passo>`. O título é
   // o mesmo do passo 1: o wizard é uma tela só, e quem diz onde a pessoa está
   // é o indicador de passo, não o cabeçalho.
