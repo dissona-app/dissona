@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { Passos } from '@/componentes/base/Passos';
 import { ENVIAR } from '@dissona/nucleo/textos/prototipo';
 import type { PassoDoEnvio } from '@/modulos/faixa/tipos';
 import { PASSOS } from '@/modulos/faixa/tipos';
@@ -25,16 +24,36 @@ export type PropsMolduraDoEnvio = {
 export function MolduraDoEnvio({ passo, children }: PropsMolduraDoEnvio) {
   const indice = PASSOS.indexOf(passo);
 
+  // Protótipo aprovado: um cartão com a faixa escura no topo — título,
+  // contador e os passos em barras — e o conteúdo numa área clara embaixo.
   return (
     <div className={estilos.base}>
-      <header className={estilos.cabecalho}>
-        <p className={estilos.contador}>{ENVIAR.passoDe(indice + 1, PASSOS.length)}</p>
-        <h2 className={estilos.heroi}>{ENVIAR.herois[indice]}</h2>
+      <header className={estilos.faixa}>
+        <div className={estilos.faixaTopo}>
+          <h2 className={estilos.heroi}>{ENVIAR.herois[indice]}</h2>
+          <p className={estilos.contador}>{ENVIAR.passoDe(indice + 1, PASSOS.length)}</p>
+        </div>
+        <nav aria-label="Progresso">
+          <ol className={estilos.passos}>
+            {ENVIAR.passos.map((texto, i) => (
+              <li
+                key={texto}
+                className={[
+                  estilos.passo,
+                  i < indice ? estilos.feito : i === indice ? estilos.atual : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                <span className={estilos.barra} aria-hidden="true" />
+                <span aria-current={i === indice ? 'step' : undefined}>{texto}</span>
+              </li>
+            ))}
+          </ol>
+        </nav>
       </header>
 
-      <Passos passos={[...ENVIAR.passos]} atual={indice} />
-
-      {children}
+      <div className={estilos.corpo}>{children}</div>
     </div>
   );
 }

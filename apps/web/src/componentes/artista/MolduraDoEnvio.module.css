@@ -1,31 +1,94 @@
-/* Moldura do wizard de envio (3). */
+/* 4 · Enviar faixa — a moldura do protótipo aprovado. */
 
 .base {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-6);
-  max-width: 46rem;
+  border: 1px solid #140d1a;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f2edf5;
+  max-width: 1100px;
 }
 
-.cabecalho {
+.faixa {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-2);
+  gap: 14px;
+  padding: 18px 22px 14px;
+  background: #140d1a;
+  background-image: radial-gradient(
+    60% 140% at 100% 50%,
+    rgba(127, 71, 221, 0.35) 0%,
+    rgba(20, 13, 26, 0) 70%
+  );
 }
 
-.contador {
-  margin: 0;
-  font-size: var(--dsn-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--dsn-ink-500);
+.faixaTopo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .heroi {
   margin: 0;
-  font-size: var(--dsn-text-xl);
+  font-size: clamp(18px, 2.2vh, 22px);
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.contador {
+  margin: 0;
+  flex: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b780e7;
+}
+
+.passos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.passo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #8a8296;
+}
+
+.barra {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.feito,
+.atual {
+  color: #ffffff;
+}
+
+.feito .barra,
+.atual .barra {
+  background: #ffffff;
+}
+
+.atual {
   font-weight: 600;
-  line-height: 1.2;
-  color: var(--dsn-ink);
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 22px 22px;
 }

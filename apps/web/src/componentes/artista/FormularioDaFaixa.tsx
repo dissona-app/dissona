@@ -285,108 +285,110 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
 
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
-      <Painel titulo={TEXTOS.enviarArquivo} sublegenda={TEXTOS.enviarArquivoApoio}>
-        <label
-          className={[estilos.dropzone, arrastando ? estilos.dropzoneAtiva : undefined]
-            .filter(Boolean)
-            .join(' ')}
-          onDragOver={(evento) => {
-            evento.preventDefault();
-            setArrastando(true);
-          }}
-          onDragLeave={() => setArrastando(false)}
-          onDrop={aoSoltarAudio}
-        >
-          <input
-            ref={entradaDeAudio}
-            type="file"
-            name="audio"
-            accept={aceitos}
-            className={estilos.entradaDeArquivo}
-            onChange={(e) => setArquivoDeAudio(e.target.files?.[0] ?? null)}
-          />
-          <span className={estilos.dropzoneTitulo}>
-            {arrastando
-              ? TEXTOS.dropzoneSoltar
-              : arquivoDeAudio !== null
-                ? TEXTOS.arquivoEscolhido(arquivoDeAudio.name)
-                : faixa?.arquivoCaminho != null
-                  ? TEXTOS.arquivoEscolhido(faixa.arquivoCaminho.split('/').pop() ?? '')
-                  : TEXTOS.dropzoneVazia}
-          </span>
-          <span className={estilos.dropzoneApoio}>{TEXTOS.dropzone(limites.tamanhoMaxMb)}</span>
-        </label>
+      {/* Protótipo aprovado: link à esquerda, arquivo à direita, lado a lado. */}
+      <div className={estilos.duasColunas}>
+        <Painel titulo={TEXTOS.colarLink} sublegenda={TEXTOS.colarLinkApoio} nivel={3}>
+          <div className={estilos.par}>
+            <Campo
+              name="urlSpotify"
+              rotulo={TEXTOS.rotuloSpotify}
+              value={urlSpotify}
+              onChange={(e) => mudarLink(setUrlSpotify, e.target.value)}
+              erro={erroDe('urlSpotify') ?? (linkLido === 'urlSpotify' ? erroDoLink : undefined)}
+              inputMode="url"
+            />
+            <Campo
+              name="urlYoutube"
+              rotulo={TEXTOS.rotuloYoutube}
+              value={urlYoutube}
+              onChange={(e) => mudarLink(setUrlYoutube, e.target.value)}
+              erro={erroDe('urlYoutube') ?? (linkLido === 'urlYoutube' ? erroDoLink : undefined)}
+              inputMode="url"
+            />
+          </div>
 
-        {(falhaDoUpload ?? erroDe('audio')) !== undefined ? (
-          <Aviso tom="erro">{falhaDoUpload ?? erroDe('audio')}</Aviso>
-        ) : null}
-
-        <Aviso tom="info" estatico>
-          {TEXTOS.arquivoSempreNecessario}
-        </Aviso>
-      </Painel>
-
-      <Painel titulo={TEXTOS.colarLink} sublegenda={TEXTOS.colarLinkApoio} nivel={3}>
-        <div className={estilos.par}>
-          <Campo
-            name="urlSpotify"
-            rotulo={TEXTOS.rotuloSpotify}
-            value={urlSpotify}
-            onChange={(e) => mudarLink(setUrlSpotify, e.target.value)}
-            erro={erroDe('urlSpotify') ?? (linkLido === 'urlSpotify' ? erroDoLink : undefined)}
-            inputMode="url"
-          />
-          <Campo
-            name="urlYoutube"
-            rotulo={TEXTOS.rotuloYoutube}
-            value={urlYoutube}
-            onChange={(e) => mudarLink(setUrlYoutube, e.target.value)}
-            erro={erroDe('urlYoutube') ?? (linkLido === 'urlYoutube' ? erroDoLink : undefined)}
-            inputMode="url"
-          />
-        </div>
-
-        <div className={estilos.acoes}>
-          <Botao
-            type="button"
-            variante="secundario"
-            carregando={detectando}
-            disabled={urlSpotify.trim() === '' && urlYoutube.trim() === ''}
-            onClick={detectarFaixa}
-          >
-            {detectando ? TEXTOS.detectando : TEXTOS.detectar}
-          </Botao>
-        </div>
-
-        {detectado !== null ? (
-          <div className={estilos.detectada} aria-live="polite">
-            {detectado.capaUrl !== null ? (
-              <Image
-                // A capa vem do CDN do provedor; `unoptimized` evita abrir
-                // `remotePatterns` para hosts de terceiros.
-                unoptimized
-                src={detectado.capaUrl}
-                alt={TEXTOS.capaDetectada(detectado.titulo)}
-                width={64}
-                height={64}
-                className={estilos.capaDetectada}
-              />
-            ) : null}
-            <span className={estilos.detectadaTexto}>
-              <span className={estilos.detectadaRotulo}>{TEXTOS.faixaEncontrada}</span>
-              <span className={estilos.detectadaTitulo}>{detectado.titulo}</span>
-              {detectado.artista !== null ? (
-                <span className={estilos.detectadaArtista}>{detectado.artista}</span>
-              ) : null}
-            </span>
-            <Botao type="button" variante="neutro" tamanho="sm" onClick={focarTitulo}>
-              {TEXTOS.corrigirDados}
+          <div className={estilos.acoes}>
+            <Botao
+              type="button"
+              variante="secundario"
+              carregando={detectando}
+              disabled={urlSpotify.trim() === '' && urlYoutube.trim() === ''}
+              onClick={detectarFaixa}
+            >
+              {detectando ? TEXTOS.detectando : TEXTOS.detectar}
             </Botao>
           </div>
-        ) : null}
 
-        {naoEncontrada ? <Aviso tom="alerta">{TEXTOS.naoDetectada}</Aviso> : null}
-      </Painel>
+          {detectado !== null ? (
+            <div className={estilos.detectada} aria-live="polite">
+              {detectado.capaUrl !== null ? (
+                <Image
+                  // A capa vem do CDN do provedor; `unoptimized` evita abrir
+                  // `remotePatterns` para hosts de terceiros.
+                  unoptimized
+                  src={detectado.capaUrl}
+                  alt={TEXTOS.capaDetectada(detectado.titulo)}
+                  width={64}
+                  height={64}
+                  className={estilos.capaDetectada}
+                />
+              ) : null}
+              <span className={estilos.detectadaTexto}>
+                <span className={estilos.detectadaRotulo}>{TEXTOS.faixaEncontrada}</span>
+                <span className={estilos.detectadaTitulo}>{detectado.titulo}</span>
+                {detectado.artista !== null ? (
+                  <span className={estilos.detectadaArtista}>{detectado.artista}</span>
+                ) : null}
+              </span>
+              <Botao type="button" variante="neutro" tamanho="sm" onClick={focarTitulo}>
+                {TEXTOS.corrigirDados}
+              </Botao>
+            </div>
+          ) : null}
+
+          {naoEncontrada ? <Aviso tom="alerta">{TEXTOS.naoDetectada}</Aviso> : null}
+        </Painel>
+        <Painel titulo={TEXTOS.enviarArquivo} sublegenda={TEXTOS.enviarArquivoApoio}>
+          <label
+            className={[estilos.dropzone, arrastando ? estilos.dropzoneAtiva : undefined]
+              .filter(Boolean)
+              .join(' ')}
+            onDragOver={(evento) => {
+              evento.preventDefault();
+              setArrastando(true);
+            }}
+            onDragLeave={() => setArrastando(false)}
+            onDrop={aoSoltarAudio}
+          >
+            <input
+              ref={entradaDeAudio}
+              type="file"
+              name="audio"
+              accept={aceitos}
+              className={estilos.entradaDeArquivo}
+              onChange={(e) => setArquivoDeAudio(e.target.files?.[0] ?? null)}
+            />
+            <span className={estilos.dropzoneTitulo}>
+              {arrastando
+                ? TEXTOS.dropzoneSoltar
+                : arquivoDeAudio !== null
+                  ? TEXTOS.arquivoEscolhido(arquivoDeAudio.name)
+                  : faixa?.arquivoCaminho != null
+                    ? TEXTOS.arquivoEscolhido(faixa.arquivoCaminho.split('/').pop() ?? '')
+                    : TEXTOS.dropzoneVazia}
+            </span>
+            <span className={estilos.dropzoneApoio}>{TEXTOS.dropzone(limites.tamanhoMaxMb)}</span>
+          </label>
+
+          {(falhaDoUpload ?? erroDe('audio')) !== undefined ? (
+            <Aviso tom="erro">{falhaDoUpload ?? erroDe('audio')}</Aviso>
+          ) : null}
+
+          <Aviso tom="info" estatico>
+            {TEXTOS.arquivoSempreNecessario}
+          </Aviso>
+        </Painel>
+      </div>
 
       <Painel titulo={TEXTOS.detalhesTitulo} nivel={3}>
         <Campo
