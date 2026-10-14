@@ -3,12 +3,7 @@
 import Link from 'next/link';
 import { useRef } from 'react';
 
-import f1 from '@dissona/nucleo/componentes/autenticacao/capas/f1.png';
-import f2 from '@dissona/nucleo/componentes/autenticacao/capas/f2.png';
-import f3 from '@dissona/nucleo/componentes/autenticacao/capas/f3.png';
-import f4 from '@dissona/nucleo/componentes/autenticacao/capas/f4.png';
-import f5 from '@dissona/nucleo/componentes/autenticacao/capas/f5.png';
-
+import { capaDoEnvio } from './capas';
 import type { LinhaDaFila } from './TabelaDaFila';
 import estilos from './PrateleirasDaFila.module.css';
 
@@ -22,14 +17,6 @@ import estilos from './PrateleirasDaFila.module.css';
  * A faixa ainda não tem capa própria no banco: a capa sai de um dos cinco
  * discos do protótipo, escolhido pelo id do envio — estável entre visitas.
  */
-
-const CAPAS = [f1.src, f2.src, f3.src, f4.src, f5.src];
-
-function capaDe(envioId: string): string {
-  // Os últimos 8 dígitos hexadecimais do UUID: espalham bem entre as cinco.
-  const numero = Number.parseInt(envioId.replace(/-/g, '').slice(-8), 16);
-  return CAPAS[(Number.isNaN(numero) ? 0 : numero) % CAPAS.length] ?? f1.src;
-}
 
 const ROTULO_DO_STATUS: Record<LinhaDaFila['status'], string> = {
   nova: 'Novo',
@@ -116,7 +103,7 @@ function Prateleira({
             >
               <span
                 className={estilos.capa}
-                style={{ backgroundImage: `url('${capaDe(linha.envioId)}')` }}
+                style={{ backgroundImage: `url('${capaDoEnvio(linha.envioId)}')` }}
               >
                 <span className={estilos.capaVeu} aria-hidden="true" />
                 <span className={estilos.status} data-status={linha.status}>
