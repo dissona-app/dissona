@@ -93,8 +93,19 @@ export function FormularioDeLogin({
   rodape,
   bannerInicial,
 }: PropsFormulario) {
+  // O React 19 reseta o `<form>` depois de toda action: sem isto, uma senha
+  // errada apagava também o e-mail digitado. O enviado vira o `defaultValue`.
+  const [enviados, setEnviados] = useState<FormData | null>(null);
+  const enviado = (campo: string): string | undefined => {
+    const valor = enviados?.get(campo);
+    return typeof valor === 'string' ? valor : undefined;
+  };
+
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
-    async (_anterior, dados) => acao(dados),
+    async (_anterior, dados) => {
+      setEnviados(dados);
+      return acao(dados);
+    },
     ESTADO_INICIAL,
   );
 
@@ -168,6 +179,7 @@ export function FormularioDeLogin({
 
         <Campo
           name="email"
+          defaultValue={enviado('email')}
           type="email"
           rotulo={textos.rotuloEmail}
           placeholder={textos.placeholderEmail}

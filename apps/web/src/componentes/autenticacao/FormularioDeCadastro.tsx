@@ -76,8 +76,19 @@ export function FormularioDeCadastro({
   papel,
   social,
 }: PropsFormularioDeCadastro) {
+  // O React 19 reseta o `<form>` depois de toda action: sem isto, uma senha
+  // errada apagava também o e-mail digitado. O enviado vira o `defaultValue`.
+  const [enviados, setEnviados] = useState<FormData | null>(null);
+  const enviado = (campo: string): string | undefined => {
+    const valor = enviados?.get(campo);
+    return typeof valor === 'string' ? valor : undefined;
+  };
+
   const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
-    async (_anterior, dados) => acao(dados),
+    async (_anterior, dados) => {
+      setEnviados(dados);
+      return acao(dados);
+    },
     ESTADO_INICIAL,
   );
 
@@ -155,6 +166,7 @@ export function FormularioDeCadastro({
 
         <Campo
           name="nome"
+          defaultValue={enviado('nome')}
           type="text"
           rotulo={textos.rotuloNome}
           placeholder={textos.placeholderNome}
@@ -165,6 +177,7 @@ export function FormularioDeCadastro({
 
         <Campo
           name="email"
+          defaultValue={enviado('email')}
           type="email"
           rotulo={textos.rotuloEmail}
           placeholder={textos.placeholderEmail}
@@ -218,7 +231,13 @@ export function FormularioDeCadastro({
           erro={erroDeCampo('confirmar')}
         />
 
-        <Checkbox name="aceite" value="on" required erro={erroDeCampo('aceite')}>
+        <Checkbox
+          name="aceite"
+          value="on"
+          required
+          defaultChecked={enviado('aceite') === 'on'}
+          erro={erroDeCampo('aceite')}
+        >
           {textos.aceiteAntes}
           <Link className={estilos.aceiteLink} href={ROTA.TERMOS}>
             {textos.aceiteTermos}
