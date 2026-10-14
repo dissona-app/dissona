@@ -1,6 +1,10 @@
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import type { Papel } from '@dissona/nucleo/lib/papeis';
-import { ehPassoDaAvaliacao, type PassoDaAvaliacao } from '@dissona/nucleo/modulos/avaliacao/tipos';
+import {
+  PASSO_NO_INDICADOR,
+  ehPassoDaAvaliacao,
+  type PassoDaAvaliacao,
+} from '@dissona/nucleo/modulos/avaliacao/tipos';
 import { CURADOR_MANUTENCAO } from '@dissona/nucleo/textos/curador';
 import { ARTISTA_PERFIL, ARTISTA_VITRINE, PAINEIS } from '@dissona/nucleo/textos/prototipo';
 
@@ -31,6 +35,8 @@ import { NOME_AMBIENTE } from './navegacao-por-ambiente';
 export type TituloDeModulo = {
   readonly titulo: string;
   readonly sublegenda?: string;
+  /** Rótulo roxo acima do título — o protótipo aprovado usa na Fila e na Avaliação. */
+  readonly sobretitulo?: string;
 };
 
 /** Rota exata → título. Consultado antes das regras de prefixo. */
@@ -110,7 +116,8 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
 
   // 13 — a fila. O detalhe (13.1) tem segmento dinâmico e cai no prefixo.
   [ROTA.CURADOR_FILA]: {
-    titulo: 'Fila de avaliações',
+    sobretitulo: 'Avaliações',
+    titulo: 'Fila',
     sublegenda: 'Faixas pendentes para avaliar.',
   },
 
@@ -198,7 +205,11 @@ export function tituloDoCaminho(caminho: string, papel: Papel): TituloDeModulo {
   if (semBarraFinal.startsWith(`${ROTA.CURADOR_AVALIAR}/`)) {
     const ultimo = semBarraFinal.slice(semBarraFinal.lastIndexOf('/') + 1);
     if (ehPassoDaAvaliacao(ultimo)) {
-      return { titulo: 'Avaliação', sublegenda: SUBLEGENDA_DA_AVALIACAO[ultimo] };
+      return {
+        sobretitulo: `Avaliação · Passo ${PASSO_NO_INDICADOR[ultimo] + 1} de 4`,
+        titulo: 'Avaliação',
+        sublegenda: SUBLEGENDA_DA_AVALIACAO[ultimo],
+      };
     }
   }
 

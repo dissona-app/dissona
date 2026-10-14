@@ -55,6 +55,15 @@
   min-width: 0;
 }
 
+/* Protótipo aprovado: 11px, 700, roxo, 0.14em — só na Fila e na Avaliação. */
+.sobretitulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dsn-purple-500);
+}
+
 .titulo {
   margin: 0;
   font-size: 30px;

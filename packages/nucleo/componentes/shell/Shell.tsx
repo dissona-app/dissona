@@ -140,6 +140,9 @@ export function Shell({
       <div className={estilos.coluna}>
         <header className={estilos.header}>
           <div className={estilos.textosHeader}>
+            {titulo === undefined && doCaminho.sobretitulo !== undefined ? (
+              <span className={estilos.sobretitulo}>{doCaminho.sobretitulo}</span>
+            ) : null}
             <h1 className={estilos.titulo}>{tituloExibido}</h1>
             {subtituloExibido !== undefined ? (
               <span className={estilos.subtitulo}>{subtituloExibido}</span>
