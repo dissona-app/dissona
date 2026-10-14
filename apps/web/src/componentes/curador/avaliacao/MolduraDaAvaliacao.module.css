@@ -110,3 +110,15 @@
   gap: 14px;
   min-width: 0;
 }
+
+.player:empty {
+  display: none;
+}
+
+.player {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+}

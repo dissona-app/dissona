@@ -61,6 +61,19 @@ export const AVALIAR = {
     `${respondidos} de ${total} respondidos · ${emAberto} obrigatórios em aberto`,
 
   criterioObrigatorio: 'obrig.',
+
+  // Protótipo aprovado: dois cartões de critérios e o painel de justificativa.
+  grupoObrigatorios: 'Obrigatórios',
+  grupoOpcionais: 'Opcionais',
+  apoioObrigatorios: (quantos: number) =>
+    `${quantos === 5 ? 'Cinco' : quantos} critérios exigidos. Com feedback em até 72h e nota subjetiva, o repasse parte deste piso.`,
+  apoioOpcionais: 'Preencher todas as justificativas eleva seus ganhos.',
+  painelJustificativa:
+    'Clique no nome ou no slider de um critério para abrir a justificativa ao lado dele.',
+  justificados: (nomes: readonly string[]) =>
+    nomes.length === 0
+      ? 'Nenhum critério justificado nesta leitura.'
+      : `Justificados: ${nomes.join(', ')}.`,
   semNota: 'Sem nota',
   removerNota: 'Remover nota',
 

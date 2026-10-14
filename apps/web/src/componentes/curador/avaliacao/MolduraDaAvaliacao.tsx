@@ -20,6 +20,9 @@ import estilos from './MolduraDaAvaliacao.module.css';
  */
 export const ID_DO_FORMULARIO = 'avaliacao-passo';
 
+/** Onde o passo de notas põe o player — embaixo do cartão da faixa. */
+export const ID_DO_PLAYER = 'player-da-avaliacao';
+
 export type PropsMolduraDaAvaliacao = {
   readonly titulo: string;
   readonly artista: string;
@@ -106,6 +109,8 @@ export function MolduraDaAvaliacao({
               </div>
             </div>
           </div>
+          {/* O passo de notas põe o player aqui (portal); os outros, nada. */}
+          <div id={ID_DO_PLAYER} className={estilos.player} />
         </aside>
 
         <div className={estilos.conteudo}>{children}</div>

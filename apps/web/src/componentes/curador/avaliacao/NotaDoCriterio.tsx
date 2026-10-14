@@ -11,12 +11,23 @@ export type PropsNotaDoCriterio = {
   /** `null` é "ainda não avaliei", que não é nota 0,0. */
   readonly nota: number | null;
   readonly onNotaMudar: (nota: number | null) => void;
+  /** De `configuracao.criterios_obrigatorios`, não de `criterio.obrigatorio`. */
+  readonly obrigatorio: boolean;
+  /** O critério cuja justificativa está aberta no painel ao lado. */
+  readonly ativo: boolean;
+  /** Já tem justificativa que rende acréscimo — marca a linha. */
+  readonly justificado: boolean;
+  readonly onAtivar: () => void;
+};
+
+export type PropsJustificativaDoCriterio = {
+  readonly criterio: Criterio;
   readonly justificativa: string;
   readonly onJustificativaMudar: (texto: string) => void;
   /** `configuracao.justificativa_min_caracteres` — o piso do acréscimo. */
   readonly minimoJustificativa: number;
-  /** De `configuracao.criterios_obrigatorios`, não de `criterio.obrigatorio`. */
-  readonly obrigatorio: boolean;
+  /** Fora do painel continua no formulário (é enviado), só não aparece. */
+  readonly visivel: boolean;
 };
 
 /**
@@ -42,22 +53,24 @@ export function NotaDoCriterio({
   criterio,
   nota,
   onNotaMudar,
-  justificativa,
-  onJustificativaMudar,
-  minimoJustificativa,
   obrigatorio,
+  ativo,
+  justificado,
+  onAtivar,
 }: PropsNotaDoCriterio) {
-  const escritos = justificativa.trim().length;
-  const rende = escritos >= minimoJustificativa;
-  const idJustificativa = `justificativa-${criterio.chave}`;
-  const idContador = `${idJustificativa}-contador`;
-
   const rotulo = obrigatorio
     ? `${criterio.rotulo} · ${AVALIAR.criterioObrigatorio}`
     : criterio.rotulo;
 
   return (
-    <div className={estilos.base}>
+    // Foco ou clique em qualquer parte da linha abre a justificativa dela no
+    // painel ao lado — o comportamento do protótipo aprovado.
+    <div
+      className={[estilos.base, ativo ? estilos.ativo : undefined].filter(Boolean).join(' ')}
+      onFocusCapture={onAtivar}
+      onPointerDownCapture={onAtivar}
+      data-justificado={justificado || undefined}
+    >
       <div className={estilos.linha}>
         <CampoNota
           rotulo={rotulo}
@@ -66,9 +79,10 @@ export function NotaDoCriterio({
           textoSemNota={AVALIAR.semNota}
         />
 
-        {/* Só aparece depois de haver o que remover: um botão permanente de
-            "remover" ao lado de um campo vazio é ruído. */}
-        {nota === null ? null : (
+        {/* Só aparece depois de haver o que remover, e só no critério aberto:
+            o protótipo não tem o botão, e onze dele apertariam os sliders. O
+            foco no slider abre o critério, então o Tab seguinte chega nele. */}
+        {nota === null || !ativo ? null : (
           <button
             type="button"
             className={estilos.remover}
@@ -81,7 +95,30 @@ export function NotaDoCriterio({
       </div>
 
       <input type="hidden" name={`nota.${criterio.chave}`} value={nota === null ? '' : nota} />
+    </div>
+  );
+}
 
+/**
+ * A justificativa de um critério, no painel ao lado das notas.
+ *
+ * Todas ficam no formulário — as fechadas com `hidden`, que ainda envia —, e
+ * cada uma mantém o próprio rótulo. Só a do critério ativo aparece.
+ */
+export function JustificativaDoCriterio({
+  criterio,
+  justificativa,
+  onJustificativaMudar,
+  minimoJustificativa,
+  visivel,
+}: PropsJustificativaDoCriterio) {
+  const escritos = justificativa.trim().length;
+  const rende = escritos >= minimoJustificativa;
+  const idJustificativa = `justificativa-${criterio.chave}`;
+  const idContador = `${idJustificativa}-contador`;
+
+  return (
+    <div className={estilos.justificativaBloco} hidden={!visivel}>
       <label className={estilos.rotuloJustificativa} htmlFor={idJustificativa}>
         {AVALIAR.justificativaDe(criterio.rotulo)}
       </label>
@@ -93,7 +130,7 @@ export function NotaDoCriterio({
         value={justificativa}
         onChange={(evento) => onJustificativaMudar(evento.target.value)}
         placeholder={AVALIAR.justificativaPlaceholder}
-        rows={3}
+        rows={8}
         aria-describedby={idContador}
       />
 

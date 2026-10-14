@@ -44,8 +44,10 @@ test.describe('C3 · Notas objetivas', () => {
   test('os onze critérios aparecem, agrupados', { tag: ['@RF-059'] }, async ({ page }) => {
     await abrirAvaliacao(page, FAIXA_DO_C3);
 
+    // `.first()`: no protótipo aprovado os critérios vêm em dois cartões
+    // (obrigatórios e opcionais), e um bloco como Composição aparece nos dois.
     for (const grupo of Object.values(AVALIAR.grupos)) {
-      await expect(page.getByRole('group', { name: grupo }), grupo).toBeVisible();
+      await expect(page.getByRole('group', { name: grupo }).first(), grupo).toBeVisible();
     }
 
     // Onze sliders de nota, um por critério.
