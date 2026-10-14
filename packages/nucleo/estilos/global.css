@@ -97,14 +97,14 @@ h1,
 h2,
 .dsn-display {
   /*
-   * `!important` provisório (Fase 0, 14/10): os módulos ainda declaram peso
-   * 700/800 e tracking negativo nos seus `.titulo`, feitos para a Inter. A
-   * Anton só tem 400 — sem isto, sai negrito sintético. A Fase 1 tira isto
-   * módulo a módulo.
+   * A Anton só tem 400: um módulo que declare 700 num título sai em negrito
+   * sintético. Os `.titulo` dos módulos usam `--dsn-weight-regular` e
+   * `--dsn-tracking-display`; o nome de faixa, que fica em Archivo, declara a
+   * própria família.
    */
-  font-family: var(--dsn-font-display) !important;
-  font-weight: var(--dsn-weight-regular) !important;
-  letter-spacing: var(--dsn-tracking-display) !important;
+  font-family: var(--dsn-font-display);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   text-transform: uppercase;
 }
 

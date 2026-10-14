@@ -68,8 +68,8 @@
 .titulo {
   margin: 0;
   font-size: var(--dsn-text-md);
-  font-weight: var(--dsn-weight-bold);
-  letter-spacing: var(--dsn-tracking-tight);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   color: var(--dsn-ink);
 }
 

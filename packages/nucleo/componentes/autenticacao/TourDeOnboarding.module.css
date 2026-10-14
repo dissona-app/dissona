@@ -51,8 +51,8 @@
   margin: 0;
   font-size: var(--dsn-text-3xl);
   line-height: var(--dsn-leading-hero);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tightest);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   text-wrap: pretty;
 }
 

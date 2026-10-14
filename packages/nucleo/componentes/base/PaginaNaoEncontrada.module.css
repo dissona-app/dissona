@@ -20,7 +20,7 @@
 .titulo {
   margin: 0;
   font-size: var(--dsn-text-xl);
-  font-weight: var(--dsn-weight-semibold);
+  font-weight: var(--dsn-weight-regular);
   color: var(--dsn-ink);
 }
 
