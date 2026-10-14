@@ -4,7 +4,9 @@ import { redirect } from 'next/navigation';
 import { CartaoDaClasse } from '@/componentes/curador/CartaoDaClasse';
 import { FormularioDeServicos } from '@/componentes/curador/FormularioDeServicos';
 import { TabelaDeMidias } from '@/componentes/curador/TabelaDeMidias';
+import { VitrineDoCurador } from '@/componentes/curador/VitrineDoCurador';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { urlPublicaDoAvatar } from '@dissona/nucleo/lib/supabase/armazenamento';
 import {
   removerMidiaDoCurador,
   salvarMidiaDoCurador,
@@ -44,8 +46,20 @@ export default async function Pagina() {
   if (estado === null) redirect(ROTA.CURADOR_ENTRAR);
   if (!estado.concluido) redirect(ROTA.CURADOR_CADASTRO);
 
+  const fotoUrl = await urlPublicaDoAvatar(estado.fotoCaminho);
+
   return (
     <div className={estilos.base}>
+      <VitrineDoCurador
+        nome={estado.nome}
+        fotoUrl={fotoUrl}
+        classe={estado.classe}
+        atuacao={estado.atuacao}
+        tempoAtuacao={estado.tempoAtuacao}
+        generos={estado.generos}
+        bio={estado.bio}
+      />
+
       <CartaoDaClasse classe={estado.classe} situacao={estado.situacaoCurador} />
 
       <TabelaDeMidias
