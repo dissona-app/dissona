@@ -39,7 +39,7 @@ export function Passo7Bio({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo, motivos, falha } = usePasso(acao);
+  const { enviar, aoEnviar, motivo, motivos, falha } = usePasso(acao);
   const [bio, setBio] = useState(estado.bio ?? '');
 
   const codigoDaBio = motivos['bio'] ?? motivo;
@@ -55,7 +55,7 @@ export function Passo7Bio({
   const erroGeral = erroGeralDe(falha, [erroDaBio, erroDaEspecialidade]);
 
   return (
-    <form action={enviar} className={estilos.formulario} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
       <div className={estilos.blocoBio}>

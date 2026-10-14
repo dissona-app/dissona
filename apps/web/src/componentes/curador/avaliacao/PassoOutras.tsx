@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Campo } from '@dissona/nucleo/componentes/base/Campo';
@@ -11,6 +11,7 @@ import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 import { AcoesDaAvaliacao } from './AcoesDaAvaliacao';
 import { ID_DO_FORMULARIO } from './MolduraDaAvaliacao';
 import estilos from './PassoOutras.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsPassoOutras = {
   readonly envioId: string;
@@ -43,7 +44,7 @@ export function PassoOutras({ envioId, avaliacao, voltarPara, acao }: PropsPasso
   const [descricao, setDescricao] = useState(avaliacao.compartilhamento?.descricao ?? '');
   const [url, setUrl] = useState(avaliacao.compartilhamento?.url ?? '');
 
-  const [resultado, enviar] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, , aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -52,7 +53,7 @@ export function PassoOutras({ envioId, avaliacao, voltarPara, acao }: PropsPasso
   const erro = falhou ? MOTIVOS[resultado.campos?.['descricao'] ?? ''] : undefined;
 
   return (
-    <form action={enviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
+    <form action={enviar} onSubmit={aoEnviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
       <input type="hidden" name="envioId" value={envioId} />
 
       {falhou && erro === undefined ? <Aviso tom="erro">{AVALIAR.erroInesperado}</Aviso> : null}

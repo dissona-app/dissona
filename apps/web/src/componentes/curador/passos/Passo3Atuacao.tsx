@@ -40,7 +40,7 @@ export function Passo3Atuacao({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo, motivos, falha } = usePasso(acao);
+  const { enviar, aoEnviar, motivo, motivos, falha } = usePasso(acao);
 
   const erroDe = (campo: string): string | undefined => {
     const codigo = motivos[campo] ?? (campo === 'frentes' ? motivo : undefined);
@@ -50,7 +50,7 @@ export function Passo3Atuacao({
   const erroGeral = erroGeralDe(falha, [erroDe('frentes'), erroDe('tempo')]);
 
   return (
-    <form action={enviar} className={estilos.formulario} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
       <Chips

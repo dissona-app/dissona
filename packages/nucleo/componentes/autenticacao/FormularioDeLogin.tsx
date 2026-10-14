@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -12,6 +12,7 @@ import { CodigoErro } from '@dissona/nucleo/lib/erros';
 
 import estilos from './FormularioDeLogin.module.css';
 import { IconeOlho } from './IconeOlho';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type Banner = { readonly titulo: string; readonly texto: string; readonly acao?: ReactNode };
 
@@ -93,19 +94,8 @@ export function FormularioDeLogin({
   rodape,
   bannerInicial,
 }: PropsFormulario) {
-  // O React 19 reseta o `<form>` depois de toda action: sem isto, uma senha
-  // errada apagava também o e-mail digitado. O enviado vira o `defaultValue`.
-  const [enviados, setEnviados] = useState<FormData | null>(null);
-  const enviado = (campo: string): string | undefined => {
-    const valor = enviados?.get(campo);
-    return typeof valor === 'string' ? valor : undefined;
-  };
-
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
-    async (_anterior, dados) => {
-      setEnviados(dados);
-      return acao(dados);
-    },
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
+    async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
   );
 
@@ -174,12 +164,11 @@ export function FormularioDeLogin({
 
       {social}
 
-      <form action={enviar} className={estilos.campos} noValidate>
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.campos} noValidate>
         {proximo !== undefined ? <input type="hidden" name="proximo" value={proximo} /> : null}
 
         <Campo
           name="email"
-          defaultValue={enviado('email')}
           type="email"
           rotulo={textos.rotuloEmail}
           placeholder={textos.placeholderEmail}

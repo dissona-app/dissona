@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Painel } from '@/componentes/base/Painel';
@@ -17,6 +17,7 @@ import { ID_DO_FORMULARIO } from './MolduraDaAvaliacao';
 import { NotaDoCriterio } from './NotaDoCriterio';
 import { PlayerComMedicao } from './PlayerComMedicao';
 import estilos from './PassoNotas.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsPassoNotas = {
   readonly envioId: string;
@@ -78,7 +79,7 @@ export function PassoNotas({
   const [notas, setNotas] = useState(inicial.notas);
   const [justificativas, setJustificativas] = useState(inicial.justificativas);
 
-  const [resultado, enviar] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, , aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -90,7 +91,7 @@ export function PassoNotas({
   const grupos = [...new Set(criterios.map((criterio) => criterio.grupo))];
 
   return (
-    <form action={enviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
+    <form action={enviar} onSubmit={aoEnviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
       <input type="hidden" name="envioId" value={envioId} />
 
       {resultado !== null && !resultado.ok ? (

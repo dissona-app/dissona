@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { AreaTexto } from '@/componentes/base/AreaTexto';
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
@@ -15,6 +15,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { ENVIAR as TEXTOS, GENEROS_DO_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDoContexto.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsFormularioDoContexto = {
   readonly faixa: FaixaEmEdicao;
@@ -54,7 +55,7 @@ function descricaoDaFaixa(faixa: FaixaEmEdicao): string {
  * própria prop já comunica ao desabilitar os demais.
  */
 export function FormularioDoContexto({ faixa, acao }: PropsFormularioDoContexto) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -72,7 +73,7 @@ export function FormularioDoContexto({ faixa, acao }: PropsFormularioDoContexto)
   const erroGeral = erroGeralDe(falha, [erroDe('genero'), erroDe('contexto')]);
 
   return (
-    <form action={enviar} className={estilos.base} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.base} noValidate>
       <input type="hidden" name="faixaId" value={faixa.id} />
 
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}

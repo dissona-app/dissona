@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BarraProgresso } from '@/componentes/base/BarraProgresso';
@@ -18,6 +18,7 @@ import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 import { AcoesDaAvaliacao } from './AcoesDaAvaliacao';
 import { ID_DO_FORMULARIO } from './MolduraDaAvaliacao';
 import estilos from './PassoSubjetiva.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsPassoSubjetiva = {
   readonly envioId: string;
@@ -64,7 +65,7 @@ export function PassoSubjetiva({
   const [nota, setNota] = useState(avaliacao.notaSubjetiva ?? NOTA_INICIAL);
   const [feedback, setFeedback] = useState(avaliacao.feedback ?? '');
 
-  const [resultado, enviar] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, , aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -76,7 +77,7 @@ export function PassoSubjetiva({
   const rende = escritos >= regras.feedbackMinCaracteres;
 
   return (
-    <form action={enviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
+    <form action={enviar} onSubmit={aoEnviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
       <input type="hidden" name="envioId" value={envioId} />
 
       {resultado !== null && !resultado.ok ? (

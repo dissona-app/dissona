@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -14,6 +14,7 @@ import { CADASTRAR, CONTA } from '@dissona/nucleo/textos/prototipo';
 
 import { IconeOlho } from '@dissona/nucleo/componentes/autenticacao/IconeOlho';
 import estilos from './ModalDeCredencial.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type TipoDeCredencial = 'senha' | 'email';
 
@@ -63,7 +64,7 @@ export function ModalDeCredencial({
 }: PropsModalDeCredencial) {
   const textos = tipo === 'senha' ? CONTA.modalSenha : CONTA.modalEmail;
 
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -129,7 +130,7 @@ export function ModalDeCredencial({
       largura="estreita"
       persistente
     >
-      <form action={enviar} className={estilos.formulario} noValidate>
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
         {limiteDeEnvio ? (
           <Aviso tom="alerta" titulo={CONTA.erroLimite}>
             {textos.texto}

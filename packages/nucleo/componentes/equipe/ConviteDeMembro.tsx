@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -15,6 +15,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { EQUIPE } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './ConviteDeMembro.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 const { convite: TEXTOS } = EQUIPE;
 
@@ -56,10 +57,11 @@ export type PropsConviteDeMembro = {
 export function ConviteDeMembro({ acao }: PropsConviteDeMembro) {
   const [aberto, setAberto] = useState(false);
 
-  const [resultado, enviar, pendente] = useActionState<
-    ResultadoDeAcao<DadosDoConvite> | null,
-    FormData
-  >(async (_anterior, dados) => acao(dados), null);
+  const [resultado, enviar, pendente, aoEnviar] =
+    useAcaoDoFormulario<ResultadoDeAcao<DadosDoConvite> | null>(
+      async (_anterior, dados) => acao(dados),
+      null,
+    );
 
   const enviado = resultado !== null && resultado.ok ? resultado.dados : undefined;
   const falhou = resultado !== null && !resultado.ok;
@@ -95,7 +97,7 @@ export function ConviteDeMembro({ acao }: PropsConviteDeMembro) {
         largura="estreita"
       >
         {enviado === undefined ? (
-          <form action={enviar} className={estilos.formulario} noValidate>
+          <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
             {limiteDeEnvio ? <Aviso tom="alerta">{TEXTOS.erroLimite}</Aviso> : null}
 
             {semPermissao ? <Aviso tom="erro">{TEXTOS.erroSemPermissao}</Aviso> : null}

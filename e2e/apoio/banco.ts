@@ -705,13 +705,20 @@ export async function pacotePorNome(nome: string): Promise<string | null> {
  * `criar_perfil_para_novo_usuario` cria o perfil com o id do usuário.
  */
 export async function perfilPorEmail(email: string): Promise<string | null> {
-  const { data, error } = await clienteDeServico().auth.admin.listUsers({
-    page: 1,
-    perPage: 200,
-  });
-
-  estourar(`perfilPorEmail("${email}")`, error);
-  return data.users.find((usuario) => usuario.email === email)?.id ?? null;
+  // Pagina até achar: com as contas de QA (`qa_*`) o projeto passou de 200
+  // usuários, e a primeira página sozinha deixava personas de fora — o
+  // helper devolvia `null` e a limpeza dos cenários deixava de rodar.
+  for (let pagina = 1; pagina <= 50; pagina += 1) {
+    const { data, error } = await clienteDeServico().auth.admin.listUsers({
+      page: pagina,
+      perPage: 200,
+    });
+    estourar(`perfilPorEmail("${email}")`, error);
+    const achado = data.users.find((usuario) => usuario.email === email);
+    if (achado !== undefined) return achado.id;
+    if (data.users.length < 200) return null;
+  }
+  return null;
 }
 
 /** O limite de upload em MB, de `configuracao` — nunca o `50` literal. */

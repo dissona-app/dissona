@@ -50,7 +50,7 @@ export function Passo4Canais({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo, falha } = usePasso(acao);
+  const { enviar, aoEnviar, motivo, falha } = usePasso(acao);
 
   const [linhas, setLinhas] = useState<readonly Linha[]>(() =>
     estado.canais.length > 0
@@ -80,7 +80,7 @@ export function Passo4Canais({
   const erroGeral = erroGeralDe(falha, [erro]);
 
   return (
-    <form action={enviar} className={estilos.formulario} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
       {(erro ?? erroGeral) !== undefined ? (
         <Aviso tom="erro" titulo={erro ?? erroGeral}>
           {CURADOR_CADASTRO.subtitulos[3]}

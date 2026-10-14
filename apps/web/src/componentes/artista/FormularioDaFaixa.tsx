@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useActionState, useRef, useState, useTransition } from 'react';
+import type { FormEvent } from 'react';
+import { startTransition, useActionState, useRef, useState, useTransition } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -174,10 +175,24 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
    * e `salvarFaixa` valida pelo `File`. Os dois caminhos existem, e o de baixo
    * é o que garante que a tela funcione sem hidratação.
    */
+  /**
+   * O envio passa pelo `onSubmit`, e não pelo `<form action>`: o React 19
+   * reseta o formulário depois de toda action, e um erro (título vazio,
+   * arquivo recusado) apagava estilo e data de lançamento. Ver
+   * `useAcaoDoFormulario`. O `action` fica para o envio sem JavaScript.
+   */
+  const aoEnviar = (evento: FormEvent<HTMLFormElement>) => {
+    if (evento.defaultPrevented) return;
+    evento.preventDefault();
+    const botao = (evento.nativeEvent as SubmitEvent).submitter;
+    const dados = new FormData(evento.currentTarget, botao ?? undefined);
+    startTransition(() => enviarComUpload(dados));
+  };
+
   const enviarComUpload = async (dados: FormData) => {
     setFalhaDoUpload(null);
     if (arquivoDeAudio === null && arquivoDaCapa === null) {
-      enviar(dados);
+      startTransition(() => enviar(dados));
       return;
     }
 
@@ -189,7 +204,7 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
       // Sem sessão legível daqui, deixa a ação recusar: ela tem a resposta
       // certa para isso, e adivinhá-la no cliente daria duas versões da regra.
       if (usuarioId === undefined) {
-        enviar(dados);
+        startTransition(() => enviar(dados));
         return;
       }
 
@@ -238,7 +253,7 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
       setSubindo(false);
     }
 
-    enviar(dados);
+    startTransition(() => enviar(dados));
   };
 
   /** O Storage recusa por tamanho e por MIME — e as mensagens já existem. */
@@ -254,7 +269,13 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   }
 
   return (
-    <form ref={formulario} action={enviarComUpload} className={estilos.base} noValidate>
+    <form
+      ref={formulario}
+      action={enviarComUpload}
+      onSubmit={aoEnviar}
+      className={estilos.base}
+      noValidate
+    >
       {faixa !== null ? <input type="hidden" name="faixaId" value={faixa.id} /> : null}
       <input
         type="hidden"

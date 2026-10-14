@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import {
   AreaTexto,
@@ -20,6 +20,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { ARTISTA_PERFIL as TEXTOS, GENEROS_DO_ARTISTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDePerfil.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsFormularioDePerfil = {
   readonly perfil: PerfilDoArtista;
@@ -52,15 +53,11 @@ const MOTIVOS: Readonly<Record<string, string>> = {
 };
 
 export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDePerfil) {
-  // Guarda também o que foi enviado. O React 19 reseta o `<form>` depois de
-  // toda action, e os campos não controlados voltariam ao `defaultValue` — o
-  // que está no banco. Num erro de validação, isso apagava tudo o que a pessoa
-  // tinha digitado nos outros campos. Com a falha, o enviado vira o padrão.
-  const [estado, enviar, pendente] = useActionState<
-    { readonly resultado: ResultadoDeAcao; readonly enviados: FormData } | null,
-    FormData
-  >(async (_anterior, dados) => ({ resultado: await acao(dados), enviados: dados }), null);
-  const resultado = estado?.resultado ?? null;
+  // Sem o reset do React 19: um erro num campo não apaga os outros.
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
+    async (_anterior, dados) => acao(dados),
+    null,
+  );
 
   // A bio é controlada porque o contador de `AreaTexto` lê `value`. Os demais
   // campos ficam não controlados — não têm contador, e `defaultValue` basta.
@@ -71,17 +68,6 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
   const [subindoFoto, setSubindoFoto] = useState(false);
 
   const falha = resultado !== null && !resultado.ok ? resultado : null;
-
-  // Depois de uma falha, o que a pessoa enviou; senão, o que está salvo.
-  const enviados = falha === null ? null : (estado?.enviados ?? null);
-  const inicial = (campo: string, salvo: string | null): string => {
-    const valor = enviados?.get(campo);
-    return typeof valor === 'string' ? valor : (salvo ?? '');
-  };
-  const generosIniciais =
-    enviados === null
-      ? perfil.generos
-      : enviados.getAll('genero').filter((g): g is string => typeof g === 'string');
 
   const erroDe = (campo: string): string | undefined => {
     if (falha === null) return undefined;
@@ -111,7 +97,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
   ]);
 
   return (
-    <form action={enviar} className={estilos.base} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.base} noValidate>
       {resultado !== null && resultado.ok ? <Aviso tom="sucesso">{TEXTOS.salvo}</Aviso> : null}
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
@@ -143,14 +129,14 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
             rotulo={TEXTOS.rotuloNomeExibicao}
             // Sem nome artístico ainda, vale o nome do cadastro — é o que o
             // Perfil (7) já exibe; o campo vazio parecia dado perdido.
-            defaultValue={inicial('nomeExibicao', perfil.nomeExibicao ?? perfil.nomeCompleto)}
+            defaultValue={perfil.nomeExibicao ?? perfil.nomeCompleto}
             erro={erroDe('nomeExibicao')}
             autoComplete="nickname"
           />
           <Campo
             name="cidade"
             rotulo={TEXTOS.rotuloCidade}
-            defaultValue={inicial('cidade', perfil.cidade)}
+            defaultValue={perfil.cidade ?? ''}
             erro={erroDe('cidade')}
             autoComplete="address-level2"
           />
@@ -159,7 +145,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
         <Campo
           name="handle"
           rotulo={TEXTOS.rotuloHandle}
-          defaultValue={inicial('handle', perfil.handle)}
+          defaultValue={perfil.handle ?? ''}
           auxiliar={TEXTOS.auxiliarHandle}
           erro={erroDe('handle')}
           autoComplete="username"
@@ -179,7 +165,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
           name="genero"
           rotulo={`${TEXTOS.rotuloGeneros} ${TEXTOS.sufixoGeneros}`}
           opcoes={GENEROS_DO_ARTISTA}
-          selecionados={generosIniciais}
+          selecionados={perfil.generos}
           maximo={MAXIMO_DE_GENEROS}
           contador={(quantos) => TEXTOS.contagemGeneros(quantos, MAXIMO_DE_GENEROS)}
           erro={erroDe('generos')}
@@ -192,7 +178,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
             name="linkInstagram"
             placeholder={TEXTOS.exemploInstagram}
             rotulo={TEXTOS.rotuloInstagram}
-            defaultValue={inicial('linkInstagram', perfil.linkInstagram)}
+            defaultValue={perfil.linkInstagram ?? ''}
             erro={erroDe('linkInstagram')}
             inputMode="url"
           />
@@ -200,7 +186,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
             name="linkSpotify"
             placeholder={TEXTOS.exemploSpotify}
             rotulo={TEXTOS.rotuloSpotify}
-            defaultValue={inicial('linkSpotify', perfil.linkSpotify)}
+            defaultValue={perfil.linkSpotify ?? ''}
             erro={erroDe('linkSpotify')}
             inputMode="url"
           />
@@ -208,7 +194,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
             name="linkYoutube"
             placeholder={TEXTOS.exemploYoutube}
             rotulo={TEXTOS.rotuloYoutube}
-            defaultValue={inicial('linkYoutube', perfil.linkYoutube)}
+            defaultValue={perfil.linkYoutube ?? ''}
             erro={erroDe('linkYoutube')}
             inputMode="url"
           />
@@ -216,7 +202,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
             name="linkSite"
             placeholder={TEXTOS.exemploSite}
             rotulo={TEXTOS.rotuloSite}
-            defaultValue={inicial('linkSite', perfil.linkSite)}
+            defaultValue={perfil.linkSite ?? ''}
             erro={erroDe('linkSite')}
             inputMode="url"
           />

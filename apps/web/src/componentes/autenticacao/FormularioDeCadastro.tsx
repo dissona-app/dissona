@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -18,6 +18,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import estilos from './FormularioDeCadastro.module.css';
 import type { Banner } from '@dissona/nucleo/componentes/autenticacao/FormularioDeLogin';
 import { IconeOlho } from '@dissona/nucleo/componentes/autenticacao/IconeOlho';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsFormularioDeCadastro = {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
@@ -76,19 +77,8 @@ export function FormularioDeCadastro({
   papel,
   social,
 }: PropsFormularioDeCadastro) {
-  // O React 19 reseta o `<form>` depois de toda action: sem isto, uma senha
-  // errada apagava também o e-mail digitado. O enviado vira o `defaultValue`.
-  const [enviados, setEnviados] = useState<FormData | null>(null);
-  const enviado = (campo: string): string | undefined => {
-    const valor = enviados?.get(campo);
-    return typeof valor === 'string' ? valor : undefined;
-  };
-
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
-    async (_anterior, dados) => {
-      setEnviados(dados);
-      return acao(dados);
-    },
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
+    async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
   );
 
@@ -159,14 +149,13 @@ export function FormularioDeCadastro({
         </Aviso>
       ) : null}
 
-      <form action={enviar} className={estilos.campos} noValidate>
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.campos} noValidate>
         {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
         {papel === undefined ? null : <input type="hidden" name="papel" value={papel} />}
 
         <Campo
           name="nome"
-          defaultValue={enviado('nome')}
           type="text"
           rotulo={textos.rotuloNome}
           placeholder={textos.placeholderNome}
@@ -177,7 +166,6 @@ export function FormularioDeCadastro({
 
         <Campo
           name="email"
-          defaultValue={enviado('email')}
           type="email"
           rotulo={textos.rotuloEmail}
           placeholder={textos.placeholderEmail}
@@ -231,13 +219,7 @@ export function FormularioDeCadastro({
           erro={erroDeCampo('confirmar')}
         />
 
-        <Checkbox
-          name="aceite"
-          value="on"
-          required
-          defaultChecked={enviado('aceite') === 'on'}
-          erro={erroDeCampo('aceite')}
-        >
+        <Checkbox name="aceite" value="on" required erro={erroDeCampo('aceite')}>
           {textos.aceiteAntes}
           <Link className={estilos.aceiteLink} href={ROTA.TERMOS}>
             {textos.aceiteTermos}

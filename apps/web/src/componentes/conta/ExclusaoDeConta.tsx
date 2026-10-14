@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -12,6 +12,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { CONTA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './ExclusaoDeConta.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type ArquivoDeExportacao = { readonly url: string; readonly nome: string };
 
@@ -57,12 +58,13 @@ export function ExclusaoDeConta({
 }: PropsExclusaoDeConta) {
   const [passo, setPasso] = useState<1 | 2>(1);
 
-  const [exportacao, exportar, exportando] = useActionState<
-    ResultadoDeAcao<ArquivoDeExportacao> | null,
-    FormData
-  >(async () => acaoDeExportar(), null);
+  const [exportacao, exportar, exportando, aoExportar] =
+    useAcaoDoFormulario<ResultadoDeAcao<ArquivoDeExportacao> | null>(
+      async () => acaoDeExportar(),
+      null,
+    );
 
-  const [exclusao, excluir, excluindo] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [exclusao, excluir, excluindo, aoExcluir] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acaoDeExcluir(dados),
     null,
   );
@@ -121,7 +123,7 @@ export function ExclusaoDeConta({
             </span>
 
             {arquivo === undefined ? (
-              <form action={exportar}>
+              <form action={exportar} onSubmit={aoExportar}>
                 <Botao type="submit" variante="secundario" tamanho="denso" carregando={exportando}>
                   {exportando ? CONTA.modalExportar.exportando : CONTA.modalExportar.exportar}
                 </Botao>
@@ -149,7 +151,7 @@ export function ExclusaoDeConta({
           </div>
         </div>
       ) : (
-        <form action={excluir} className={estilos.corpo} noValidate>
+        <form action={excluir} onSubmit={aoExcluir} className={estilos.corpo} noValidate>
           {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
           <Campo

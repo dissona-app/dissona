@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -15,6 +15,7 @@ import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { SELECAO as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './SelecaoDeCuradores.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 /** Um curador na lista, **já formatado no servidor**. */
 export type CuradorNaLista = {
@@ -55,7 +56,7 @@ const MOTIVOS: Readonly<Record<string, string>> = {
  * discordarem.
  */
 export function SelecaoDeCuradores({ faixaId, curadores, acao }: PropsSelecaoDeCuradores) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -86,7 +87,7 @@ export function SelecaoDeCuradores({ faixaId, curadores, acao }: PropsSelecaoDeC
   }
 
   return (
-    <form action={enviar} className={estilos.base} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.base} noValidate>
       <input type="hidden" name="faixaId" value={faixaId} />
 
       {erro !== null ? (

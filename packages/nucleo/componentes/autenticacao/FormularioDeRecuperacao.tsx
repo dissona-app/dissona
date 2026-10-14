@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -11,6 +11,7 @@ import { CodigoErro } from '@dissona/nucleo/lib/erros';
 import { SENHA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDeRecuperacao.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsFormularioDeRecuperacao = {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
@@ -62,7 +63,7 @@ export function FormularioDeRecuperacao({
   const [fimDoCooldown, setFimDoCooldown] = useState<number | null>(null);
   const [agora, setAgora] = useState(0);
 
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => {
       const proximo = await acao(dados);
       if (proximo.ok) {
@@ -128,7 +129,7 @@ export function FormularioDeRecuperacao({
         campo sai de vista, porque o endereço já foi dado e reeditá-lo seria
         outro pedido, não um reenvio.
       */}
-      <form action={enviar} className={estilos.campos}>
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.campos}>
         <div className={enviado ? 'dsn-apenas-leitor' : estilos.campo}>
           <Campo
             name="email"
