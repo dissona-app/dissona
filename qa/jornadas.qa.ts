@@ -503,6 +503,13 @@ test('Jornada 4 · Admin → Artista: pacote desativado sai da vitrine', async (
     await expect(artista.getByRole('link', { name: new RegExp(NOME_DO_PACOTE) })).toHaveCount(0);
   });
 
+  // O pacote da rodada sai de vez (exclusão lógica): o banco é o de
+  // produção, e pacotes de QA acumulados apareciam no painel do admin.
+  await clienteDeServico()
+    .from('pacote_clave')
+    .update({ ativo: false, excluido_em: new Date().toISOString() })
+    .eq('nome', NOME_DO_PACOTE);
+
   await admin.context().close();
   await artista.context().close();
 });

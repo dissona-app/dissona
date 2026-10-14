@@ -1,7 +1,55 @@
-/* 3.3 · Status do envio — versão mínima. */
+/* 4.4 · Status do envio — valores literais do protótipo aprovado. */
 
 .base {
-  max-width: 52rem;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1100px;
+}
+
+.faixa {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.capa {
+  width: 52px;
+  height: 52px;
+  border-radius: 5px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #b780e7;
+}
+
+.faixaTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.faixaTitulo {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faixaInfo {
+  font-size: 13px;
+  color: #6e6478;
+}
+
+.moldura {
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .tabela {
@@ -9,22 +57,24 @@
   border-collapse: collapse;
 }
 
-.tabela th,
-.tabela td {
-  padding: var(--dsn-space-4) var(--dsn-space-2);
-  border-bottom: 1px solid var(--dsn-border-faint);
+.tabela thead th {
+  padding: 12px 20px;
+  background: #140d1a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b780e7;
   text-align: left;
-  font-weight: 400;
-  color: var(--dsn-ink);
-  vertical-align: middle;
 }
 
-.tabela thead th {
-  font-size: var(--dsn-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--dsn-ink-500);
+.tabela tbody th,
+.tabela tbody td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #efeaf2;
+  text-align: left;
+  vertical-align: middle;
+  font-weight: 400;
 }
 
 .tabela tbody tr:last-child th,
@@ -33,17 +83,110 @@
 }
 
 .curador {
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
 }
 
-/* A barra ocupa a coluna inteira; o rótulo é oculto porque a coluna "Etapa"
-   ao lado já diz em palavras o que ela mostra em forma. */
-.andamento {
-  min-width: 10rem;
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #140d1a;
+  background: #efe7f8;
+}
+
+.curadorNome {
+  font-size: 14px;
+  font-weight: 600;
+  color: #5b2e8f;
+}
+
+.barras,
+.legendas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px 10px;
+}
+
+.barras {
+  margin-bottom: 6px;
+}
+
+.barra {
+  height: 6px;
+  border-radius: 2px;
+}
+
+.legenda,
+.legendaFeita,
+.legendaAtual {
+  font-size: 11px;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
+.legenda {
+  font-weight: 500;
+  color: #a9a2b4;
+}
+
+.legendaFeita {
+  font-weight: 500;
+  color: #6e6478;
+}
+
+.legendaAtual {
+  font-weight: 700;
+  color: #140d1a;
+}
+
+.prazo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a3242;
+  white-space: nowrap;
+}
+
+.prazoCurto {
+  color: #8c3a2c;
+}
+
+.prazoEntregue {
+  color: #1e7a4a;
+}
+
+.etapa,
+.etapaPronta {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.etapa {
+  color: #140d1a;
+  background: #efe7f8;
+}
+
+.etapaPronta {
+  color: #1e7a4a;
+  background: #e6f5ed;
 }
 
 .nota {
-  margin: var(--dsn-space-6) 0 0;
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+  margin: 0;
+  font-size: 12px;
+  color: #6e6478;
 }

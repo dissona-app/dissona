@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { BarraProgresso } from '@/componentes/base/BarraProgresso';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
-import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
-import { Painel } from '@/componentes/base/Painel';
 import { prazoRestante } from '@dissona/nucleo/lib/formato';
 import { buscar } from '@/modulos/faixa/repositorio';
 import { lerEnviosDaFaixa } from '@/modulos/selecao/consultas';
@@ -18,14 +15,29 @@ export const metadata: Metadata = {
 };
 
 /** Quanto da jornada `Recebeu → Ouviu → Avaliando → Pronto` já andou. */
-const AVANCO: Readonly<Record<string, number>> = {
-  recebeu: 25,
-  ouviu: 50,
-  avaliando: 75,
-  pronto: 100,
-  devolvido: 100,
-  cancelado: 100,
-};
+/**
+ * As quatro etapas do andamento — `enEtapasMeta` do protótipo aprovado: cada
+ * barra acende na cor da sua etapa até a atual.
+ */
+const ETAPAS = [
+  { chave: 'recebeu', cor: '#B780E7', legenda: 'Curador recebeu sua música' },
+  { chave: 'ouviu', cor: '#7F47DD', legenda: 'O curador ouviu e está avaliando' },
+  { chave: 'avaliando', cor: '#140D1A', legenda: 'Falta pouco, estamos ansiosos junto com você!' },
+  { chave: 'pronto', cor: '#2FA565', legenda: 'Parabéns! Seu feedback está prontinho' },
+] as const;
+
+function indiceDaEtapa(situacao: string): number {
+  const i = ETAPAS.findIndex((etapa) => etapa.chave === situacao);
+  return i === -1 ? ETAPAS.length - 1 : i;
+}
+
+function iniciais(nome: string): string {
+  return nome
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((parte) => parte[0]?.toUpperCase() ?? '')
+    .join('');
+}
 
 /**
  * 3.3 · Status de envio — **versão mínima** da R2.
@@ -49,10 +61,24 @@ export default async function PaginaDoStatus({
 
   return (
     <div className={estilos.base}>
-      <Painel titulo={TEXTOS.titulo} sublegenda={faixa.titulo}>
-        {envios.length === 0 ? (
-          <EstadoVazio titulo={TEXTOS.vazioTitulo} descricao={TEXTOS.vazioDescricao} />
-        ) : (
+      <div className={estilos.faixa}>
+        <span className={estilos.capa} aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18V5l12-2v13" stroke="#140D1A" strokeWidth="1.8" />
+            <circle cx="6" cy="18" r="3" stroke="#140D1A" strokeWidth="1.8" />
+            <circle cx="18" cy="16" r="3" stroke="#140D1A" strokeWidth="1.8" />
+          </svg>
+        </span>
+        <span className={estilos.faixaTextos}>
+          <span className={estilos.faixaTitulo}>{faixa.titulo}</span>
+          <span className={estilos.faixaInfo}>{TEXTOS.titulo}</span>
+        </span>
+      </div>
+
+      {envios.length === 0 ? (
+        <EstadoVazio titulo={TEXTOS.vazioTitulo} descricao={TEXTOS.vazioDescricao} />
+      ) : (
+        <div className={estilos.moldura}>
           <table className={estilos.tabela}>
             <caption className="dsn-apenas-leitor">{TEXTOS.titulo}</caption>
             <thead>
@@ -66,40 +92,76 @@ export default async function PaginaDoStatus({
             <tbody>
               {envios.map((envio) => {
                 const prazo = prazoRestante(envio.prazoEm, agora);
+                const atual = indiceDaEtapa(envio.situacao);
+                const pronto = envio.situacao === 'pronto';
                 return (
                   <tr key={envio.id}>
                     <th scope="row" className={estilos.curador}>
-                      {envio.curador}
+                      <span className={estilos.avatar} aria-hidden="true">
+                        {iniciais(envio.curador)}
+                      </span>
+                      <span className={estilos.curadorNome}>{envio.curador}</span>
                     </th>
-                    <td className={estilos.andamento}>
-                      <BarraProgresso
-                        percentual={AVANCO[envio.situacao] ?? 0}
-                        rotulo={`${envio.curador}: ${TEXTOS.etapas[envio.situacao]}`}
-                        rotuloOculto
-                        tom={envio.situacao === 'pronto' ? 'sucesso' : 'marca'}
-                      />
+                    <td>
+                      <span className={estilos.barras}>
+                        {ETAPAS.map((etapa, i) => (
+                          <span
+                            key={etapa.chave}
+                            className={estilos.barra}
+                            style={{ background: i <= atual ? etapa.cor : '#EDE8F2' }}
+                          />
+                        ))}
+                      </span>
+                      <span className={estilos.legendas}>
+                        {ETAPAS.map((etapa, i) => (
+                          <span
+                            key={etapa.chave}
+                            className={
+                              i === atual
+                                ? estilos.legendaAtual
+                                : i < atual
+                                  ? estilos.legendaFeita
+                                  : estilos.legenda
+                            }
+                          >
+                            {etapa.legenda}
+                          </span>
+                        ))}
+                      </span>
+                    </td>
+                    <td
+                      className={[
+                        estilos.prazo,
+                        pronto ? estilos.prazoEntregue : undefined,
+                        !pronto && !prazo.vencido && prazo.dias === 0
+                          ? estilos.prazoCurto
+                          : undefined,
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                    >
+                      {pronto
+                        ? 'Entregue'
+                        : prazo.vencido
+                          ? '—'
+                          : prazo.dias > 0
+                            ? `${prazo.dias}d ${prazo.horas}h`
+                            : `${prazo.horas}h`}
                     </td>
                     <td>
-                      {prazo.vencido
-                        ? '—'
-                        : prazo.dias > 0
-                          ? `${prazo.dias}d ${prazo.horas}h`
-                          : `${prazo.horas}h`}
-                    </td>
-                    <td>
-                      <Etiqueta tom={envio.situacao === 'pronto' ? 'sucesso' : 'neutro'}>
+                      <span className={pronto ? estilos.etapaPronta : estilos.etapa}>
                         {TEXTOS.etapas[envio.situacao]}
-                      </Etiqueta>
+                      </span>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-        )}
+        </div>
+      )}
 
-        <p className={estilos.nota}>{TEXTOS.nota}</p>
-      </Painel>
+      <p className={estilos.nota}>{TEXTOS.nota}</p>
     </div>
   );
 }
