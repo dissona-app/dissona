@@ -1,20 +1,15 @@
 /*
- * Moldura das telas de autenticação — protótipos 1 (artista/curador) e 19
- * (admin), de `docs/R2/extraido/{Artista,Admin,Curador}.html`.
+ * Moldura das telas de entrada — protótipo aprovado (`docs/prototipo-aprovado/`,
+ * telas Login, Cadastro, Recuperação e Redefinição dos três ambientes).
  *
- * Os `clamp()` são os do protótipo, copiados como estão. Eles são a única
- * responsividade que o R2 tem — não existe um `@media` nos três arquivos
- * (pendência #24) — e reescrevê-los em breakpoints inventados quebraria a
- * fidelidade sem resolver o mobile, que ninguém desenhou ainda.
+ * Fundo `#140D1A` com a órbita animada (`OrbitaDeFundo`), a faixa de quatro
+ * cores no topo e o cartão branco. Os `clamp()` são os do protótipo, copiados
+ * como estão.
  *
- * Os três ambientes divergem em quatro pontos, cada um coberto por uma classe
- * `.ambiente*` que sobrescreve a base: altura da marca (essa vem por `style`
- * inline, na prop `altura` do componente `Marca`), `margin-bottom` da marca,
- * `gap` do card e geometria da chamada (`gap`, `max-width`, corpo e
- * entrelinha do título). Antes desta divisão os três usavam o valor do
- * artista — foi a unificação que o comentário do TSX registrava como "sem
- * nenhuma razão", e a decisão do cliente é a oposta: cada ambiente usa o
- * literal do seu próprio protótipo.
+ * Dois arranjos:
+ * - **login** (`.login`): herói à esquerda — marca, sobretítulo lilás e título
+ *   branco em Anton com o fim em laranja — e o cartão "Entrar" à direita;
+ * - **demais telas**: marca centrada numa barra no topo e cartão no meio.
  */
 
 .pagina {
@@ -22,45 +17,143 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--dsn-grad-auth-bg);
-}
-
-/*
- * As ondas decorativas do protótipo, com o clarão radial por cima. São
- * `aria-hidden` no TSX e `pointer-events: none` aqui: decoração que intercepta
- * clique é a origem de "o botão não funciona em alguns lugares".
- */
-.fundo {
-  position: absolute;
-  inset: 0;
+  background: #140d1a;
   overflow: hidden;
-  pointer-events: none;
 }
 
-/*
- * `width: 200%` com o padrão repetindo a cada metade — é o que faz o deslize
- * de −50% → 0 do `dsnWaveX` fechar sem costura visível.
- */
-.ondas {
+.faixaDeCores {
   position: absolute;
   left: 0;
+  right: 0;
   top: 0;
-  width: 200%;
-  height: 100%;
-  overflow: visible;
-  animation: dsnWaveX 46s linear infinite;
+  height: 4px;
+  display: flex;
+  pointer-events: none;
+  z-index: 3;
 }
 
-.clarao {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    90% 58% at 50% 50%,
-    rgb(255 255 255 / 90%) 0%,
-    rgb(255 255 255 / 55%) 44%,
-    rgb(255 255 255 / 0%) 76%
-  );
+.faixaDeCores span {
+  flex: 1;
 }
+
+.faixaDeCores span:nth-child(1) {
+  background: #5b2e8f;
+}
+
+.faixaDeCores span:nth-child(2) {
+  background: #7f47dd;
+}
+
+.faixaDeCores span:nth-child(3) {
+  background: #b780e7;
+}
+
+.faixaDeCores span:nth-child(4) {
+  background: #e35336;
+}
+
+/* ------------------------------------------------------------------ login */
+
+.mioloLogin {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(32px, 5vw, 96px);
+  width: 100%;
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vh, 80px) clamp(24px, 5vw, 96px) clamp(18px, 2.2vh, 26px);
+}
+
+.heroi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(24px, 4vh, 44px);
+  min-width: 0;
+  max-width: 900px;
+  flex: 1 1 480px;
+}
+
+.marca {
+  display: inline-flex;
+  flex: none;
+  border-radius: var(--dsn-radius-md);
+}
+
+.chamada {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 22px);
+}
+
+.chamadaOverline {
+  font-size: clamp(11px, 0.9vw, 15px);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: 0.2em;
+  color: #b780e7;
+  text-transform: uppercase;
+}
+
+.chamadaTitulo {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.06em;
+  font-size: clamp(46px, min(5.8vw, 11.5vh), 116px);
+  line-height: 1.18;
+  color: #ffffff;
+}
+
+.linha {
+  white-space: nowrap;
+}
+
+.destaque {
+  color: #e35336;
+}
+
+.provas {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-weight: var(--dsn-weight-medium);
+  color: #e7e3ef;
+}
+
+.separador {
+  color: #7f47dd;
+}
+
+.cardLogin {
+  position: relative;
+  flex: 0 1 clamp(380px, 30vw, 460px);
+  min-width: min(100%, 340px);
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: clamp(22px, 2.4vw, 36px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.cardTitulo {
+  margin: 0 0 2px;
+  font-size: clamp(30px, 2.4vw, 42px);
+  line-height: 1;
+  color: #140d1a;
+}
+
+/* --------------------------------------------------------- demais telas */
 
 .miolo {
   position: relative;
@@ -70,166 +163,42 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(12px, 1.8vh, 18px);
-  padding: clamp(20px, 2.4vh, 28px) var(--dsn-pad-auth-x);
+  gap: clamp(14px, 2vh, 20px);
+  padding: clamp(98px, 12.5vh, 118px) clamp(20px, 4vw, 48px) clamp(18px, 2.2vh, 26px);
 }
 
-/*
- * A marca é o logotipo do protótipo, e só ele — nada de texto ao lado. A
- * altura vem por `style` inline (varia por ambiente — ver `MolduraDeAutenticacao.tsx`);
- * o `margin-bottom` varia do mesmo jeito, nas classes `.ambiente*` abaixo.
- *
- * `inline-flex` para o link não esticar na largura do `.miolo` centrado, o que
- * daria uma área clicável do tamanho da tela.
- */
-.marca {
-  display: inline-flex;
-  margin-bottom: clamp(4px, 1vh, 10px);
-  border-radius: var(--dsn-radius-md);
-  flex: none;
-}
-
-/* Chamada acima do card — só a tela 1 tem. Geometria varia por ambiente. */
-.chamada {
+.topo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  max-width: 600px;
-  text-align: center;
-  flex: none;
+  justify-content: center;
+  background: #140d1a;
+  padding: clamp(13px, 1.8vh, 18px) clamp(20px, 4vw, 48px);
 }
 
-.chamadaOverline {
-  font-size: var(--dsn-text-3xs);
-  font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-label);
-  color: var(--dsn-ink-500);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.chamadaTitulo {
-  margin: 0;
-  font-size: clamp(26px, 3.4vw, 38px);
-  line-height: 1.06;
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-hero);
-  text-wrap: balance;
-}
-
-/* Subtítulo da chamada — só o curador tem (`Curador.html`). */
-.chamadaSubtitulo {
-  margin: 0;
-  font-size: 14px;
-  line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink-500);
-  max-width: 430px;
-  text-wrap: pretty;
-}
-
-/*
- * O card. 436px é o valor literal do protótipo, nos três arquivos — e é
- * estreito de propósito: um formulário de duas linhas mais largo que isto
- * espalha rótulo e campo longe demais um do outro. O `gap` interno varia por
- * ambiente (16px no admin, 14px no artista e no curador).
- */
 .card {
   width: 100%;
-  max-width: 436px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: var(--dsn-surface);
-  border: var(--dsn-border-width) solid var(--dsn-border);
-  border-radius: var(--dsn-radius-3xl);
-  padding: clamp(18px, 2.4vw, 26px);
-  box-shadow: var(--dsn-shadow-card);
+  gap: clamp(16px, 2.4vh, 22px);
+  background: #ffffff;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  padding: clamp(20px, 2.8vh, 30px);
+  box-shadow:
+    0 1px 2px rgba(20, 13, 26, 0.05),
+    0 18px 48px rgba(20, 13, 26, 0.12);
   flex: none;
-}
-
-/* --- Ambiente admin — `Admin.html` --- */
-.ambienteAdmin .marca {
-  margin-bottom: clamp(6px, 1.2vh, 12px);
-}
-
-.ambienteAdmin .card {
-  gap: 16px;
-}
-
-/* --- Ambiente artista — `Artista.html`. É a base acima; sem sobrescrita. --- */
-.ambienteArtista {
-}
-
-/* --- Ambiente curador — `Curador.html` --- */
-.ambienteCurador .chamada {
-  gap: 7px;
-  max-width: 620px;
-}
-
-.ambienteCurador .chamadaTitulo {
-  font-size: clamp(24px, 2.9vw, 33px);
-  line-height: 1.08;
-}
-
-/* Provas sociais do pé da tela 1. */
-.provas {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--dsn-space-2) var(--dsn-space-6);
-  max-width: 520px;
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
-  text-align: center;
-}
-
-.separador {
-  color: var(--dsn-ink-250);
-}
-
-.rodape {
-  position: relative;
-  z-index: 1;
-  flex: none;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--dsn-space-4) var(--dsn-space-7);
-  padding: 0 var(--dsn-pad-auth-x) clamp(14px, 2vh, 22px);
-  font-size: var(--dsn-text-2xs);
-  line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink-500);
-}
-
-.rodapeLinha {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--dsn-space-1) var(--dsn-space-5);
-}
-
-.rodape a {
-  color: var(--dsn-ink-500);
-  text-decoration: none;
-}
-
-.rodape a:hover {
-  color: var(--dsn-purple-600);
 }
 
 /*
- * Variante split-screen — Design System §3.3. Usada pelo cadastro (1.1) e pelo
- * wizard do curador (12).
- *
- * `auto-fit` com `minmax` em vez de `@media`: os protótipos da R2 não têm um
- * único `@media` (pendência #24), e inventar breakpoint aqui seria fingir uma
- * decisão de layout mobile que ninguém tomou. Com `auto-fit`, as duas colunas
- * viram uma quando não cabem — sem número mágico de viewport, e sem quebrar a
- * fidelidade do que foi desenhado.
+ * Cadastro e wizard do curador: cartão e painel lado a lado. `auto-fit` com
+ * `minmax` — as duas colunas viram uma quando não cabem.
  */
 .split {
   display: grid;
@@ -240,13 +209,62 @@
   align-items: start;
 }
 
-/* `#FAF7FE` sobre `#F0EAF9`, valores literais do protótipo do curador. */
+.split .card {
+  max-width: none;
+}
+
 .painel {
   display: flex;
   flex-direction: column;
   gap: var(--dsn-space-7);
   background: var(--dsn-auth-painel-bg);
   border: var(--dsn-border-width) solid var(--dsn-auth-painel-border);
-  border-radius: var(--dsn-radius-2xl);
+  border-radius: 5px;
   padding: clamp(15px, 1.8vw, 20px);
+}
+
+/* ---------------------------------------------------------------- rodapé */
+
+.rodape {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  padding: 0 clamp(20px, 4vw, 48px) clamp(14px, 2vh, 22px);
+}
+
+.rodapeLinha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #a99fb6;
+}
+
+.rodapeLinha .separador {
+  color: #5a4e68;
+}
+
+.rodape a {
+  color: #c6b4de;
+  text-decoration: none;
+  font-weight: var(--dsn-weight-regular);
+}
+
+.rodape a:hover {
+  color: #ffffff;
+}
+
+/* Os ambientes compartilham a moldura; as classes ficam para ajustes finos. */
+.ambienteAdmin,
+.ambienteArtista,
+.ambienteCurador {
+  --dsn-moldura-ambiente: 1;
 }

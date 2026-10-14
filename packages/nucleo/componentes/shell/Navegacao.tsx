@@ -44,7 +44,11 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
             ) : null}
 
             <ul className={estilos.lista}>
-              {grupo.itens.map((item) => {
+              {grupo.itens.map((item, posicao) => {
+                // O fundo do item ativo gira entre lilás, pêssego e lavanda
+                // pela posição do item no menu (protótipo aprovado, `NAVC`).
+                const ordem =
+                  grupos.slice(0, indice).reduce((soma, g) => soma + g.itens.length, 0) + posicao;
                 // Exato para a raiz do ambiente; por prefixo nas subrotas,
                 // para que `/artista/carteira/extrato` mantenha "Carteira"
                 // marcada.
@@ -68,6 +72,7 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                           .join(' ')}
                         href={hrefDoAdmin(item.caminho)}
                         aria-current={ativo ? 'page' : undefined}
+                        data-cor={ordem % 3}
                       >
                         <span className={estilos.rotulo}>{item.rotulo}</span>
                         <IndicadorDeNavegacao />

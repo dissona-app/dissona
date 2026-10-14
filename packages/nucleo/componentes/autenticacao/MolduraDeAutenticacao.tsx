@@ -5,7 +5,7 @@ import { Marca } from '@dissona/nucleo/componentes/base/Marca';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 
 import estilos from './MolduraDeAutenticacao.module.css';
-import { OndasDeFundo } from './OndasDeFundo';
+import { OrbitaDeFundo } from './OrbitaDeFundo';
 
 export type LinkDeRodape = {
   readonly rotulo: string;
@@ -30,7 +30,15 @@ export type PropsMoldura = {
     readonly overline: string;
     readonly titulo: string;
     readonly subtitulo?: string;
+    /**
+     * O título do herói em duas linhas, com o fim da segunda em laranja —
+     * protótipo aprovado: "Leitura real / da **sua música.**". Sem isto, o
+     * `titulo` sai inteiro numa linha branca.
+     */
+    readonly linhas?: readonly [string, string, string];
   };
+  /** Título do cartão de login ("Entrar"), em Anton. Só no login. */
+  readonly tituloDoCard?: string;
   /** Provas sociais do pé — idem. */
   readonly provas?: readonly string[];
   readonly linksDeRodape: readonly LinkDeRodape[];
@@ -47,23 +55,6 @@ export type PropsMoldura = {
 };
 
 const ANO = 2026;
-
-/** Altura da marca por ambiente — literal dos três protótipos (§ ver módulo). */
-const ALTURA_DA_MARCA: Record<AmbienteDeAutenticacao, string> = {
-  admin: 'clamp(44px, 5.6vh, 60px)',
-  artista: 'clamp(28px, 3vw, 36px)',
-  curador: '36px',
-};
-
-/**
- * A variante split-screen (`aside` presente — tela 1.1) tem sua própria
- * altura de marca, menor que a do login: `clamp(26px,2.6vw,32px)` em
- * `Artista.html`, contra `clamp(28px,3vw,36px)` na tela sem `aside`. É o
- * valor verificado; sem dado equivalente para o wizard do curador (módulo
- * 12) ou para um split do admin — que hoje não existe —, o mesmo literal
- * atende os dois enquanto não houver protótipo próprio para eles.
- */
-const ALTURA_DA_MARCA_SPLIT = 'clamp(26px, 2.6vw, 32px)';
 
 const CLASSE_DO_AMBIENTE: Record<AmbienteDeAutenticacao, string | undefined> = {
   admin: estilos.ambienteAdmin,
@@ -89,59 +80,89 @@ export function MolduraDeAutenticacao({
   provas,
   linksDeRodape,
   aside,
+  tituloDoCard,
   children,
 }: PropsMoldura) {
+  // Login: herói à esquerda, órbita à direita, cartão encostado à direita.
+  // Demais telas: marca no topo, órbita centrada, cartão no meio.
+  const ehLogin = chamada !== undefined;
   return (
-    <div className={[estilos.pagina, CLASSE_DO_AMBIENTE[ambiente]].filter(Boolean).join(' ')}>
-      <OndasDeFundo />
+    <div
+      className={[estilos.pagina, ehLogin ? estilos.login : undefined, CLASSE_DO_AMBIENTE[ambiente]]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className={estilos.faixaDeCores} aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <OrbitaDeFundo centro={ehLogin ? '76%' : '50%'} />
 
-      <main className={estilos.miolo}>
-        <Link className={estilos.marca} href={ROTA.HOME}>
-          <Marca
-            variante="colorida"
-            altura={aside === undefined ? ALTURA_DA_MARCA[ambiente] : ALTURA_DA_MARCA_SPLIT}
-          />
-        </Link>
-
-        {chamada !== undefined ? (
-          <div className={estilos.chamada}>
-            <span className={estilos.chamadaOverline}>{chamada.overline}</span>
-            {/*
-              O `<h1>` da página é o título da chamada quando ela existe; sem
-              chamada (tela 19), o `<h1>` é o do card. Um só `<h1>` por página,
-              sempre — dois quebra a estrutura para leitor de tela.
-            */}
-            <h1 className={estilos.chamadaTitulo}>{chamada.titulo}</h1>
-            {chamada.subtitulo !== undefined ? (
-              <p className={estilos.chamadaSubtitulo}>{chamada.subtitulo}</p>
+      {ehLogin ? (
+        <main className={estilos.mioloLogin}>
+          <div className={estilos.heroi}>
+            <Link className={estilos.marca} href={ROTA.HOME}>
+              <Marca variante="branca" altura="clamp(52px, 6.4vh, 80px)" />
+            </Link>
+            <div className={estilos.chamada}>
+              <span className={estilos.chamadaOverline}>{chamada.overline}</span>
+              <h1 className={estilos.chamadaTitulo}>
+                {chamada.linhas === undefined ? (
+                  chamada.titulo
+                ) : (
+                  <>
+                    <span className={estilos.linha}>{chamada.linhas[0]}</span>
+                    <span className={estilos.linha}>
+                      {chamada.linhas[1]}
+                      <span className={estilos.destaque}>{chamada.linhas[2]}</span>
+                    </span>
+                  </>
+                )}
+              </h1>
+            </div>
+            {provas !== undefined && provas.length > 0 ? (
+              <p className={estilos.provas}>
+                {provas.map((prova, indice) => (
+                  <span key={prova}>
+                    {indice > 0 ? (
+                      <span className={estilos.separador} aria-hidden="true">
+                        {' · '}
+                      </span>
+                    ) : null}
+                    {prova}
+                  </span>
+                ))}
+              </p>
             ) : null}
           </div>
-        ) : null}
 
-        {aside === undefined ? (
-          <div className={estilos.card}>{children}</div>
-        ) : (
-          <div className={estilos.split}>
-            <div className={estilos.card}>{children}</div>
-            <aside className={estilos.painel}>{aside}</aside>
+          <div className={estilos.cardLogin}>
+            {tituloDoCard !== undefined ? (
+              <h2 className={estilos.cardTitulo}>{tituloDoCard}</h2>
+            ) : null}
+            {children}
           </div>
-        )}
+        </main>
+      ) : (
+        <main className={estilos.miolo}>
+          <div className={estilos.topo}>
+            <Link className={estilos.marca} href={ROTA.HOME}>
+              <Marca variante="branca" altura="clamp(36px, 3.8vw, 46px)" />
+            </Link>
+          </div>
 
-        {provas !== undefined && provas.length > 0 ? (
-          <p className={estilos.provas}>
-            {provas.map((prova, indice) => (
-              <span key={prova}>
-                {indice > 0 ? (
-                  <span className={estilos.separador} aria-hidden="true">
-                    {' · '}
-                  </span>
-                ) : null}
-                {prova}
-              </span>
-            ))}
-          </p>
-        ) : null}
-      </main>
+          {aside === undefined ? (
+            <div className={estilos.card}>{children}</div>
+          ) : (
+            <div className={estilos.split}>
+              <div className={estilos.card}>{children}</div>
+              <aside className={estilos.painel}>{aside}</aside>
+            </div>
+          )}
+        </main>
+      )}
 
       <footer className={estilos.rodape}>
         <div className={estilos.rodapeLinha}>

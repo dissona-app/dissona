@@ -43,17 +43,20 @@
  * onde se põe texto branco em cima dela. Ver 07-pendências e open-questions #26.
  */
 .primario {
-  background: var(--dsn-orange-600);
+  background: var(--dsn-orange-500);
   color: #ffffff;
+  font-weight: var(--dsn-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--dsn-tracking-botao);
 }
 
 .primario:hover:not(:disabled) {
-  background: var(--dsn-orange-700);
+  background: var(--dsn-orange-600);
   box-shadow: var(--dsn-shadow-cta);
 }
 
 .primario:active:not(:disabled) {
-  background: var(--dsn-orange-800);
+  background: var(--dsn-orange-700);
   box-shadow: none;
 }
 
@@ -61,12 +64,13 @@
 
 .secundario {
   background: var(--dsn-surface);
-  color: var(--dsn-purple-600);
-  border: var(--dsn-border-width) solid var(--dsn-purple-600);
+  color: var(--dsn-ink);
+  border: var(--dsn-border-width) solid #e0d6ec;
 }
 
 .secundario:hover:not(:disabled) {
   background: var(--dsn-purple-050);
+  border-color: var(--dsn-ink);
 }
 
 /* ----------------------------------------------------------------- ghost */

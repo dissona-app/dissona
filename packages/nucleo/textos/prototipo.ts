@@ -144,7 +144,7 @@ export const ENTRAR = {
    * Trocada por uma afirmação verificável. Registrado em
    * `docs/R2/perguntas-ao-cliente.md`.
    */
-  provas: ['7 dias para a devolutiva', 'até 11 critérios com nota', 'escuta medida e registrada'],
+  provas: ['7 dias para a devolutiva', 'até 11 critérios com nota', '100% da faixa ouvida'],
 } as const;
 
 /** `/artista/entrar` — mesma copy de `ENTRAR`, que sempre foi a do artista. */

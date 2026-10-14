@@ -40,7 +40,12 @@ export default async function Pagina({
   return (
     <MolduraDeAutenticacao
       ambiente="artista"
-      chamada={{ overline: ENTRAR_ARTISTA.overline, titulo: ENTRAR_ARTISTA.titulo }}
+      chamada={{
+        overline: ENTRAR_ARTISTA.overline,
+        titulo: ENTRAR_ARTISTA.titulo,
+        linhas: ['Leitura real', 'da ', 'sua música.'],
+      }}
+      tituloDoCard="Entrar"
       provas={ENTRAR_ARTISTA.provas}
       linksDeRodape={[
         { rotulo: 'Termos', href: ROTA.TERMOS },

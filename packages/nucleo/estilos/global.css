@@ -76,11 +76,33 @@ a:hover {
   outline-offset: var(--dsn-focus-offset);
 }
 
-/* Numerais de KPI, saldo e valor alinham por coluna. */
+/* Numerais de KPI, saldo e valor: Anton, alinhados por coluna. */
 .dsn-numeral {
-  font-weight: var(--dsn-weight-bold);
+  font-family: var(--dsn-font-display);
+  font-weight: var(--dsn-weight-regular);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--dsn-tracking-snug);
+  letter-spacing: var(--dsn-tracking-display);
+}
+
+/*
+ * Títulos do protótipo aprovado: Anton, caixa-alta, peso 400. Vale para todo
+ * `h1` e `h2` — título de página, de painel e das telas de entrada. Quem
+ * precisar de outro desenho (um `h2` que é texto corrido) sobrescreve no
+ * próprio módulo.
+ */
+h1,
+h2,
+.dsn-display {
+  /*
+   * `!important` provisório (Fase 0, 14/10): os módulos ainda declaram peso
+   * 700/800 e tracking negativo nos seus `.titulo`, feitos para a Inter. A
+   * Anton só tem 400 — sem isto, sai negrito sintético. A Fase 1 tira isto
+   * módulo a módulo.
+   */
+  font-family: var(--dsn-font-display) !important;
+  font-weight: var(--dsn-weight-regular) !important;
+  letter-spacing: var(--dsn-tracking-display) !important;
+  text-transform: uppercase;
 }
 
 /* Conteúdo só para leitor de tela — rótulo de tabela, live region, skip link. */
@@ -101,6 +123,12 @@ a:hover {
 @keyframes dsnSpin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes dsnOrbitR {
+  to {
+    transform: rotate(-360deg);
   }
 }
 

@@ -4,35 +4,76 @@
     {
       "name": "Dissona — apresentação (produção local)",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["apresentacao", "--sem-build"],
+      "runtimeArgs": [
+        "apresentacao",
+        "--sem-build"
+      ],
       "port": 4000,
       "url": "http://localhost:4000"
     },
     {
       "name": "Dissona Web — Artista · Curador",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@dissona/web", "dev"],
+      "runtimeArgs": [
+        "--filter",
+        "@dissona/web",
+        "dev"
+      ],
       "port": 3000,
       "autoPort": true
     },
     {
       "name": "Dissona Admin",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@dissona/admin", "exec", "next", "dev", "--port", "3001"],
+      "runtimeArgs": [
+        "--filter",
+        "@dissona/admin",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3001"
+      ],
       "port": 3001,
       "url": "http://admin.localhost:3001"
     },
     {
       "name": "Dissona Web — build de produção",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@dissona/web", "exec", "next", "start", "--port", "3200"],
+      "runtimeArgs": [
+        "--filter",
+        "@dissona/web",
+        "exec",
+        "next",
+        "start",
+        "--port",
+        "3200"
+      ],
       "port": 3200
     },
     {
       "name": "Protótipos R2",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4100", "--directory", "docs/R2"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4100",
+        "--directory",
+        "docs/R2"
+      ],
       "port": 4100
+    },
+    {
+      "name": "Protótipos aprovados",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4102",
+        "--directory",
+        "docs/prototipo-aprovado"
+      ],
+      "port": 4102
     }
   ]
 }

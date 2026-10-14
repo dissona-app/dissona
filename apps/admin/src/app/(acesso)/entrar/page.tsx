@@ -33,16 +33,20 @@ export default async function Pagina({
   const { proximo } = await searchParams;
 
   return (
-    <MolduraDeAutenticacao ambiente="admin" linksDeRodape={linksLegais()}>
+    <MolduraDeAutenticacao
+      ambiente="admin"
+      chamada={{
+        overline: ADMIN_ENTRAR.overline,
+        titulo: ADMIN_ENTRAR.titulo,
+        linhas: ['Acesso', '', 'restrito.'],
+      }}
+      tituloDoCard="Entrar"
+      linksDeRodape={linksLegais()}
+    >
       <FormularioDeLogin
         acao={entrarComoAdmin}
         proximo={proximo}
-        icone={<IconeCadeado />}
         textos={{
-          overline: ADMIN_ENTRAR.overline,
-          titulo: ADMIN_ENTRAR.titulo,
-          tituloComoH1: true,
-          subtitulo: ADMIN_ENTRAR.subtitulo,
           rotuloEmail: ADMIN_ENTRAR.rotuloEmail,
           placeholderEmail: ADMIN_ENTRAR.placeholderEmail,
           rotuloSenha: ADMIN_ENTRAR.rotuloSenha,
@@ -71,25 +75,5 @@ export default async function Pagina({
         rodape={<span className={estilos.nota}>{ADMIN_ENTRAR.rodape}</span>}
       />
     </MolduraDeAutenticacao>
-  );
-}
-
-function IconeCadeado() {
-  return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M7 10V7.5a5 5 0 0 1 10 0V10" />
-      <path d="M5 10h14v10H5z" />
-    </svg>
   );
 }

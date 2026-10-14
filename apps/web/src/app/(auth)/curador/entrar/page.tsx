@@ -43,7 +43,9 @@ export default async function Pagina({
         overline: ENTRAR_CURADOR.overline,
         titulo: ENTRAR_CURADOR.titulo,
         subtitulo: ENTRAR_CURADOR.subtitulo,
+        linhas: ['Escute com método e', 'seja remunerado ', 'por isso.'],
       }}
+      tituloDoCard="Entrar"
       provas={ENTRAR_CURADOR.provas}
       linksDeRodape={[
         { rotulo: 'Termos', href: ROTA.TERMOS },
