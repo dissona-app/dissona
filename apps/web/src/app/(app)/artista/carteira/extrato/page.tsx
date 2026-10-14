@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Abas } from '@dissona/nucleo/componentes/base/Abas';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
-import { Painel } from '@/componentes/base/Painel';
 import * as claves from '@dissona/nucleo/lib/claves';
 import { formatarData } from '@dissona/nucleo/lib/formato';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
@@ -37,22 +36,20 @@ export default async function PaginaDoExtrato({
 
   return (
     <div className={estilos.base}>
-      <Abas
-        abas={FILTROS_DO_EXTRATO.map((cada) => ({ chave: cada, rotulo: TEXTOS.filtros[cada] }))}
-        ativa={filtro}
-        caminho={ROTA.ARTISTA_EXTRATO}
-        parametro="tipo"
-        rotulo={TEXTOS.filtrosRotulo}
-      />
+      <div className={estilos.topo}>
+        <BotaoLink href={ROTA.ARTISTA_CARTEIRA} variante="ghost" tamanho="sm">
+          {TEXTOS.voltarParaCarteira}
+        </BotaoLink>
+        <Abas
+          abas={FILTROS_DO_EXTRATO.map((cada) => ({ chave: cada, rotulo: TEXTOS.filtros[cada] }))}
+          ativa={filtro}
+          caminho={ROTA.ARTISTA_EXTRATO}
+          parametro="tipo"
+          rotulo={TEXTOS.filtrosRotulo}
+        />
+      </div>
 
-      <Painel
-        titulo={TEXTOS.extratoTitulo}
-        acao={
-          <BotaoLink href={ROTA.ARTISTA_CARTEIRA} variante="ghost" tamanho="sm">
-            {TEXTOS.voltarParaCarteira}
-          </BotaoLink>
-        }
-      >
+      <section className={estilos.moldura} aria-label={TEXTOS.extratoTitulo}>
         {linhas.length === 0 ? (
           <EstadoVazio
             titulo={vazioPorFiltro ? TEXTOS.vazioPorFiltroTitulo : TEXTOS.vazioTitulo}
@@ -81,7 +78,11 @@ export default async function PaginaDoExtrato({
                   <th scope="row" className={estilos.origem}>
                     {linha.origem}
                   </th>
-                  <td>{TEXTOS.tipos[linha.tipo]}</td>
+                  <td>
+                    <span className={linha.quantidade > 0n ? estilos.tipoEntrada : estilos.tipo}>
+                      {TEXTOS.tipos[linha.tipo]}
+                    </span>
+                  </td>
                   <td
                     className={[
                       estilos.numerica,
@@ -98,9 +99,8 @@ export default async function PaginaDoExtrato({
             </tbody>
           </table>
         )}
-
-        <p className={estilos.nota}>{TEXTOS.notaDevolucao}</p>
-      </Painel>
+      </section>
+      <p className={estilos.nota}>{TEXTOS.notaDevolucao}</p>
     </div>
   );
 }
