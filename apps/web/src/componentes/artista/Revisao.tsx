@@ -1,6 +1,7 @@
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { rotuloDaFonte } from '@/modulos/faixa/servico';
 import type { FaixaEmEdicao } from '@/modulos/faixa/tipos';
 import { ENVIAR as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
@@ -21,23 +22,22 @@ export type PropsRevisao = {
  * — aqui nada é debitado, e o aviso diz isso.
  */
 export function Revisao({ faixa, saldo }: PropsRevisao) {
+  // A origem aparece para link e preenchimento manual (RF-037). Para arquivo
+  // o cartão já diz "Arquivo enviado", e o nome no Storage é um UUID.
+  const fonte = rotuloDaFonte(faixa);
+  const genero = faixa.genero ?? '—';
+  const info =
+    fonte === 'arquivo'
+      ? genero
+      : `${genero} · ${fonte === 'link' ? TEXTOS.resumoFonte.link : TEXTOS.resumoFonte.manual}`;
+
   return (
     <div className={estilos.base}>
       {/* Protótipo aprovado: o cartão da faixa em destaque e, ao lado, o que
           o artista escreveu para o curador. */}
       <div className={estilos.grade}>
         <div className={estilos.colunaFaixa}>
-          <CartaoDaFaixa faixa={faixa} destaque info={faixa.genero ?? '—'} />
-          <dl className={estilos.lista}>
-            <div>
-              <dt className={estilos.rotulo}>{TEXTOS.rotuloTitulo}</dt>
-              <dd className={estilos.valor}>{faixa.titulo}</dd>
-            </div>
-            <div>
-              <dt className={estilos.rotulo}>{TEXTOS.rotuloGenero}</dt>
-              <dd className={estilos.valor}>{faixa.genero}</dd>
-            </div>
-          </dl>
+          <CartaoDaFaixa faixa={faixa} destaque info={info} />
         </div>
         <section className={estilos.cartaoContexto} aria-label={TEXTOS.resumoContexto}>
           <h3 className={estilos.rotuloContexto}>{TEXTOS.resumoContexto}</h3>
