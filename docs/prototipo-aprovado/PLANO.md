@@ -37,6 +37,11 @@ do Artista coincidem.
   - os pacotes do admin passaram de tabela para lista;
   - C1 e A1 foram reescritos.
 
+## Fase 1 — feita em 14/10/2026 (antes das 10h)
+
+- Artista: Escolher curador (cartões largos), Status do envio (andamento em barras), Extrato, Pagamento (título).
+- Curador: Detalhe da faixa (13.1), moldura da avaliação com o cartão da faixa, Notas e feedback.
+
 ## Fase 1 — pendente
 
 Cada tela abaixo segue o mesmo método: abrir o protótipo e o app no mesmo tamanho de janela e
@@ -47,18 +52,13 @@ animação).
 
 - [ ] Detalhes por link e por mp3 (passo 1, estado com a faixa detectada)
 - [ ] Contexto (passo 2)
-- [ ] Escolher curador (o aprovado tem 4 passos; o app tem 3, com a seleção depois da revisão)
 - [ ] Revisar
-- [ ] Confirmação e Status do envio
-- [ ] Checkout e Extrato
 - [ ] Editar cadastro (capa do perfil, que o aprovado tem)
 - [ ] Configurações (abas)
 
 ### Curador
 
-- [ ] Detalhe da faixa (13.1)
 - [ ] Avaliação: notas, subjetiva, compartilhamento, outras e remuneração
-- [ ] Notas e feedback
 - [ ] Carteira
 - [ ] Meu cadastro
 - [ ] Conta
