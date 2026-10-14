@@ -125,7 +125,9 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
           <Campo
             name="nomeExibicao"
             rotulo={TEXTOS.rotuloNomeExibicao}
-            defaultValue={perfil.nomeExibicao ?? ''}
+            // Sem nome artístico ainda, vale o nome do cadastro — é o que o
+            // Perfil (7) já exibe; o campo vazio parecia dado perdido.
+            defaultValue={perfil.nomeExibicao ?? perfil.nomeCompleto}
             erro={erroDe('nomeExibicao')}
             autoComplete="nickname"
           />
