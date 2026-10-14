@@ -100,6 +100,8 @@ test.describe('A1 · Lista de pacotes', () => {
     async ({ page }) => {
       await abrirPacotes(page);
 
+      // `count()` não espera: a grade precisa estar na tela antes de contar.
+      await expect(grade(page).getByRole('listitem').first()).toBeVisible();
       const total = await grade(page).getByRole('listitem').count();
       const ativos = await linhasAtivas(page).count();
 
