@@ -67,6 +67,7 @@ export default async function PaginaDoPassoDaAvaliacao({
       <MolduraDaAvaliacao
         titulo={tela.item.titulo}
         artista={tela.item.artista}
+        envioId={envioId}
         passo="remuneracao"
         concluida={tela.avaliacao.concluida}
       >
@@ -84,7 +85,12 @@ export default async function PaginaDoPassoDaAvaliacao({
 
   if (bruto === 'notas') {
     return (
-      <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="notas">
+      <MolduraDaAvaliacao
+        titulo={item.titulo}
+        artista={item.artista}
+        envioId={envioId}
+        passo="notas"
+      >
         <PassoNotas
           envioId={envioId}
           titulo={item.titulo}
@@ -101,7 +107,12 @@ export default async function PaginaDoPassoDaAvaliacao({
 
   if (bruto === 'subjetiva') {
     return (
-      <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="subjetiva">
+      <MolduraDaAvaliacao
+        titulo={item.titulo}
+        artista={item.artista}
+        envioId={envioId}
+        passo="subjetiva"
+      >
         <PassoSubjetiva
           envioId={envioId}
           avaliacao={avaliacao}
@@ -116,7 +127,12 @@ export default async function PaginaDoPassoDaAvaliacao({
 
   if (bruto === 'compartilhamento') {
     return (
-      <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="compartilhamento">
+      <MolduraDaAvaliacao
+        titulo={item.titulo}
+        artista={item.artista}
+        envioId={envioId}
+        passo="compartilhamento"
+      >
         <PassoCompartilhamento
           envioId={envioId}
           avaliacao={avaliacao}
@@ -133,7 +149,12 @@ export default async function PaginaDoPassoDaAvaliacao({
   }
 
   return (
-    <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="outras">
+    <MolduraDaAvaliacao
+      titulo={item.titulo}
+      artista={item.artista}
+      envioId={envioId}
+      passo="outras"
+    >
       <PassoOutras
         envioId={envioId}
         avaliacao={avaliacao}
