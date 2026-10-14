@@ -33,3 +33,18 @@
   font-size: var(--dsn-text-xs);
   color: var(--dsn-ink-500);
 }
+
+/* Campos à esquerda, cartão da faixa à direita — protótipo aprovado. */
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 30vw, 400px);
+  gap: clamp(14px, 2vw, 22px);
+  align-items: start;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}

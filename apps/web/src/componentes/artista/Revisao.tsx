@@ -1,11 +1,10 @@
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
-import { Painel } from '@/componentes/base/Painel';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
-import { rotuloDaFonte } from '@/modulos/faixa/servico';
 import type { FaixaEmEdicao } from '@/modulos/faixa/tipos';
 import { ENVIAR as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
+import { CartaoDaFaixa } from './CartaoDaFaixa';
 import estilos from './Revisao.module.css';
 
 export type PropsRevisao = {
@@ -22,38 +21,29 @@ export type PropsRevisao = {
  * — aqui nada é debitado, e o aviso diz isso.
  */
 export function Revisao({ faixa, saldo }: PropsRevisao) {
-  const fonte = rotuloDaFonte(faixa);
-  const nomeDoArquivo = faixa.arquivoCaminho?.split('/').pop() ?? '';
-
-  const rotuloDaFonteTexto =
-    fonte === 'arquivo'
-      ? TEXTOS.resumoFonte.arquivo(nomeDoArquivo)
-      : fonte === 'link'
-        ? TEXTOS.resumoFonte.link
-        : TEXTOS.resumoFonte.manual;
-
   return (
     <div className={estilos.base}>
-      <Painel titulo={TEXTOS.resumoFaixa}>
-        <dl className={estilos.lista}>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloTitulo}</dt>
-            <dd className={estilos.valor}>{faixa.titulo}</dd>
-          </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloGenero}</dt>
-            <dd className={estilos.valor}>{faixa.genero}</dd>
-          </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.enviarArquivo}</dt>
-            <dd className={estilos.valor}>{rotuloDaFonteTexto}</dd>
-          </div>
-        </dl>
-      </Painel>
-
-      <Painel titulo={TEXTOS.resumoContexto} nivel={3}>
-        <p className={estilos.contexto}>{faixa.contextoCurador}</p>
-      </Painel>
+      {/* Protótipo aprovado: o cartão da faixa em destaque e, ao lado, o que
+          o artista escreveu para o curador. */}
+      <div className={estilos.grade}>
+        <div className={estilos.colunaFaixa}>
+          <CartaoDaFaixa faixa={faixa} destaque info={faixa.genero ?? '—'} />
+          <dl className={estilos.lista}>
+            <div>
+              <dt className={estilos.rotulo}>{TEXTOS.rotuloTitulo}</dt>
+              <dd className={estilos.valor}>{faixa.titulo}</dd>
+            </div>
+            <div>
+              <dt className={estilos.rotulo}>{TEXTOS.rotuloGenero}</dt>
+              <dd className={estilos.valor}>{faixa.genero}</dd>
+            </div>
+          </dl>
+        </div>
+        <section className={estilos.cartaoContexto} aria-label={TEXTOS.resumoContexto}>
+          <h3 className={estilos.rotuloContexto}>{TEXTOS.resumoContexto}</h3>
+          <p className={estilos.contexto}>{faixa.contextoCurador}</p>
+        </section>
+      </div>
 
       {saldo !== null ? (
         <Aviso tom="info" estatico>
