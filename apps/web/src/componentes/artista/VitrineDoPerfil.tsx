@@ -62,7 +62,7 @@ export function VitrineDoPerfil({
         <div className={estilos.capa} style={{ backgroundImage: `url('${capaPadrao.src}')` }}>
           <span className={estilos.capaVeu} aria-hidden="true" />
           <span className={estilos.capaFaixa} aria-hidden="true" />
-          <div className={estilos.capaAcoes}>
+          <div className={estilos.capaAcoes} data-botoes="compacto">
             <BotaoLink href={ROTA.ARTISTA_PERFIL_EDITAR} variante="secundario" tamanho="sm">
               {TEXTOS.editar}
             </BotaoLink>

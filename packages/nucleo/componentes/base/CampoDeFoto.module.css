@@ -190,3 +190,9 @@
     text-align: left;
   }
 }
+
+/* No artista o botão segue o secundário em tinta (protótipo aprovado). */
+:global([data-papel='artista']) .botao {
+  color: var(--dsn-ink);
+  border-color: var(--dsn-ink);
+}

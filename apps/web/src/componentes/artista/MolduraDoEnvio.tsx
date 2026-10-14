@@ -27,7 +27,7 @@ export function MolduraDoEnvio({ passo, children }: PropsMolduraDoEnvio) {
   // Protótipo aprovado: um cartão com a faixa escura no topo — título,
   // contador e os passos em barras — e o conteúdo numa área clara embaixo.
   return (
-    <div className={estilos.base}>
+    <div className={estilos.base} data-botoes="frase">
       <header className={estilos.faixa}>
         <div className={estilos.faixaTopo}>
           <h2 className={estilos.heroi}>{ENVIAR.herois[indice]}</h2>

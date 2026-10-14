@@ -216,6 +216,26 @@
   font-size: var(--dsn-text-sm);
 }
 
+/*
+ * Variações de contexto do protótipo aprovado, ligadas por atributo no
+ * contêiner — o `Botao` não aceita `className` de fora:
+ * - `frase`: o envio do artista usa o primário sem caixa-alta, 15px/600;
+ * - `compacto`: o "Editar cadastro" da capa do perfil desce para 13px.
+ */
+:global([data-botoes='frase']) .primario {
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+:global([data-botoes='frase']) .md {
+  font-size: var(--dsn-text-base);
+}
+
+:global([data-botoes='compacto']) .sm {
+  font-size: var(--dsn-text-xs);
+}
+
 .semPadding {
   padding: 0;
 }

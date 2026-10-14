@@ -32,8 +32,8 @@
 
 .heroi {
   margin: 0;
-  font-size: clamp(18px, 2.2vh, 22px);
-  line-height: 1.1;
+  font-size: clamp(18px, 2.4vh, 24px);
+  line-height: 1.25;
   color: #ffffff;
 }
 
@@ -62,8 +62,8 @@
   flex-direction: column;
   gap: 6px;
   font-size: 11px;
-  font-weight: 500;
-  color: #8a8296;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .barra {
@@ -72,14 +72,21 @@
   background: rgba(255, 255, 255, 0.16);
 }
 
-.feito,
+/* Protótipo aprovado: feito em lilás, atual em areia, o resto apagado. */
+.feito {
+  color: rgba(255, 255, 255, 0.74);
+}
+
 .atual {
   color: #ffffff;
 }
 
-.feito .barra,
+.feito .barra {
+  background: #b780e7;
+}
+
 .atual .barra {
-  background: #ffffff;
+  background: #f4f2ef;
 }
 
 .atual {

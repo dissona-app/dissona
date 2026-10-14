@@ -2,16 +2,7 @@
 
 import { useState } from 'react';
 
-import {
-  AreaTexto,
-  Aviso,
-  Botao,
-  BotaoLink,
-  Campo,
-  CampoDeFoto,
-  Chips,
-  Painel,
-} from '@/componentes/base';
+import { AreaTexto, Aviso, Botao, BotaoLink, Campo, CampoDeFoto, Chips } from '@/componentes/base';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { MAXIMO_DA_BIO, MAXIMO_DE_GENEROS } from '@/modulos/artista/tipos';
@@ -101,124 +92,131 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
       {resultado !== null && resultado.ok ? <Aviso tom="sucesso">{TEXTOS.salvo}</Aviso> : null}
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
-      {/* O painel se chama "Seus dados", e não "Editar cadastro": este último
-          já é o `<h1>` da rota, e repeti-lo daria dois títulos iguais na mesma
-          tela. A sublegenda é a primeira linha do corpo no protótipo. */}
-      <Painel titulo={TEXTOS.tituloDoPainel} sublegenda={TEXTOS.subtitulo} nivel={2}>
-        {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
-
-        <CampoDeFoto
-          nome={perfil.nomeExibicao ?? perfil.nomeCompleto}
-          fotoUrl={fotoUrl}
-          caminhoAtual={perfil.fotoCaminho}
-          aoMudarEnvio={setSubindoFoto}
-          tamanho="lg"
-          textos={{
-            botao: TEXTOS.trocarFoto,
-            hint: TEXTOS.fotoHint,
-            enviando: TEXTOS.fotoEnviando,
-            enviada: TEXTOS.fotoEnviada,
-            erroTipo: TEXTOS.erroFotoTipo,
-            erroTamanho: TEXTOS.erroFotoTamanho,
-          }}
-        />
-
-        <div className={estilos.par}>
-          <Campo
-            name="nomeExibicao"
-            rotulo={TEXTOS.rotuloNomeExibicao}
-            // Sem nome artístico ainda, vale o nome do cadastro — é o que o
-            // Perfil (7) já exibe; o campo vazio parecia dado perdido.
-            defaultValue={perfil.nomeExibicao ?? perfil.nomeCompleto}
-            erro={erroDe('nomeExibicao')}
-            autoComplete="nickname"
+      {/* Protótipo aprovado: um só cartão — a foto no alto, os dados à
+          esquerda, os links à direita e o rodapé com as ações. */}
+      <div className={estilos.cartao}>
+        <section className={estilos.topo} aria-label={TEXTOS.tituloDoPainel}>
+          {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
+          <CampoDeFoto
+            nome={perfil.nomeExibicao ?? perfil.nomeCompleto}
+            fotoUrl={fotoUrl}
+            caminhoAtual={perfil.fotoCaminho}
+            aoMudarEnvio={setSubindoFoto}
+            tamanho="lg"
+            textos={{
+              botao: TEXTOS.trocarFoto,
+              hint: TEXTOS.fotoHint,
+              enviando: TEXTOS.fotoEnviando,
+              enviada: TEXTOS.fotoEnviada,
+              erroTipo: TEXTOS.erroFotoTipo,
+              erroTamanho: TEXTOS.erroFotoTamanho,
+            }}
           />
-          <Campo
-            name="cidade"
-            rotulo={TEXTOS.rotuloCidade}
-            defaultValue={perfil.cidade ?? ''}
-            erro={erroDe('cidade')}
-            autoComplete="address-level2"
-          />
+        </section>
+
+        <div className={estilos.colunas}>
+          <section className={estilos.dados} aria-label={TEXTOS.subtitulo}>
+            <div className={estilos.par}>
+              <Campo
+                name="nomeExibicao"
+                rotulo={TEXTOS.rotuloNomeExibicao}
+                // Sem nome artístico ainda, vale o nome do cadastro — é o que o
+                // Perfil (7) já exibe; o campo vazio parecia dado perdido.
+                defaultValue={perfil.nomeExibicao ?? perfil.nomeCompleto}
+                erro={erroDe('nomeExibicao')}
+                autoComplete="nickname"
+              />
+              <Campo
+                name="cidade"
+                rotulo={TEXTOS.rotuloCidade}
+                defaultValue={perfil.cidade ?? ''}
+                erro={erroDe('cidade')}
+                autoComplete="address-level2"
+              />
+            </div>
+
+            <Campo
+              name="handle"
+              rotulo={TEXTOS.rotuloHandle}
+              defaultValue={perfil.handle ?? ''}
+              auxiliar={TEXTOS.auxiliarHandle}
+              erro={erroDe('handle')}
+              autoComplete="username"
+            />
+
+            <AreaTexto
+              name="bio"
+              rotulo={TEXTOS.rotuloBio}
+              variante="bio"
+              limite={MAXIMO_DA_BIO}
+              value={bio}
+              onChange={(evento) => setBio(evento.target.value)}
+              erro={erroDe('bio')}
+            />
+
+            <Chips
+              name="genero"
+              rotulo={`${TEXTOS.rotuloGeneros} ${TEXTOS.sufixoGeneros}`}
+              opcoes={GENEROS_DO_ARTISTA}
+              selecionados={perfil.generos}
+              maximo={MAXIMO_DE_GENEROS}
+              contador={(quantos) => TEXTOS.contagemGeneros(quantos, MAXIMO_DE_GENEROS)}
+              erro={erroDe('generos')}
+            />
+          </section>
+
+          <section className={estilos.links} aria-labelledby="titulo-links">
+            <h3 id="titulo-links" className={estilos.overline}>
+              {TEXTOS.rotuloLinks}
+            </h3>
+            <div className={estilos.listaDeLinks}>
+              <Campo
+                name="linkInstagram"
+                placeholder={TEXTOS.exemploInstagram}
+                rotulo={TEXTOS.rotuloInstagram}
+                defaultValue={perfil.linkInstagram ?? ''}
+                erro={erroDe('linkInstagram')}
+                inputMode="url"
+              />
+              <Campo
+                name="linkSpotify"
+                placeholder={TEXTOS.exemploSpotify}
+                rotulo={TEXTOS.rotuloSpotify}
+                defaultValue={perfil.linkSpotify ?? ''}
+                erro={erroDe('linkSpotify')}
+                inputMode="url"
+              />
+              <Campo
+                name="linkYoutube"
+                placeholder={TEXTOS.exemploYoutube}
+                rotulo={TEXTOS.rotuloYoutube}
+                defaultValue={perfil.linkYoutube ?? ''}
+                erro={erroDe('linkYoutube')}
+                inputMode="url"
+              />
+              <Campo
+                name="linkSite"
+                placeholder={TEXTOS.exemploSite}
+                rotulo={TEXTOS.rotuloSite}
+                defaultValue={perfil.linkSite ?? ''}
+                erro={erroDe('linkSite')}
+                inputMode="url"
+              />
+            </div>
+          </section>
         </div>
 
-        <Campo
-          name="handle"
-          rotulo={TEXTOS.rotuloHandle}
-          defaultValue={perfil.handle ?? ''}
-          auxiliar={TEXTOS.auxiliarHandle}
-          erro={erroDe('handle')}
-          autoComplete="username"
-        />
-
-        <AreaTexto
-          name="bio"
-          rotulo={TEXTOS.rotuloBio}
-          variante="bio"
-          limite={MAXIMO_DA_BIO}
-          value={bio}
-          onChange={(evento) => setBio(evento.target.value)}
-          erro={erroDe('bio')}
-        />
-
-        <Chips
-          name="genero"
-          rotulo={`${TEXTOS.rotuloGeneros} ${TEXTOS.sufixoGeneros}`}
-          opcoes={GENEROS_DO_ARTISTA}
-          selecionados={perfil.generos}
-          maximo={MAXIMO_DE_GENEROS}
-          contador={(quantos) => TEXTOS.contagemGeneros(quantos, MAXIMO_DE_GENEROS)}
-          erro={erroDe('generos')}
-        />
-      </Painel>
-
-      <Painel titulo={TEXTOS.rotuloLinks} nivel={3}>
-        <div className={estilos.par}>
-          <Campo
-            name="linkInstagram"
-            placeholder={TEXTOS.exemploInstagram}
-            rotulo={TEXTOS.rotuloInstagram}
-            defaultValue={perfil.linkInstagram ?? ''}
-            erro={erroDe('linkInstagram')}
-            inputMode="url"
-          />
-          <Campo
-            name="linkSpotify"
-            placeholder={TEXTOS.exemploSpotify}
-            rotulo={TEXTOS.rotuloSpotify}
-            defaultValue={perfil.linkSpotify ?? ''}
-            erro={erroDe('linkSpotify')}
-            inputMode="url"
-          />
-          <Campo
-            name="linkYoutube"
-            placeholder={TEXTOS.exemploYoutube}
-            rotulo={TEXTOS.rotuloYoutube}
-            defaultValue={perfil.linkYoutube ?? ''}
-            erro={erroDe('linkYoutube')}
-            inputMode="url"
-          />
-          <Campo
-            name="linkSite"
-            placeholder={TEXTOS.exemploSite}
-            rotulo={TEXTOS.rotuloSite}
-            defaultValue={perfil.linkSite ?? ''}
-            erro={erroDe('linkSite')}
-            inputMode="url"
-          />
+        <div className={estilos.acoes}>
+          <Botao type="submit" tamanho="denso" carregando={pendente} disabled={subindoFoto}>
+            {TEXTOS.salvar}
+          </Botao>
+          {/* "Cancelar" volta à vitrine — é o par do "Editar cadastro" de lá. O
+              texto existia em `prototipo.ts` desde a R1 e não era renderizado. */}
+          <BotaoLink href={ROTA.ARTISTA_PERFIL} variante="neutro" tamanho="denso">
+            {TEXTOS.cancelar}
+          </BotaoLink>
+          <span className={estilos.nota}>{TEXTOS.nota}</span>
         </div>
-      </Painel>
-
-      <div className={estilos.acoes}>
-        <Botao type="submit" carregando={pendente} disabled={subindoFoto}>
-          {TEXTOS.salvar}
-        </Botao>
-        {/* "Cancelar" volta à vitrine — é o par do "Editar cadastro" de lá. O
-            texto existia em `prototipo.ts` desde a R1 e não era renderizado. */}
-        <BotaoLink href={ROTA.ARTISTA_PERFIL} variante="ghost">
-          {TEXTOS.cancelar}
-        </BotaoLink>
-        <span className={estilos.nota}>{TEXTOS.nota}</span>
       </div>
     </form>
   );
