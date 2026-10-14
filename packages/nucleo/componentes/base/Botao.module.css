@@ -73,6 +73,12 @@
   background: var(--dsn-purple-050);
 }
 
+/* No artista, o mesmo botão em tinta (protótipo aprovado, Configurações). */
+:global([data-papel='artista']) .secundario {
+  color: var(--dsn-ink);
+  border-color: var(--dsn-ink);
+}
+
 /* ----------------------------------------------------------------- ghost */
 
 .ghost {

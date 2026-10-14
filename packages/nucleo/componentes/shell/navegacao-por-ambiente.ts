@@ -25,6 +25,12 @@ export type ItemNavegacao = {
   readonly caminho: string;
   readonly release: 1 | 2 | 3 | 4 | 5;
   /**
+   * Índice do item no `NAVC` do protótipo aprovado — a cor do item ativo. O
+   * protótipo fixa o índice por tela, e não pela posição no menu; sem ele,
+   * vale a posição.
+   */
+  readonly cor?: number;
+  /**
    * Por que o item não é clicável, quando "Disponível na Release N" não é a
    * resposta certa. É o caso de "Notas e feedback": a tela **existe** na R2, e
    * o que não existe é um endereço para ela sem uma faixa escolhida.
@@ -51,6 +57,7 @@ const ARTISTA: readonly GrupoNavegacao[] = [
       {
         rotulo: NAVEGACAO_DO_ARTISTA.devolutivas,
         caminho: `${ROTA.ARTISTA}/devolutivas`,
+        cor: 4,
         release: 4,
       },
     ],
@@ -58,15 +65,25 @@ const ARTISTA: readonly GrupoNavegacao[] = [
   {
     titulo: NAVEGACAO_DO_ARTISTA.grupoCuradoria,
     itens: [
-      { rotulo: NAVEGACAO_DO_ARTISTA.curadores, caminho: `${ROTA.ARTISTA}/curadores`, release: 3 },
+      {
+        rotulo: NAVEGACAO_DO_ARTISTA.curadores,
+        caminho: `${ROTA.ARTISTA}/curadores`,
+        release: 3,
+        cor: 3,
+      },
     ],
   },
   {
     titulo: NAVEGACAO_DO_ARTISTA.grupoConta,
     itens: [
-      { rotulo: NAVEGACAO_DO_ARTISTA.perfil, caminho: ROTA.ARTISTA_PERFIL, release: 1 },
-      { rotulo: NAVEGACAO_DO_ARTISTA.carteira, caminho: ROTA.ARTISTA_CARTEIRA, release: 2 },
-      { rotulo: NAVEGACAO_DO_ARTISTA.configuracoes, caminho: ROTA.ARTISTA_CONTA, release: 1 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.perfil, caminho: ROTA.ARTISTA_PERFIL, release: 1, cor: 7 },
+      { rotulo: NAVEGACAO_DO_ARTISTA.carteira, caminho: ROTA.ARTISTA_CARTEIRA, release: 2, cor: 5 },
+      {
+        rotulo: NAVEGACAO_DO_ARTISTA.configuracoes,
+        caminho: ROTA.ARTISTA_CONTA,
+        release: 1,
+        cor: 6,
+      },
     ],
   },
 ];
@@ -98,7 +115,9 @@ const CURADOR: readonly GrupoNavegacao[] = [
   },
   {
     titulo: NAVEGACAO_DO_CURADOR.grupoConta,
-    itens: [{ rotulo: NAVEGACAO_DO_CURADOR.conta, caminho: ROTA.CURADOR_CONTA, release: 1 }],
+    itens: [
+      { rotulo: NAVEGACAO_DO_CURADOR.conta, caminho: ROTA.CURADOR_CONTA, release: 1, cor: 6 },
+    ],
   },
 ];
 

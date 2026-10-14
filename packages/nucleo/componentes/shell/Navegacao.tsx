@@ -72,7 +72,7 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                           .join(' ')}
                         href={hrefDoAdmin(item.caminho)}
                         aria-current={ativo ? 'page' : undefined}
-                        data-cor={ordem % 3}
+                        data-cor={(item.cor ?? ordem) % 3}
                       >
                         <span className={estilos.rotulo}>{item.rotulo}</span>
                         <IndicadorDeNavegacao />

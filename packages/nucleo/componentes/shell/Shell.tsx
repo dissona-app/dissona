@@ -126,7 +126,7 @@ export function Shell({
   const subtituloExibido = subtitulo ?? doCaminho.sublegenda;
 
   return (
-    <div className={estilos.grade}>
+    <div className={estilos.grade} data-papel={papelAtivo}>
       {registrarAmbiente === undefined ? null : (
         <RegistrarAmbiente papel={papelAtivo} acao={registrarAmbiente} />
       )}

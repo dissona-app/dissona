@@ -31,3 +31,9 @@
   color: var(--dsn-ink);
   box-shadow: inset 0 -2px 0 var(--dsn-purple-600);
 }
+
+/* No artista o protótipo aprovado sublinha a aba em tinta; curador e admin,
+   em roxo. */
+:global([data-papel='artista']) .ativa {
+  box-shadow: inset 0 -2px 0 var(--dsn-ink);
+}
