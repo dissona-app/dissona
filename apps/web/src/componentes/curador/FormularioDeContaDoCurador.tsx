@@ -115,7 +115,6 @@ export function FormularioDeContaDoCurador({
       <CampoDeFoto
         nome={nome}
         aoMudarEnvio={setSubindoFoto}
-        tamanhoDoBotao="sm"
         semDica
         textos={{
           botao: CURADOR_CADASTRO.adicionarFoto,
@@ -185,7 +184,7 @@ export function FormularioDeContaDoCurador({
         <Link className={estilos.voltar} href={ROTA.CURADOR_ENTRAR}>
           {CURADOR_CADASTRO.voltarAoLogin}
         </Link>
-        <Botao type="submit" tamanho="denso" carregando={pendente} disabled={subindoFoto}>
+        <Botao type="submit" tamanho="md" carregando={pendente} disabled={subindoFoto}>
           {pendente ? CADASTRAR.enviando : CURADOR_CADASTRO.continuar}
         </Botao>
       </div>

@@ -74,7 +74,17 @@ const CENARIOS: readonly Cenario[] = [
     props: { telaInicial: 'Onboarding', passoOnboarding: 1 },
     rota: '/onboarding',
     persona: PERSONA.TOUR,
-    excecoes: [TRACKING_DE_BOTAO_MD('Avançar')],
+    excecoes: [
+      TRACKING_DE_BOTAO_MD('Avançar'),
+      {
+        texto: 'Pular',
+        propriedades: ['cor'],
+        motivo:
+          'No protótipo aprovado "Pular" fica no alto da tela, sobre a tinta; aqui ' +
+          'ele está no cartão branco, junto do contador do tour, e usa o cinza ' +
+          'de texto de apoio. Registrado no PLANO.md.',
+      },
+    ],
   },
   {
     nome: 'conta do artista',
@@ -102,6 +112,14 @@ const CENARIOS: readonly Cenario[] = [
     excecoes:
       passo === 8
         ? [
+            ...['Termos de uso', 'Política de privacidade'].map((texto): Excecao => ({
+              texto,
+              propriedades: ['cor'],
+              motivo:
+                'O protótipo aprovado pinta estes links em #5B2E8F sobre o fundo ' +
+                '#140D1A do wizard (1,6:1, ilegível). A aplicação usa o lilás ' +
+                'do texto de apoio, que passa no contraste.',
+            })),
             {
               texto: 'Completo',
               propriedades: ['cor'],
@@ -132,7 +150,7 @@ const CENARIOS: readonly Cenario[] = [
     excecoes: [
       {
         texto: 'Começar o curso',
-        propriedades: ['cor'],
+        propriedades: ['cor', 'peso', 'tracking', 'caixa'],
         motivo:
           'O curso é conteúdo de outra release, e o botão está desabilitado — daí ' +
           'o rótulo em `ink` no lugar do branco sobre laranja do protótipo. ' +
@@ -140,7 +158,7 @@ const CENARIOS: readonly Cenario[] = [
       },
       {
         texto: 'Ir para o painel',
-        propriedades: ['cor'],
+        propriedades: ['cor', 'peso', 'tracking', 'caixa'],
         motivo:
           'Com o curso desabilitado, "Ir para o painel" assume o primário da tela ' +
           '— no protótipo ele é o secundário. Mesma divergência do item acima.',
@@ -232,7 +250,7 @@ for (const cenario of CENARIOS) {
       expect(lista, `divergências de tipografia:\n${relatorio(lista)}`).toEqual([]);
     });
 
-    test('títulos renderizam em Inter, e não no fallback do sistema', async ({ page, context }) => {
+    test('títulos renderizam em Anton, e não no fallback do sistema', async ({ page, context }) => {
       const doPrototipo = await context.newPage();
       await abrirPrototipo(doPrototipo, cenario.prototipo, cenario.props);
 
@@ -245,8 +263,8 @@ for (const cenario of CENARIOS) {
       const noPrototipo = await fonteRenderizada(doPrototipo, 'h1');
       const naAplicacao = await fonteRenderizada(page, 'h1');
 
-      expect(noPrototipo, 'o protótipo deveria renderizar o h1 em Inter').toEqual(
-        expect.arrayContaining([expect.stringMatching(/^Inter/)]),
+      expect(noPrototipo, 'o protótipo aprovado renderiza o h1 em Anton').toEqual(
+        expect.arrayContaining([expect.stringMatching(/^Anton/)]),
       );
       expect(naAplicacao).toEqual(noPrototipo);
     });

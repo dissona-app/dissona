@@ -56,6 +56,11 @@ export type PropsMoldura = {
    * que o Design System §3.3 descreve.
    */
   readonly aside?: ReactNode;
+  /**
+   * `dentro` (padrão): o painel escuro vai dentro do cartão branco — cadastro.
+   * `fora`: cartão e painel lado a lado sobre a órbita — onboarding.
+   */
+  readonly asideFora?: boolean;
   readonly children: ReactNode;
 };
 
@@ -84,6 +89,7 @@ export function MolduraDeAutenticacao({
   chamada,
   linksDeRodape,
   aside,
+  asideFora = false,
   tituloDoCard,
   children,
 }: PropsMoldura) {
@@ -142,14 +148,19 @@ export function MolduraDeAutenticacao({
         <main className={estilos.miolo}>
           <div className={estilos.topo}>
             <Link className={estilos.marca} href={ROTA.HOME}>
-              <Marca variante="branca" altura="clamp(36px, 3.8vw, 46px)" />
+              {/* Com o painel ao lado o cartão é mais alto, e o protótipo
+                  aprovado desce o logotipo para 38px. */}
+              <Marca
+                variante="branca"
+                altura={aside === undefined ? 'clamp(36px, 3.8vw, 46px)' : 'clamp(30px, 3vw, 38px)'}
+              />
             </Link>
           </div>
 
           {aside === undefined ? (
             <div className={estilos.card}>{children}</div>
           ) : (
-            <div className={estilos.split}>
+            <div className={asideFora ? estilos.splitFora : estilos.split}>
               <div className={estilos.card}>{children}</div>
               <aside className={estilos.painel}>{aside}</aside>
             </div>

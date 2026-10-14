@@ -42,7 +42,7 @@
 /* Um link com a aparência do botão fantasma do protótipo: 14px, cinza, e o
    fundo lilás só no hover. É link, e não botão, porque navega. */
 .voltar {
-  font-size: var(--dsn-text-sm);
+  font-size: var(--dsn-text-base);
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-ink-500);
   text-decoration: none;

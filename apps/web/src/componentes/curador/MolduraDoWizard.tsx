@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { OrbitaDeFundo } from '@dissona/nucleo/componentes/autenticacao/OrbitaDeFundo';
+import { Marca } from '@dissona/nucleo/componentes/base/Marca';
 import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './MolduraDoWizard.module.css';
@@ -62,8 +63,14 @@ export function MolduraDoWizard({ passo, total, aside, children }: PropsMolduraD
   }
 
   return (
-    <div className={estilos.pagina}>
+    <div className={`${estilos.pagina ?? ''} ${estilos.escuro ?? ''}`}>
       {progresso}
+      <OrbitaDeFundo centro="50%" />
+
+      <header className={estilos.topo}>
+        <Marca variante="branca" altura="30px" />
+        <span className={estilos.contador}>{contador}</span>
+      </header>
 
       <main
         className={estilos.miolo}
@@ -71,7 +78,6 @@ export function MolduraDoWizard({ passo, total, aside, children }: PropsMolduraD
       >
         <div className={estilos.coluna}>
           <div className={estilos.cabecalho}>
-            <span className={estilos.contador}>{contador}</span>
             <h1 className={estilos.titulo}>{titulo}</h1>
             <p className={estilos.subtitulo}>{subtitulo}</p>
           </div>

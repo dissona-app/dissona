@@ -10,15 +10,16 @@
 .overline {
   font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-label);
+  letter-spacing: 0.18em;
   color: var(--dsn-ink-500);
   text-transform: uppercase;
 }
 
 .titulo {
   margin: 0;
-  font-size: clamp(17px, 2.1vh, 20px);
-  line-height: var(--dsn-leading-lead);
+  font-size: clamp(17px, 1.5vw, 24px);
+  line-height: 1.14;
+  color: var(--dsn-ink);
   font-weight: var(--dsn-weight-regular);
   letter-spacing: var(--dsn-tracking-display);
   text-wrap: pretty;
@@ -42,7 +43,11 @@
   display: flex;
   align-items: baseline;
   gap: var(--dsn-space-7);
-  padding-bottom: clamp(10px, 1.5vh, 14px);
+  padding: clamp(10px, 1.5vh, 14px) 0;
+}
+
+.passo + .passo {
+  border-top: 1px solid var(--dsn-auth-painel-border);
 }
 
 /*
@@ -53,11 +58,13 @@
 .passoNumero {
   flex: 0 0 auto;
   width: 28px;
-  font-size: 19px;
-  font-weight: var(--dsn-weight-bold);
-  /* -0.02em: o valor do numeral no protótipo, entre `tight` e `snug`. */
-  letter-spacing: -0.02em;
-  color: var(--dsn-purple-600);
+  /* Protótipo aprovado: o numeral em Anton, 23px, na cor do texto de apoio. */
+  font-family: var(--dsn-font-display);
+  font-size: 23px;
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
+  color: var(--dsn-ink-500);
+  text-transform: uppercase;
   font-variant-numeric: tabular-nums;
 }
 

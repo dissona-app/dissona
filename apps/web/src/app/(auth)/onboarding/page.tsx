@@ -52,6 +52,7 @@ export default async function Pagina({
           { rotulo: 'Privacidade', href: ROTA.PRIVACIDADE },
         ]}
         aside={<NavegadorDoTour />}
+        asideFora
       >
         <TourDeOnboarding
           passos={passos}

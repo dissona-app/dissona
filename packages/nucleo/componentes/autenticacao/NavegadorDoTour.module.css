@@ -11,25 +11,21 @@
 .overline {
   flex: none;
   font-size: var(--dsn-text-3xs);
-  font-weight: var(--dsn-weight-semibold);
+  font-weight: var(--dsn-weight-bold);
   letter-spacing: var(--dsn-tracking-label);
-  color: var(--dsn-ink-500);
+  color: #b780e7;
   text-transform: uppercase;
 }
 
+/* Protótipo aprovado: a lista em tinta, com borda lilás, sobre a órbita. */
 .lista {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 10px;
-  border: var(--dsn-border-width) solid var(--dsn-border);
-  border-radius: var(--dsn-radius-xl);
-  /* Translúcido sobre as ondas do fundo, como no protótipo. */
-  background: rgb(255 255 255 / 74%);
-  backdrop-filter: blur(14px);
-  box-shadow:
-    0 1px 2px rgb(27 18 38 / 4%),
-    0 12px 32px rgb(27 18 38 / 6%);
+  border: 1px solid rgba(198, 180, 222, 0.2);
+  border-radius: 6px;
+  background: #140d1a;
 }
 
 .linha {
@@ -38,20 +34,19 @@
   gap: var(--dsn-space-7);
   width: 100%;
   padding: clamp(11px, 1.7vh, 15px) 14px;
-  border: var(--dsn-border-width) solid transparent;
-  border-radius: var(--dsn-radius-lg);
+  border: 1px solid transparent;
+  border-radius: 4px;
   background: transparent;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
   transition:
     background var(--dsn-duration-base),
-    border-color var(--dsn-duration-base),
-    box-shadow var(--dsn-duration-base);
+    border-color var(--dsn-duration-base);
 }
 
 .linha:hover {
-  border-color: var(--dsn-purple-200);
+  border-color: rgba(198, 180, 222, 0.2);
 }
 
 .linha:focus-visible {
@@ -60,11 +55,8 @@
 }
 
 .linhaAtual {
-  background: var(--dsn-purple-100);
-  border-color: var(--dsn-purple-200);
-  box-shadow:
-    0 1px 2px rgb(27 18 38 / 5%),
-    0 8px 20px rgb(91 46 143 / 10%);
+  background: rgba(198, 180, 222, 0.15);
+  border-color: rgba(198, 180, 222, 0.32);
 }
 
 .numero {
@@ -75,23 +67,21 @@
   width: 30px;
   height: 30px;
   margin-top: -1px;
-  border: var(--dsn-border-width) solid var(--dsn-border);
-  border-radius: 9px;
-  background: var(--dsn-surface);
-  color: var(--dsn-ink-300);
+  border-radius: 3px;
+  background: rgba(198, 180, 222, 0.1);
+  color: #c6b4de;
   font-size: var(--dsn-text-xs);
   font-weight: var(--dsn-weight-bold);
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--dsn-tracking-snug);
   transition:
     background var(--dsn-duration-base),
     color var(--dsn-duration-base);
 }
 
 .linhaAtual .numero {
-  background: var(--dsn-purple-600);
-  border-color: var(--dsn-purple-600);
-  color: var(--dsn-surface);
+  background: #c6b4de;
+  color: #140d1a;
 }
 
 .textos {
@@ -105,17 +95,17 @@
   font-size: var(--dsn-text-base);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-snug);
-  color: var(--dsn-ink-700);
+  color: #c6b4de;
 }
 
 .linhaAtual .titulo {
-  color: var(--dsn-ink);
+  color: #ffffff;
 }
 
 .texto {
   font-size: var(--dsn-text-xs);
   /* 1.45 — o valor literal do protótipo nesta linha, e não o 1.5 do corpo. */
   line-height: var(--dsn-leading-dense);
-  color: var(--dsn-ink-500);
+  color: #c6b4de;
   text-wrap: pretty;
 }

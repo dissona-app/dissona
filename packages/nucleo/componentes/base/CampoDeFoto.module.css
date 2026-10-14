@@ -36,7 +36,8 @@
   background: #f1eafb;
   border: var(--dsn-border-width) solid #e2d6f5;
   color: var(--dsn-purple-600);
-  font-size: 17px;
+  /* 21px no passo 1 do curador, no protótipo aprovado. */
+  font-size: 21px;
   font-weight: var(--dsn-weight-bold);
   letter-spacing: normal;
 }

@@ -33,12 +33,14 @@ import type { Page } from '@playwright/test';
  * do protótipo, e para essas há o `depois`.
  */
 
-const ORIGEM = 'docs/R2';
+// O protótipo aprovado pelo cliente em 30/09/2026 substituiu o da R2 como
+// fonte da verdade do visual (docs/prototipo-aprovado/PLANO.md).
+const ORIGEM = 'docs/prototipo-aprovado';
 
 export const PROTOTIPO = {
-  ARTISTA: 'Dissona - Ambiente Artista - Release 2.html',
-  CURADOR: 'Dissona - Ambiente Curador - Release 2.html',
-  ADMIN: 'Dissona - Ambiente Admin - Release 2.html',
+  ARTISTA: 'Artista.html',
+  CURADOR: 'Curador.html',
+  ADMIN: 'Admin.html',
 } as const;
 
 export type Prototipo = (typeof PROTOTIPO)[keyof typeof PROTOTIPO];

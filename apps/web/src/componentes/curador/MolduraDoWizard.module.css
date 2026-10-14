@@ -7,7 +7,58 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow: hidden;
   background: #ffffff;
+}
+
+/*
+ * Passos 2 a 8 — protótipo aprovado: a tela inteira em tinta, sobre a órbita.
+ * Os tokens são redefinidos aqui dentro, e todo componente dos passos (campo,
+ * chip, botão secundário) herda o tema sem saber dele. Medidas do protótipo:
+ * fundo #140D1A, campo e chip #211A2A com borda lilás a 22%, texto #C6B4DE.
+ */
+.escuro {
+  --dsn-ink: #ffffff;
+  --dsn-ink-700: #c6b4de;
+  --dsn-ink-500: #c6b4de;
+  --dsn-ink-400: rgba(198, 180, 222, 0.6);
+  --dsn-surface: #211a2a;
+  --dsn-surface-alt: #1e1726;
+  --dsn-border: rgba(198, 180, 222, 0.22);
+  --dsn-border-campo: rgba(198, 180, 222, 0.22);
+  --dsn-border-soft: rgba(198, 180, 222, 0.14);
+  --dsn-border-faint: rgba(198, 180, 222, 0.1);
+  --dsn-purple-050: #2a2334;
+  --dsn-purple-100: #33293f;
+  /* Botão secundário em lilás sobre a tinta ("Adicionar canal"). */
+  --dsn-purple-600: #c6b4de;
+  --dsn-track: rgba(198, 180, 222, 0.18);
+  color: #ffffff;
+  background: #140d1a;
+}
+
+.escuro .progresso,
+.escuro .progresso::-webkit-progress-bar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Logotipo à esquerda e o contador à direita, no alto — como no protótipo. */
+.topo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(20px, 3.4vh, 32px) clamp(24px, 4.4vw, 64px) 0;
+}
+
+.topo .contador {
+  align-self: center;
+}
+
+.escuro .cabecalho {
+  align-items: center;
+  text-align: center;
 }
 
 /*
@@ -99,9 +150,8 @@
 }
 
 .tituloEstreito {
-  font-size: clamp(24px, 3.2vh, 30px);
-  line-height: var(--dsn-leading-title);
-  letter-spacing: var(--dsn-tracking-tightest);
+  font-size: clamp(28px, 4.6vh, 40px);
+  line-height: 1.1;
 }
 
 .subtitulo {
@@ -114,7 +164,7 @@
 
 /* Acompanha `.tituloEstreito`: no passo 1 a coluna é mais estreita. */
 .subtituloEstreito {
-  font-size: var(--dsn-text-sm);
+  font-size: var(--dsn-text-md);
 }
 
 /* ------------------------------------------------------------------------
@@ -123,7 +173,9 @@
  * --------------------------------------------------------------------- */
 
 .paginaDividida {
-  --dsn-rotulo-corpo: var(--dsn-text-4xs);
+  /* No passo 1 o rótulo é 11,5px (protótipo aprovado), e não os 10px dos
+     outros passos. */
+  --dsn-rotulo-corpo: 11.5px;
   position: relative;
   display: grid;
   grid-template-columns: 46% minmax(0, 1fr);

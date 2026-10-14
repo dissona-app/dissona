@@ -5,6 +5,9 @@
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  /* As notas medem em `em` a partir daqui; o protótipo parte de 16px e tinta. */
+  font-size: 16px;
+  color: #140d1a;
 }
 
 .brilho {

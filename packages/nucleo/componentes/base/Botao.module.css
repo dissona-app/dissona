@@ -201,6 +201,11 @@
   letter-spacing: var(--dsn-tracking-snug);
 }
 
+/* O CTA grande do protótipo aprovado mantém o tracking de botão (0.06em). */
+.md.primario {
+  letter-spacing: var(--dsn-tracking-botao);
+}
+
 .denso {
   padding: clamp(10px, 1.5vh, 13px) var(--dsn-space-11);
   font-size: var(--dsn-text-base);

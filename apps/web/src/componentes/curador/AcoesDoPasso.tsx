@@ -65,7 +65,7 @@ export function AcoesDoPasso({
       <Botao
         type="submit"
         variante="neutro"
-        tamanho="sm"
+        tamanho={passo <= 1 ? 'denso' : 'sm'}
         formAction={acaoDeVoltar}
         formNoValidate
         disabled={travado}
@@ -89,7 +89,8 @@ export function AcoesDoPasso({
           </Botao>
         ) : null}
 
-        <Botao type="submit" tamanho="denso" carregando={travado}>
+        {/* No passo 1 (tela dividida) o protótipo aprovado usa o CTA grande. */}
+        <Botao type="submit" tamanho={passo <= 1 ? 'md' : 'denso'} carregando={travado}>
           {ultimo ? CURADOR_CADASTRO.enviarCadastro : CURADOR_CADASTRO.continuar}
         </Botao>
       </div>

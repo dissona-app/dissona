@@ -139,3 +139,8 @@
   border-top: 1px solid var(--dsn-border);
   background: var(--dsn-surface-alt);
 }
+
+/* O selo do papel no protótipo aprovado fecha um pouco mais (0.08em). */
+.linhaDoNome > :last-child {
+  letter-spacing: 0.08em;
+}
