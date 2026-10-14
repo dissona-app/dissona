@@ -80,6 +80,14 @@ export function ListaDaEquipe({
     (linha) => linha.situacao === 'pendente' || linha.situacao === 'expirado',
   ).length;
 
+  // Protótipo aprovado: a contagem de integrantes ativos por papel, em Anton,
+  // no cabeçalho escuro. Papel sem ninguém fica apagado, e não some.
+  const porPapel = PAPEIS_ADMIN.map((papel) => ({
+    ...papel,
+    total: linhas.filter((linha) => linha.situacao === 'ativo' && linha.papelAdmin === papel.valor)
+      .length,
+  }));
+
   return (
     <section className={estilos.base} aria-label={TEXTOS.overline}>
       <div className={estilos.cabecalho}>
@@ -87,7 +95,22 @@ export function ListaDaEquipe({
           <span className={estilos.overline}>{TEXTOS.overline}</span>
           <span className={estilos.resumo}>{TEXTOS.resumo(ativos, pendentes)}</span>
         </div>
-        {acaoDeConvidar}
+        <div className={estilos.ladoDireito}>
+          <dl className={estilos.contagens}>
+            {porPapel.map((papel) => (
+              <div
+                key={papel.valor}
+                className={[estilos.contagem, papel.total === 0 ? estilos.contagemVazia : undefined]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                <dt className={estilos.contagemRotulo}>{papel.rotulo}</dt>
+                <dd className={estilos.contagemNumero}>{papel.total}</dd>
+              </div>
+            ))}
+          </dl>
+          {acaoDeConvidar}
+        </div>
       </div>
 
       {aviso === null ? null : (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
 import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@dissona/nucleo/lib/arquivos';
 import { iniciaisDe } from '@dissona/nucleo/lib/iniciais';
@@ -64,6 +65,12 @@ export type PropsCampoDeFoto = {
    * do botão; sem isso o upload em curso ficaria mudo.
    */
   readonly semDica?: boolean;
+  /**
+   * Protótipo aprovado (Conta do admin): o avatar sobe sobre a capa escura, a
+   * identidade fica no meio e o botão com a dica vai para a direita. O que
+   * entra no meio é de quem chama.
+   */
+  readonly vitrine?: ReactNode;
   readonly textos: TextosDoCampoDeFoto;
 };
 
@@ -87,6 +94,7 @@ export function CampoDeFoto({
   tamanhoDoBotao = 'md',
   tamanho = 'sm',
   semDica = false,
+  vitrine,
   textos,
 }: PropsCampoDeFoto) {
   const foto = useUploadDireto({
@@ -141,7 +149,11 @@ export function CampoDeFoto({
       */}
       {foto.erro === undefined ? null : <Aviso tom="erro">{foto.erro}</Aviso>}
 
-      <div className={estilos.base}>
+      <div
+        className={[estilos.base, vitrine === undefined ? undefined : estilos.emVitrine]
+          .filter(Boolean)
+          .join(' ')}
+      >
         {imagem !== null ? (
           // `<img>` e não `next/image`: a origem é o bucket público do Supabase,
           // e passar por `remotePatterns` só para um avatar de 56px não paga.
@@ -159,6 +171,8 @@ export function CampoDeFoto({
             {iniciaisDe(nome)}
           </span>
         )}
+
+        {vitrine === undefined ? null : <div className={estilos.meio}>{vitrine}</div>}
 
         <div className={estilos.textos}>
           {/* `<label>` envolvendo o input: alvo de clique do tamanho do botão,

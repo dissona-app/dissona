@@ -17,7 +17,49 @@
   justify-content: space-between;
   gap: var(--dsn-space-8);
   padding: clamp(14px, 2vh, 20px) clamp(16px, 2.4vh, 24px);
-  border-bottom: 1px solid var(--dsn-border);
+  /* Protótipo aprovado: cabeçalho e cabeçalho da grade em tinta. */
+  background: #140d1a;
+  color: #ffffff;
+}
+
+.ladoDireito {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 28px);
+}
+
+.contagens {
+  display: flex;
+  gap: clamp(14px, 2vw, 24px);
+  margin: 0;
+}
+
+/* `column-reverse`: o número vem antes na tela, e o rótulo antes na leitura. */
+.contagem {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.contagemVazia {
+  opacity: 0.45;
+}
+
+.contagemRotulo {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c6b4de;
+}
+
+.contagemNumero {
+  margin: 0;
+  font-family: var(--dsn-font-display);
+  font-size: 22px;
+  line-height: 1;
+  color: #ffffff;
 }
 
 .textos {
@@ -29,16 +71,16 @@
 
 .overline {
   font-size: var(--dsn-text-3xs);
-  font-weight: var(--dsn-weight-semibold);
+  font-weight: var(--dsn-weight-bold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;
-  color: var(--dsn-ink-500);
+  color: #ffffff;
 }
 
 .resumo {
   font-size: var(--dsn-text-xs);
   line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink-500);
+  color: #c6b4de;
 }
 
 .faixaDeAviso {
@@ -63,13 +105,13 @@
 .cabecalhoDaGrade {
   padding-top: 10px;
   padding-bottom: 10px;
-  background: var(--dsn-surface-alt);
-  border-bottom: 1px solid var(--dsn-border);
+  background: #140d1a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: var(--dsn-text-4xs);
-  font-weight: var(--dsn-weight-semibold);
+  font-weight: var(--dsn-weight-bold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;
-  color: var(--dsn-ink-500);
+  color: #c6b4de;
 }
 
 .alinhadoADireita {

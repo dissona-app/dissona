@@ -62,15 +62,15 @@
 
 /* ------------------------------------------------------------ secundário */
 
+/* Protótipo aprovado: contorno e rótulo em `purple-600`, nos três ambientes. */
 .secundario {
   background: var(--dsn-surface);
-  color: var(--dsn-ink);
-  border: var(--dsn-border-width) solid #e0d6ec;
+  color: var(--dsn-purple-600);
+  border: var(--dsn-border-width) solid var(--dsn-purple-600);
 }
 
 .secundario:hover:not(:disabled) {
   background: var(--dsn-purple-050);
-  border-color: var(--dsn-ink);
 }
 
 /* ----------------------------------------------------------------- ghost */

@@ -115,11 +115,14 @@ export function DadosDoMembro({
 
   return (
     <section className={estilos.base} aria-label={EQUIPE.abas.dados}>
+      {/* Protótipo aprovado: capa escura com dois brilhos e o avatar subindo
+          sobre ela; nome, papel, cargo e e-mail ao lado. */}
+      <div className={estilos.capa} aria-hidden="true">
+        <span className={estilos.brilhoA} />
+        <span className={estilos.brilhoB} />
+      </div>
+
       <form action={enviar} onSubmit={aoEnviar} className={estilos.corpo} noValidate>
-        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
-
-        {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
-
         <div className={estilos.identidade}>
           <CampoDeFoto
             nome={nome}
@@ -127,6 +130,17 @@ export function DadosDoMembro({
             caminhoAtual={fotoCaminho}
             aoMudarEnvio={setSubindoFoto}
             tamanho="md"
+            vitrine={
+              <div className={estilos.quem}>
+                <span className={estilos.linhaDoNome}>
+                  <span className={estilos.nome}>{nome}</span>
+                  <Etiqueta tom="info">{rotuloDoPapel(papelAdmin)}</Etiqueta>
+                </span>
+                <span className={estilos.cargoEmail}>
+                  {cargo === null || cargo === '' ? email : `${cargo} · ${email}`}
+                </span>
+              </div>
+            }
             textos={{
               botao: TEXTOS.trocarFoto,
               hint: TEXTOS.fotoHint,
@@ -136,8 +150,11 @@ export function DadosDoMembro({
               erroTamanho: TEXTOS.erroFotoTamanho,
             }}
           />
-          <Etiqueta tom="info">{rotuloDoPapel(papelAdmin)}</Etiqueta>
         </div>
+
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
+        {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
 
         <div className={estilos.par}>
           <Campo

@@ -102,6 +102,13 @@
   border-color: var(--dsn-danger-fg);
 }
 
+/* Somente leitura (o e-mail que troca por modal): o lilás do protótipo
+ * aprovado, com a tinta um tom acima da do desabilitado. */
+.entrada:read-only:not(:disabled) {
+  background: var(--dsn-purple-050);
+  color: #3a3242;
+}
+
 .entrada:disabled {
   background: var(--dsn-purple-050);
   color: var(--dsn-ink-500);

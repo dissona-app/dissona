@@ -116,6 +116,12 @@
   padding: clamp(18px, 2.8vh, 32px) var(--dsn-space-20) clamp(20px, 3vh, 40px);
 }
 
+/* Protótipo aprovado: o admin trabalha sobre um fundo areia, e os cartões
+ * brancos se destacam dele. Artista e curador seguem no branco. */
+.colunaAdmin {
+  background: var(--dsn-fundo-admin, #f4f2ef);
+}
+
 .conteudoAdmin {
   padding: clamp(14px, 2.2vh, 26px) var(--dsn-space-20) clamp(16px, 2.4vh, 32px);
 }

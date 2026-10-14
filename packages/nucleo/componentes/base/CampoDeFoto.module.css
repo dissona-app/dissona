@@ -83,7 +83,7 @@
   font-weight: var(--dsn-weight-semibold);
   color: var(--dsn-purple-600);
   background: var(--dsn-surface);
-  border: var(--dsn-border-width) solid var(--dsn-border);
+  border: var(--dsn-border-width) solid var(--dsn-purple-600);
   border-radius: var(--dsn-radius-lg);
   padding: 9px var(--dsn-space-7);
   cursor: pointer;
@@ -96,7 +96,7 @@
 }
 
 .botao:hover {
-  border-color: var(--dsn-purple-600);
+  background: var(--dsn-purple-050);
 }
 
 .botao:focus-within {
@@ -142,4 +142,50 @@
   display: flex;
   flex-direction: column;
   gap: var(--dsn-space-5);
+}
+
+/* ------------------------------------------------------------ vitrine */
+
+/* Protótipo aprovado, Conta do admin: avatar de 84px com aro branco subindo
+   sobre a capa, identidade no meio, botão e dica à direita. */
+.emVitrine {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 16px;
+}
+
+.emVitrine .avatar,
+.emVitrine .avatarImagem {
+  width: 84px;
+  height: 84px;
+  position: relative;
+  z-index: 1;
+  margin-top: -38px;
+  border: 4px solid #ffffff;
+  background-color: #efe7f8;
+  box-shadow: 0 6px 16px rgba(20, 13, 26, 0.18);
+  font-size: 24px;
+}
+
+.emVitrine .textos {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.meio {
+  min-width: 0;
+  padding-bottom: 4px;
+}
+
+@media (max-width: 640px) {
+  .emVitrine {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .emVitrine .textos {
+    grid-column: 1 / -1;
+    align-items: flex-start;
+    text-align: left;
+  }
 }
