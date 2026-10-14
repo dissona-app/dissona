@@ -287,7 +287,12 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
 
       {/* Protótipo aprovado: link à esquerda, arquivo à direita, lado a lado. */}
       <div className={estilos.duasColunas}>
-        <Painel titulo={TEXTOS.colarLink} sublegenda={TEXTOS.colarLinkApoio} nivel={3}>
+        <Painel
+          titulo={TEXTOS.colarLink}
+          sublegenda={TEXTOS.colarLinkApoio}
+          nivel={3}
+          estilo="rotulo"
+        >
           <div className={estilos.par}>
             <Campo
               name="urlSpotify"
@@ -310,7 +315,8 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
           <div className={estilos.acoes}>
             <Botao
               type="button"
-              variante="secundario"
+              variante="tinta"
+              tamanho="sm"
               carregando={detectando}
               disabled={urlSpotify.trim() === '' && urlYoutube.trim() === ''}
               onClick={detectarFaixa}
@@ -319,36 +325,14 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
             </Botao>
           </div>
 
-          {detectado !== null ? (
-            <div className={estilos.detectada} aria-live="polite">
-              {detectado.capaUrl !== null ? (
-                <Image
-                  // A capa vem do CDN do provedor; `unoptimized` evita abrir
-                  // `remotePatterns` para hosts de terceiros.
-                  unoptimized
-                  src={detectado.capaUrl}
-                  alt={TEXTOS.capaDetectada(detectado.titulo)}
-                  width={64}
-                  height={64}
-                  className={estilos.capaDetectada}
-                />
-              ) : null}
-              <span className={estilos.detectadaTexto}>
-                <span className={estilos.detectadaRotulo}>{TEXTOS.faixaEncontrada}</span>
-                <span className={estilos.detectadaTitulo}>{detectado.titulo}</span>
-                {detectado.artista !== null ? (
-                  <span className={estilos.detectadaArtista}>{detectado.artista}</span>
-                ) : null}
-              </span>
-              <Botao type="button" variante="neutro" tamanho="sm" onClick={focarTitulo}>
-                {TEXTOS.corrigirDados}
-              </Botao>
-            </div>
-          ) : null}
-
           {naoEncontrada ? <Aviso tom="alerta">{TEXTOS.naoDetectada}</Aviso> : null}
         </Painel>
-        <Painel titulo={TEXTOS.enviarArquivo} sublegenda={TEXTOS.enviarArquivoApoio}>
+        <Painel
+          titulo={TEXTOS.enviarArquivo}
+          sublegenda={TEXTOS.enviarArquivoApoio}
+          nivel={3}
+          estilo="rotulo"
+        >
           <label
             className={[estilos.dropzone, arrastando ? estilos.dropzoneAtiva : undefined]
               .filter(Boolean)
@@ -389,6 +373,57 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
           </Aviso>
         </Painel>
       </div>
+
+      {/* Protótipo aprovado: a faixa encontrada ganha a largura toda — capa
+          com o vinil saindo por trás, origem, título em Anton e o artista. */}
+      {detectado !== null ? (
+        <div className={estilos.detectada} aria-live="polite">
+          <span
+            className={estilos.detectadaFundo}
+            style={
+              detectado.capaUrl === null
+                ? undefined
+                : { backgroundImage: `url('${detectado.capaUrl}')` }
+            }
+            aria-hidden="true"
+          />
+          <div className={estilos.detectadaArte}>
+            <span className={estilos.detectadaVinil} aria-hidden="true">
+              <span className={estilos.detectadaFuro} />
+            </span>
+            {detectado.capaUrl !== null ? (
+              <Image
+                // A capa vem do CDN do provedor; `unoptimized` evita abrir
+                // `remotePatterns` para hosts de terceiros.
+                unoptimized
+                src={detectado.capaUrl}
+                alt={TEXTOS.capaDetectada(detectado.titulo)}
+                width={160}
+                height={160}
+                className={estilos.capaDetectada}
+              />
+            ) : (
+              <span className={estilos.capaDetectada} aria-hidden="true" />
+            )}
+          </div>
+          <span className={estilos.detectadaTexto}>
+            <span className={estilos.detectadaRotulo}>
+              <span aria-hidden="true">✓ </span>
+              {TEXTOS.faixaEncontradaNo(detectado.provedor === 'spotify' ? 'Spotify' : 'YouTube')}
+            </span>
+            <span className={estilos.detectadaTitulo}>{detectado.titulo}</span>
+            {detectado.artista !== null ? (
+              <span className={estilos.detectadaArtista}>{detectado.artista}</span>
+            ) : null}
+          </span>
+          <div className={estilos.detectadaLado}>
+            <span>{TEXTOS.dadosConferidos}</span>
+            <Botao type="button" variante="secundario" tamanho="sm" onClick={focarTitulo}>
+              {TEXTOS.corrigirDados}
+            </Botao>
+          </div>
+        </div>
+      ) : null}
 
       <Painel titulo={TEXTOS.detalhesTitulo} nivel={3}>
         <Campo

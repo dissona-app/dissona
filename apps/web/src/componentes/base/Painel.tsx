@@ -10,6 +10,12 @@ export type PropsPainel = {
   readonly semMoldura?: boolean;
   /** Nivel do heading. A pagina define a hierarquia, nao o componente. */
   readonly nivel?: 2 | 3 | 4;
+  /**
+   * `rotulo`: o título vira o rótulo pequeno em caixa-alta e a sublegenda vira
+   * o título em negrito — os cartões do envio no protótipo aprovado. O
+   * heading continua sendo o título, para a leitura da página não mudar.
+   */
+  readonly estilo?: 'titulo' | 'rotulo';
   readonly children: ReactNode;
 };
 
@@ -39,6 +45,7 @@ export function Painel({
   acao,
   semMoldura = false,
   nivel = 2,
+  estilo = 'titulo',
   children,
 }: PropsPainel) {
   const Titulo = (nivel === 2 ? 'h2' : nivel === 3 ? 'h3' : 'h4') as 'h2' | 'h3' | 'h4';
@@ -46,7 +53,11 @@ export function Painel({
   return (
     <section
       aria-label={titulo}
-      className={[estilos.base, semMoldura ? estilos.semMoldura : undefined]
+      className={[
+        estilos.base,
+        semMoldura ? estilos.semMoldura : undefined,
+        estilo === 'rotulo' ? estilos.comRotulo : undefined,
+      ]
         .filter(Boolean)
         .join(' ')}
     >

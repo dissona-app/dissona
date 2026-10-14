@@ -108,40 +108,133 @@
 
 /* 3.1 · "Faixa encontrada" — capa, título e artista vindos do oEmbed. */
 .detectada {
-  display: flex;
-  flex-wrap: wrap;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--dsn-space-8);
-  padding: var(--dsn-space-8);
+  gap: clamp(16px, 2.4vw, 28px);
+  overflow: hidden;
+  padding: 18px 22px;
   border: 1px solid var(--dsn-border);
-  border-radius: var(--dsn-radius-md);
-  background: var(--dsn-surface);
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f6eedd 0%, #ffffff 55%);
+}
+
+/* A cor da capa, desfocada, tinge o cartão — como no protótipo. */
+.detectadaFundo {
+  position: absolute;
+  inset: -60px;
+  background-position: center;
+  background-size: cover;
+  filter: blur(60px) saturate(1.3);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.detectadaArte {
+  position: relative;
+  width: 196px;
+  height: 152px;
+}
+
+.detectadaVinil {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  right: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #1b1424 0 2px, #140d1a 2px 4px);
+  box-shadow: 0 10px 24px rgba(20, 13, 26, 0.35);
+  animation: dsnSpin 9s linear infinite;
+}
+
+.detectadaFuro {
+  position: absolute;
+  inset: 46%;
+  border-radius: 50%;
+  background: #f4f2ef;
 }
 
 .capaDetectada {
-  flex: none;
-  border-radius: var(--dsn-radius-md);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 152px;
+  height: 152px;
+  border-radius: 3px;
+  background: #140d1a;
   object-fit: cover;
+  box-shadow:
+    0 2px 6px rgba(20, 13, 26, 0.16),
+    0 16px 32px rgba(20, 13, 26, 0.28);
 }
 
 .detectadaTexto {
+  position: relative;
   display: flex;
-  flex: 1 1 12rem;
   flex-direction: column;
-  gap: var(--dsn-space-1);
+  gap: 4px;
   min-width: 0;
 }
 
-.detectadaRotulo,
-.detectadaArtista {
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+.detectadaRotulo {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1e7a4a;
 }
 
 .detectadaTitulo {
-  font-weight: 500;
+  font-family: var(--dsn-font-display);
+  font-size: clamp(22px, 3vh, 28px);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
   color: var(--dsn-ink);
   overflow-wrap: anywhere;
+}
+
+.detectadaArtista {
+  font-size: 13px;
+  color: var(--dsn-ink-700, #3a3242);
+}
+
+.detectadaLado {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 180px;
+  padding-left: clamp(16px, 2vw, 24px);
+  border-left: 1px solid var(--dsn-border);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--dsn-ink-500);
+}
+
+@media (max-width: 760px) {
+  .detectada {
+    grid-template-columns: 1fr;
+  }
+
+  .detectadaLado {
+    align-items: flex-start;
+    max-width: none;
+    padding-left: 0;
+    border-left: none;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detectadaVinil {
+    animation: none;
+  }
 }
 
 /* Colar link e Enviar arquivo lado a lado — protótipo aprovado. */

@@ -12,7 +12,9 @@
   flex-direction: column;
   /* Sem isto, conteudo largo estica a coluna e quebra a grade. */
   min-width: 0;
-  background: var(--dsn-surface);
+  /* Protótipo aprovado: os três ambientes trabalham sobre um fundo areia, e
+   * os cartões brancos se destacam dele. O cabeçalho continua branco. */
+  background: var(--dsn-fundo-app, #f4f2ef);
 }
 
 .header {
@@ -114,12 +116,6 @@
 
 .conteudo {
   padding: clamp(18px, 2.8vh, 32px) var(--dsn-space-20) clamp(20px, 3vh, 40px);
-}
-
-/* Protótipo aprovado: o admin trabalha sobre um fundo areia, e os cartões
- * brancos se destacam dele. Artista e curador seguem no branco. */
-.colunaAdmin {
-  background: var(--dsn-fundo-admin, #f4f2ef);
 }
 
 .conteudoAdmin {

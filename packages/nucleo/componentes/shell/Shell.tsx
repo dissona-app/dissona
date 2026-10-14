@@ -137,11 +137,7 @@ export function Shell({
 
       <Navegacao papel={papelAtivo} releaseAtual={releaseAtual} rodape={rodapeNavegacao} />
 
-      <div
-        className={[estilos.coluna, ehAdmin ? estilos.colunaAdmin : undefined]
-          .filter(Boolean)
-          .join(' ')}
-      >
+      <div className={estilos.coluna}>
         <header className={estilos.header}>
           <div className={estilos.textosHeader}>
             <h1 className={estilos.titulo}>{tituloExibido}</h1>

@@ -1090,8 +1090,8 @@ export const ENVIAR = {
   passoDe: (atual: number, total: number) => `Passo ${atual} de ${total}`,
 
   herois: [
-    'Sua faixa vai ser ouvida por quem entende.',
-    'Diga o que você quer descobrir com essa faixa.',
+    'Sua faixa nas mãos de quem entende.',
+    'Diga o que você quer descobrir.',
     'Última olhada antes de soltar.',
   ] as const,
 
@@ -1101,6 +1101,8 @@ export const ENVIAR = {
   detectar: 'Detectar faixa',
   detectando: 'Procurando os dados da faixa',
   faixaEncontrada: 'Faixa encontrada',
+  faixaEncontradaNo: (provedor: string) => `Faixa encontrada no ${provedor}`,
+  dadosConferidos: 'Dados conferidos? Siga para o contexto.',
   corrigirDados: 'Corrigir dados',
   /** Sem detecção, o protótipo abre o preenchimento manual. */
   naoDetectada: 'Não encontramos a faixa por esse link. Preencha os dados abaixo.',

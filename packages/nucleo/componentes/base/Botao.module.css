@@ -79,6 +79,17 @@
   border-color: var(--dsn-ink);
 }
 
+/* ----------------------------------------------------------------- tinta */
+
+.tinta {
+  background: var(--dsn-ink);
+  color: #ffffff;
+}
+
+.tinta:hover:not(:disabled) {
+  background: #2a1f33;
+}
+
 /* ----------------------------------------------------------------- ghost */
 
 .ghost {
