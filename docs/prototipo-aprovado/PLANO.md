@@ -46,36 +46,56 @@ do Artista coincidem.
 - Conferidas sem mudança: Conta do curador (mesmas abas e cartões; o aprovado não tem a aba
   Perfil, e os dados de recebimento seguem "próxima entrega" até o Pix existir).
 
-## Fase 1 — pendente
+## Fase 1 — fechada em 14/10/2026 (tarde)
 
-Cada tela abaixo segue o mesmo método: abrir o protótipo e o app no mesmo tamanho de janela e
-portar layout, espaçamento, estados (vazio, carregando, erro, sucesso) e efeitos (hover, foco,
-animação).
+**Como se verifica:** `e2e/prototipo/` agora abre os HTML **aprovados** (não mais os da R2) e
+compara a tipografia de todo texto pareado — corpo, peso, tracking, entrelinha, caixa e cor —, além
+da fonte dos títulos (Anton) e da altura do logotipo. São 75 cenários, todos passando:
 
-### Artista
+- `telas-de-autenticacao.spec.ts`: logins, cadastros, recuperação, redefinição, verificação.
+- `telas-da-r1.spec.ts`: onboarding, conta do artista, wizard do curador (8 passos), classificação,
+  Bronze, análise, conta do curador, conta e equipe do admin.
+- `telas-da-r2.spec.ts`: carteira, perfil, editar cadastro, enviar, fila, avaliação (notas), meu
+  perfil do curador, pacotes do admin.
 
-- [ ] Detalhes por link e por mp3 (passo 1, estado com a faixa detectada)
-- [ ] Editar cadastro (capa do perfil, que o aprovado tem)
-- [ ] Configurações (abas)
+Para rodar contra o servidor de desenvolvimento, sem build:
 
-### Curador
+```
+BASE_URL=http://localhost:3000 BASE_URL_ADMIN=http://admin.localhost:3001 npx playwright test e2e/prototipo
+```
 
-- [ ] Avaliação: notas, subjetiva, compartilhamento, outras e remuneração
-- [ ] Carteira
+Feito nesta etapa:
 
-### Admin
+- **Transversal:** fundo areia `#F4F2EF` nos três ambientes; botão secundário com contorno roxo
+  (curador e admin) ou tinta (artista); cor do item ativo do menu fixa por tela (o `NAVC` do
+  protótipo); abas do artista sublinhadas em tinta; campo somente leitura em lilás; `h1`/`h2` sem o
+  `!important` da Fase 0; sobretítulo roxo na Fila e na Avaliação.
+- **Artista:** passo 1 do envio com a faixa encontrada (capa, vinil, origem); Configurações em
+  880px; Editar cadastro num só cartão (foto, dados, links, rodapé); cadastro com o painel "Como
+  funciona" escuro dentro do cartão; onboarding com o navegador do tour em tinta.
+- **Curador:** wizard de cadastro escuro sobre a órbita nos passos 2 a 8; avaliação em três colunas
+  (player sob a capa, critérios em obrigatórios/opcionais, justificativa no painel ao lado).
+- **Admin:** Dados pessoais com capa escura e avatar; Equipe e Papéis com cabeçalho em tinta e
+  contagem por papel; CTAs da faixa escura sem caixa-alta.
 
-- [ ] Editar pacote
-- [ ] Convite, onboarding e verificação
-- [ ] Equipe (abas Equipe e Papéis)
+## Divergências que ficam (decisão nossa, registradas como exceção na suíte)
 
-### Transversal
+| Onde | O aprovado | A aplicação | Por quê |
+|---|---|---|---|
+| Borda de campo | `#E5DEEA` | `#9890A6` | WCAG 1.4.11 pede 3:1 na borda de campo branco sobre branco. |
+| Boas-vindas Bronze | "Começar o curso" é o primário | "Ir para o painel" é o primário | O curso é de outra release e o botão está desabilitado. |
+| Wizard, passo 8 | Links de termos em `#5B2E8F` sobre `#140D1A` | Lilás `#C6B4DE` | 1,6:1 no aprovado — ilegível. |
+| Onboarding | "Pular" no alto da tela | "Pular" no cartão | Composição do tour; pode subir se o cliente quiser. |
+| Perfil, enviar | "Ver todas" e "Detectar faixa" ativos | Desabilitados sem destino/sem link | Funcionalidade. |
 
-- [ ] Componentes: Tabela, Modal, Aviso, Etiqueta, Chips, Abas, Campo e Selecao com os literais
-  do aprovado.
-- [ ] Tirar o `!important` provisório de `h1`/`h2` em `packages/nucleo/estilos/global.css`,
-  ajustando módulo a módulo.
-- [ ] Ligar a suíte `e2e/prototipo` aos HTML aprovados.
+## Pendente — depende de decisão do cliente ou de banco
+
+- [ ] **Capa do perfil** (Editar cadastro): o aprovado tem cinco capas prontas e upload. Pede uma
+  coluna em `perfil` e um bucket — migração no banco compartilhado com produção.
+- [ ] **Envio em 4 passos**: no aprovado a escolha do curador vem **antes** da revisão (Envio ·
+  Contexto · Escolher curador · Revisar). Hoje são 3 passos e a escolha vem depois. Muda o fluxo.
+- [ ] Dados de recebimento (curador) e de cobrança (artista): o aprovado mostra Pix e cartão; as
+  telas dizem "próxima entrega" até a funcionalidade existir.
 
 ### Fora do escopo da R1/R2
 
