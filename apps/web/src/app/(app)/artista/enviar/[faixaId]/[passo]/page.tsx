@@ -7,11 +7,15 @@ import { MolduraDoEnvio } from '@/componentes/artista/MolduraDoEnvio';
 import { Revisao } from '@/componentes/artista/Revisao';
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import * as claves from '@dissona/nucleo/lib/claves';
+import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerCarteira } from '@/modulos/claves/consultas';
 import { detectarFaixa, salvarContexto, salvarFaixa } from '@/modulos/faixa/acoes';
 import { lerFaixaDoPasso, lerLimitesDeUpload } from '@/modulos/faixa/consultas';
 import { ehPassoDoEnvio } from '@/modulos/faixa/tipos';
+import { confirmarSelecaoDeCuradores } from '@/modulos/selecao/acoes';
+import { lerCuradoresParaSelecao } from '@/modulos/selecao/consultas';
+import { lerSelecaoDaUrl, selecaoEmQuery } from '@/modulos/selecao/tipos';
 import { CARTEIRA, ENVIAR } from '@dissona/nucleo/textos/prototipo';
 
 export const metadata: Metadata = {
@@ -29,8 +33,10 @@ export const metadata: Metadata = {
  */
 export default async function PaginaDoPasso({
   params,
+  searchParams,
 }: {
   readonly params: Promise<{ readonly faixaId: string; readonly passo: string }>;
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { faixaId, passo: bruto } = await params;
 
@@ -88,9 +94,53 @@ export default async function PaginaDoPasso({
     );
   }
 
-  // O saldo entra no aviso da revisão — "o teto é o seu saldo, hoje X".
+  // Revisão — a escolha dos curadores chega da seleção pela URL (ordem do
+  // protótipo aprovado). Sem escolha, o lugar é a seleção.
+  const [carteira, curadores, busca] = await Promise.all([
+    lerCarteira(),
+    lerCuradoresParaSelecao(),
+    searchParams,
+  ]);
+  const pedida = lerSelecaoDaUrl(busca);
+  const disponiveis = new Map(curadores.map((curador) => [curador.id, curador]));
+
+  // Só o que ainda pode receber envio e só os serviços que o curador oferece.
+  const selecao = Object.fromEntries(
+    Object.entries(pedida)
+      .filter(([id]) => disponiveis.has(id))
+      .map(([id, servicos]) => [
+        id,
+        servicos.filter((tipo) =>
+          (disponiveis.get(id)?.opcionais ?? []).some((opcional) => opcional.tipo === tipo),
+        ),
+      ]),
+  );
+  const alterar = `${ROTA.ARTISTA_ENVIAR}/${faixaId}/curadores${selecaoEmQuery(selecao)}`;
+  if (Object.keys(selecao).length === 0) redirect(alterar);
+
+  const formatarClaves = (n: number) =>
+    `${claves.formatar(BigInt(Math.round(n * 100)))} ${n === 1 ? 'Clave' : CARTEIRA.saldoUnidade}`;
+  const escolhidos = Object.entries(selecao).map(([id, servicos]) => {
+    const curador = disponiveis.get(id);
+    const extras = (curador?.opcionais ?? []).filter((opcional) =>
+      servicos.includes(opcional.tipo),
+    );
+    const soma = (curador?.precoBaseClaves ?? 0) + extras.reduce((t, o) => t + o.precoClaves, 0);
+    return {
+      id,
+      nome: curador?.nome ?? '',
+      servicos: ['Feedback', ...extras.map((opcional) => opcional.rotulo)].join(' + '),
+      claves: formatarClaves(soma),
+      soma,
+    };
+  });
+  const total = escolhidos.reduce((t, curador) => t + curador.soma, 0);
+  const totalEmReais =
+    carteira === null
+      ? ''
+      : dinheiro.formatar((BigInt(Math.round(total * 100)) * carteira.valorDaClave) / 100n);
+
   // Formatado aqui, no servidor: `bigint` não atravessa a fronteira.
-  const carteira = await lerCarteira();
   const saldo =
     carteira === null
       ? null
@@ -98,7 +148,16 @@ export default async function PaginaDoPasso({
 
   return (
     <MolduraDoEnvio passo="revisao">
-      <Revisao faixa={faixa} saldo={saldo} />
+      <Revisao
+        faixa={faixa}
+        saldo={saldo}
+        escolhidos={escolhidos}
+        total={formatarClaves(total)}
+        totalEmReais={totalEmReais}
+        selecao={selecao}
+        alterar={alterar}
+        acao={confirmarSelecaoDeCuradores}
+      />
     </MolduraDoEnvio>
   );
 }

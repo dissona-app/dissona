@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 
 import { ENVIAR } from '@dissona/nucleo/textos/prototipo';
 import type { PassoDoEnvio } from '@/modulos/faixa/tipos';
-import { PASSOS } from '@/modulos/faixa/tipos';
 
 import estilos from './MolduraDoEnvio.module.css';
 
@@ -23,8 +22,16 @@ export type PropsMolduraDoEnvio = {
  * vez de generalizá-la e mexer num fluxo entregue, esta é a moldura do envio,
  * apoiada no `<Passos>` do Design System, cujo docblock já previa "envio em 3".
  */
+const ORDEM_NO_INDICADOR: Readonly<Record<PassoDoEnvio | 'curadores', number>> = {
+  faixa: 0,
+  contexto: 1,
+  curadores: 2,
+  revisao: 3,
+};
+
 export function MolduraDoEnvio({ passo, children }: PropsMolduraDoEnvio) {
-  const indice = passo === 'curadores' ? PASSOS.length : PASSOS.indexOf(passo);
+  // Ordem do protótipo aprovado: envio, contexto, escolher curador, revisar.
+  const indice = ORDEM_NO_INDICADOR[passo];
 
   // Protótipo aprovado: um cartão com a faixa escura no topo — título,
   // contador e os passos em barras — e o conteúdo numa área clara embaixo.

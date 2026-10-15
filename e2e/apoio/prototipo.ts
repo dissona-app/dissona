@@ -79,7 +79,9 @@ export type PropsDoPrototipo = {
     | 'Avaliação'
     // Admin
     | 'Pacotes de Claves'
-    | 'Conta e equipe';
+    | 'Conta e equipe'
+    | 'Editar cadastro'
+    | 'Meu perfil';
   readonly estadoInicial?:
     'Normal' | 'Loading' | 'Erro' | 'Bloqueada' | 'Autenticado' | 'Sem permissão';
   readonly estadoCadastro?: 'Normal' | 'Loading' | 'Erro' | 'Sucesso';

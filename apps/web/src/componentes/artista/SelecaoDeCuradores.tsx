@@ -2,35 +2,19 @@
 
 import { useState } from 'react';
 
-import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Checkbox } from '@/componentes/base/Checkbox';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
-import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
-import { CodigoErro } from '@dissona/nucleo/lib/erros';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { SELECAO as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
-import estilos from './SelecaoDeCuradores.module.css';
-import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
+import type { CuradorNaLista, SelecaoNaUrl } from '@/modulos/selecao/tipos';
 
-/** Um curador na lista, **já formatado no servidor**. */
-export type CuradorNaLista = {
-  readonly id: string;
-  readonly nome: string;
-  readonly classe: 'bronze' | 'prata' | 'ouro';
-  readonly precoBase: string;
-  /** O mesmo preço em Claves, como número — só para o total exibido. */
-  readonly precoBaseClaves: number;
-  readonly opcionais: readonly {
-    readonly tipo: string;
-    readonly rotulo: string;
-    readonly preco: string;
-    readonly precoClaves: number;
-  }[];
-};
+import estilos from './SelecaoDeCuradores.module.css';
+
+export type { CuradorNaLista } from '@/modulos/selecao/tipos';
 
 export type PropsSelecaoDeCuradores = {
   readonly faixaId: string;
@@ -38,15 +22,8 @@ export type PropsSelecaoDeCuradores = {
   /** Saldo disponível, já formatado ("12 Claves"). `null` quando não há carteira. */
   readonly saldo: string | null;
   readonly curadores: readonly CuradorNaLista[];
-  readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
-};
-
-const MOTIVOS: Readonly<Record<string, string>> = {
-  selecao_vazia: TEXTOS.erroSelecaoVazia,
-  saldo_insuficiente: TEXTOS.erroSaldo,
-  curador_invalido: TEXTOS.erroCuradorInvalido,
-  servico_feedback_obrigatorio: TEXTOS.erroSemFeedback,
-  faixa_situacao_invalida: TEXTOS.erroFaixaInvalida,
+  /** A escolha anterior, quando a pessoa volta da revisão para alterar. */
+  readonly inicial?: SelecaoNaUrl;
 };
 
 const formatoDeClaves = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
@@ -64,10 +41,10 @@ function iniciais(nome: string): string {
  * tabela de curadores com os serviços marcáveis e o total por linha, e o
  * cartão "Seleção desta faixa" à direita.
  *
- * É aqui que as Claves saem: `confirmar_selecao_curadores` debita o ledger,
- * cria os envios e notifica, tudo numa transação. O total na tela é soma de
- * exibição; o valor cobrado é o que a RPC calcula a partir de
- * `servico_curador`.
+ * Ordem do protótipo: este passo vem **antes** da revisão. Nada é debitado
+ * aqui — o formulário é um `GET` para a revisão, com a escolha na URL, e as
+ * Claves só saem no "Enviar para curadoria" de lá. O total é soma de exibição;
+ * o valor cobrado é o que a RPC calcula a partir de `servico_curador`.
  *
  * O ranking e a calibração do protótipo não têm dado nesta release, e por isso
  * as colunas não aparecem.
@@ -77,27 +54,15 @@ export function SelecaoDeCuradores({
   tituloDaFaixa,
   saldo,
   curadores,
-  acao,
+  inicial = {},
 }: PropsSelecaoDeCuradores) {
-  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
-    async (_anterior, dados) => acao(dados),
-    null,
+  const [marcados, setMarcados] = useState<readonly string[]>(() =>
+    curadores.filter((curador) => inicial[curador.id] !== undefined).map((curador) => curador.id),
   );
-
-  const [marcados, setMarcados] = useState<readonly string[]>([]);
-  const [extras, setExtras] = useState<Readonly<Record<string, readonly string[]>>>({});
+  const [extras, setExtras] = useState<Readonly<Record<string, readonly string[]>>>(() => inicial);
   const [busca, setBusca] = useState('');
 
-  const falha = resultado !== null && !resultado.ok ? resultado : null;
-  const motivo = falha?.detalhes?.['motivo'];
-  const erro =
-    falha === null
-      ? null
-      : ((typeof motivo === 'string' ? MOTIVOS[motivo] : undefined) ??
-        MOTIVOS[falha.codigo] ??
-        TEXTOS.erroCuradorInvalido);
-
-  const voltar = `${ROTA.ARTISTA_ENVIAR}/${faixaId}/revisao`;
+  const voltar = `${ROTA.ARTISTA_ENVIAR}/${faixaId}/contexto`;
 
   if (curadores.length === 0) {
     return (
@@ -106,7 +71,7 @@ export function SelecaoDeCuradores({
         descricao={TEXTOS.vazioDescricao}
         acao={
           <BotaoLink href={voltar} variante="secundario">
-            {TEXTOS.voltar}
+            {TEXTOS.voltarAoContexto}
           </BotaoLink>
         }
       />
@@ -148,27 +113,12 @@ export function SelecaoDeCuradores({
   );
 
   return (
-    <form action={enviar} onSubmit={aoEnviar} className={estilos.base} noValidate>
-      <input type="hidden" name="faixaId" value={faixaId} />
-
+    <form
+      action={`${ROTA.ARTISTA_ENVIAR}/${faixaId}/revisao`}
+      method="get"
+      className={estilos.base}
+    >
       <div className={estilos.principal}>
-        {erro !== null ? (
-          <Aviso
-            tom="erro"
-            acao={
-              /* O bloqueio por saldo é o único dos cinco erros com saída: os
-                 outros quatro se resolvem mudando a seleção, e este não. */
-              falha?.codigo === CodigoErro.SALDO_INSUFICIENTE ? (
-                <BotaoLink href={ROTA.ARTISTA_PACOTES} variante="secundario" tamanho="sm">
-                  {TEXTOS.erroSaldoAcao}
-                </BotaoLink>
-              ) : undefined
-            }
-          >
-            {erro}
-          </Aviso>
-        ) : null}
-
         <h2 className="dsn-apenas-leitor">{TEXTOS.titulo}</h2>
 
         <label className={estilos.busca}>
@@ -299,16 +249,11 @@ export function SelecaoDeCuradores({
           <p className={estilos.cotacao}>{TEXTOS.cotacao}</p>
 
           <div className={estilos.resumoAcoes}>
-            <Botao
-              type="submit"
-              carregando={pendente}
-              disabled={marcados.length === 0}
-              blocoInteiro
-            >
-              {TEXTOS.confirmar}
+            <Botao type="submit" disabled={marcados.length === 0} blocoInteiro>
+              {TEXTOS.continuarParaRevisao}
             </Botao>
             <BotaoLink href={voltar} variante="secundario" blocoInteiro>
-              ‹ {TEXTOS.voltar}
+              ‹ {TEXTOS.voltarAoContexto}
             </BotaoLink>
           </div>
         </div>

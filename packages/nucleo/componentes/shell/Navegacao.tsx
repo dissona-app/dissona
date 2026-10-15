@@ -6,6 +6,9 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { Marca } from '@dissona/nucleo/componentes/base/Marca';
+import Image from 'next/image';
+
+import simbolo from '../../marca/dissona-simbolo.png';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import type { Papel } from '@dissona/nucleo/lib/papeis';
 
@@ -57,7 +60,14 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
         className={estilos.marca}
         href={papel === 'admin' ? hrefDoAdmin(ROTA.ADMIN) : ROTA.HOME}
       >
-        <Marca variante="branca" altura="clamp(36px, 4.8vh, 42px)" />
+        <span className={estilos.marcaInteira}>
+          <Marca variante="branca" altura="clamp(36px, 4.8vh, 42px)" />
+        </span>
+        {/* Protótipo aprovado: recolhido, o menu mostra só o símbolo colorido
+            num quadrado branco de 42px — e não a marca horizontal cortada. */}
+        <span className={estilos.simbolo} aria-hidden="true">
+          <Image src={simbolo} alt="" width={28} height={29} />
+        </span>
       </Link>
 
       <nav className={estilos.grupos} aria-label={`Navegação — ${NOME_AMBIENTE[papel]}`}>

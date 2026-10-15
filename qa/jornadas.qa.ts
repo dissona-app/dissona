@@ -316,8 +316,7 @@ test('Jornada 2 · Artista → Curador: envio, escuta, avaliação e devolutiva'
       .getByRole('textbox', { name: new RegExp(ENVIAR.rotuloContexto) })
       .fill('Single de estreia. Quero saber se o refrão segura e se a mix está pronta para rádio.');
     await artista.getByRole('button', { name: ENVIAR.continuar }).click();
-    await artista.waitForURL(/\/revisao$/);
-    await expect(artista.getByText(TITULO_DA_FAIXA)).toBeVisible();
+    await artista.waitForURL(/\/curadores$/);
   });
 
   await etapa(
@@ -325,18 +324,16 @@ test('Jornada 2 · Artista → Curador: envio, escuta, avaliação e devolutiva'
     J,
     'Artista seleciona o curador QA e confirma (Claves debitadas)',
     async () => {
-      await clicarLink(
-        artista,
-        artista.getByRole('link', { name: ENVIAR.enviarParaCuradoria }),
-        /\/curadores$/,
-      );
       const caixa = artista.getByRole('checkbox', { name: new RegExp(conta.curador.nome) });
       if ((await caixa.count()) > 0) {
         await caixa.first().check({ force: true });
       } else {
         await artista.getByText(conta.curador.nome).first().click();
       }
-      await artista.getByRole('button', { name: SELECAO.confirmar }).click();
+      await artista.getByRole('button', { name: SELECAO.continuarParaRevisao }).click();
+      await artista.waitForURL(/\/revisao\?/);
+      await expect(artista.getByText(TITULO_DA_FAIXA)).toBeVisible();
+      await artista.getByRole('button', { name: ENVIAR.enviarParaCuradoria }).click();
       await artista.waitForURL(/\/confirmacao$/);
       await expect(artista.getByText(ENVIAR.confirmacaoTitulo)).toBeVisible();
     },

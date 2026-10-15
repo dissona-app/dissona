@@ -128,8 +128,8 @@
 /* ---------------------------------------------------------- recolhido */
 
 .aside[data-recolhido] {
-  padding-left: 12px;
-  padding-right: 12px;
+  padding-left: 14px;
+  padding-right: 14px;
 }
 
 .aside[data-recolhido] .rotulo,
@@ -149,14 +149,40 @@
   transform: scaleX(-1);
 }
 
-.aside[data-recolhido] .marca {
-  width: 40px;
-  overflow: hidden;
-  padding-left: 4px;
+.simbolo {
+  display: none;
 }
 
-.aside[data-recolhido] .grupo + .grupo {
-  margin-top: 14px;
+/* Recolhido: o símbolo num quadrado branco de 42px, centrado — protótipo. */
+.aside[data-recolhido] .marca {
+  align-self: center;
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.aside[data-recolhido] .marcaInteira {
+  display: none;
+}
+
+.aside[data-recolhido] .simbolo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+/* E os grupos separados por um fio de 27px, no lugar dos títulos. */
+.aside[data-recolhido] .grupo + .grupo::before {
+  content: '';
+  display: block;
+  width: 27px;
+  height: 1px;
+  margin: 14px auto;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* O spinner do clique — o mesmo dsnSpin do botão em loading. */

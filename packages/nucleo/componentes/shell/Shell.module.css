@@ -10,7 +10,7 @@
 
 /* "Recolher menu": a lateral fica só com os ícones. */
 .grade:has(> aside[data-recolhido]) {
-  grid-template-columns: 68px 1fr;
+  grid-template-columns: 76px 1fr;
 }
 
 .coluna {

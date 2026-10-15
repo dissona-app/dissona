@@ -1088,18 +1088,18 @@ export const CARTEIRA = {
 
 export const ENVIAR = {
   /**
-   * Os quatro passos do indicador, como no protótipo aprovado. A ordem dos
-   * dois últimos segue o fluxo do produto (revisar e então escolher o
-   * curador, que é onde as Claves saem); o protótipo os inverte.
+   * Os quatro passos do indicador, na ordem do protótipo aprovado (decisão
+   * de 15/10): o curador é escolhido antes da revisão, e as Claves só saem no
+   * "Enviar para curadoria" da revisão.
    */
-  passos: ['Envio da faixa', 'Contexto', 'Revisar', 'Escolher curador'] as const,
+  passos: ['Envio da faixa', 'Contexto', 'Escolher curador', 'Revisar'] as const,
   passoDe: (atual: number, total: number) => `Passo ${atual} de ${total}`,
 
   herois: [
     'Sua faixa nas mãos de quem entende.',
     'Diga o que você quer descobrir.',
-    'Última olhada antes de soltar.',
     'Escolha quem vai ouvir.',
+    'Última olhada antes de soltar.',
   ] as const,
 
   // ------------------------------------------------------ passo 1 ---------
@@ -1263,6 +1263,13 @@ export const SELECAO = {
   servicoObrigatorio: 'Feedback escrito · sempre incluso',
   confirmar: 'Confirmar e enviar',
   voltar: 'Voltar para a revisão',
+  /** Ordem do protótipo: a seleção vem antes da revisão. */
+  continuarParaRevisao: 'Continuar para revisão',
+  voltarAoContexto: 'Voltar',
+  curadoresEscolhidos: 'Curadores escolhidos',
+  alterar: 'Alterar',
+  notaDaRevisao: (curadores: number, total: string, saldo: string) =>
+    `${curadores} ${curadores === 1 ? 'curador' : 'curadores'} · ${total} de ${saldo} do seu saldo. As Claves só saem quando você confirma o envio.`,
 
   vazioTitulo: 'Nenhum curador disponível agora',
   vazioDescricao:

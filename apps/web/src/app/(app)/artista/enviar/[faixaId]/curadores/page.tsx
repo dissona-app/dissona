@@ -3,77 +3,44 @@ import { notFound } from 'next/navigation';
 
 import { MolduraDoEnvio } from '@/componentes/artista/MolduraDoEnvio';
 import { SelecaoDeCuradores } from '@/componentes/artista/SelecaoDeCuradores';
-import type { CuradorNaLista } from '@/componentes/artista/SelecaoDeCuradores';
 import * as claves from '@dissona/nucleo/lib/claves';
 import { lerSaldoDisponivel } from '@/modulos/claves/consultas';
 import { lerFaixaDoPasso } from '@/modulos/faixa/consultas';
-import { confirmarSelecaoDeCuradores } from '@/modulos/selecao/acoes';
-import { listarDisponiveis } from '@/modulos/selecao/repositorio';
-import { podeReceberEnvio } from '@/modulos/selecao/servico';
-import { SERVICO_OBRIGATORIO } from '@/modulos/selecao/tipos';
+import { lerCuradoresParaSelecao } from '@/modulos/selecao/consultas';
+import { lerSelecaoDaUrl } from '@/modulos/selecao/tipos';
 import { CARTEIRA } from '@dissona/nucleo/textos/prototipo';
 
 export const metadata: Metadata = {
-  title: 'Escolher curadores',
+  title: 'Escolher curador',
   robots: { index: false, follow: false },
 };
 
-/** Rótulo humano do serviço opcional. */
-const ROTULO_DO_SERVICO: Readonly<Record<string, string>> = {
-  playlist: 'Playlist',
-  post: 'Post no Instagram',
-  materia: 'Matéria',
-  outro: 'Outra divulgação',
-};
-
-/** Claves (bigint em centésimos) → número, só para a soma exibida na tela. */
-function emNumero(valor: claves.Claves): number {
-  return Number(claves.formatar(valor, 'en-US').replace(/,/g, ''));
-}
-
 /**
- * Placeholder da seleção de curadores — entre a revisão (passo 3) e a
- * confirmação.
+ * 4.3 · Escolher curador — passo 3 de 4, entre o contexto e a revisão (ordem
+ * do protótipo aprovado).
  *
- * A tela real é o módulo 4 e é da R3. Esta existe para a R2 ser testável fim a
- * fim: sem ela não há `envio`, e sem `envio` não há fila, avaliação nem ganho.
+ * Nada sai da carteira aqui: a escolha segue na URL para a revisão, e é lá que
+ * o "Enviar para curadoria" chama `confirmar_selecao_curadores`.
  */
 export default async function PaginaDaSelecao({
   params,
+  searchParams,
 }: {
   readonly params: Promise<{ readonly faixaId: string }>;
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { faixaId } = await params;
 
-  // A faixa tem de estar pronta para a revisão — o mesmo estado que libera o
-  // passo 3. Chegar aqui com o wizard incompleto é 404, não tela vazia.
+  // A faixa tem de ter passado pelo contexto — o mesmo estado que libera a
+  // revisão. Chegar aqui com o wizard incompleto é 404, não tela vazia.
   const estado = await lerFaixaDoPasso(faixaId, 'revisao');
   if (estado.estado !== 'ok') notFound();
 
-  const [disponiveis, saldo] = await Promise.all([listarDisponiveis(), lerSaldoDisponivel()]);
-
-  const curadores: readonly CuradorNaLista[] = disponiveis
-    // Sem `feedback` ativo a RPC recusaria com DS012. Filtrar aqui evita
-    // oferecer uma escolha que falha só na confirmação.
-    .filter(podeReceberEnvio)
-    .map((curador) => {
-      const base = curador.servicos.find((servico) => servico.tipo === SERVICO_OBRIGATORIO);
-      return {
-        id: curador.perfilCuradorId,
-        nome: curador.nome,
-        classe: curador.classe,
-        precoBase: `${claves.formatar(base?.precoClaves ?? 0n)} ${CARTEIRA.saldoUnidade}`,
-        precoBaseClaves: emNumero(base?.precoClaves ?? 0n),
-        opcionais: curador.servicos
-          .filter((servico) => servico.tipo !== SERVICO_OBRIGATORIO)
-          .map((servico) => ({
-            tipo: servico.tipo,
-            rotulo: ROTULO_DO_SERVICO[servico.tipo] ?? servico.tipo,
-            preco: `${claves.formatar(servico.precoClaves)} ${CARTEIRA.saldoUnidade}`,
-            precoClaves: emNumero(servico.precoClaves),
-          })),
-      };
-    });
+  const [curadores, saldo, busca] = await Promise.all([
+    lerCuradoresParaSelecao(),
+    lerSaldoDisponivel(),
+    searchParams,
+  ]);
 
   return (
     <MolduraDoEnvio passo="curadores">
@@ -82,7 +49,7 @@ export default async function PaginaDaSelecao({
         tituloDaFaixa={estado.faixa.titulo}
         saldo={saldo === null ? null : `${claves.formatar(saldo)} ${CARTEIRA.saldoUnidade}`}
         curadores={curadores}
-        acao={confirmarSelecaoDeCuradores}
+        inicial={lerSelecaoDaUrl(busca)}
       />
     </MolduraDoEnvio>
   );

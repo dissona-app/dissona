@@ -5,7 +5,7 @@ import type { Page, TestInfo } from '@playwright/test';
 
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
-import { ENVIAR } from '../apoio/textos';
+import { ENVIAR, SELECAO } from '../apoio/textos';
 
 /**
  * B6 · Contexto e revisão — módulo 3
@@ -67,16 +67,23 @@ test.describe('B6 · Contexto e revisão', () => {
     await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloContexto) }).fill(contexto);
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
 
-    await page.waitForURL(/\/revisao$/);
+    // Ordem do protótipo aprovado: o curador é escolhido antes da revisão.
+    await page.waitForURL(/\/curadores$/);
     await expect(page.getByText(ENVIAR.passoDe(3, 4))).toBeVisible();
+    await page.getByRole('checkbox').first().check({ force: true });
+    await page.getByRole('button', { name: SELECAO.continuarParaRevisao }).click();
+
+    await page.waitForURL(/\/revisao\?/);
+    await expect(page.getByText(ENVIAR.passoDe(4, 4))).toBeVisible();
 
     await expect(page.getByText(titulo)).toBeVisible();
     await expect(page.getByText('Indie', { exact: true })).toBeVisible();
     await expect(page.getByText(contexto)).toBeVisible();
 
-    // O aviso de saldo é o que explica que nada foi debitado ainda.
-    await expect(page.getByText(/as Claves só saem quando você confirma a seleção/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: ENVIAR.enviarParaCuradoria })).toBeVisible();
+    // A nota de saldo é o que explica que nada foi debitado ainda.
+    await expect(page.getByText(/as Claves só saem quando você confirma o envio/i)).toBeVisible();
+    await expect(page.getByText(SELECAO.curadoresEscolhidos)).toBeVisible();
+    await expect(page.getByRole('button', { name: ENVIAR.enviarParaCuradoria })).toBeVisible();
   });
 
   test(

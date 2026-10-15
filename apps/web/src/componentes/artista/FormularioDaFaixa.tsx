@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import type { FormEvent } from 'react';
-import { startTransition, useActionState, useRef, useState, useTransition } from 'react';
+import { startTransition, useActionState, useEffect, useRef, useState, useTransition } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -75,6 +75,14 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   // `FormData` do envio. Sem isso, "Arraste o arquivo aqui" era uma promessa
   // que a tela não cumpria.
   const entradaDeAudio = useRef<HTMLInputElement>(null);
+
+  // Arquivo escolhido antes da hidratação: o `onChange` ainda não existia e o
+  // React não soube da escolha — os campos de detalhe ficariam escondidos com
+  // o arquivo já no input. Acontece em conexão lenta, e acontecia nos testes.
+  useEffect(() => {
+    const jaEscolhido = entradaDeAudio.current?.files?.[0];
+    if (jaEscolhido !== undefined) setArquivoDeAudio(jaEscolhido);
+  }, []);
   const [arrastando, setArrastando] = useState(false);
 
   function aoSoltarAudio(evento: React.DragEvent<HTMLLabelElement>) {

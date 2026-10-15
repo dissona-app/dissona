@@ -6,7 +6,12 @@ import { estourarSeErro } from '@dissona/nucleo/lib/supabase/erros';
 import { criarClienteServidor } from '@dissona/nucleo/lib/supabase/servidor';
 import type { Database } from '@dissona/nucleo/lib/supabase/tipos-bd';
 
-import { nomesDeCuradores } from './repositorio';
+import * as claves from '@dissona/nucleo/lib/claves';
+import { CARTEIRA } from '@dissona/nucleo/textos/prototipo';
+
+import { listarDisponiveis, nomesDeCuradores } from './repositorio';
+import { podeReceberEnvio } from './servico';
+import { SERVICO_OBRIGATORIO, type CuradorNaLista } from './tipos';
 
 export type SituacaoEnvio = Database['public']['Enums']['situacao_envio'];
 
@@ -57,4 +62,46 @@ export async function lerEnviosDaFaixa(faixaId: string): Promise<readonly EnvioD
     situacao: envio.situacao,
     prazoEm: new Date(envio.prazo_em),
   }));
+}
+
+/** Rótulo humano do serviço opcional. */
+const ROTULO_DO_SERVICO: Readonly<Record<string, string>> = {
+  playlist: 'Playlist',
+  post: 'Post no Instagram',
+  materia: 'Matéria',
+  outro: 'Outra divulgação',
+};
+
+/** Claves (bigint em centésimos) → número, só para a soma exibida na tela. */
+function emNumero(valor: claves.Claves): number {
+  return Number(claves.formatar(valor, 'en-US').replace(/,/g, ''));
+}
+
+/**
+ * Os curadores que podem receber o envio, prontos para a tela — a seleção e a
+ * revisão leem a mesma lista.
+ *
+ * Sem `feedback` ativo a RPC recusaria com DS012: filtrar aqui evita oferecer
+ * uma escolha que só falharia na confirmação.
+ */
+export async function lerCuradoresParaSelecao(): Promise<readonly CuradorNaLista[]> {
+  const disponiveis = await listarDisponiveis();
+  return disponiveis.filter(podeReceberEnvio).map((curador) => {
+    const base = curador.servicos.find((servico) => servico.tipo === SERVICO_OBRIGATORIO);
+    return {
+      id: curador.perfilCuradorId,
+      nome: curador.nome,
+      classe: curador.classe,
+      precoBase: `${claves.formatar(base?.precoClaves ?? 0n)} ${CARTEIRA.saldoUnidade}`,
+      precoBaseClaves: emNumero(base?.precoClaves ?? 0n),
+      opcionais: curador.servicos
+        .filter((servico) => servico.tipo !== SERVICO_OBRIGATORIO)
+        .map((servico) => ({
+          tipo: servico.tipo,
+          rotulo: ROTULO_DO_SERVICO[servico.tipo] ?? servico.tipo,
+          preco: `${claves.formatar(servico.precoClaves)} ${CARTEIRA.saldoUnidade}`,
+          precoClaves: emNumero(servico.precoClaves),
+        })),
+    };
+  });
 }
