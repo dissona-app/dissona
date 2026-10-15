@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -18,6 +18,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import estilos from './FormularioDeCadastro.module.css';
 import type { Banner } from '@dissona/nucleo/componentes/autenticacao/FormularioDeLogin';
 import { IconeOlho } from '@dissona/nucleo/componentes/autenticacao/IconeOlho';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsFormularioDeCadastro = {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
@@ -76,7 +77,7 @@ export function FormularioDeCadastro({
   papel,
   social,
 }: PropsFormularioDeCadastro) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
   );
@@ -148,7 +149,7 @@ export function FormularioDeCadastro({
         </Aviso>
       ) : null}
 
-      <form action={enviar} className={estilos.campos} noValidate>
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.campos} noValidate>
         {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
         {papel === undefined ? null : <input type="hidden" name="papel" value={papel} />}
@@ -160,6 +161,7 @@ export function FormularioDeCadastro({
           placeholder={textos.placeholderNome}
           autoComplete="name"
           required
+          semMarcador
           erro={erroDeCampo('nome')}
         />
 
@@ -170,6 +172,7 @@ export function FormularioDeCadastro({
           placeholder={textos.placeholderEmail}
           autoComplete="email"
           required
+          semMarcador
           erro={erroDeCampo('email')}
         />
 
@@ -181,6 +184,7 @@ export function FormularioDeCadastro({
             placeholder={textos.placeholderSenha}
             autoComplete="new-password"
             required
+            semMarcador
             value={senha}
             onChange={(evento) => setSenha(evento.target.value)}
             erro={erroDeCampo('senha')}
@@ -201,6 +205,7 @@ export function FormularioDeCadastro({
           <MedidorDeSenha
             senha={senha}
             rotulos={textos.forcaDaSenha}
+            soRequisitos
             requisitos={{
               tamanho: textos.requisitoTamanho,
               numero: textos.requisitoNumero,
@@ -215,6 +220,7 @@ export function FormularioDeCadastro({
           placeholder={textos.placeholderConfirmar}
           autoComplete="new-password"
           required
+          semMarcador
           erro={erroDeCampo('confirmar')}
         />
 

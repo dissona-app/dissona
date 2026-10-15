@@ -8,7 +8,7 @@ import {
   lerIdentidadeDaSessao,
 } from '@dissona/nucleo/modulos/autenticacao/consultas';
 import { lerSessoesDaConta } from '@/modulos/conta/consultas';
-import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
+import { lerCadastroDoCurador, lerRecebimentoDoCurador } from '@/modulos/curador/consultas';
 import { lerPreferencias } from '@/modulos/preferencias/consultas';
 
 export const metadata: Metadata = {
@@ -43,6 +43,7 @@ export default async function Pagina({
   const sessoes = aba === 'seguranca' ? await lerSessoesDaConta() : [];
   const cadastroDoCurador = aba === 'perfil' ? await lerCadastroDoCurador() : null;
   const preferencias = aba === 'preferencias' ? await lerPreferencias('curador') : null;
+  const recebimento = aba === 'dados' ? await lerRecebimentoDoCurador() : null;
 
   return (
     <TelaDeConta
@@ -54,6 +55,8 @@ export default async function Pagina({
       sessoes={sessoes}
       cadastroDoCurador={cadastroDoCurador}
       preferencias={preferencias}
+      nome={identidade.nome}
+      recebimento={recebimento}
     />
   );
 }

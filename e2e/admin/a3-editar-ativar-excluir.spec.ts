@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Page, TestInfo } from '@playwright/test';
 
 import { telaDoAdmin, URL_ADMIN } from '../apoio/admin';
-import { auditoriaDe, pacotePorNome } from '../apoio/banco';
+import { auditoriaDe, excluirPacotesDeTeste, pacotePorNome } from '../apoio/banco';
 import { nomeUnico } from '../apoio/personas';
 import { abrirPacotes } from '../apoio/sessao';
 import { ADMIN_PACOTE_EXCLUIR, ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '../apoio/textos';
@@ -35,9 +35,17 @@ import { ADMIN_PACOTE_EXCLUIR, ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '..
  * já tem prova em `supabase/testes/0007b_pacote_exclusao.testes.sql`.
  */
 
+/** Os pacotes deste arquivo, para o `afterAll` tirar da vitrine. */
+const criados: string[] = [];
+
+test.afterAll(async () => {
+  await excluirPacotesDeTeste(criados);
+});
+
 /** Cria um pacote pela própria tela e devolve o nome. */
 async function criarPacote(page: Page, info: TestInfo, rotulo: string): Promise<string> {
   const nome = nomeUnico(rotulo, info.workerIndex);
+  criados.push(nome);
 
   await page.getByRole('link', { name: ADMIN_PACOTES.novo }).click();
   await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloNome).fill(nome);
@@ -49,7 +57,7 @@ async function criarPacote(page: Page, info: TestInfo, rotulo: string): Promise<
   // salvamento lento faz a busca acontecer ainda no formulário, e a falha diz
   // "linha não encontrada" quando o que houve foi espera insuficiente.
   await page.waitForURL(telaDoAdmin('/pacotes'));
-  await expect(page.getByRole('row').filter({ hasText: nome })).toBeVisible();
+  await expect(page.getByRole('listitem').filter({ hasText: nome })).toBeVisible();
   return nome;
 }
 
@@ -59,7 +67,7 @@ test.describe('A3 · Editar / ativar / excluir', () => {
     const nome = await criarPacote(page, info, 'A3 editar');
 
     await page
-      .getByRole('row')
+      .getByRole('listitem')
       .filter({ hasText: nome })
       .getByRole('link', { name: ADMIN_PACOTES.editar })
       .click();
@@ -79,7 +87,7 @@ test.describe('A3 · Editar / ativar / excluir', () => {
 
     await expect(page.getByText(ADMIN_PACOTE_FORMULARIO.flashAtualizado)).toBeVisible();
 
-    const linha = page.getByRole('row').filter({ hasText: nome });
+    const linha = page.getByRole('listitem').filter({ hasText: nome });
     // 20 Claves × R$ 10 = R$ 200, menos 20% = R$ 160, ou R$ 8,00 por Clave.
     await expect(linha).toContainText('20%');
     await expect(linha).toContainText('8,00');
@@ -92,22 +100,21 @@ test.describe('A3 · Editar / ativar / excluir', () => {
       await abrirPacotes(page);
       const nome = await criarPacote(page, info, 'A3 alternar');
 
-      const linha = page.getByRole('row').filter({ hasText: nome });
+      const linha = page.getByRole('listitem').filter({ hasText: nome });
       await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
 
       await linha.getByRole('button', { name: ADMIN_PACOTES.desativar }).click();
 
       await expect(page.getByText(ADMIN_PACOTES.flashDesativado(nome))).toBeVisible();
       await expect(linha).toContainText(ADMIN_PACOTES.statusInativo);
-      // A promessa da nota de rodapé, do lado do admin: o pacote continua na
-      // lista da equipe e sai da Carteira do artista.
-      await expect(linha).toContainText(ADMIN_PACOTES.subForaDaCarteira);
+      // O pacote continua na lista da equipe, agora oferecendo "Ativar".
+      await expect(linha.getByRole('button', { name: ADMIN_PACOTES.ativar })).toBeVisible();
 
       await linha.getByRole('button', { name: ADMIN_PACOTES.ativar }).click();
 
       await expect(page.getByText(ADMIN_PACOTES.flashAtivado(nome))).toBeVisible();
       await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
-      await expect(linha).toContainText(ADMIN_PACOTES.subNaCarteira);
+      await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
     },
   );
 
@@ -118,7 +125,7 @@ test.describe('A3 · Editar / ativar / excluir', () => {
       await abrirPacotes(page);
       const nome = await criarPacote(page, info, 'A3 excluir');
 
-      const linha = page.getByRole('row').filter({ hasText: nome });
+      const linha = page.getByRole('listitem').filter({ hasText: nome });
       await linha.getByRole('button', { name: new RegExp(`^${ADMIN_PACOTES.excluir}:`) }).click();
 
       const dialogo = page.getByRole('dialog');
@@ -142,7 +149,7 @@ test.describe('A3 · Editar / ativar / excluir', () => {
       await expect(page.getByText(ADMIN_PACOTES.flashExcluido(nome))).toBeVisible();
       // Excluído sai da lista do admin — é o que o distingue de desativado, que
       // continua listado como "Inativo". A `0007b` é que sustenta a diferença.
-      await expect(page.getByRole('row').filter({ hasText: nome })).toHaveCount(0);
+      await expect(page.getByRole('listitem').filter({ hasText: nome })).toHaveCount(0);
     },
   );
 
@@ -160,7 +167,7 @@ test.describe('A3 · Editar / ativar / excluir', () => {
       await abrirPacotes(page);
       const nome = await criarPacote(page, info, 'A3 sumido');
 
-      const linha = page.getByRole('row').filter({ hasText: nome });
+      const linha = page.getByRole('listitem').filter({ hasText: nome });
       const url = await linha
         .getByRole('link', { name: ADMIN_PACOTES.editar })
         .getAttribute('href');
@@ -210,7 +217,7 @@ test.describe('A3 · Editar / ativar / excluir', () => {
       const pacoteId = await pacotePorNome(nome);
       expect(pacoteId, `o pacote "${nome}" precisa existir no banco`).not.toBeNull();
 
-      const linha = page.getByRole('row').filter({ hasText: nome });
+      const linha = page.getByRole('listitem').filter({ hasText: nome });
       await linha.getByRole('button', { name: ADMIN_PACOTES.desativar }).click();
       await expect(page.getByText(ADMIN_PACOTES.flashDesativado(nome))).toBeVisible();
 

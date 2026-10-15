@@ -48,7 +48,7 @@ export function BotaoConcluir({ envioId, escutaMinima, escutaMedida, acao }: Pro
         <Aviso tom="erro">{mensagem(resultado.codigo, escutaMinima, escutaMedida)}</Aviso>
       ) : null}
 
-      <Botao type="submit" variante="perigo" blocoInteiro carregando={pendente}>
+      <Botao type="submit" variante="primario" blocoInteiro carregando={pendente}>
         {AVALIAR.concluir}
       </Botao>
 

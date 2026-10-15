@@ -87,8 +87,6 @@ function BlocoSocial() {
         }}
         verbo="Criar conta com"
       />
-
-      <p className={estilos.notaSocial}>{CADASTRAR_ARTISTA.notaSocial}</p>
     </div>
   );
 }

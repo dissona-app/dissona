@@ -1,7 +1,7 @@
+import Link from 'next/link';
+
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
-import { Cartao } from '@/componentes/base/Cartao';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
-import { Painel } from '@/componentes/base/Painel';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { CARTEIRA as TEXTOS } from '@dissona/nucleo/textos/prototipo';
 
@@ -43,99 +43,102 @@ export function TelaDaCarteira({
   usadas,
   ultimas,
 }: PropsTelaDaCarteira) {
+  // Layout do protótipo aprovado: o saldo num cartão escuro à esquerda; à
+  // direita, os três números do resumo e as últimas movimentações.
   return (
     <div className={estilos.base}>
-      <Cartao variante="kpi">
-        <div className={estilos.saldo}>
-          <div>
-            <p className={estilos.rotulo}>{TEXTOS.saldoTitulo}</p>
-            <p className={estilos.numero}>
-              {saldo} <span className={estilos.unidade}>{TEXTOS.saldoUnidade}</span>
-            </p>
-            <p className={estilos.nota}>{saldoNota}</p>
-          </div>
-
-          <div className={estilos.acoes}>
-            <BotaoLink href={ROTA.ARTISTA_PACOTES}>{TEXTOS.comprar}</BotaoLink>
-            <BotaoLink href={ROTA.ARTISTA_EXTRATO} variante="secundario">
-              {TEXTOS.verExtrato}
-            </BotaoLink>
-          </div>
-        </div>
-
+      <section className={estilos.saldo} aria-label={TEXTOS.saldoTitulo}>
+        <span className={estilos.saldoRotulo}>{TEXTOS.saldoTitulo}</span>
+        <p className={estilos.saldoLinha}>
+          <span className={estilos.numero}>{saldo}</span>{' '}
+          <span className={estilos.unidade}>{TEXTOS.saldoUnidade}</span>
+        </p>
+        <span className={estilos.saldoNota}>{saldoNota}</span>
+        <span className={estilos.divisor} aria-hidden="true" />
         <dl className={estilos.paralelos}>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.comprometidas}</dt>
-            <dd className={estilos.paralelo}>{comprometido}</dd>
+          <div className={estilos.paralelo}>
+            <dt>{TEXTOS.comprometidas}</dt>
+            <dd>{`${comprometido} ${TEXTOS.saldoUnidade}`}</dd>
           </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.devolvidas}</dt>
-            <dd className={estilos.paralelo}>{devolvido}</dd>
+          <div className={estilos.paralelo}>
+            <dt>{TEXTOS.devolvidas}</dt>
+            <dd>{`${devolvido} ${TEXTOS.saldoUnidade}`}</dd>
           </div>
         </dl>
-      </Cartao>
+        <div className={estilos.acoes}>
+          <BotaoLink href={ROTA.ARTISTA_PACOTES} tamanho="denso">
+            {TEXTOS.comprar}
+          </BotaoLink>
+          <Link className={estilos.botaoClaro} href={ROTA.ARTISTA_EXTRATO}>
+            {TEXTOS.verExtrato}
+          </Link>
+        </div>
+      </section>
 
-      <dl className={estilos.resumo}>
-        {(
-          [
-            [TEXTOS.resumo.adquiridas, adquiridas, estilos.adquiridas],
-            [TEXTOS.resumo.usadas, usadas, undefined],
-            // O mesmo número do bloco de cima: "Devolvidas por falta de
-            // resposta" e o card de resumo são a mesma soma, e o protótipo os
-            // mostra nos dois lugares.
-            [TEXTOS.resumo.devolvidas, devolvido, estilos.devolvidas],
-          ] as const
-        ).map(([texto, valor, classe]) => (
-          <Cartao key={texto.rotulo} variante="compacto">
-            <dt className={estilos.rotulo}>{texto.rotulo}</dt>
-            <dd className={[estilos.numeroMedio, classe].filter(Boolean).join(' ')}>{valor}</dd>
-            <p className={estilos.nota}>{texto.descricao}</p>
-          </Cartao>
-        ))}
-      </dl>
+      <div className={estilos.coluna}>
+        <dl className={estilos.resumo}>
+          {(
+            [
+              [TEXTOS.resumo.adquiridas, adquiridas, estilos.adquiridas],
+              [TEXTOS.resumo.usadas, usadas, undefined],
+              [TEXTOS.resumo.devolvidas, devolvido, estilos.devolvidas],
+            ] as const
+          ).map(([texto, valor, classe]) => (
+            <div key={texto.rotulo} className={estilos.cartaoResumo}>
+              <dt className={estilos.rotulo}>{texto.rotulo}</dt>
+              <dd className={[estilos.numeroMedio, classe].filter(Boolean).join(' ')}>{valor}</dd>
+              <p className={estilos.nota}>{texto.descricao}</p>
+            </div>
+          ))}
+        </dl>
 
-      <Painel
-        titulo={TEXTOS.ultimasTitulo}
-        acao={
-          ultimas.length > 0 ? (
-            <BotaoLink href={ROTA.ARTISTA_EXTRATO} variante="ghost" tamanho="sm">
-              {TEXTOS.verTudo}
-            </BotaoLink>
-          ) : undefined
-        }
-      >
-        {ultimas.length === 0 ? (
-          <EstadoVazio
-            titulo={TEXTOS.vazioTitulo}
-            descricao={TEXTOS.vazioDescricao}
-            acao={
-              <BotaoLink href={ROTA.ARTISTA_PACOTES} tamanho="sm">
-                {TEXTOS.comprar}
-              </BotaoLink>
-            }
-          />
-        ) : (
-          <ul className={estilos.movimentacoes}>
-            {ultimas.map((linha) => (
-              <li key={linha.id} className={estilos.movimentacao}>
-                <div>
-                  <p className={estilos.origem}>{linha.origem}</p>
-                  <p className={estilos.nota}>
-                    {linha.data} · {linha.tipo}
-                  </p>
-                </div>
-                <span
-                  className={[estilos.quantidade, linha.entrada ? estilos.entrada : undefined]
-                    .filter(Boolean)
-                    .join(' ')}
-                >
-                  {linha.quantidade}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Painel>
+        <section className={estilos.ultimas} aria-label={TEXTOS.ultimasTitulo}>
+          <div className={estilos.ultimasCabecalho}>
+            <span className={estilos.saldoRotulo}>{TEXTOS.ultimasTitulo}</span>
+            {ultimas.length > 0 ? (
+              <Link className={estilos.verTudo} href={ROTA.ARTISTA_EXTRATO}>
+                {TEXTOS.verTudo}
+              </Link>
+            ) : null}
+          </div>
+          {ultimas.length === 0 ? (
+            <div className={estilos.vazio}>
+              <EstadoVazio
+                titulo={TEXTOS.vazioTitulo}
+                descricao={TEXTOS.vazioDescricao}
+                acao={
+                  <BotaoLink href={ROTA.ARTISTA_PACOTES} tamanho="sm">
+                    {TEXTOS.comprar}
+                  </BotaoLink>
+                }
+              />
+            </div>
+          ) : (
+            <ul className={estilos.movimentacoes}>
+              {ultimas.map((linha) => (
+                <li key={linha.id} className={estilos.movimentacao}>
+                  <span className={estilos.data}>{linha.data}</span>
+                  <span className={estilos.origem}>{linha.origem}</span>
+                  <span
+                    className={[estilos.tipo, linha.entrada ? estilos.tipoEntrada : undefined]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    {linha.tipo}
+                  </span>
+                  <span
+                    className={[estilos.quantidade, linha.entrada ? estilos.entrada : undefined]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    {linha.quantidade}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

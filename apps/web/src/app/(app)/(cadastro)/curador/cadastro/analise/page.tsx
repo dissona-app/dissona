@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { MolduraDaClasse } from '@/componentes/curador/MolduraDaClasse';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
@@ -43,11 +42,9 @@ export default async function Pagina() {
       titulo={CURADOR_CLASSIFICACAO.analiseTitulo}
       texto={CURADOR_CLASSIFICACAO.analiseTexto}
       tom="analise"
+      icone="analise"
+      largura={480}
     >
-      <Aviso tom="info" estatico>
-        {CURADOR_CLASSIFICACAO.analiseNota}
-      </Aviso>
-
       <form action={sair} className={estilos.formulario}>
         <Botao type="submit" tamanho="denso" blocoInteiro>
           {CURADOR_CLASSIFICACAO.entendi}

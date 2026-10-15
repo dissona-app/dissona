@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
-import { ENVIAR } from '../apoio/textos';
+import { ENVIAR, SELECAO } from '../apoio/textos';
 
 /**
  * B4 · Enviar por link — módulo 3 · 3.1
@@ -41,7 +41,7 @@ test.describe('B4 · Enviar por link', () => {
       await entrarComo(page, PERSONA.ARTISTA);
       await page.goto('/artista/enviar');
 
-      await page.getByLabel(ENVIAR.rotuloYoutube, { exact: true }).fill(LINK_ESTAVEL);
+      await page.getByLabel(ENVIAR.rotuloLink, { exact: true }).fill(LINK_ESTAVEL);
       await page.getByRole('button', { name: ENVIAR.detectar }).click();
 
       await expect(page.getByText(ENVIAR.faixaEncontrada)).toBeVisible({ timeout: 15_000 });
@@ -61,7 +61,7 @@ test.describe('B4 · Enviar por link', () => {
         .fill(`e2e_Faixa B4 ${Date.now().toString(36)}`);
 
       // O arquivo segue obrigatório no caminho por link.
-      await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+      await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
       await page.getByRole('button', { name: ENVIAR.continuar }).click();
       await page.waitForURL(/\/artista\/enviar\/[0-9a-f-]{36}\/contexto/);
 
@@ -76,7 +76,7 @@ test.describe('B4 · Enviar por link', () => {
     await entrarComo(page, PERSONA.ARTISTA);
     await page.goto('/artista/enviar');
 
-    await page.getByLabel(ENVIAR.rotuloYoutube, { exact: true }).fill(LINK_INEXISTENTE);
+    await page.getByLabel(ENVIAR.rotuloLink, { exact: true }).fill(LINK_INEXISTENTE);
     await page.getByRole('button', { name: ENVIAR.detectar }).click();
 
     await expect(page.getByText(ENVIAR.naoDetectada)).toBeVisible({ timeout: 15_000 });
@@ -107,7 +107,7 @@ test.describe('B4 · Enviar por link', () => {
       await entrarComo(page, PERSONA.ARTISTA);
       await page.goto('/artista/enviar');
 
-      await page.getByLabel(ENVIAR.rotuloYoutube, { exact: true }).fill(LINK_INEXISTENTE);
+      await page.getByLabel(ENVIAR.rotuloLink, { exact: true }).fill(LINK_INEXISTENTE);
       await page.getByRole('button', { name: ENVIAR.detectar }).click();
       await expect(page.getByText(ENVIAR.naoDetectada)).toBeVisible({ timeout: 15_000 });
 
@@ -115,7 +115,7 @@ test.describe('B4 · Enviar por link', () => {
       await page.getByLabel(ENVIAR.rotuloEstilo, { exact: true }).fill(ESTILO);
       await page.getByText(ENVIAR.lancadaSim, { exact: true }).click();
       await page.getByLabel(ENVIAR.rotuloData(true), { exact: true }).fill(DATA);
-      await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+      await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
 
       await page.getByRole('button', { name: ENVIAR.continuar }).click();
       await page.waitForURL(/\/artista\/enviar\/[0-9a-f-]{36}\/contexto/);
@@ -139,7 +139,12 @@ test.describe('B4 · Enviar por link', () => {
         .getByRole('textbox', { name: new RegExp(ENVIAR.rotuloContexto) })
         .fill('Faixa da suíte automatizada: preenchimento manual.');
       await page.getByRole('button', { name: ENVIAR.continuar }).click();
-      await page.waitForURL(/\/revisao$/);
+
+      // Ordem do protótipo aprovado: escolhe o curador e só então revisa.
+      await page.waitForURL(/\/curadores$/);
+      await page.getByRole('checkbox').first().check({ force: true });
+      await page.getByRole('button', { name: SELECAO.continuarParaRevisao }).click();
+      await page.waitForURL(/\/revisao\?/);
 
       await expect(page.getByText(ENVIAR.resumoFonte.manual)).toBeVisible();
     },
@@ -152,9 +157,7 @@ test.describe('B4 · Enviar por link', () => {
       await entrarComo(page, PERSONA.ARTISTA);
       await page.goto('/artista/enviar');
 
-      await page
-        .getByLabel(ENVIAR.rotuloSpotify, { exact: true })
-        .fill('https://soundcloud.com/x/y');
+      await page.getByLabel(ENVIAR.rotuloLink, { exact: true }).fill('https://soundcloud.com/x/y');
       await page.getByRole('button', { name: ENVIAR.detectar }).click();
 
       await expect(page.getByText(ENVIAR.erroLinkNaoSuportado)).toBeVisible();

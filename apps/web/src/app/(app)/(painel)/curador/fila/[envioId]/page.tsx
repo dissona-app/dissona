@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { capaDoEnvio } from '@/componentes/curador/capas';
 import { IniciarAvaliacao } from '@/componentes/curador/IniciarAvaliacao';
 import { PlayerComMedicao } from '@/componentes/curador/avaliacao/PlayerComMedicao';
-import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
-import { Painel } from '@/componentes/base/Painel';
 import * as claves from '@dissona/nucleo/lib/claves';
 import { formatarData, tempoRelativo } from '@dissona/nucleo/lib/formato';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
@@ -74,104 +73,129 @@ export default async function PaginaDoDetalhe({
     Math.ceil((item.devolucaoEm.getTime() - agora.getTime()) / 86_400_000),
   );
 
+  // Protótipo aprovado (13.1): um cartão com a capa desfocada ao fundo; à
+  // esquerda a capa, a faixa e o player; à direita o que o artista quer
+  // saber, o prazo e o serviço, e o botão de começar.
+  const capa = capaDoEnvio(item.envioId);
   return (
     <div className={estilos.base}>
       <BotaoLink href={ROTA.CURADOR_FILA} variante="ghost" tamanho="sm">
-        {TEXTOS.voltarParaFila}
+        <span aria-hidden="true">‹</span> {TEXTOS.voltarParaFila}
       </BotaoLink>
 
-      <Painel titulo={item.titulo} sublegenda={item.artista}>
-        <dl className={estilos.dados}>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.colunas.genero}</dt>
-            <dd className={estilos.valor}>{item.genero ?? '—'}</dd>
-          </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloDuracao}</dt>
-            <dd className={estilos.valor}>{duracao(item.duracaoSegundos)}</dd>
-          </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloEnviada}</dt>
-            <dd className={estilos.valor}>{tempoRelativo(item.enviadoEm, 'pt-BR', agora)}</dd>
-          </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloStatus}</dt>
-            <dd className={estilos.valor}>
-              <Etiqueta tom={status === 'atrasada' ? 'erro' : 'info'}>
+      <section className={estilos.cartao} aria-labelledby="titulo-da-faixa">
+        <span
+          className={estilos.fundo}
+          style={{ backgroundImage: `url('${capa}')` }}
+          aria-hidden="true"
+        />
+        <span className={estilos.veu} aria-hidden="true" />
+
+        <div className={estilos.grade}>
+          <div className={estilos.esquerda}>
+            <div className={estilos.capa} style={{ backgroundImage: `url('${capa}')` }}>
+              <span className={estilos.status} data-status={status}>
                 {TEXTOS.filtros[status]}
-              </Etiqueta>
-            </dd>
+              </span>
+            </div>
+
+            <div className={estilos.identidade}>
+              <div className={estilos.identidadeTextos}>
+                <h2 id="titulo-da-faixa" className={estilos.titulo}>
+                  {item.titulo}
+                </h2>
+                <span className={estilos.artista}>
+                  {item.artista} · {item.genero ?? '—'}
+                </span>
+              </div>
+              <span className={estilos.info}>
+                {duracao(item.duracaoSegundos)} · {tempoRelativo(item.enviadoEm, 'pt-BR', agora)}
+              </span>
+            </div>
+
+            {/* O player mede a escuta e carimba `ouviu` — ver 13.1. */}
+            <PlayerComMedicao
+              envioId={item.envioId}
+              src={audioUrl}
+              titulo={item.titulo}
+              artista={item.artista}
+              minimoPercentual={escutaMinimaPercentual}
+              escutaSalva={escutaSalva}
+            />
           </div>
-        </dl>
-      </Painel>
 
-      {/* RF-071 · a escuta acontece aqui, **antes** de "Iniciar avaliação".
-          Entrar no wizard grava `avaliando`, e enquanto o player só existia lá
-          dentro o estado `ouviu` nunca acendia — o nome do estado sempre disse
-          que ele vem antes de assumir a avaliação. O componente é o mesmo da
-          etapa 14; o que muda é onde ele é montado. */}
-      <PlayerComMedicao
-        envioId={item.envioId}
-        src={audioUrl}
-        titulo={item.titulo}
-        artista={item.artista}
-        minimoPercentual={escutaMinimaPercentual}
-        escutaSalva={escutaSalva}
-      />
+          <div className={estilos.direita}>
+            <div className={estilos.bloco}>
+              <h3 className={estilos.rotulo}>{TEXTOS.oQueOArtistaQuerSaber}</h3>
+              <p className={item.contextoCurador === null ? estilos.vazio : estilos.contexto}>
+                {item.contextoCurador ?? TEXTOS.semContexto}
+              </p>
+              <span className={estilos.nota}>
+                {TEXTOS.rotuloEnviada} {tempoRelativo(item.enviadoEm, 'pt-BR', agora)} ·{' '}
+                {item.artista}
+              </span>
+            </div>
 
-      <Painel titulo={TEXTOS.oQueOArtistaQuerSaber} nivel={3}>
-        <p className={item.contextoCurador === null ? estilos.vazio : estilos.contexto}>
-          {item.contextoCurador ?? TEXTOS.semContexto}
-        </p>
-      </Painel>
-
-      <Painel titulo={TEXTOS.prazoRestante} nivel={3}>
-        <p className={atrasado ? estilos.prazoAtrasado : estilos.prazo}>
-          {atrasado
-            ? TEXTOS.prazoVencidoHoras(Math.floor(-horas))
-            : horas < 24
-              ? TEXTOS.prazoHoras(Math.floor(horas))
-              : TEXTOS.prazoDias(Math.floor(horas / 24), Math.floor(horas % 24))}
-        </p>
-        <p className={estilos.nota}>
-          {atrasado ? TEXTOS.notaAtrasado(diasAteDevolucao) : TEXTOS.notaNoPrazo}
-        </p>
-        <p className={estilos.nota}>{formatarData(item.prazoEm)}</p>
-      </Painel>
-
-      <Painel titulo={TEXTOS.rotuloServico} nivel={3}>
-        <ul className={estilos.servicos}>
-          {servicos.map((servico) => (
-            <li key={servico.tipo} className={estilos.servico}>
-              <span className={estilos.servicoNome}>
-                {TEXTOS.servicos[servico.tipo]}
-                {/* A descrição é a mesma que o curador leu ao definir o preço
-                    (passo 5 do cadastro) — o protótipo a mostra aqui como
-                    `sv.desc`, e duas descrições do mesmo serviço seriam duas
-                    promessas diferentes. */}
-                {descricaoDoServico(servico.tipo) !== undefined ? (
-                  <span className={estilos.servicoDescricao}>
-                    {descricaoDoServico(servico.tipo)}
-                  </span>
+            <div className={estilos.cartoes}>
+              <div
+                className={[estilos.mini, atrasado ? estilos.miniAtrasado : undefined]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                <h3 className={estilos.rotulo}>{TEXTOS.prazoRestante}</h3>
+                <p className={atrasado ? estilos.prazoAtrasado : estilos.prazo}>
+                  {atrasado
+                    ? TEXTOS.prazoVencidoHoras(Math.floor(-horas))
+                    : horas < 24
+                      ? TEXTOS.prazoHoras(Math.floor(horas))
+                      : TEXTOS.prazoDias(Math.floor(horas / 24), Math.floor(horas % 24))}
+                  {atrasado ? null : ' restantes'}
+                </p>
+                <span className={estilos.barra}>
+                  <span
+                    className={estilos.barraValor}
+                    style={{
+                      width: `${atrasado ? 100 : Math.max(4, Math.min(100, Math.round(((72 - horas) / 72) * 100)))}%`,
+                    }}
+                  />
+                </span>
+                {atrasado ? (
+                  <p className={estilos.nota}>{TEXTOS.notaAtrasado(diasAteDevolucao)}</p>
                 ) : null}
-              </span>
-              <span className={estilos.preco}>
-                {claves.formatar(servico.precoClaves)} {CARTEIRA.saldoUnidade}
-              </span>
-            </li>
-          ))}
-        </ul>
+              </div>
 
-        <p className={estilos.total}>
-          {TEXTOS.totalDaLeitura}: {claves.formatar(total)} {CARTEIRA.saldoUnidade}
-        </p>
+              <div className={estilos.mini}>
+                <div className={estilos.miniTopo}>
+                  <h3 className={estilos.rotulo}>{TEXTOS.rotuloServico}</h3>
+                  <span className={estilos.total}>
+                    <span className="dsn-apenas-leitor">{TEXTOS.totalDaLeitura}: </span>
+                    {claves.formatar(total)} {CARTEIRA.saldoUnidade}
+                  </span>
+                </div>
+                <ul className={estilos.servicos}>
+                  {servicos.map((servico) => (
+                    <li key={servico.tipo} className={estilos.servico}>
+                      <span className={estilos.servicoNome}>
+                        {TEXTOS.servicos[servico.tipo]}
+                        {descricaoDoServico(servico.tipo) !== undefined ? (
+                          <span className={estilos.servicoDescricao}>
+                            {descricaoDoServico(servico.tipo)}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className={estilos.preco}>
+                        {claves.formatar(servico.precoClaves)} {CARTEIRA.saldoUnidade}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
 
-        <IniciarAvaliacao envioId={item.envioId} acao={iniciarAvaliacaoDoEnvio} />
-      </Painel>
-
-      <p className={estilos.nota}>
-        {TEXTOS.nota} · {prazoDeDevolucaoDias} dias
-      </p>
+            <IniciarAvaliacao envioId={item.envioId} acao={iniciarAvaliacaoDoEnvio} />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
 
-import { MolduraDeAutenticacao } from '@dissona/nucleo/componentes/autenticacao/MolduraDeAutenticacao';
+import { OrbitaDeFundo } from '@dissona/nucleo/componentes/autenticacao/OrbitaDeFundo';
+import { Marca } from '@dissona/nucleo/componentes/base/Marca';
 import { NavegadorDoTour } from '@dissona/nucleo/componentes/autenticacao/NavegadorDoTour';
 import { ProvedorDoTour } from '@dissona/nucleo/componentes/autenticacao/estado-do-tour';
 import { TourDeOnboarding } from '@dissona/nucleo/componentes/autenticacao/TourDeOnboarding';
 import type { PassoDoTour } from '@dissona/nucleo/componentes/autenticacao/TourDeOnboarding';
-import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { Papel } from '@dissona/nucleo/lib/papeis';
 import { encerrarOnboarding } from '@/modulos/autenticacao/acoes';
 import { lerContextoDaSessao } from '@dissona/nucleo/modulos/autenticacao/consultas';
 import { ONBOARDING } from '@dissona/nucleo/textos/prototipo';
+
+import estilos from './pagina.module.css';
 
 export const metadata: Metadata = {
   title: 'Como a Dissona funciona · Dissona',
@@ -46,19 +48,29 @@ export default async function Pagina({
     // passo: o card à esquerda por "Avançar"/"Voltar", o painel à direita
     // saltando direto. A moldura segue sendo componente de servidor.
     <ProvedorDoTour total={passos.length}>
-      <MolduraDeAutenticacao
-        linksDeRodape={[
-          { rotulo: 'Termos', href: ROTA.TERMOS },
-          { rotulo: 'Privacidade', href: ROTA.PRIVACIDADE },
-        ]}
-        aside={<NavegadorDoTour />}
-      >
-        <TourDeOnboarding
-          passos={passos}
-          acaoDeEncerrar={encerrarOnboarding}
-          revendo={rever === '1'}
-        />
-      </MolduraDeAutenticacao>
+      {/* Protótipo aprovado: a marca no alto da coluna do cartão, "Pular" à
+          direita dela, o cartão de 540px e a lista de 460px ao lado — sem
+          rodapé. */}
+      <div className={estilos.pagina}>
+        <OrbitaDeFundo centro="50%" />
+        <div className={estilos.grade}>
+          <div className={estilos.coluna}>
+            <header className={estilos.topo}>
+              <Marca variante="branca" altura="32px" />
+            </header>
+            <main className={estilos.cartao}>
+              <TourDeOnboarding
+                passos={passos}
+                acaoDeEncerrar={encerrarOnboarding}
+                revendo={rever === '1'}
+              />
+            </main>
+          </div>
+          <aside className={estilos.lateral}>
+            <NavegadorDoTour />
+          </aside>
+        </div>
+      </div>
     </ProvedorDoTour>
   );
 }

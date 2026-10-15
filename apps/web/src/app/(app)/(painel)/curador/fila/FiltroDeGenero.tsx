@@ -24,6 +24,7 @@ export function FiltroDeGenero({ generos, atual }: PropsFiltroDeGenero) {
   return (
     <Selecao
       rotulo={TEXTOS.generoRotulo}
+      rotuloOculto
       variante="tabela"
       value={atual ?? ''}
       opcoes={[

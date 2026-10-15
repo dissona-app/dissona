@@ -34,10 +34,9 @@ test.describe('B1 · Saldo e resumo', () => {
     await expect(page.getByText(CARTEIRA.saldoTitulo)).toBeVisible();
     await expect(page.getByText(CARTEIRA.saldoUnidade, { exact: true })).toBeVisible();
 
-    // A nota traz "… em crédito. Uma Clave equivale a R$ …" — os dois valores
-    // são formatados no servidor, e o que importa aqui é que ela existe e
-    // menciona a moeda, não quanto ela diz.
-    await expect(page.getByText(/em crédito\. Uma Clave equivale a R\$/)).toBeVisible();
+    // Protótipo aprovado: a nota do saldo é a frase do crédito livre; o
+    // equivalente em reais saiu da tela.
+    await expect(page.getByText(CARTEIRA.saldoNota)).toBeVisible();
   });
 
   test('os dois recortes do saldo aparecem', async ({ page }) => {
@@ -56,7 +55,9 @@ test.describe('B1 · Saldo e resumo', () => {
     await page.goto('/artista/carteira');
 
     for (const card of Object.values(CARTEIRA.resumo)) {
-      await expect(page.getByText(card.rotulo, { exact: true }), card.rotulo).toBeVisible();
+      // `.first()`: o rótulo do cartão se repete no selo de tipo das últimas
+      // movimentações (protótipo aprovado).
+      await expect(page.getByText(card.rotulo, { exact: true }).first(), card.rotulo).toBeVisible();
       await expect(page.getByText(card.descricao), card.descricao).toBeVisible();
     }
   });

@@ -1,0 +1,155 @@
+/* Meu perfil do curador — cabeçalho do protótipo aprovado. */
+
+.cartao {
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(20, 13, 26, 0.04),
+    0 14px 34px rgba(20, 13, 26, 0.07);
+}
+
+.capa {
+  position: relative;
+  height: clamp(90px, 12vh, 120px);
+  background: #140d1a;
+  background-image:
+    radial-gradient(60% 140% at 100% 0%, rgba(127, 71, 221, 0.45) 0%, rgba(20, 13, 26, 0) 70%),
+    radial-gradient(40% 120% at 0% 100%, rgba(227, 83, 54, 0.25) 0%, rgba(20, 13, 26, 0) 70%);
+}
+
+.capaFaixa {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #5b2e8f 0 25%,
+    #7f47dd 25% 50%,
+    #b780e7 50% 75%,
+    #e35336 75% 100%
+  );
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 clamp(20px, 2.8vw, 32px) clamp(18px, 2.6vh, 26px);
+}
+
+.identidade {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  min-width: 0;
+}
+
+.avatar {
+  position: relative;
+  z-index: 1;
+  width: clamp(88px, 11vh, 104px);
+  height: clamp(88px, 11vh, 104px);
+  margin-top: clamp(-52px, -5.5vh, -44px);
+  border-radius: 50%;
+  border: 5px solid #ffffff;
+  box-shadow:
+    0 0 0 1px #e5deea,
+    0 10px 24px rgba(20, 13, 26, 0.16);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dsn-font-display);
+  font-size: 30px;
+  color: #5b2e8f;
+  background: #efe7f8;
+  object-fit: cover;
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding-top: 12px;
+}
+
+.papel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7f47dd;
+}
+
+.nome {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--dsn-font-display);
+  font-size: clamp(24px, 3.4vh, 32px);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #140d1a;
+}
+
+.classe {
+  font-family: var(--dsn-font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 9px;
+  border-radius: 2px;
+  color: #8a5a12;
+  background: #fdf3e2;
+}
+
+.classe[data-classe='prata'] {
+  color: #3a3242;
+  background: #f2edf5;
+}
+
+.classe[data-classe='ouro'] {
+  color: #8a5a12;
+  background: #fbe9b7;
+}
+
+.meta {
+  margin: 0;
+  font-size: 13.5px;
+  color: #6e6478;
+}
+
+.generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.genero {
+  font-size: 12px;
+  font-weight: 600;
+  color: #140d1a;
+  background: #efe7f8;
+  border: 1px solid #e0d6ec;
+  border-radius: 2px;
+  padding: 5px 12px;
+}
+
+.bio {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #3a3242;
+  max-width: 720px;
+}

@@ -50,7 +50,7 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
 
     await entrarComo(page, PERSONA.ARTISTA_SEM_SALDO);
     await page.goto('/artista/enviar');
-    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+    await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
     await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloTitulo) }).fill(titulo);
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
     await page.waitForURL(/\/contexto$/);
@@ -60,11 +60,6 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
       .getByRole('textbox', { name: new RegExp(ENVIAR.rotuloContexto) })
       .fill('Faixa da suíte automatizada: cenário de saldo insuficiente.');
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
-    await page.waitForURL(/\/revisao$/);
-
-    // O aviso da revisão é o que torna o bloqueio justo: até aqui nada foi
-    // cobrado, e é na confirmação da seleção que as Claves sairiam.
-    await page.getByRole('link', { name: ENVIAR.enviarParaCuradoria }).click();
     await page.waitForURL(/\/curadores$/);
 
     const primeiro = page.getByRole('checkbox').first();
@@ -74,7 +69,11 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
     ).toBeAttached();
     await primeiro.check({ force: true });
 
-    await page.getByRole('button', { name: SELECAO.confirmar }).click();
+    // Até aqui nada foi cobrado: escolher leva à revisão, e é no "Enviar para
+    // curadoria" de lá que as Claves sairiam.
+    await page.getByRole('button', { name: SELECAO.continuarParaRevisao }).click();
+    await page.waitForURL(/\/revisao\?/);
+    await page.getByRole('button', { name: ENVIAR.enviarParaCuradoria }).click();
 
     await expect(page.getByText(SELECAO.erroSaldo)).toBeVisible();
     // Dentro do conteúdo: o card de saldo no pé da sidebar tem um
@@ -84,8 +83,8 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
       page.locator('#conteudo-principal').getByRole('link', { name: SELECAO.erroSaldoAcao }),
     ).toBeVisible();
 
-    // Continua na seleção: um bloqueio que avançasse de tela teria cobrado.
-    await expect(page).toHaveURL(/\/curadores$/);
+    // Continua na revisão: um bloqueio que avançasse de tela teria cobrado.
+    await expect(page).toHaveURL(/\/revisao\?/);
 
     const { data: envios } = await clienteDeServico()
       .from('envio')
@@ -103,7 +102,7 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
 
     await entrarComo(page, PERSONA.ARTISTA_SEM_SALDO);
     await page.goto('/artista/enviar');
-    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+    await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
     await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloTitulo) }).fill(titulo);
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
     await page.waitForURL(/\/contexto$/);
@@ -113,13 +112,12 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
       .getByRole('textbox', { name: new RegExp(ENVIAR.rotuloContexto) })
       .fill('Faixa da suíte automatizada: CTA do bloqueio por saldo.');
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
-    await page.waitForURL(/\/revisao$/);
-
-    await page.getByRole('link', { name: ENVIAR.enviarParaCuradoria }).click();
     await page.waitForURL(/\/curadores$/);
 
     await page.getByRole('checkbox').first().check({ force: true });
-    await page.getByRole('button', { name: SELECAO.confirmar }).click();
+    await page.getByRole('button', { name: SELECAO.continuarParaRevisao }).click();
+    await page.waitForURL(/\/revisao\?/);
+    await page.getByRole('button', { name: ENVIAR.enviarParaCuradoria }).click();
 
     await page.getByRole('link', { name: SELECAO.erroSaldoAcao }).click();
     await page.waitForURL(/\/artista\/pacotes/);

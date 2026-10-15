@@ -127,6 +127,24 @@ describe('esquemaDadosDoPerfil', () => {
       );
     });
 
+    it.each([
+      ['@seuperfil', 'https://instagram.com/seuperfil'],
+      ['seuperfil', 'https://instagram.com/seuperfil'],
+      ['@lucas.artista_', 'https://instagram.com/lucas.artista_'],
+      ['instagram.com/seuperfil', 'https://instagram.com/seuperfil'],
+      ['https://www.instagram.com/seuperfil/', 'https://www.instagram.com/seuperfil/'],
+    ])('Instagram aceita "%s", como o placeholder sugere', (entrada, esperado) => {
+      const analise = esquemaDadosDoPerfil.safeParse({ ...VAZIO, linkInstagram: entrada });
+      if (!analise.success) throw new Error('esperado sucesso');
+      expect(analise.data.linkInstagram).toBe(esperado);
+    });
+
+    it('Instagram ainda recusa o que não é usuário nem endereço', () => {
+      expect(
+        motivoDe({ ...VAZIO, linkInstagram: '@nome com espaço' }, 'linkInstagram'),
+      ).toBeDefined();
+    });
+
     it('recusa texto que não é endereço', () => {
       expect(motivoDe({ ...VAZIO, linkYoutube: 'meu canal' }, 'linkYoutube')).toBeDefined();
     });

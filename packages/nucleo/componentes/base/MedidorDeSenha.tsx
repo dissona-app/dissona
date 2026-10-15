@@ -9,6 +9,12 @@ export type PropsMedidorDeSenha = {
   readonly rotulos: readonly [string, string, string, string];
   /** Rótulos dos dois requisitos com *dot*, na ordem da tela. */
   readonly requisitos: { readonly tamanho: string; readonly numero: string };
+  /**
+   * Só a lista de requisitos, em coluna e com a marca redonda — o cadastro do
+   * protótipo aprovado. As barras e o rótulo de força continuam para o leitor
+   * de tela.
+   */
+  readonly soRequisitos?: boolean;
 };
 
 const CLASSE_NIVEL: Record<NivelDeForca, string | undefined> = {
@@ -45,14 +51,27 @@ const CLASSE_NIVEL: Record<NivelDeForca, string | undefined> = {
  * de tela digita a senha inteira sem saber que existe um medidor. `polite`, e
  * não `assertive`, para não interromper a digitação.
  */
-export function MedidorDeSenha({ senha, rotulos, requisitos }: PropsMedidorDeSenha) {
+export function MedidorDeSenha({
+  senha,
+  rotulos,
+  requisitos,
+  soRequisitos = false,
+}: PropsMedidorDeSenha) {
   const nivel = forcaDaSenha(senha);
   const temTamanho = senhaTemTamanho(senha);
   const temNumero = senhaTemNumero(senha);
 
   return (
-    <div className={[estilos.envolvente, CLASSE_NIVEL[nivel]].filter(Boolean).join(' ')}>
-      <div className={estilos.medidor}>
+    <div
+      className={[
+        estilos.envolvente,
+        CLASSE_NIVEL[nivel],
+        soRequisitos ? estilos.soRequisitos : undefined,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className={soRequisitos ? 'dsn-apenas-leitor' : estilos.medidor}>
         <div className={estilos.barras} aria-hidden="true">
           <span className={nivel >= 1 ? estilos.barraAtiva : estilos.barra} />
           <span className={nivel >= 2 ? estilos.barraAtiva : estilos.barra} />

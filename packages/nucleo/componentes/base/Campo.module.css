@@ -3,7 +3,8 @@
 .envolvente {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-4);
+  /* Protótipo aprovado: 7px entre o rótulo e o campo. */
+  gap: 7px;
 }
 
 .rotulo {
@@ -15,6 +16,8 @@
    * componentes de campo.
    */
   font-size: var(--dsn-rotulo-corpo, var(--dsn-text-3xs));
+  /* O rótulo do protótipo ocupa uma linha justa (12px para 11px de corpo). */
+  line-height: 1.1;
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;
@@ -74,7 +77,7 @@
    * 1.4.11 exige 3:1 dela. Ver o comentário do token. */
   border: var(--dsn-border-width) solid var(--dsn-border-campo);
   border-radius: var(--dsn-radius-lg);
-  padding: 13px var(--dsn-space-7);
+  padding: 11.5px 14px;
   outline: none;
   transition:
     border-color var(--dsn-duration-base),
@@ -100,6 +103,13 @@
 
 .invalido {
   border-color: var(--dsn-danger-fg);
+}
+
+/* Somente leitura (o e-mail que troca por modal): o lilás do protótipo
+ * aprovado, com a tinta um tom acima da do desabilitado. */
+.entrada:read-only:not(:disabled) {
+  background: var(--dsn-purple-050);
+  color: #3a3242;
 }
 
 .entrada:disabled {

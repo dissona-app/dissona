@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -16,6 +16,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { CONTA, EQUIPE } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './DadosDoMembro.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 const { dados: TEXTOS } = EQUIPE;
 
@@ -80,7 +81,7 @@ export function DadosDoMembro({
   acaoDeSenha,
   acaoDeEmail,
 }: PropsDadosDoMembro) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -114,11 +115,14 @@ export function DadosDoMembro({
 
   return (
     <section className={estilos.base} aria-label={EQUIPE.abas.dados}>
-      <form action={enviar} className={estilos.corpo} noValidate>
-        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+      {/* Protótipo aprovado: capa escura com dois brilhos e o avatar subindo
+          sobre ela; nome, papel, cargo e e-mail ao lado. */}
+      <div className={estilos.capa} aria-hidden="true">
+        <span className={estilos.brilhoA} />
+        <span className={estilos.brilhoB} />
+      </div>
 
-        {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
-
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.corpo} noValidate>
         <div className={estilos.identidade}>
           <CampoDeFoto
             nome={nome}
@@ -126,6 +130,17 @@ export function DadosDoMembro({
             caminhoAtual={fotoCaminho}
             aoMudarEnvio={setSubindoFoto}
             tamanho="md"
+            vitrine={
+              <div className={estilos.quem}>
+                <span className={estilos.linhaDoNome}>
+                  <span className={estilos.nome}>{nome}</span>
+                  <Etiqueta tom="info">{rotuloDoPapel(papelAdmin)}</Etiqueta>
+                </span>
+                <span className={estilos.cargoEmail}>
+                  {cargo === null || cargo === '' ? email : `${cargo} · ${email}`}
+                </span>
+              </div>
+            }
             textos={{
               botao: TEXTOS.trocarFoto,
               hint: TEXTOS.fotoHint,
@@ -135,8 +150,11 @@ export function DadosDoMembro({
               erroTamanho: TEXTOS.erroFotoTamanho,
             }}
           />
-          <Etiqueta tom="info">{rotuloDoPapel(papelAdmin)}</Etiqueta>
         </div>
+
+        {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
+
+        {erroDe('foto') === undefined ? null : <Aviso tom="erro">{erroDe('foto')}</Aviso>}
 
         <div className={estilos.par}>
           <Campo

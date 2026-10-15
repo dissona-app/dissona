@@ -7,10 +7,7 @@ import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
-import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { Modal } from '@dissona/nucleo/componentes/base/Modal';
-import { Tabela } from '@dissona/nucleo/componentes/base/Tabela';
-import type { ColunaTabela } from '@dissona/nucleo/componentes/base/Tabela';
 import { useHrefDoAdmin } from '@dissona/nucleo/componentes/shell/BaseDoAdmin';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { alternarAtivo, excluirPacote } from '@/acoes/pacote';
@@ -92,145 +89,41 @@ export function ListaDePacotes({
     });
   }
 
-  const colunas: readonly ColunaTabela<LinhaDePacote>[] = [
-    {
-      chave: 'nome',
-      titulo: ADMIN_PACOTES.colunas.nome,
-      celula: (linha) => (
-        <span className={estilos.nomeCelula}>
-          <span className={estilos.nome}>{linha.nome}</span>
-          <span className={estilos.sub}>
-            {linha.ativo ? ADMIN_PACOTES.subNaCarteira : ADMIN_PACOTES.subForaDaCarteira}
-          </span>
-        </span>
-      ),
-    },
-    {
-      chave: 'claves',
-      titulo: ADMIN_PACOTES.colunas.claves,
-      numerica: true,
-      celula: (linha) => linha.claves,
-    },
-    {
-      chave: 'valor',
-      titulo: ADMIN_PACOTES.colunas.valor,
-      numerica: true,
-      celula: (linha) => <strong>{linha.valor}</strong>,
-    },
-    {
-      chave: 'desconto',
-      titulo: ADMIN_PACOTES.colunas.desconto,
-      numerica: true,
-      celula: (linha) => (
-        <span className={linha.temDesconto ? estilos.comDesconto : estilos.semDesconto}>
-          {linha.desconto}
-        </span>
-      ),
-    },
-    {
-      chave: 'porClave',
-      titulo: ADMIN_PACOTES.colunas.porClave,
-      numerica: true,
-      celula: (linha) => <span className={estilos.porClave}>{linha.precoPorClave}</span>,
-    },
-    {
-      chave: 'status',
-      titulo: ADMIN_PACOTES.colunas.status,
-      numerica: true,
-      celula: (linha) =>
-        linha.ativo ? (
-          <Etiqueta tom="sucesso" dot="sucesso">
-            {ADMIN_PACOTES.statusAtivo}
-          </Etiqueta>
-        ) : (
-          <Etiqueta tom="neutro" dot="desativado">
-            {ADMIN_PACOTES.statusInativo}
-          </Etiqueta>
-        ),
-    },
-    {
-      chave: 'acoes',
-      titulo: ADMIN_PACOTES.colunas.acoes,
-      numerica: true,
-      celula: (linha) => (
-        <span className={estilos.acoes}>
-          {/*
-            "Editar" navega, então é `<a>`: preserva Ctrl+clique e "abrir em
-            nova aba", que numa tela de gestão são gestos usados de verdade.
-          */}
-          <Link className={estilos.acao} href={hrefDoAdmin(`${ROTA.ADMIN_PACOTES}/${linha.id}`)}>
-            {ADMIN_PACOTES.editar}
-          </Link>
-
-          <button
-            type="button"
-            className={[estilos.acao, linha.ativo ? estilos.acaoDesativar : undefined]
-              .filter(Boolean)
-              .join(' ')}
-            disabled={!podeEscrever || pendente}
-            onClick={() =>
-              executar(
-                () => alternarAtivo({ pacoteId: linha.id, ativo: !linha.ativo }),
-                linha.ativo
-                  ? ADMIN_PACOTES.flashDesativado(linha.nome)
-                  : ADMIN_PACOTES.flashAtivado(linha.nome),
-              )
-            }
-          >
-            {linha.ativo ? ADMIN_PACOTES.desativar : ADMIN_PACOTES.ativar}
-          </button>
-
-          <button
-            type="button"
-            className={estilos.acaoExcluir}
-            disabled={!podeEscrever || pendente}
-            onClick={() => setAExcluir(linha)}
-            // O ícone é a única marca visual, então o nome acessível vem do
-            // rótulo — e nomear o pacote evita quatro "Excluir pacote"
-            // idênticos na árvore de acessibilidade.
-            aria-label={`${ADMIN_PACOTES.excluir}: ${linha.nome}`}
-            title={ADMIN_PACOTES.excluir}
-          >
-            <IconeLixeira />
-          </button>
-        </span>
-      ),
-    },
-  ];
-
+  // Protótipo aprovado: um cartão com a faixa escura da tabela de preços no
+  // topo e os pacotes numa grade de cartões, cada um com as próprias ações.
   return (
     <div className={estilos.tela}>
-      <div className={estilos.topo}>
-        <div className={estilos.contexto}>
-          {/*
-            "Base de 1 Clave por R$ 10, com desconto progressivo por volume." O
-            valor vem de `configuracao.clave_valor_centavos`, não da copy: se a
-            Clave mudar de preço, esta linha muda com ela (RNF-011).
-          */}
-          <span className={estilos.base}>{baseDaClave}</span>
-          <span className={estilos.resumo}>
-            <span className={estilos.pontoAtivo} aria-hidden="true" />
-            {resumo}
-          </span>
-        </div>
-
-        {podeEscrever ? (
-          <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_PACOTES_NOVO)} tamanho="denso">
-            {ADMIN_PACOTES.novo}
-          </BotaoLink>
-        ) : null}
-      </div>
-
       {erro !== null ? <Aviso tom="erro">{erro}</Aviso> : null}
 
       <div className={estilos.moldura}>
-        <Tabela
-          legenda={ADMIN_PACOTES.titulo}
-          legendaOculta
-          colunas={colunas}
-          linhas={linhas}
-          chaveDaLinha={(linha) => linha.id}
-          vazio={
+        <div className={estilos.topo}>
+          <div className={estilos.contexto}>
+            <span className={estilos.overline}>Tabela de preços</span>
+            <div className={estilos.contextoLinha}>
+              {/*
+                O valor vem de `configuracao.clave_valor_centavos`, não da
+                copy: se a Clave mudar de preço, esta linha muda com ela.
+              */}
+              <span className={estilos.base}>{baseDaClave}</span>
+              <span className={estilos.resumo}>
+                <span className={estilos.pontoAtivo} aria-hidden="true" />
+                {resumo}
+              </span>
+            </div>
+          </div>
+
+          {/* Protótipo aprovado: o CTA da faixa escura é sem caixa-alta, 14px. */}
+          {podeEscrever ? (
+            <span data-botoes="frase">
+              <BotaoLink href={hrefDoAdmin(ROTA.ADMIN_PACOTES_NOVO)} tamanho="sm">
+                {ADMIN_PACOTES.novo}
+              </BotaoLink>
+            </span>
+          ) : null}
+        </div>
+
+        {linhas.length === 0 ? (
+          <div className={estilos.vazio}>
             <EstadoVazio
               titulo={ADMIN_PACOTES.vazioTitulo}
               descricao={ADMIN_PACOTES.vazioDescricao}
@@ -242,11 +135,95 @@ export function ListaDePacotes({
                 ) : undefined
               }
             />
-          }
-        />
+          </div>
+        ) : (
+          <ul className={estilos.grade} aria-label={ADMIN_PACOTES.titulo}>
+            {linhas.map((linha) => (
+              <li
+                key={linha.id}
+                className={[estilos.cartao, linha.ativo ? undefined : estilos.cartaoInativo]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                <div className={estilos.cartaoCorpo}>
+                  <div className={estilos.cartaoTopo}>
+                    <div className={estilos.nomeCelula}>
+                      <span className={estilos.nome}>{linha.nome}</span>
+                      <span
+                        className={[estilos.status, linha.ativo ? estilos.statusAtivo : undefined]
+                          .filter(Boolean)
+                          .join(' ')}
+                      >
+                        <span className={estilos.statusPonto} aria-hidden="true" />
+                        {linha.ativo ? ADMIN_PACOTES.statusAtivo : ADMIN_PACOTES.statusInativo}
+                      </span>
+                    </div>
+                    <span className={linha.temDesconto ? estilos.comDesconto : estilos.semDesconto}>
+                      {/* Protótipo aprovado: "−5%" ou "Sem desconto". */}
+                      {linha.temDesconto ? `−${linha.desconto}` : 'Sem desconto'}
+                    </span>
+                  </div>
+
+                  <p className={estilos.quantidade}>
+                    <span className={estilos.quantidadeNumero}>{linha.claves}</span>
+                    <span className={estilos.quantidadeUnidade}>Claves</span>
+                  </p>
+
+                  <dl className={estilos.valores}>
+                    <div>
+                      <dt>{ADMIN_PACOTES.colunas.valor}</dt>
+                      <dd className={estilos.valor}>{linha.valor}</dd>
+                    </div>
+                    <div>
+                      <dt>{ADMIN_PACOTES.colunas.porClave}</dt>
+                      <dd className={estilos.porClave}>{linha.precoPorClave}</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div className={estilos.acoes}>
+                  <Link
+                    className={estilos.acao}
+                    href={hrefDoAdmin(`${ROTA.ADMIN_PACOTES}/${linha.id}`)}
+                  >
+                    {ADMIN_PACOTES.editar}
+                  </Link>
+
+                  <button
+                    type="button"
+                    className={[estilos.acao, linha.ativo ? estilos.acaoDesativar : undefined]
+                      .filter(Boolean)
+                      .join(' ')}
+                    disabled={!podeEscrever || pendente}
+                    onClick={() =>
+                      executar(
+                        () => alternarAtivo({ pacoteId: linha.id, ativo: !linha.ativo }),
+                        linha.ativo
+                          ? ADMIN_PACOTES.flashDesativado(linha.nome)
+                          : ADMIN_PACOTES.flashAtivado(linha.nome),
+                      )
+                    }
+                  >
+                    {linha.ativo ? ADMIN_PACOTES.desativar : ADMIN_PACOTES.ativar}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={estilos.acaoExcluir}
+                    disabled={!podeEscrever || pendente}
+                    onClick={() => setAExcluir(linha)}
+                    aria-label={`${ADMIN_PACOTES.excluir}: ${linha.nome}`}
+                    title={ADMIN_PACOTES.excluir}
+                  >
+                    <IconeLixeira />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className={estilos.rodapeDaTabela}>
-          <span className={estilos.nota}>{ADMIN_PACOTES.nota}</span>
           {confirmacao !== null ? <Aviso tom="sucesso">{confirmacao}</Aviso> : null}
         </div>
       </div>

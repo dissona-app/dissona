@@ -30,13 +30,13 @@ export function Passo2Generos({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo, falha } = usePasso(acao);
+  const { enviar, aoEnviar, motivo, falha } = usePasso(acao);
 
   const erro = motivo === undefined ? undefined : MOTIVOS[motivo];
   const erroGeral = erroGeralDe(falha, [erro]);
 
   return (
-    <form action={enviar} className={estilos.formulario} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
       <Chips

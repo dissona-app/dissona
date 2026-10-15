@@ -41,6 +41,28 @@ const esquemaHandle = z
     message: 'handle_formato',
   });
 
+/**
+ * Usuário do Instagram, como a pessoa costuma escrever: `@nome` ou só `nome`
+ * (letras, números, ponto e sublinhado, até 30 — a regra do Instagram).
+ */
+const USUARIO_DO_INSTAGRAM = /^@?([a-z0-9._]{1,30})$/i;
+
+/**
+ * Instagram aceita o `@usuario` que o próprio campo sugere, além do link.
+ *
+ * O placeholder é `@seuperfil` (protótipo 7.1), e a validação só aceitava
+ * endereço: quem seguia a dica levava "Link inválido". Agora `@nome` — ou
+ * `nome`, sem ponto — vira `https://instagram.com/nome`; o resto segue a regra
+ * comum de link. `nome.com` sem `@` continua sendo lido como endereço.
+ */
+const esquemaInstagramOpcional = z.preprocess((valor) => {
+  if (typeof valor !== 'string') return valor;
+  const limpo = valor.trim();
+  const usuario = USUARIO_DO_INSTAGRAM.exec(limpo)?.[1];
+  const ehUsuario = usuario !== undefined && (limpo.startsWith('@') || !limpo.includes('.'));
+  return ehUsuario ? `instagram.com/${usuario}` : limpo;
+}, esquemaLinkOpcional);
+
 export const esquemaDadosDoPerfil = z.object({
   nomeExibicao: textoOpcional(80, 'nome_exibicao_longo'),
   cidade: textoOpcional(80, 'cidade_longa'),
@@ -53,7 +75,7 @@ export const esquemaDadosDoPerfil = z.object({
   generos: z
     .array(z.enum(GENEROS_DO_ARTISTA, { message: 'genero_desconhecido' }))
     .max(MAXIMO_DE_GENEROS, { message: 'generos_demais' }),
-  linkInstagram: esquemaLinkOpcional,
+  linkInstagram: esquemaInstagramOpcional,
   linkSpotify: esquemaLinkOpcional,
   linkYoutube: esquemaLinkOpcional,
   linkSite: esquemaLinkOpcional,

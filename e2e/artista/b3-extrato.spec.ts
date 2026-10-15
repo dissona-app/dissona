@@ -64,7 +64,8 @@ test.describe('B3 · Extrato', () => {
 
     // Data em pt-BR (dd/mm/aaaa) — o `locale` do projeto está no
     // playwright.config.ts, então o formato é estável.
-    await expect(primeira).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+    // Protótipo aprovado: "02 abr" — dia e mês abreviado.
+    await expect(primeira).toContainText(/\d{2} [a-zç]{3}/);
 
     // A origem é `lancamento_clave.descricao`, escrita pelas RPCs.
     const origem = primeira.getByRole('rowheader');

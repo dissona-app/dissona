@@ -79,10 +79,11 @@
 }
 
 .derivadoValor {
+  font-family: var(--dsn-font-display);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   font-size: 22px;
-  font-weight: var(--dsn-weight-bold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--dsn-tracking-tighter);
 }
 
 /* O primeiro derivado é o número que decide a compra — em roxo, destacado. */

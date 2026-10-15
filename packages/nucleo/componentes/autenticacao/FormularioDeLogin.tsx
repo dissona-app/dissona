@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -12,6 +12,7 @@ import { CodigoErro } from '@dissona/nucleo/lib/erros';
 
 import estilos from './FormularioDeLogin.module.css';
 import { IconeOlho } from './IconeOlho';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type Banner = { readonly titulo: string; readonly texto: string; readonly acao?: ReactNode };
 
@@ -93,7 +94,7 @@ export function FormularioDeLogin({
   rodape,
   bannerInicial,
 }: PropsFormulario) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
   );
@@ -163,7 +164,7 @@ export function FormularioDeLogin({
 
       {social}
 
-      <form action={enviar} className={estilos.campos} noValidate>
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.campos} noValidate>
         {proximo !== undefined ? <input type="hidden" name="proximo" value={proximo} /> : null}
 
         <Campo
@@ -173,6 +174,7 @@ export function FormularioDeLogin({
           placeholder={textos.placeholderEmail}
           autoComplete="email"
           required
+          semMarcador
           erro={erroDeCampo('email')}
         />
 
@@ -183,6 +185,7 @@ export function FormularioDeLogin({
           placeholder={textos.placeholderSenha}
           autoComplete="current-password"
           required
+          semMarcador
           erro={erroDeCampo('senha')}
           acessorioDoRotulo={
             <Link className={estilos.esqueci} href={textos.hrefEsqueciSenha}>

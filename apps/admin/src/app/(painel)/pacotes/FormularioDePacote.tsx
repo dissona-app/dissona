@@ -136,6 +136,7 @@ export function FormularioDePacote({
             onChange={(evento) => setNome(evento.target.value)}
             maxLength={80}
             required
+            semMarcador
             erro={campoComErro === 'nome' ? (erro ?? undefined) : undefined}
           />
 
@@ -148,6 +149,7 @@ export function FormularioDePacote({
               onChange={(evento) => aoMudarQuantidade(evento.target.value)}
               auxiliar={ADMIN_PACOTE_FORMULARIO.auxiliarBase(derivados.base)}
               required
+              semMarcador
               erro={campoComErro === 'quantidade' ? (erro ?? undefined) : undefined}
             />
 
@@ -168,6 +170,7 @@ export function FormularioDePacote({
               onChange={(evento) => aoMudarValor(evento.target.value)}
               auxiliar={ADMIN_PACOTE_FORMULARIO.auxiliarValor}
               required
+              semMarcador
               erro={campoComErro === 'valor' ? (erro ?? undefined) : undefined}
             />
           </div>
@@ -191,9 +194,6 @@ export function FormularioDePacote({
             <span className={estilos.alternanciaTextos}>
               <span className={estilos.alternanciaTitulo} id="rotulo-pacote-ativo">
                 {ADMIN_PACOTE_FORMULARIO.ativoTitulo}
-              </span>
-              <span className={estilos.alternanciaDescricao}>
-                {ADMIN_PACOTE_FORMULARIO.ativoDescricao}
               </span>
             </span>
 

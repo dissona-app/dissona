@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 
-import { OndasDeFundo } from '@dissona/nucleo/componentes/autenticacao/OndasDeFundo';
+import { OrbitaDeFundo } from '@dissona/nucleo/componentes/autenticacao/OrbitaDeFundo';
+import { Marca } from '@dissona/nucleo/componentes/base/Marca';
 import { CURADOR_CADASTRO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './MolduraDoWizard.module.css';
-import { OndasDoPainel } from './OndasDoPainel';
 
 export type PropsMolduraDoWizard = {
   /** 1 a 8. Decide o título, o subtítulo e a barra de progresso. */
@@ -63,10 +63,14 @@ export function MolduraDoWizard({ passo, total, aside, children }: PropsMolduraD
   }
 
   return (
-    <div className={estilos.pagina}>
-      <OndasDeFundo />
-
+    <div className={`${estilos.pagina ?? ''} ${estilos.escuro ?? ''}`}>
       {progresso}
+      <OrbitaDeFundo centro="50%" />
+
+      <header className={estilos.topo}>
+        <Marca variante="branca" altura="30px" />
+        <span className={estilos.contador}>{contador}</span>
+      </header>
 
       <main
         className={estilos.miolo}
@@ -74,7 +78,6 @@ export function MolduraDoWizard({ passo, total, aside, children }: PropsMolduraD
       >
         <div className={estilos.coluna}>
           <div className={estilos.cabecalho}>
-            <span className={estilos.contador}>{contador}</span>
             <h1 className={estilos.titulo}>{titulo}</h1>
             <p className={estilos.subtitulo}>{subtitulo}</p>
           </div>
@@ -133,7 +136,7 @@ function MolduraDividida({
       {progresso}
 
       <aside className={estilos.painelDividido}>
-        <OndasDoPainel />
+        <OrbitaDeFundo centro="50%" />
         {aside}
       </aside>
 

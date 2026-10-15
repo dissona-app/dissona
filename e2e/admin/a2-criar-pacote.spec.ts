@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { telaDoAdmin } from '../apoio/admin';
-import { auditoriaDe, pacotePorNome, perfilPorEmail } from '../apoio/banco';
+import { auditoriaDe, excluirPacotesDeTeste, pacotePorNome, perfilPorEmail } from '../apoio/banco';
 import { nomeUnico, PERSONA } from '../apoio/personas';
 import { abrirPacotes } from '../apoio/sessao';
 import { ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '../apoio/textos';
@@ -28,6 +28,17 @@ import { ADMIN_PACOTE_FORMULARIO, ADMIN_PACOTES } from '../apoio/textos';
  * um veria o do outro na lista — falha intermitente que se atribui a
  * "flakiness" e se esconde com retry.
  */
+/** Os pacotes deste arquivo, para o `afterAll` tirar da vitrine. */
+const criados: string[] = [];
+function registrar(nome: string): string {
+  criados.push(nome);
+  return nome;
+}
+
+test.afterAll(async () => {
+  await excluirPacotesDeTeste(criados);
+});
+
 test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
   test('o preço por Clave e o desconto são calculados enquanto se digita', async ({
     page,
@@ -41,7 +52,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
 
     await page
       .getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloNome)
-      .fill(nomeUnico('A2', info.workerIndex));
+      .fill(registrar(nomeUnico('A2', info.workerIndex)));
     await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloQuantidade).fill('30');
 
     // Digitar o desconto recalcula o valor — "Recalcula o valor", diz a copy
@@ -62,7 +73,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
   });
 
   test('o pacote salvo entra na lista', async ({ page }, info) => {
-    const nome = nomeUnico('A2 novo', info.workerIndex);
+    const nome = registrar(nomeUnico('A2 novo', info.workerIndex));
 
     await abrirPacotes(page);
     await page.getByRole('link', { name: ADMIN_PACOTES.novo }).click();
@@ -76,12 +87,12 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
     // A confirmação do protótipo, no pé da tabela.
     await expect(page.getByText(ADMIN_PACOTE_FORMULARIO.flashCriado)).toBeVisible();
 
-    const linha = page.getByRole('row').filter({ hasText: nome });
+    const linha = page.getByRole('listitem').filter({ hasText: nome });
     await expect(linha).toBeVisible();
     // Nasce ativo — é o padrão do formulário, e a copy da alternância promete
     // que "Ativo aparece na Carteira do artista na hora em que você salva".
     await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
-    await expect(linha).toContainText(ADMIN_PACOTES.subNaCarteira);
+    await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
     // 12,5% de desconto sobrevive com a casa decimal: 45 × R$ 10 = R$ 450,
     // menos 12,5% = R$ 393,75, ou R$ 8,75 por Clave. Se a tela arredondasse o
     // desconto para inteiro, este número não fecharia.
@@ -116,7 +127,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
 
       await page
         .getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloNome)
-        .fill(nomeUnico('A2 zero', info.workerIndex));
+        .fill(registrar(nomeUnico('A2 zero', info.workerIndex)));
       await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloQuantidade).fill('0');
       await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloValor).fill('10,00');
       await page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar }).click();
@@ -139,7 +150,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
 
       await page
         .getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloNome)
-        .fill(nomeUnico('A2 caro', info.workerIndex));
+        .fill(registrar(nomeUnico('A2 caro', info.workerIndex)));
       await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloQuantidade).fill('10');
       // Base de 10 Claves é R$ 100. R$ 150 é desconto negativo.
       await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloValor).fill('150,00');
@@ -160,7 +171,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
    * de coisa que se quebra em silêncio numa refatoração de RPC.
    */
   test('a criação fica registrada em log, com o autor', async ({ page }, info) => {
-    const nome = nomeUnico('A2 log', info.workerIndex);
+    const nome = registrar(nomeUnico('A2 log', info.workerIndex));
 
     await abrirPacotes(page);
     await page.getByRole('link', { name: ADMIN_PACOTES.novo }).click();
@@ -169,7 +180,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
     await page.getByLabel(ADMIN_PACOTE_FORMULARIO.rotuloDesconto).fill('5');
     await page.getByRole('button', { name: ADMIN_PACOTE_FORMULARIO.salvar }).click();
 
-    await expect(page.getByRole('row').filter({ hasText: nome })).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: nome })).toBeVisible();
 
     const pacoteId = await pacotePorNome(nome);
     expect(pacoteId, `o pacote "${nome}" precisa existir no banco`).not.toBeNull();

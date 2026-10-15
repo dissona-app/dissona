@@ -60,7 +60,7 @@ export function Passo6Credenciais({
   acaoDeVoltar,
   acaoDePular,
 }: PropsDoPasso & { readonly estado: EstadoDoCadastro }) {
-  const { enviar, motivo, falha } = usePasso(acao);
+  const { enviar, aoEnviar, motivo, falha } = usePasso(acao);
 
   const anexo = useUploadDireto({
     balde: 'materiais',
@@ -111,7 +111,7 @@ export function Passo6Credenciais({
   const aviso = anexo.erro ?? erro ?? erroGeral;
 
   return (
-    <form action={enviar} className={estilos.formulario} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
       {aviso !== undefined ? (
         <Aviso tom="erro" titulo={aviso}>
           {CURADOR_CADASTRO.subtitulos[5]}

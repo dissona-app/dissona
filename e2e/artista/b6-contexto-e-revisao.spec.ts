@@ -5,7 +5,7 @@ import type { Page, TestInfo } from '@playwright/test';
 
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
-import { ENVIAR } from '../apoio/textos';
+import { ENVIAR, SELECAO } from '../apoio/textos';
 
 /**
  * B6 · Contexto e revisão — módulo 3
@@ -30,7 +30,7 @@ async function ateOContexto(page: Page, info: TestInfo): Promise<string> {
 
   await entrarComo(page, PERSONA.ARTISTA);
   await page.goto('/artista/enviar');
-  await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+  await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
   await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloTitulo) }).fill(titulo);
   await page.getByRole('button', { name: ENVIAR.continuar }).click();
   await page.waitForURL(/\/contexto$/);
@@ -39,14 +39,14 @@ async function ateOContexto(page: Page, info: TestInfo): Promise<string> {
 }
 
 test.describe('B6 · Contexto e revisão', () => {
-  test('o wizard mostra os três passos', async ({ page }, info) => {
+  test('o wizard mostra os quatro passos', async ({ page }, info) => {
     await ateOContexto(page, info);
 
     // O indicador é um `<nav>` nomeado com uma `<ol>` de verdade dentro, e o
     // passo atual leva `aria-current="step"`.
     const passos = page.getByRole('navigation', { name: /progresso/i });
-    await expect(passos.getByRole('listitem')).toHaveCount(3);
-    await expect(page.getByText(ENVIAR.passoDe(2, 3))).toBeVisible();
+    await expect(passos.getByRole('listitem')).toHaveCount(4);
+    await expect(page.getByText(ENVIAR.passoDe(2, 4))).toBeVisible();
   });
 
   test('o contexto é obrigatório', { tag: ['@RF-038'] }, async ({ page }, info) => {
@@ -67,16 +67,23 @@ test.describe('B6 · Contexto e revisão', () => {
     await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloContexto) }).fill(contexto);
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
 
-    await page.waitForURL(/\/revisao$/);
-    await expect(page.getByText(ENVIAR.passoDe(3, 3))).toBeVisible();
+    // Ordem do protótipo aprovado: o curador é escolhido antes da revisão.
+    await page.waitForURL(/\/curadores$/);
+    await expect(page.getByText(ENVIAR.passoDe(3, 4))).toBeVisible();
+    await page.getByRole('checkbox').first().check({ force: true });
+    await page.getByRole('button', { name: SELECAO.continuarParaRevisao }).click();
+
+    await page.waitForURL(/\/revisao\?/);
+    await expect(page.getByText(ENVIAR.passoDe(4, 4))).toBeVisible();
 
     await expect(page.getByText(titulo)).toBeVisible();
     await expect(page.getByText('Indie', { exact: true })).toBeVisible();
     await expect(page.getByText(contexto)).toBeVisible();
 
-    // O aviso de saldo é o que explica que nada foi debitado ainda.
-    await expect(page.getByText(/as Claves só saem quando você confirma a seleção/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: ENVIAR.enviarParaCuradoria })).toBeVisible();
+    // A nota de saldo é o que explica que nada foi debitado ainda.
+    await expect(page.getByText(/as Claves só saem quando você confirma o envio/i)).toBeVisible();
+    await expect(page.getByText(SELECAO.curadoresEscolhidos)).toBeVisible();
+    await expect(page.getByRole('button', { name: ENVIAR.enviarParaCuradoria })).toBeVisible();
   });
 
   test(

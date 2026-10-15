@@ -15,7 +15,7 @@
   flex: none;
   border-radius: var(--dsn-radius-circle);
   background: var(--dsn-purple-050);
-  color: var(--dsn-purple-600);
+  color: var(--dsn-ink);
   font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-bold);
   overflow: hidden;
@@ -61,4 +61,10 @@
 
 .pendencia:hover {
   text-decoration: none;
+}
+
+/* A seta do chip da conta, como no protótipo aprovado. */
+.seta {
+  flex: none;
+  color: var(--dsn-ink-500);
 }

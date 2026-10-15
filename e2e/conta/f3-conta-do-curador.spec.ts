@@ -27,42 +27,47 @@ import { CONTA, PREFERENCIAS } from '../apoio/textos';
  * existe em vez de um parâmetro no F1.
  */
 test.describe('F3 · Conta do curador', () => {
-  test('as quatro abas do curador existem', { tag: ['@RF-025'] }, async ({ page }) => {
+  test('Conta tem as três abas do protótipo aprovado', { tag: ['@RF-025'] }, async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
-    await page.goto('/curador/conta?aba=perfil');
+    await page.goto('/curador/conta');
 
-    for (const aba of Object.values(CONTA.abas)) {
+    for (const aba of [CONTA.abas.dados, CONTA.abas.preferencias, CONTA.abas.seguranca]) {
       await expect(
         page.getByRole('link', { name: aba, exact: true }),
         `aba "${aba}"`,
       ).toBeVisible();
     }
+    // O perfil do curador saiu de Conta: é a tela "Meu perfil".
+    await expect(page.getByRole('link', { name: CONTA.abas.perfil, exact: true })).toHaveCount(0);
   });
 
-  test('o perfil do curador aparece em leitura', { tag: ['@RF-025'] }, async ({ page }) => {
-    await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
-    await page.goto('/curador/conta?aba=perfil');
+  test(
+    '"Meu perfil" é a vitrine, e a edição fica atrás de "Editar perfil"',
+    { tag: ['@RF-025'] },
+    async ({ page }) => {
+      await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
+      await page.goto('/curador/meu-cadastro');
 
-    // Sem botão de salvar: a edição é no 12.6, e a tela não finge o contrário.
-    await expect(page.getByRole('button', { name: /^Salvar alterações$/ })).toHaveCount(0);
-  });
+      await expect(page.getByText('Curadorias', { exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: /^Salvar/ })).toHaveCount(0);
+      await page.getByRole('link', { name: 'Editar perfil' }).click();
+      await expect(page).toHaveURL(/\/curador\/meu-cadastro\/editar$/);
+    },
+  );
 
   /**
-   * ⚠️ RF-026 **não está implementado**.
-   *
-   * A chave Pix em que as Claves viram repasse não existe nesta release. A tela
-   * declara a pendência em vez de mostrar campos que não gravariam nada — e o
-   * teste afirma a declaração, que vira regressão quando a tela real chegar.
+   * RF-026 · dados de recebimento — protótipo aprovado: o cartão mostra a
+   * chave Pix gravada em `perfil_curador`, ou diz que o repasse precisa dela.
    */
   test(
-    'os dados de recebimento ainda não estão nesta release',
+    'os dados de recebimento mostram a chave Pix, ou pedem uma',
     { tag: ['@RF-026'] },
     async ({ page }) => {
       await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
       await page.goto('/curador/conta?aba=dados');
 
       await expect(page.getByText(CONTA.financeiroPendente.curador.titulo).first()).toBeVisible();
-      await expect(page.getByText(CONTA.pendenteNestaRelease).first()).toBeVisible();
+      await expect(page.getByText(/Pix · chave de|Nenhuma chave Pix cadastrada/)).toBeVisible();
     },
   );
 
@@ -77,7 +82,11 @@ test.describe('F3 · Conta do curador', () => {
 
     // A nota do idioma é a **do curador**, e não a do artista: a faixa e o
     // contexto chegam no idioma de quem enviou.
-    await expect(page.getByText(PREFERENCIAS.idiomaNotaCurador).first()).toBeVisible();
+    // Protótipo aprovado: as categorias do curador e o idioma num seletor.
+    await expect(
+      page.getByRole('switch', { name: PREFERENCIAS.categorias.curador[0].titulo }),
+    ).toBeVisible();
+    await expect(page.getByLabel(PREFERENCIAS.idiomaTitulo)).toBeVisible();
   });
 
   test('a segurança do curador traz senha e sessões', { tag: ['@RF-027'] }, async ({ page }) => {

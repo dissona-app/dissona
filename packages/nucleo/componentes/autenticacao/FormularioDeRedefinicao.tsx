@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -14,6 +14,7 @@ import { SENHA } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDeRedefinicao.module.css';
 import { IconeOlho } from './IconeOlho';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsFormularioDeRedefinicao = {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
@@ -54,7 +55,7 @@ export function FormularioDeRedefinicao({
   hrefDaRecuperacao,
   autorizado,
 }: PropsFormularioDeRedefinicao) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
   );
@@ -133,7 +134,7 @@ export function FormularioDeRedefinicao({
         <p className={estilos.texto}>{SENHA.redefinirTexto}</p>
       </div>
 
-      <form action={enviar} className={estilos.campos} noValidate>
+      <form action={enviar} onSubmit={aoEnviar} className={estilos.campos} noValidate>
         {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
         <div className={estilos.blocoSenha}>

@@ -144,7 +144,7 @@ export const ENTRAR = {
    * Trocada por uma afirmação verificável. Registrado em
    * `docs/R2/perguntas-ao-cliente.md`.
    */
-  provas: ['7 dias para a devolutiva', 'até 11 critérios com nota', 'escuta medida e registrada'],
+  provas: ['7 dias para a devolutiva', 'até 11 critérios com nota', '100% da faixa ouvida'],
 } as const;
 
 /** `/artista/entrar` — mesma copy de `ENTRAR`, que sempre foi a do artista. */
@@ -681,7 +681,7 @@ export const ONBOARDING = {
 /** Tela 21 — lista de pacotes de Claves (`/admin/pacotes`). */
 export const ADMIN_PACOTES = {
   titulo: 'Pacotes de Claves',
-  subtitulo: 'Pacotes que o artista compra.',
+  subtitulo: 'Preço, desconto e disponibilidade dos pacotes na Carteira do artista.',
   base: 'Base de 1 Clave por R$ 10, com desconto progressivo por volume.',
   novo: 'Novo pacote',
 
@@ -770,7 +770,7 @@ export const ADMIN_PACOTE_FORMULARIO = {
 
   salvar: 'Salvar',
   cancelar: 'Cancelar',
-  notaRodape: 'A alteração vale para novas compras e fica registrada em log.',
+  notaRodape: 'Vale para novas compras.',
 
   flashCriado: 'Pacote criado. Já vale na Carteira do artista.',
   flashAtualizado: 'Pacote atualizado. Já vale na Carteira do artista.',
@@ -829,6 +829,7 @@ export const NAVEGACAO_DO_CURADOR = {
   metricas: 'Métricas',
   financeiro: 'Financeiro',
   grupoConta: 'Conta',
+  meuPerfil: 'Meu perfil',
   conta: 'Conta e configurações',
 } as const;
 
@@ -946,7 +947,7 @@ export const ARTISTA_PERFIL = {
    * o tamanho mínimo, que é a única linha que declara o formato aceito.
    */
   trocarFoto: 'Trocar foto',
-  fotoHint: 'JPG ou PNG, a partir de 400×400. Aparece nas suas faixas e no perfil.',
+  fotoHint: 'JPG ou PNG, a partir de 400×400.',
   fotoEnviando: 'Enviando a foto…',
   fotoEnviada: 'Foto enviada.',
   erroFotoTipo: 'A foto precisa ser JPG ou PNG.',
@@ -958,6 +959,8 @@ export const ARTISTA_PERFIL = {
   rotuloCidade: 'Cidade',
   rotuloHandle: 'Usuário',
   auxiliarHandle: 'Letras minúsculas, números e _ · de 3 a 30 caracteres',
+  /** Ao lado do rótulo "Usuário", como no protótipo aprovado. */
+  handleUnico: 'Único na plataforma',
   rotuloBio: 'Bio',
   rotuloGeneros: 'Gêneros',
   sufixoGeneros: '· até 3',
@@ -1022,9 +1025,8 @@ export const SALDO_NA_NAVEGACAO = {
 export const CARTEIRA = {
   saldoTitulo: 'Saldo disponível',
   saldoUnidade: 'Claves',
-  /** `caSaldoReais` — o valor da Clave vem de `configuracao`, nunca daqui. */
-  saldoNota: (emReais: string, valorDaClave: string) =>
-    `${emReais} em crédito. Uma Clave equivale a ${valorDaClave}.`,
+  /** Protótipo aprovado — o equivalente em reais saiu da tela. */
+  saldoNota: 'Crédito livre para enviar faixas a qualquer curador da plataforma.',
 
   comprometidas: 'Comprometidas em análise',
   devolvidas: 'Devolvidas por falta de resposta',
@@ -1033,9 +1035,9 @@ export const CARTEIRA = {
   verExtrato: 'Ver extrato',
 
   resumo: {
-    adquiridas: { rotulo: 'Adquiridas', descricao: 'Compradas em pacotes até aqui' },
-    usadas: { rotulo: 'Usadas', descricao: 'Gastas em envios para curadores' },
-    devolvidas: { rotulo: 'Devolvidas', descricao: 'Voltaram por falta de resposta' },
+    adquiridas: { rotulo: 'Adquiridas', descricao: 'Claves compradas em pacotes até aqui' },
+    usadas: { rotulo: 'Usadas', descricao: 'Claves gastas em envios para curadores' },
+    devolvidas: { rotulo: 'Devolvidas', descricao: 'Claves que voltaram por falta de resposta' },
   },
 
   ultimasTitulo: 'Últimas movimentações',
@@ -1068,8 +1070,7 @@ export const CARTEIRA = {
   vazioPorFiltroTitulo: 'Nada nesse filtro',
   vazioPorFiltroDescricao: 'Troque o tipo de movimentação para ver o restante.',
 
-  notaDevolucao:
-    'Quando um curador não responde em 7 dias, a Clave volta para a sua carteira e aparece aqui como devolvida.',
+  notaDevolucao: 'Devolvida: curador sem resposta em 7 dias.',
 
   /** Rótulo de `tipo_lancamento_clave` na coluna "Tipo". */
   tipos: {
@@ -1086,12 +1087,18 @@ export const CARTEIRA = {
 // ---------------------------------------------------------------------------
 
 export const ENVIAR = {
-  passos: ['Envio da faixa', 'Contexto', 'Revisar'] as const,
+  /**
+   * Os quatro passos do indicador, na ordem do protótipo aprovado (decisão
+   * de 15/10): o curador é escolhido antes da revisão, e as Claves só saem no
+   * "Enviar para curadoria" da revisão.
+   */
+  passos: ['Envio da faixa', 'Contexto', 'Escolher curador', 'Revisar'] as const,
   passoDe: (atual: number, total: number) => `Passo ${atual} de ${total}`,
 
   herois: [
-    'Sua faixa vai ser ouvida por quem entende.',
-    'Diga o que você quer descobrir com essa faixa.',
+    'Sua faixa nas mãos de quem entende.',
+    'Diga o que você quer descobrir.',
+    'Escolha quem vai ouvir.',
     'Última olhada antes de soltar.',
   ] as const,
 
@@ -1101,9 +1108,15 @@ export const ENVIAR = {
   detectar: 'Detectar faixa',
   detectando: 'Procurando os dados da faixa',
   faixaEncontrada: 'Faixa encontrada',
+  faixaEncontradaNo: (provedor: string) => `Faixa encontrada no ${provedor}`,
+  dadosConferidos: 'Dados conferidos? Siga para o contexto.',
   corrigirDados: 'Corrigir dados',
   /** Sem detecção, o protótipo abre o preenchimento manual. */
   naoDetectada: 'Não encontramos a faixa por esse link. Preencha os dados abaixo.',
+  /** O campo único de link do protótipo aprovado. */
+  rotuloLink: 'Link da faixa',
+  placeholderLink: 'https://open.spotify.com/track/...',
+  notaInicial: 'Comece colando o link ou enviando o arquivo.',
   capaDetectada: (titulo: string) => `Capa de ${titulo}`,
   erroLinkVazio: 'Cole o link do Spotify ou do YouTube.',
 
@@ -1127,7 +1140,7 @@ export const ENVIAR = {
   faixaLancada: (data: string) => `lançada em ${data}`,
   faixaSemData: 'sem data definida',
 
-  dropzoneVazia: 'Arraste o arquivo aqui, ou clique para escolher',
+  dropzoneVazia: 'Arraste o mp3 aqui',
   /** O rótulo enquanto o arquivo está sobre a área — `enDropLabel` do protótipo. */
   dropzoneSoltar: 'Solte para carregar',
   arquivoEscolhido: (nome: string) => `Arquivo escolhido: ${nome}`,
@@ -1235,6 +1248,14 @@ export const SELECAO = {
   titulo: 'Escolha quem vai ouvir',
   subtitulo:
     'Versão simplificada. A busca por gênero, o ranking e o detalhe do curador chegam na próxima release.',
+  buscar: 'Buscar curador',
+  disponiveis: (n: number) => `${n} ${n === 1 ? 'curador disponível' : 'curadores disponíveis'}`,
+  selecaoDestaFaixa: 'Seleção desta faixa',
+  dicaDaSelecao:
+    'Toque num curador para montar o envio. Feedback vem incluso e dá para somar outros serviços.',
+  total: 'Total',
+  saldoDisponivel: 'Saldo disponível',
+  cotacao: '1 Clave = R$ 10',
 
   totalDaLeitura: 'Total da seleção',
   saldoApos: (saldo: string) => `Saldo depois da confirmação: ${saldo}`,
@@ -1242,6 +1263,13 @@ export const SELECAO = {
   servicoObrigatorio: 'Feedback escrito · sempre incluso',
   confirmar: 'Confirmar e enviar',
   voltar: 'Voltar para a revisão',
+  /** Ordem do protótipo: a seleção vem antes da revisão. */
+  continuarParaRevisao: 'Continuar para revisão',
+  voltarAoContexto: 'Voltar',
+  curadoresEscolhidos: 'Curadores escolhidos',
+  alterar: 'Alterar',
+  notaDaRevisao: (curadores: number, total: string, saldo: string) =>
+    `${curadores} ${curadores === 1 ? 'curador' : 'curadores'} · ${total} de ${saldo} do seu saldo. As Claves só saem quando você confirma o envio.`,
 
   vazioTitulo: 'Nenhum curador disponível agora',
   vazioDescricao:
@@ -1291,7 +1319,9 @@ export const STATUS_DO_ENVIO = {
   },
   vazioTitulo: 'Nenhum curador ainda',
   vazioDescricao: 'Confirme a seleção para a faixa entrar na fila de alguém.',
-  nota: 'Cada curador tem 72h para responder com repasse cheio. Sem resposta em 7 dias, a Clave volta para a sua carteira e aparece no extrato.',
+  nota: 'Sem resposta em 7 dias, a Clave volta para a sua carteira.',
+  voltar: 'Voltar para Minhas faixas',
+  enviarOutra: 'Enviar outra faixa',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -1315,20 +1345,20 @@ export const STATUS_DO_ENVIO = {
  */
 export const PAINEIS = {
   artista: {
-    titulo: 'Painel do artista',
-    sublegenda: 'Suas faixas, prazos e devolutivas.',
+    titulo: 'Início',
+    sublegenda: 'Suas faixas em análise, notas recentes e o que fazer agora.',
     vazio: 'O painel do artista entra na Release 4',
     descricao: 'Faixas em análise, devolutivas recentes, saldo de Claves e próximos prazos.',
   },
   curador: {
     titulo: 'Painel do curador',
-    sublegenda: 'Suas leituras, prazos e ganhos do período.',
+    sublegenda: 'Sua fila, leituras em andamento e prazos da semana.',
     vazio: 'O painel do curador entra na Release 4',
     descricao: 'Convites abertos, leituras em andamento, prazos e Claves do período.',
   },
   admin: {
     titulo: 'Painel administrativo',
-    sublegenda: 'Visão geral da plataforma.',
+    sublegenda: 'Envios, devolutivas, receita e o que pede decisão hoje.',
     vazio: 'O painel administrativo entra na Release 4',
     descricao:
       'Volume de envios, devolutivas em atraso, receita do período e alertas de moderação.',
@@ -1478,6 +1508,9 @@ export const CARTAO_SALVO = {
   vazioEmConta: 'Nenhum cartão salvo. O primeiro pagamento com cartão guarda um.',
   nota: 'Guardamos só a referência que o provedor devolve — nunca o número, a validade ou o código de segurança.',
   remover: 'Remover cartão',
+  /** A linha do cartão em Dados de cobrança — protótipo aprovado. */
+  mascarado: (ultimos: string) => `•••• •••• •••• ${ultimos}`,
+  padrao: 'Padrão',
   removido: 'Cartão removido.',
   erroNaoEncontrado: 'Esse cartão não está mais salvo.',
 } as const;

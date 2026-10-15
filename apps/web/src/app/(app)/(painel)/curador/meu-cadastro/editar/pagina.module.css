@@ -1,0 +1,8 @@
+/* 12.6 — alteração de cadastro e mídias. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dsn-space-10);
+  max-width: 920px;
+}

@@ -1,0 +1,395 @@
+/* "Meu perfil" do curador — medidas do protótipo aprovado. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cartao {
+  overflow: hidden;
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}
+
+.capa {
+  position: relative;
+  height: 90px;
+  /* Protótipo aprovado: tinta com dois brilhos roxos. */
+  background:
+    radial-gradient(360px 260px at 12% -40%, rgba(183, 128, 231, 0.42), transparent 64%),
+    radial-gradient(420px 300px at 70% -60%, rgba(127, 71, 221, 0.32), transparent 64%), #140d1a;
+}
+
+.veu {
+  display: none;
+}
+
+.acoesDaCapa {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.verComoArtista,
+.editar {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.verComoArtista {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  cursor: default;
+}
+
+.editar {
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: var(--dsn-ink);
+}
+
+.editar:hover {
+  text-decoration: none;
+  background: #f2edf5;
+}
+
+.identidade {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+  padding: 0 24px 14px;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  position: relative;
+  z-index: 1;
+  margin-top: -46px;
+  border: 4px solid #ffffff;
+  border-radius: 50%;
+  background: #efe7f8;
+  object-fit: cover;
+  font-family: var(--dsn-font-display);
+  font-size: 26px;
+  color: var(--dsn-purple-600);
+  box-shadow: 0 6px 16px rgba(20, 13, 26, 0.18);
+}
+
+.quem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.linhaDoNome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.nome {
+  font-family: var(--dsn-font-display);
+  font-size: 24px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--dsn-ink);
+}
+
+.classe {
+  padding: 3px 9px;
+  border: 1px solid #cfd3da;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5f646e;
+}
+
+.classe[data-classe='bronze'] {
+  border-color: #e2c4a6;
+  color: #8a5a2b;
+}
+
+.classe[data-classe='ouro'] {
+  border-color: #e7d08a;
+  color: #8a6d12;
+}
+
+.apoio {
+  font-size: 13px;
+  color: var(--dsn-ink-500);
+}
+
+.generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.generos li {
+  padding: 5px 10px;
+  border-radius: 2px;
+  background: #f2edf5;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.bio {
+  max-width: 760px;
+  margin: 0;
+  padding: 0 24px 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #3a3242;
+}
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.numero {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 18px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}
+
+.numeroRotulo {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--dsn-ink-500);
+}
+
+.numeroValor {
+  margin: 0;
+  font-family: var(--dsn-font-display);
+  font-size: 26px;
+  letter-spacing: 0.01em;
+  color: var(--dsn-ink);
+}
+
+.numeroApoio {
+  margin: 0;
+  font-size: 12px;
+  color: #8a8296;
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .numeros,
+  .colunas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.coluna {
+  padding: 18px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}
+
+.cabecalhoDaColuna {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.overline {
+  margin: 0;
+  font-family: inherit !important;
+  font-size: 10px;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.apoioDoCabecalho {
+  font-size: 12px;
+  color: #8a8296;
+}
+
+.verTodas {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.servicos,
+.canais,
+.leituras {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.servico {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 4px;
+}
+
+.iconeServico,
+.iconeCanal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: #fbeae4;
+}
+
+.iconeCanal {
+  background: #f2edf5;
+}
+
+.textosServico {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tituloServico {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.descricao {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--dsn-ink-500);
+  text-overflow: ellipsis;
+}
+
+.preco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.precoClaves {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--dsn-ink);
+  white-space: nowrap;
+}
+
+.precoReais {
+  font-size: 11px;
+  color: #8a8296;
+}
+
+.canal {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.seguidores {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #3a3242;
+}
+
+.leitura {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--dsn-border);
+}
+
+.leitura:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.linhaDaLeitura {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+}
+
+.artista {
+  font-size: 13.5px;
+  color: #8a8296;
+}
+
+.nota {
+  margin-left: auto;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: #f2edf5;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dsn-purple-600);
+}
+
+.trecho {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--dsn-ink-500);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.vazio {
+  margin: 0;
+  font-size: 13px;
+  color: var(--dsn-ink-500);
+}

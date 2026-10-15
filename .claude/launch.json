@@ -2,6 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "Dissona — apresentação (produção local)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["apresentacao", "--sem-build"],
+      "port": 4000,
+      "url": "http://localhost:4000"
+    },
+    {
       "name": "Dissona Web — Artista · Curador",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@dissona/web", "dev"],
@@ -26,6 +33,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4100", "--directory", "docs/R2"],
       "port": 4100
+    },
+    {
+      "name": "Protótipos aprovados",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4102", "--directory", "docs/prototipo-aprovado"],
+      "port": 4102
     }
   ]
 }

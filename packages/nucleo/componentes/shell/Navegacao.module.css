@@ -8,47 +8,40 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-10);
-  padding: var(--dsn-space-12) var(--dsn-space-6);
-  background: var(--dsn-grad-sidebar);
-  border-right: var(--dsn-border-width) solid var(--dsn-nav-divider);
+  /* Protótipo aprovado: 22px 14px 18px, tinta chapada, sem borda. */
+  padding: 22px 14px 18px;
+  background: #140d1a;
+  transition: padding 200ms var(--dsn-ease-out);
 }
 
-/*
- * O logotipo branco do protótipo — design-system.md 2.1.1, `height:
- * clamp(28px,3.8vh,34px)` e padding `6px 12px`. O `padding-bottom` do protótipo
- * (`clamp(16px,3.2vh,28px)`) é o `gap` do `.aside`, e não se repete aqui.
- *
- * `align-self: flex-start` para o link ocupar só a largura do logotipo dentro
- * da coluna de 260px.
- */
 .marca {
   display: inline-flex;
   align-self: flex-start;
-  padding: var(--dsn-space-3) var(--dsn-space-6);
+  padding: 6px 4px clamp(16px, 3.2vh, 28px) 12px;
   border-radius: var(--dsn-radius-md);
 }
 
 .grupos {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-10);
-  flex: 1;
+  gap: 2px;
 }
 
 .grupo {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-1);
+  gap: 2px;
 }
 
 .overline {
-  padding: 0 var(--dsn-space-6) var(--dsn-space-3);
-  font-size: var(--dsn-text-4xs);
+  padding: 17px 12px 6px;
+  font-size: 10px;
+  line-height: 1.1;
   font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-overline);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--dsn-nav-overline);
+  color: #8a8296;
+  white-space: nowrap;
 }
 
 .lista {
@@ -57,56 +50,139 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-1);
+  gap: 2px;
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: var(--dsn-space-4);
-  padding: var(--dsn-pad-nav-item) var(--dsn-space-6);
-  border-radius: var(--dsn-radius-lg);
-  font-size: var(--dsn-text-sm);
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: var(--dsn-weight-medium);
-  color: var(--dsn-nav-fg-idle);
+  line-height: 1.1;
+  color: #c6b4de;
   text-decoration: none;
+  white-space: nowrap;
   transition:
-    background var(--dsn-duration-base),
-    color var(--dsn-duration-base);
+    background 200ms var(--dsn-ease-out),
+    color 200ms;
 }
 
 .item:hover {
-  background: var(--dsn-nav-bg-hover);
-  color: var(--dsn-nav-fg);
+  background: rgba(255, 255, 255, 0.08);
+  color: #c6b4de;
   text-decoration: none;
 }
 
-/* Release futura: esmaecido, sem o hover de quem navega. */
+/* Release futura: desenhado igual aos outros (protótipo aprovado), só não
+   navega. */
 .indisponivel {
   cursor: default;
-  opacity: 0.55;
-}
-
-.indisponivel:hover {
-  background: transparent;
-  color: var(--dsn-nav-fg-idle);
 }
 
 .rotulo {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.emBreve {
-  flex: none;
-  padding: 1px var(--dsn-space-3);
-  border: var(--dsn-border-width) solid var(--dsn-nav-divider);
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: var(--dsn-weight-semibold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
+.espaco {
+  flex: 1 1 auto;
+  min-height: 12px;
+}
+
+/* "Recolher menu" — o botão do pé da lateral. */
+.recolher {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  margin-top: 10px;
+  padding: clamp(7px, 1.2vh, 10px) 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: var(--dsn-weight-medium);
+  text-align: left;
+  color: #c6b4de;
+  cursor: pointer;
+  transition:
+    background 200ms var(--dsn-ease-out),
+    color 200ms;
+}
+
+.recolher:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.recolher:focus-visible {
+  outline-color: var(--dsn-focus-outline-color-dark);
+}
+
+/* ---------------------------------------------------------- recolhido */
+
+.aside[data-recolhido] {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+.aside[data-recolhido] .rotulo,
+.aside[data-recolhido] .overline,
+.aside[data-recolhido] .rodape {
+  display: none;
+}
+
+.aside[data-recolhido] .item,
+.aside[data-recolhido] .recolher {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.aside[data-recolhido] .recolher svg {
+  transform: scaleX(-1);
+}
+
+.simbolo {
+  display: none;
+}
+
+/* Recolhido: o símbolo num quadrado branco de 42px, centrado — protótipo. */
+.aside[data-recolhido] .marca {
+  align-self: center;
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.aside[data-recolhido] .marcaInteira {
+  display: none;
+}
+
+.aside[data-recolhido] .simbolo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+/* E os grupos separados por um fio de 27px, no lugar dos títulos. */
+.aside[data-recolhido] .grupo + .grupo::before {
+  content: '';
+  display: block;
+  width: 27px;
+  height: 1px;
+  margin: 14px auto;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* O spinner do clique — o mesmo dsnSpin do botão em loading. */
@@ -127,13 +203,21 @@
 }
 
 .ativo {
-  background: var(--dsn-nav-bg-active);
-  color: var(--dsn-nav-fg);
+  background: var(--dsn-nav-ativo-1);
+  color: var(--dsn-nav-fg-ativo);
   font-weight: var(--dsn-weight-semibold);
 }
 
+.ativo[data-cor='1'] {
+  background: var(--dsn-nav-ativo-2);
+}
+
+.ativo[data-cor='2'] {
+  background: var(--dsn-nav-ativo-3);
+}
+
 .ativo:hover {
-  background: var(--dsn-nav-bg-active);
+  color: var(--dsn-nav-fg-ativo);
 }
 
 /* Na sidebar escura o anel roxo nao tem contraste; o branco tem
@@ -147,8 +231,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--dsn-space-5);
-  padding-top: var(--dsn-space-10);
-  border-top: var(--dsn-border-width) solid var(--dsn-nav-divider);
+  padding-top: clamp(14px, 3vh, 28px);
 }
 
 /*
@@ -162,8 +245,10 @@
 .faixaDeAmbiente {
   display: flex;
   align-items: center;
-  gap: var(--dsn-space-4);
+  gap: 8px;
   margin: 0;
+  padding: clamp(12px, 2vh, 18px) 12px 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: var(--dsn-text-3xs);
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: 0.1em;
@@ -182,34 +267,35 @@
 .cartaoSaldo {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-2);
-  padding: var(--dsn-space-6);
-  border-radius: var(--dsn-radius-xl);
-  background: var(--dsn-nav-card-bg);
-  border: var(--dsn-border-width) solid var(--dsn-nav-divider);
+  gap: 6px;
+  padding: 14px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .rotuloSaldo {
-  font-size: var(--dsn-text-4xs);
+  font-size: 10px;
   font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-overline);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--dsn-nav-overline);
+  color: #8a8296;
 }
 
 .valorSaldo {
-  font-size: var(--dsn-text-md);
-  font-weight: var(--dsn-weight-bold);
+  font-size: 17px;
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-  color: var(--dsn-nav-fg);
+  color: #ffffff;
 }
 
 /* "Comprar Claves": link discreto dentro do card, como no protótipo — sem
    fundo e sem borda, sublinhando no hover. */
 .comprar {
   width: fit-content;
-  color: var(--dsn-nav-fg-idle);
-  font-size: var(--dsn-text-xs);
+  color: #c6b4de;
+  font-size: 13px;
   font-weight: var(--dsn-weight-semibold);
   text-decoration: none;
   transition: color var(--dsn-duration-base) var(--dsn-ease-out);
@@ -222,4 +308,9 @@
 
 .comprar:focus-visible {
   outline-color: var(--dsn-focus-outline-color-dark);
+}
+
+/* No admin a faixa de ambiente encosta no espaço, sem o respiro do saldo. */
+.rodape:has(.faixaDeAmbiente) {
+  padding-top: 0;
 }

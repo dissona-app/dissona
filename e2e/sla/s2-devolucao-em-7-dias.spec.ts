@@ -10,6 +10,7 @@ import {
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
 import { CARTEIRA, STATUS_DO_ENVIO } from '../apoio/textos';
+import { cartaoDaFila } from '../apoio/avaliacao';
 
 /**
  * S2 · Devolução em 7 dias — RF-070
@@ -64,7 +65,7 @@ test.describe('S2 · Devolução em 7 dias', { tag: ['@RF-070'] }, () => {
     // consumido passaria pelo resto do teste sem provar nada.
     await entrarComo(page, PERSONA.CURADOR_SLA);
     await page.goto('/curador/fila');
-    await expect(page.getByRole('row').filter({ hasText: FAIXA })).toHaveCount(1);
+    await expect(cartaoDaFila(page, FAIXA)).toHaveCount(1);
 
     // Prazo vencido há quatro dias e devolução vencida há uma hora: é o estado
     // que o sétimo dia produz.
@@ -76,7 +77,7 @@ test.describe('S2 · Devolução em 7 dias', { tag: ['@RF-070'] }, () => {
     // --- tela do curador: a faixa sai da fila -------------------------------
     await page.reload();
     await expect(
-      page.getByRole('row').filter({ hasText: FAIXA }),
+      cartaoDaFila(page, FAIXA),
       'faixa devolvida não pode continuar na fila de quem não respondeu',
     ).toHaveCount(0);
 

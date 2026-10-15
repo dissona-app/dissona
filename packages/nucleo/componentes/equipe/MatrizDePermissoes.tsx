@@ -1,7 +1,5 @@
 'use client';
 
-import { useActionState } from 'react';
-
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { Selecao } from '@dissona/nucleo/componentes/base/Selecao';
@@ -12,6 +10,7 @@ import { NivelDeAcesso, PAPEIS_ADMIN, celulaTravada } from '@dissona/nucleo/modu
 import { EQUIPE } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './MatrizDePermissoes.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 const { papeis: TEXTOS } = EQUIPE;
 
@@ -56,7 +55,7 @@ export type PropsMatrizDePermissoes = {
  * velha se falhasse no meio.
  */
 export function MatrizDePermissoes({ celulas, acao, podeEditar }: PropsMatrizDePermissoes) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -73,7 +72,7 @@ export function MatrizDePermissoes({ celulas, acao, podeEditar }: PropsMatrizDeP
   const falhou = resultado !== null && !resultado.ok;
 
   return (
-    <form action={enviar} className={estilos.base}>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.base}>
       <div className={estilos.cabecalho}>
         <div className={estilos.textos}>
           <span className={estilos.overline}>{TEXTOS.overline}</span>

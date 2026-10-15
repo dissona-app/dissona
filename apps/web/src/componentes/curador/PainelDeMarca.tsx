@@ -26,7 +26,7 @@ import estilos from './PainelDeMarca.module.css';
 export function PainelDeMarca() {
   return (
     <>
-      <Marca variante="colorida" altura="36px" className={estilos.marca} />
+      <Marca variante="branca" altura="36px" className={estilos.marca} />
       <div className={estilos.promessa}>
         {/* `<h2>`: o `<h1>` da página é o título do passo, na moldura. */}
         <h2 className={estilos.titulo}>{CURADOR_CADASTRO.asideTitulo}</h2>

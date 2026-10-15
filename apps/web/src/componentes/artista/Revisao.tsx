@@ -1,74 +1,119 @@
-import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
-import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
-import { Painel } from '@/componentes/base/Painel';
-import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import Link from 'next/link';
+
+import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { rotuloDaFonte } from '@/modulos/faixa/servico';
 import type { FaixaEmEdicao } from '@/modulos/faixa/tipos';
-import { ENVIAR as TEXTOS } from '@dissona/nucleo/textos/prototipo';
+import type { SelecaoNaUrl } from '@/modulos/selecao/tipos';
+import { ENVIAR as TEXTOS, SELECAO } from '@dissona/nucleo/textos/prototipo';
 
+import { CartaoDaFaixa } from './CartaoDaFaixa';
+import { ConfirmarEnvio } from './ConfirmarEnvio';
 import estilos from './Revisao.module.css';
 
 export type PropsRevisao = {
   readonly faixa: FaixaEmEdicao;
-  /** Saldo já formatado — "25,00 Claves". `null` se a conta não tem carteira. */
+  /** Saldo já formatado — "25 Claves". `null` se a conta não tem carteira. */
   readonly saldo: string | null;
+  /** Os curadores escolhidos no passo anterior, já formatados. */
+  readonly escolhidos: readonly {
+    readonly id: string;
+    readonly nome: string;
+    readonly servicos: string;
+    readonly claves: string;
+  }[];
+  /** "3 Claves" e "R$ 30,00" — somas de exibição; a RPC é quem cobra. */
+  readonly total: string;
+  readonly totalEmReais: string;
+  readonly selecao: SelecaoNaUrl;
+  /** Endereço da seleção com a escolha preservada (o "Alterar" e o "Voltar"). */
+  readonly alterar: string;
+  readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
 };
 
 /**
- * Passo 3 do envio — revisão.
+ * Passo 4 do envio — revisão (ordem do protótipo aprovado).
  *
- * Server Component: só leitura e links. O "Enviar para curadoria" leva ao
- * placeholder da seleção (módulo 4, da R3), que é onde as Claves de fato saem
- * — aqui nada é debitado, e o aviso diz isso.
+ * A faixa, o contexto e os curadores escolhidos; o "Enviar para curadoria" é o
+ * que debita as Claves (ver `ConfirmarEnvio`).
  */
-export function Revisao({ faixa, saldo }: PropsRevisao) {
+export function Revisao({
+  faixa,
+  saldo,
+  escolhidos,
+  total,
+  totalEmReais,
+  selecao,
+  alterar,
+  acao,
+}: PropsRevisao) {
+  // A origem aparece para link e preenchimento manual (RF-037). Para arquivo
+  // o cartão já diz "Arquivo enviado", e o nome no Storage é um UUID.
   const fonte = rotuloDaFonte(faixa);
-  const nomeDoArquivo = faixa.arquivoCaminho?.split('/').pop() ?? '';
-
-  const rotuloDaFonteTexto =
+  const genero = faixa.genero ?? '—';
+  const info =
     fonte === 'arquivo'
-      ? TEXTOS.resumoFonte.arquivo(nomeDoArquivo)
-      : fonte === 'link'
-        ? TEXTOS.resumoFonte.link
-        : TEXTOS.resumoFonte.manual;
+      ? genero
+      : `${genero} · ${fonte === 'link' ? TEXTOS.resumoFonte.link : TEXTOS.resumoFonte.manual}`;
 
   return (
     <div className={estilos.base}>
-      <Painel titulo={TEXTOS.resumoFaixa}>
-        <dl className={estilos.lista}>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloTitulo}</dt>
-            <dd className={estilos.valor}>{faixa.titulo}</dd>
-          </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.rotuloGenero}</dt>
-            <dd className={estilos.valor}>{faixa.genero}</dd>
-          </div>
-          <div>
-            <dt className={estilos.rotulo}>{TEXTOS.enviarArquivo}</dt>
-            <dd className={estilos.valor}>{rotuloDaFonteTexto}</dd>
-          </div>
-        </dl>
-      </Painel>
+      {/* Protótipo aprovado: o cartão da faixa em destaque e, ao lado, o que
+          o artista escreveu para o curador. */}
+      <div className={estilos.grade}>
+        <div className={estilos.colunaFaixa}>
+          <CartaoDaFaixa faixa={faixa} destaque info={info} />
+        </div>
+        <div className={estilos.colunaLateral}>
+          <section className={estilos.cartaoContexto} aria-label={TEXTOS.resumoContexto}>
+            <h3 className={estilos.rotuloContexto}>{TEXTOS.resumoContexto}</h3>
+            <p className={estilos.contexto}>{faixa.contextoCurador}</p>
+          </section>
 
-      <Painel titulo={TEXTOS.resumoContexto} nivel={3}>
-        <p className={estilos.contexto}>{faixa.contextoCurador}</p>
-      </Painel>
-
-      {saldo !== null ? (
-        <Aviso tom="info" estatico>
-          {TEXTOS.avisoSelecao(saldo)}
-        </Aviso>
-      ) : null}
-
-      <div className={estilos.acoes}>
-        <BotaoLink href={`${ROTA.ARTISTA_ENVIAR}/${faixa.id}/contexto`} variante="secundario">
-          {TEXTOS.voltar}
-        </BotaoLink>
-        <BotaoLink href={`${ROTA.ARTISTA_ENVIAR}/${faixa.id}/curadores`}>
-          {TEXTOS.enviarParaCuradoria}
-        </BotaoLink>
+          {/* Protótipo aprovado: os curadores escolhidos, com "Alterar" e o
+              total em Claves e em reais. */}
+          <section className={estilos.cartaoCuradores} aria-label={SELECAO.curadoresEscolhidos}>
+            <div className={estilos.curadoresTopo}>
+              <h3 className={estilos.rotuloContexto}>{SELECAO.curadoresEscolhidos}</h3>
+              <Link className={estilos.alterar} href={alterar}>
+                {SELECAO.alterar}
+              </Link>
+            </div>
+            <ul className={estilos.escolhidos}>
+              {escolhidos.map((curador) => (
+                <li key={curador.id} className={estilos.escolhido}>
+                  <span className={estilos.avatar} aria-hidden="true">
+                    {curador.nome
+                      .split(/\s+/)
+                      .slice(0, 2)
+                      .map((parte) => parte[0]?.toUpperCase() ?? '')
+                      .join('')}
+                  </span>
+                  <span className={estilos.escolhidoTextos}>
+                    <span className={estilos.escolhidoNome}>{curador.nome}</span>
+                    <span className={estilos.escolhidoServico}>{curador.servicos}</span>
+                  </span>
+                  <span className={estilos.escolhidoClaves}>{curador.claves}</span>
+                </li>
+              ))}
+            </ul>
+            <div className={estilos.totalDosCuradores}>
+              <span>{SELECAO.total}</span>
+              <span className={estilos.totalValores}>
+                <span className={estilos.totalReais}>{totalEmReais}</span>
+                <strong className={estilos.totalClaves}>{total}</strong>
+              </span>
+            </div>
+          </section>
+        </div>
       </div>
+
+      <ConfirmarEnvio
+        faixaId={faixa.id}
+        selecao={selecao}
+        voltar={alterar}
+        nota={saldo === null ? '' : SELECAO.notaDaRevisao(escolhidos.length, total, saldo)}
+        acao={acao}
+      />
     </div>
   );
 }

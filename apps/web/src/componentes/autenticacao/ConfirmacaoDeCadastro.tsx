@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -14,6 +13,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { CONFIRMAR_SOCIAL } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './ConfirmacaoDeCadastro.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsConfirmacaoDeCadastro = {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
@@ -62,7 +62,7 @@ export function ConfirmacaoDeCadastro({
   nome,
   email,
 }: PropsConfirmacaoDeCadastro) {
-  const [resultado, confirmar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, confirmar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
   );
@@ -112,7 +112,7 @@ export function ConfirmacaoDeCadastro({
         </Aviso>
       ) : null}
 
-      <form action={confirmar} className={estilos.campos} noValidate>
+      <form action={confirmar} onSubmit={aoEnviar} className={estilos.campos} noValidate>
         {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
         <Campo

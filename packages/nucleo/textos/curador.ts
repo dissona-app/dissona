@@ -43,7 +43,7 @@ export const CURADOR_CADASTRO = {
   /** Painel do split-screen, só no passo 1. */
   asideTitulo: 'Sua escuta vira crédito e remuneração.',
   asideTexto:
-    'São oito perguntas curtas: gêneros, atuação, canais, serviços, preços e as credenciais que definem sua classe.',
+    'São oito perguntas curtas: gêneros, atuação, canais, serviços, preços e credenciais.',
 
   titulos: [
     'Dados básicos',
@@ -267,25 +267,23 @@ export const CURADOR_CLASSIFICACAO = {
   subBronze: 'Classe de entrada',
   subPrata: (minimo: number) => `${minimo} ou mais credenciais comprovadas`,
   descBronze: (minimo: number) =>
-    `Você entra como curador Bronze e suas indicações já circulam na plataforma. Comprove pelo menos ${minimo} credenciais verificáveis para se candidatar à classe Prata.`,
+    `Você entra como curador Bronze. Comprove pelo menos ${minimo} credenciais verificáveis para se candidatar à classe Prata.`,
   descPrata: (minimo: number) =>
-    `Você comprovou ${minimo} credenciais verificáveis ou mais. Seu perfil segue como candidato a Prata para análise da equipe. Aprovado, suas curadorias ganham mais peso e visibilidade.`,
+    `Você comprovou ${minimo} credenciais verificáveis ou mais. Seu perfil segue como candidato a Prata para análise da equipe.`,
 
   painelCredenciais: 'Credenciais reconhecidas',
   contagem: (comprovadas: number, minimo: number) =>
     comprovadas >= minimo
       ? `${comprovadas} comprovadas`
       : `${comprovadas} de ${minimo} necessárias`,
-  notaOuro:
-    'A classe Ouro não é atribuída no cadastro. Ela vem por convite ou por desempenho na plataforma.',
+  notaOuro: 'Ouro vem por convite ou por desempenho.',
   continuar: 'Continuar',
 
   // -------------------------------------------- 12.5 · Bronze aprovado ----
   seloBronze: 'Curador Bronze aprovado',
   boasVindas: (primeiroNome: string) =>
     primeiroNome === '' ? 'Boas-vindas à curadoria' : `Boas-vindas, ${primeiroNome}`,
-  boasVindasTexto:
-    'Seu acesso está liberado. O curso de curadoria mostra como a Dissona escuta, pontua e escreve. É opcional: se preferir, vá direto para o painel.',
+  boasVindasTexto: 'Seu acesso está liberado. O curso de curadoria é opcional.',
   cursoTitulo: 'Curso de curadoria',
   cursoResumo: '3 módulos · 39 min',
   cursoOpcional: 'Opcional',
@@ -316,7 +314,7 @@ export const CURADOR_CLASSIFICACAO = {
   seloAnalise: 'Em análise',
   analiseTitulo: 'Cadastro em análise',
   analiseTexto:
-    'Seu perfil de candidato a Prata foi enviado para a avaliação manual do time Dissona. Assim que for aprovado, você recebe um aviso por e-mail e o acesso à curadoria é liberado.',
+    'Seu perfil de candidato a Prata está em avaliação. Avisamos por e-mail quando for aprovado.',
   analiseNota: 'A equipe já recebeu o alerta para avaliar suas credenciais.',
   entendi: 'Entendi',
 } as const;
@@ -332,8 +330,8 @@ export const CURADOR_CLASSIFICACAO = {
  * classe.
  */
 export const CURADOR_MANUTENCAO = {
-  titulo: 'Meu cadastro',
-  subtitulo: 'Suas mídias, seus serviços e a classe que você tem hoje.',
+  titulo: 'Meu perfil',
+  subtitulo: 'Como os artistas veem você antes de escolher quem ouve a faixa.',
 
   classeOverline: 'Classe atual',
   /**

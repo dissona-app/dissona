@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -13,6 +13,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { CURADOR_CADASTRO, CURADOR_MANUTENCAO } from '@dissona/nucleo/textos/curador';
 
 import estilos from './ModalDeMidia.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 const MOTIVOS: Readonly<Record<string, string>> = {
   midia_sem_nome: CURADOR_MANUTENCAO.erroMidiaSemNome,
@@ -48,7 +49,7 @@ export type PropsModalDeMidia = {
  * anteriores, porque o React vê o mesmo `<input>` no mesmo lugar.
  */
 export function ModalDeMidia({ alvo, onFechar, acao, onSucesso }: PropsModalDeMidia) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -99,7 +100,13 @@ export function ModalDeMidia({ alvo, onFechar, acao, onSucesso }: PropsModalDeMi
       largura="estreita"
       persistente
     >
-      <form key={midia?.id ?? 'nova'} action={enviar} className={estilos.formulario} noValidate>
+      <form
+        key={midia?.id ?? 'nova'}
+        action={enviar}
+        onSubmit={aoEnviar}
+        className={estilos.formulario}
+        noValidate
+      >
         {midia === undefined ? null : <input type="hidden" name="midiaId" value={midia.id} />}
 
         {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}

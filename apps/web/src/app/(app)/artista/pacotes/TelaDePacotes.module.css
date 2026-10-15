@@ -1,28 +1,33 @@
-/* 5.1 · Pacotes de Claves. */
+/* 5.1 · Pacotes de Claves — protótipo aprovado. */
 
 .base {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-4);
-  align-items: flex-start;
+  gap: 14px;
+}
+
+.voltar {
+  display: inline-flex;
+  gap: 8px;
+  width: fit-content;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+  text-decoration: none;
 }
 
 .chamada {
-  max-width: 39rem;
   margin: 0;
-  line-height: 1.6;
-  color: var(--dsn-ink-700);
+  font-size: 14px;
+  color: #3a3242;
 }
 
-/* Quatro colunas no protótipo (`repeat(4, minmax(0, 1fr))`), com `auto-fit`
-   no lugar do número fixo: os pacotes vêm da tela 21, e a equipe pode ter
-   três ou cinco. */
 .grade {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: var(--dsn-space-4);
-  width: 100%;
-  margin: var(--dsn-space-2) 0 0;
+  /* Quatro colunas, como no protótipo; três pacotes deixam a quarta vazia. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 2px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -30,50 +35,91 @@
 .cartao {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-3);
-  align-items: flex-start;
+  gap: 4px;
+  padding: 20px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+  transition:
+    background 200ms var(--dsn-ease-out),
+    border-color 200ms var(--dsn-ease-out);
+}
+
+/* O destaque do protótipo no cartão em foco: lilás, com o botão em tinta. */
+.cartao:hover,
+.cartao:focus-within {
+  border-color: #7f47dd;
+  background: #f5eefc;
 }
 
 .chamadaCard {
-  margin: 0;
-  font-size: var(--dsn-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--dsn-ink-500);
 }
 
 .quantidade {
   margin: 0;
-  font-size: var(--dsn-text-3xl);
-  font-weight: 600;
-  line-height: 1.1;
-  font-variant-numeric: tabular-nums;
+  font-family: var(--dsn-font-display);
+  font-size: 34px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
   color: var(--dsn-ink);
 }
 
 .unidade {
-  font-size: var(--dsn-text-base);
-  font-weight: 400;
+  font-family: var(--dsn-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--dsn-ink-500);
 }
 
 .preco {
   margin: 0;
-  font-size: var(--dsn-text-xl);
-  font-weight: 600;
-  color: var(--dsn-purple-600);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--dsn-ink);
 }
 
 .porClave {
-  margin: 0;
-  font-size: var(--dsn-text-sm);
-  line-height: 1.5;
+  flex: 1;
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.35;
   color: var(--dsn-ink-500);
 }
 
-.nota {
-  margin: 0;
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+.escolher {
+  display: inline-flex;
+  justify-content: center;
+  padding: 11px 16px;
+  border: 1px solid #d6cbe4;
+  border-radius: 4px;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+  text-decoration: none;
+  transition:
+    background 200ms,
+    color 200ms;
+}
+
+.cartao:hover .escolher,
+.escolher:focus-visible {
+  border-color: var(--dsn-ink);
+  background: var(--dsn-ink);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+@media (max-width: 1100px) {
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

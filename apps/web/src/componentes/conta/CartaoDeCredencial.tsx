@@ -16,7 +16,7 @@ export type PropsCartaoDeCredencial = {
   readonly titulo: string;
   /** Valor em destaque no lugar do título — o e-mail atual da conta. */
   readonly valor?: string;
-  readonly nota: string;
+  readonly nota?: string;
   readonly rotuloDaAcao: string;
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
 };

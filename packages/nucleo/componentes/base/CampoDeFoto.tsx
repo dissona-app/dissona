@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
 import { FOTO_MAX_BYTES, FOTO_TIPOS } from '@dissona/nucleo/lib/arquivos';
 import { iniciaisDe } from '@dissona/nucleo/lib/iniciais';
@@ -21,10 +22,11 @@ export type TextosDoCampoDeFoto = {
 };
 
 /** `sm` é a base do módulo CSS, e por isso não tem classe própria. */
-const CLASSE_DO_TAMANHO: Record<'sm' | 'md' | 'lg', string | undefined> = {
+const CLASSE_DO_TAMANHO: Record<'sm' | 'md' | 'lg' | 'xl', string | undefined> = {
   sm: undefined,
   md: estilos.avatarMd,
   lg: estilos.avatarLg,
+  xl: estilos.avatarXl,
 };
 
 export type PropsCampoDeFoto = {
@@ -55,7 +57,7 @@ export type PropsCampoDeFoto = {
    * `sm` é o passo 1 do curador (56px/17px), `md` os dados do membro admin
    * (27.1) e `lg` o perfil do artista (7.1), que é o maior. Ver o módulo CSS.
    */
-  readonly tamanho?: 'sm' | 'md' | 'lg';
+  readonly tamanho?: 'sm' | 'md' | 'lg' | 'xl';
   /**
    * Sem a linha de dica ao lado do botão. O passo 1 do curador no protótipo não
    * tem dica nenhuma: o retorno de "escolhi uma foto" é o próprio avatar, que
@@ -64,6 +66,12 @@ export type PropsCampoDeFoto = {
    * do botão; sem isso o upload em curso ficaria mudo.
    */
   readonly semDica?: boolean;
+  /**
+   * Protótipo aprovado (Conta do admin): o avatar sobe sobre a capa escura, a
+   * identidade fica no meio e o botão com a dica vai para a direita. O que
+   * entra no meio é de quem chama.
+   */
+  readonly vitrine?: ReactNode;
   readonly textos: TextosDoCampoDeFoto;
 };
 
@@ -87,6 +95,7 @@ export function CampoDeFoto({
   tamanhoDoBotao = 'md',
   tamanho = 'sm',
   semDica = false,
+  vitrine,
   textos,
 }: PropsCampoDeFoto) {
   const foto = useUploadDireto({
@@ -141,7 +150,15 @@ export function CampoDeFoto({
       */}
       {foto.erro === undefined ? null : <Aviso tom="erro">{foto.erro}</Aviso>}
 
-      <div className={estilos.base}>
+      <div
+        className={[
+          estilos.base,
+          vitrine === undefined ? undefined : estilos.emVitrine,
+          tamanho === 'xl' ? estilos.baseXl : undefined,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
         {imagem !== null ? (
           // `<img>` e não `next/image`: a origem é o bucket público do Supabase,
           // e passar por `remotePatterns` só para um avatar de 56px não paga.
@@ -159,6 +176,8 @@ export function CampoDeFoto({
             {iniciaisDe(nome)}
           </span>
         )}
+
+        {vitrine === undefined ? null : <div className={estilos.meio}>{vitrine}</div>}
 
         <div className={estilos.textos}>
           {/* `<label>` envolvendo o input: alvo de clique do tamanho do botão,

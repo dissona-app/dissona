@@ -7,6 +7,7 @@ import {
   FAIXA_DO_C6,
   FAIXA_PARA_CONCLUIR,
   irAteARemuneracao,
+  cartaoDaFila,
 } from '../apoio/avaliacao';
 import {
   envioDaFaixa,
@@ -141,7 +142,7 @@ test.describe('C6 · Remuneração por classe', () => {
     // E a faixa deixa a fila — o envio virou `pronto`.
     await page.getByRole('link', { name: AVALIAR.voltarParaFila }).click();
     await page.waitForURL('**/curador/fila');
-    await expect(page.getByRole('row').filter({ hasText: FAIXA_PARA_CONCLUIR })).toHaveCount(0);
+    await expect(cartaoDaFila(page, FAIXA_PARA_CONCLUIR)).toHaveCount(0);
   });
 
   /**

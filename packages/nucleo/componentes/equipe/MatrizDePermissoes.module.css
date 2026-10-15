@@ -23,7 +23,9 @@
   align-items: end;
   padding-top: clamp(13px, 2vh, 19px);
   padding-bottom: clamp(13px, 2vh, 19px);
-  border-bottom: 1px solid var(--dsn-border);
+  /* Protótipo aprovado: cabeçalho da matriz em tinta. */
+  background: #140d1a;
+  color: #ffffff;
 }
 
 .textos {
@@ -38,13 +40,13 @@
   font-weight: var(--dsn-weight-semibold);
   letter-spacing: var(--dsn-tracking-label);
   text-transform: uppercase;
-  color: var(--dsn-ink-500);
+  color: #ffffff;
 }
 
 .descricao {
   font-size: var(--dsn-text-xs);
   line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink-500);
+  color: #c6b4de;
 }
 
 .nomeDoPapel {

@@ -1,42 +1,20 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { CartaoDaClasse } from '@/componentes/curador/CartaoDaClasse';
-import { FormularioDeServicos } from '@/componentes/curador/FormularioDeServicos';
-import { TabelaDeMidias } from '@/componentes/curador/TabelaDeMidias';
+import { PerfilDoCuradorPublico } from '@/componentes/curador/PerfilDoCuradorPublico';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
-import {
-  removerMidiaDoCurador,
-  salvarMidiaDoCurador,
-  salvarServicosNaManutencao,
-} from '@/modulos/curador/acoes';
-import { lerCadastroDoCurador } from '@/modulos/curador/consultas';
-
-import estilos from './pagina.module.css';
+import { urlPublicaDoAvatar } from '@dissona/nucleo/lib/supabase/armazenamento';
+import { lerValorDaClave } from '@dissona/nucleo/modulos/pacote/consultas';
+import { lerCadastroDoCurador, lerVitrineDoCuradorCompleta } from '@/modulos/curador/consultas';
 
 export const metadata: Metadata = {
-  title: 'Meu cadastro · Dissona',
+  title: 'Meu perfil · Dissona',
   robots: { index: false, follow: false },
 };
 
 /**
- * 12.6 — alteração de cadastro e mídias.
- *
- * A tela de **manutenção** do que o wizard definiu: acrescentar uma playlist,
- * corrigir um link, mexer nos preços. Ela entrou na V3.1 do discovery e não
- * existe no protótipo — o conteúdo vem do PRD §12.6, e a forma reaproveita os
- * cards e a lista de serviços do módulo 12.
- *
- * Rota própria, e não `/curador/cadastro`: aquela é a retomada do wizard e
- * manda quem já concluiu para a classificação, o que faria "Meu cadastro" na
- * sidebar abrir a tela de parabéns do Bronze.
- *
- * Cadastro pendente volta ao wizard. É a mesma decisão que o serviço toma nas
- * três escritas (`paraManutencao`), repetida aqui porque a guarda de rota manda
- * pelo `cadastroCuradorConcluido` da sessão e esta página lê o estado real —
- * são duas fontes, e a que decide o que renderizar é esta.
- *
- * Sem `<h1>`: o `Shell` já põe o da rota.
+ * "Meu perfil" do curador — protótipo aprovado: a vitrine que o artista vê.
+ * A manutenção (mídias, serviços, classe) fica em `/curador/meu-cadastro/editar`.
  */
 export default async function Pagina() {
   const estado = await lerCadastroDoCurador();
@@ -44,17 +22,24 @@ export default async function Pagina() {
   if (estado === null) redirect(ROTA.CURADOR_ENTRAR);
   if (!estado.concluido) redirect(ROTA.CURADOR_CADASTRO);
 
+  const [fotoUrl, vitrine, valorDaClave] = await Promise.all([
+    urlPublicaDoAvatar(estado.fotoCaminho),
+    lerVitrineDoCuradorCompleta(estado.perfilCuradorId),
+    lerValorDaClave(),
+  ]);
+  if (vitrine === null) redirect(ROTA.CURADOR_ENTRAR);
+
   return (
-    <div className={estilos.base}>
-      <CartaoDaClasse classe={estado.classe} situacao={estado.situacaoCurador} />
-
-      <TabelaDeMidias
-        midias={estado.canais}
-        acaoDeSalvar={salvarMidiaDoCurador}
-        acaoDeExcluir={removerMidiaDoCurador}
-      />
-
-      <FormularioDeServicos servicos={estado.servicos} acao={salvarServicosNaManutencao} />
-    </div>
+    <PerfilDoCuradorPublico
+      nome={estado.nome}
+      fotoUrl={fotoUrl}
+      classe={estado.classe}
+      generos={estado.generos}
+      bio={estado.bio}
+      canais={estado.canais}
+      servicos={estado.servicos}
+      valorDaClave={valorDaClave}
+      vitrine={vitrine}
+    />
   );
 }

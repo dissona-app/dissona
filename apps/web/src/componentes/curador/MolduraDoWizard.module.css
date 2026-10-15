@@ -7,7 +7,58 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--dsn-grad-auth-bg);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/*
+ * Passos 2 a 8 — protótipo aprovado: a tela inteira em tinta, sobre a órbita.
+ * Os tokens são redefinidos aqui dentro, e todo componente dos passos (campo,
+ * chip, botão secundário) herda o tema sem saber dele. Medidas do protótipo:
+ * fundo #140D1A, campo e chip #211A2A com borda lilás a 22%, texto #C6B4DE.
+ */
+.escuro {
+  --dsn-ink: #ffffff;
+  --dsn-ink-700: #c6b4de;
+  --dsn-ink-500: #c6b4de;
+  --dsn-ink-400: rgba(198, 180, 222, 0.6);
+  --dsn-surface: #211a2a;
+  --dsn-surface-alt: #1e1726;
+  --dsn-border: rgba(198, 180, 222, 0.22);
+  --dsn-border-campo: rgba(198, 180, 222, 0.22);
+  --dsn-border-soft: rgba(198, 180, 222, 0.14);
+  --dsn-border-faint: rgba(198, 180, 222, 0.1);
+  --dsn-purple-050: #2a2334;
+  --dsn-purple-100: #33293f;
+  /* Botão secundário em lilás sobre a tinta ("Adicionar canal"). */
+  --dsn-purple-600: #c6b4de;
+  --dsn-track: rgba(198, 180, 222, 0.18);
+  color: #ffffff;
+  background: #140d1a;
+}
+
+.escuro .progresso,
+.escuro .progresso::-webkit-progress-bar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Logotipo à esquerda e o contador à direita, no alto — como no protótipo. */
+.topo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(20px, 3.4vh, 32px) clamp(24px, 4.4vw, 64px) 0;
+}
+
+.topo .contador {
+  align-self: center;
+}
+
+.escuro .cabecalho {
+  align-items: center;
+  text-align: center;
 }
 
 /*
@@ -93,15 +144,14 @@
   margin: 0;
   font-size: clamp(25px, 3.6vh, 34px);
   line-height: var(--dsn-leading-heading);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-hero);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   text-wrap: balance;
 }
 
 .tituloEstreito {
-  font-size: clamp(24px, 3.2vh, 30px);
-  line-height: var(--dsn-leading-title);
-  letter-spacing: var(--dsn-tracking-tightest);
+  font-size: clamp(28px, 4.6vh, 40px);
+  line-height: 1.1;
 }
 
 .subtitulo {
@@ -114,7 +164,7 @@
 
 /* Acompanha `.tituloEstreito`: no passo 1 a coluna é mais estreita. */
 .subtituloEstreito {
-  font-size: var(--dsn-text-sm);
+  font-size: var(--dsn-text-md);
 }
 
 /* ------------------------------------------------------------------------
@@ -123,7 +173,9 @@
  * --------------------------------------------------------------------- */
 
 .paginaDividida {
-  --dsn-rotulo-corpo: var(--dsn-text-4xs);
+  /* No passo 1 o rótulo é 11,5px (protótipo aprovado), e não os 10px dos
+     outros passos. */
+  --dsn-rotulo-corpo: 11.5px;
   position: relative;
   display: grid;
   grid-template-columns: 46% minmax(0, 1fr);
@@ -141,7 +193,9 @@
   justify-content: space-between;
   gap: 24px;
   padding: clamp(28px, 4.6vh, 52px) clamp(26px, 3.2vw, 48px);
-  background: linear-gradient(180deg, #fdfcff 0%, #f7f3fd 55%, #f1ecfa 100%);
+  background: #140d1a;
+  border-right: 1px solid rgba(198, 180, 222, 0.2);
+  overflow: hidden;
   border-right: var(--dsn-border-width) solid #ede8f6;
 }
 
@@ -212,7 +266,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(14px, 2.2vh, 22px);
+  gap: 25px;
   padding: clamp(14px, 2vh, 24px) clamp(24px, 4vw, 56px) clamp(22px, 3.4vh, 34px);
 }
 
@@ -226,7 +280,20 @@
 .corpoDividido > *,
 .corpoDividido > form > * {
   width: 100%;
-  max-width: 404px;
+  max-width: 520px;
+}
+
+/* Protótipo aprovado (passo 1): campos de 51px, com 16px de respiro, e o
+   rótulo a 9px do campo. */
+.corpoDividido input:not([type='checkbox']):not([type='file']):not([type='radio']) {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  padding-left: 16px;
+}
+
+.corpoDividido label:has(+ div input),
+.corpoDividido label:has(+ input) {
+  margin-bottom: 2px;
 }
 
 /* Os dois `auto` dividem o espaço livre: metade acima do título, metade acima

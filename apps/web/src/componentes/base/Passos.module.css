@@ -14,7 +14,9 @@
   display: flex;
   align-items: center;
   gap: var(--dsn-space-4);
-  font-size: var(--dsn-text-2xs);
+  /* Protótipo aprovado: 13px, peso 500 nos passos que não são o atual. */
+  font-size: var(--dsn-text-xs);
+  font-weight: var(--dsn-weight-medium);
 }
 
 .numeral {

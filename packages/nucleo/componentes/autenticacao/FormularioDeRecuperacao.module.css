@@ -29,8 +29,8 @@
   margin: 0;
   font-size: var(--dsn-text-2xl);
   line-height: var(--dsn-leading-title);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tightest);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   text-wrap: balance;
 }
 
@@ -38,8 +38,8 @@
   margin: 0;
   font-size: var(--dsn-text-xl);
   line-height: var(--dsn-leading-wrap);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tightest);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   text-wrap: pretty;
 }
 
@@ -92,4 +92,22 @@
 
 .rodapeLink:hover {
   text-decoration: underline;
+}
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+/* Cabeçalho centrado e um fio separando o rodapé, como no protótipo. */
+.cabecalho {
+  align-items: center;
+  text-align: center;
+}
+
+.overline {
+  align-self: center;
+}
+
+.rodape {
+  padding-top: 14px;
+  border-top: 1px solid var(--dsn-border-faint);
+  gap: 6px;
 }

@@ -155,6 +155,7 @@ export type FaixaNaVitrine = {
   readonly leiturasConcluidas: number;
   /** Quantos envios existem ao todo — é o que separa "em análise" de "sem envio". */
   readonly envios: number;
+  readonly envioIds: readonly string[];
 };
 
 /**
@@ -172,7 +173,7 @@ export async function listarFaixasDoArtista(
 
   const { data, error } = await supabase
     .from('faixa')
-    .select('id, titulo, genero, criado_em, envio(situacao)')
+    .select('id, titulo, genero, criado_em, envio(id, situacao)')
     .eq('perfil_artista_id', perfilArtistaId)
     .order('criado_em', { ascending: false });
 
@@ -187,8 +188,38 @@ export async function listarFaixasDoArtista(
       criadoEm: linha.criado_em,
       leiturasConcluidas: envios.filter((envio) => envio.situacao === 'pronto').length,
       envios: envios.length,
+      envioIds: envios.map((envio) => envio.id),
     };
   });
+}
+
+/**
+ * A NF média de cada faixa, pelas avaliações concluídas (`nota_avaliacao`,
+ * escala 0–10). Faixa sem avaliação concluída fica de fora do mapa.
+ */
+export async function notasDasFaixas(
+  faixas: readonly { readonly id: string; readonly envioIds: readonly string[] }[],
+): Promise<ReadonlyMap<string, number>> {
+  const envioIds = faixas.flatMap((faixa) => faixa.envioIds);
+  if (envioIds.length === 0) return new Map();
+
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .from('nota_avaliacao')
+    .select('envio_id, nf')
+    .in('envio_id', envioIds);
+  // Nota é enfeite da vitrine: sem acesso, a lista segue sem ela.
+  if (error !== null) return new Map();
+
+  const notas = new Map<string, number>();
+  for (const faixa of faixas) {
+    const nfs = (data ?? [])
+      .filter((linha) => linha.envio_id !== null && faixa.envioIds.includes(linha.envio_id))
+      .map((linha) => Number(linha.nf))
+      .filter((nf) => Number.isFinite(nf));
+    if (nfs.length > 0) notas.set(faixa.id, nfs.reduce((a, b) => a + b, 0) / nfs.length);
+  }
+  return notas;
 }
 
 /**

@@ -5,7 +5,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--dsn-grad-auth-bg);
+  background: #140d1a;
+  overflow: hidden;
 }
 
 .miolo {
@@ -81,8 +82,8 @@
   margin: 0;
   font-size: clamp(21px, 2.8vh, 26px);
   line-height: var(--dsn-leading-title);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tighter);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   text-wrap: balance;
 }
 
@@ -106,4 +107,132 @@
   line-height: var(--dsn-leading-relaxed);
   color: var(--dsn-ink-700);
   text-wrap: pretty;
+}
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+.topo {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: 16px 48px;
+}
+
+.miolo {
+  align-items: flex-start;
+  padding: 30px 48px 16px;
+}
+
+/* Cartão centrado: 22px de respiro, 10,8px entre os blocos, raio 6. */
+.cartao {
+  align-items: center;
+  gap: 10.8px;
+  padding: 22px;
+  border-color: #e5deea;
+  border-radius: 6px;
+  text-align: center;
+  margin: auto 0;
+}
+
+.cartao > * {
+  align-self: stretch;
+}
+
+.cartao > .medalha,
+.cartao > .relogio,
+.cartao > .seloBronze,
+.cartao > .seloPrata,
+.cartao > .seloAnalise {
+  align-self: center;
+}
+
+.cabecalho {
+  align-items: center;
+  gap: 4px;
+}
+
+.texto {
+  max-width: 430px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #3a3242;
+}
+
+.medalha {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(70% 70% at 32% 26%, #e4b074 0%, #c2853a 46%, #8e5f27 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    0 8px 20px rgba(142, 95, 39, 0.28);
+  color: #fff4e6;
+}
+
+.medalhaPrata {
+  background: radial-gradient(70% 70% at 32% 26%, #f2f3f5 0%, #c9cbd1 44%, #8e9199 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.7),
+    0 8px 20px rgba(142, 145, 153, 0.28);
+  color: #ffffff;
+}
+
+.aprovada {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #1f9d55;
+  color: #ffffff;
+}
+
+.relogio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #efe7f8;
+  color: #5b2e8f;
+}
+
+.seloBronze,
+.seloPrata,
+.seloAnalise {
+  padding: 4px 9px;
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.seloAnalise::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: 1px;
+}
+
+.textoBronze {
+  font-size: 14px;
+}
+
+/* A classificação: o nome da classe sob a medalha, com a entrelinha justa. */
+.tituloDaMedalha {
+  line-height: 1.08;
 }

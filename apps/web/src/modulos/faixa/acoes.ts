@@ -241,6 +241,8 @@ export async function salvarContexto(dados: FormData): Promise<ResultadoDeAcao> 
   });
 
   if (!resultado.ok) return resultado;
-  revalidatePath(`${ROTA.ARTISTA_ENVIAR}/${faixaId}/revisao`);
-  redirect(`${ROTA.ARTISTA_ENVIAR}/${faixaId}/revisao`);
+  // Ordem do protótipo aprovado: depois do contexto vem a escolha do curador,
+  // e só então a revisão.
+  revalidatePath(`${ROTA.ARTISTA_ENVIAR}/${faixaId}/curadores`);
+  redirect(`${ROTA.ARTISTA_ENVIAR}/${faixaId}/curadores`);
 }

@@ -36,7 +36,7 @@
   display: flex;
   align-items: center;
   gap: var(--dsn-space-8);
-  padding: 14px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--dsn-border);
 }
 
@@ -77,7 +77,8 @@
   font-family: inherit;
   font-size: var(--dsn-text-sm);
   font-weight: 600;
-  color: var(--dsn-purple-600);
+  /* Protótipo aprovado: "Encerrar" em tinta. */
+  color: var(--dsn-ink);
   cursor: pointer;
   transition: background var(--dsn-duration-base) var(--dsn-ease-out);
 }

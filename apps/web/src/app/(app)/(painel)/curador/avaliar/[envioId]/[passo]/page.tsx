@@ -67,6 +67,7 @@ export default async function PaginaDoPassoDaAvaliacao({
       <MolduraDaAvaliacao
         titulo={tela.item.titulo}
         artista={tela.item.artista}
+        envioId={envioId}
         passo="remuneracao"
         concluida={tela.avaliacao.concluida}
       >
@@ -84,7 +85,12 @@ export default async function PaginaDoPassoDaAvaliacao({
 
   if (bruto === 'notas') {
     return (
-      <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="notas">
+      <MolduraDaAvaliacao
+        titulo={item.titulo}
+        artista={item.artista}
+        envioId={envioId}
+        passo="notas"
+      >
         <PassoNotas
           envioId={envioId}
           titulo={item.titulo}
@@ -101,7 +107,12 @@ export default async function PaginaDoPassoDaAvaliacao({
 
   if (bruto === 'subjetiva') {
     return (
-      <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="subjetiva">
+      <MolduraDaAvaliacao
+        titulo={item.titulo}
+        artista={item.artista}
+        envioId={envioId}
+        passo="subjetiva"
+      >
         <PassoSubjetiva
           envioId={envioId}
           avaliacao={avaliacao}
@@ -115,13 +126,30 @@ export default async function PaginaDoPassoDaAvaliacao({
   }
 
   if (bruto === 'compartilhamento') {
+    // A previsão do protótipo aprovado ao lado das formas de divulgar.
+    const conta = await lerRemuneracao(envioId).catch(() => null);
+    const previa =
+      conta?.remuneracao == null
+        ? null
+        : {
+            aplicado: Math.round(conta.remuneracao.percentualAplicado),
+            piso: Math.round(conta.remuneracao.pisoPercentual),
+            teto: Math.round(conta.remuneracao.tetoPercentual),
+            classe: conta.classe.charAt(0).toUpperCase() + conta.classe.slice(1),
+          };
     return (
-      <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="compartilhamento">
+      <MolduraDaAvaliacao
+        titulo={item.titulo}
+        artista={item.artista}
+        envioId={envioId}
+        passo="compartilhamento"
+      >
         <PassoCompartilhamento
           envioId={envioId}
           avaliacao={avaliacao}
           voltarPara={`${raiz}/subjetiva`}
           acao={salvarEscolhaDeCompartilhamento}
+          previa={previa}
         />
       </MolduraDaAvaliacao>
     );
@@ -133,7 +161,12 @@ export default async function PaginaDoPassoDaAvaliacao({
   }
 
   return (
-    <MolduraDaAvaliacao titulo={item.titulo} artista={item.artista} passo="outras">
+    <MolduraDaAvaliacao
+      titulo={item.titulo}
+      artista={item.artista}
+      envioId={envioId}
+      passo="outras"
+    >
       <PassoOutras
         envioId={envioId}
         avaliacao={avaliacao}

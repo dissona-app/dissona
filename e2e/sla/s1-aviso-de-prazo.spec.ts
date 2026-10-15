@@ -9,6 +9,7 @@ import {
 } from '../apoio/banco';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
+import { cartaoDaFila } from '../apoio/avaliacao';
 
 /**
  * S1 · Aviso de prazo — RF-069
@@ -110,7 +111,7 @@ test.describe('S1 · Aviso de prazo', { tag: ['@RF-069'] }, () => {
     await entrarComo(page, PERSONA.CURADOR_SLA);
     await page.goto('/curador/fila');
 
-    await expect(page.getByRole('row').filter({ hasText: FAIXA })).toHaveCount(1);
+    await expect(cartaoDaFila(page, FAIXA)).toHaveCount(1);
 
     const envio = await envioDaFaixa(FAIXA);
     expect(envio?.situacao, 'avisar não muda o estado do envio').toBe('recebeu');

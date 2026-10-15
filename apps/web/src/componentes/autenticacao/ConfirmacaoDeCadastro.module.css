@@ -19,8 +19,8 @@
   margin: 0;
   font-size: clamp(22px, 3vh, 27px);
   line-height: var(--dsn-leading-title);
-  font-weight: var(--dsn-weight-black);
-  letter-spacing: var(--dsn-tracking-tightest);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
 }
 
 .subtitulo {

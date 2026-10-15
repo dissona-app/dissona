@@ -1,21 +1,100 @@
-/* 7.1 · Perfil do artista.
-
-   O protótipo ("Editar cadastro") põe os campos em dois painéis empilhados e
-   os pares curtos lado a lado, quebrando para uma coluna quando não cabem. */
+/* 7.1 · Editar cadastro — protótipo aprovado: um só cartão, com a foto no
+   alto, os dados à esquerda, os links à direita e o rodapé das ações. */
 
 .base {
   display: flex;
   flex-direction: column;
   gap: var(--dsn-space-6);
+  /* Protótipo aprovado: 976px, centralizado na área de conteúdo. */
+  max-width: 976px;
+  margin: 0 auto;
 }
 
-/* `auto-fit` com `minmax` em vez de duas colunas fixas: os quatro links viram
-   duas linhas de dois em telas largas e uma coluna nas estreitas, sem
-   `@media` — a pendência #24 (breakpoints) segue aberta, e uma grade que se
-   resolve sozinha não a antecipa. */
+.cartao {
+  /* Rótulo de campo do aprovado nesta tela: 11px. */
+  --dsn-rotulo-corpo: 11px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}
+
+.topo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--dsn-border);
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  padding: 20px 22px;
+}
+
+@media (max-width: 900px) {
+  .colunas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dados,
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Os gêneros do aprovado são menores e mais leves que os chips do wizard:
+   13px/500, cinza quando soltos e em tinta quando marcados. */
+.dados label:has(input[type='checkbox']) span {
+  padding: 6px 13px;
+  border-radius: 2px;
+  border-color: var(--dsn-border);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dsn-ink-500);
+}
+
+.dados label:has(input[type='checkbox']:checked) span {
+  background: #efe7f8;
+  border-color: #7f47dd;
+  color: var(--dsn-ink);
+}
+
+.overline {
+  margin: 0;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+.listaDeLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Os rótulos dos links são o nome da rede, em caixa normal, com o ícone
+   colorido antes. */
+.listaDeLinks label:has(+ .iconeDeRede),
+.listaDeLinks label {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .par {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: var(--dsn-space-4);
 }
 
@@ -24,9 +103,36 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--dsn-space-4);
+  padding: 14px 22px;
+  border-top: 1px solid var(--dsn-border);
+  border-radius: 0 0 6px 6px;
+}
+
+/* "Cancelar" é texto em tinta, sem caixa. */
+.acoes a {
+  color: var(--dsn-ink);
 }
 
 .nota {
   font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.listaDeLinks label + .iconeDeRede {
+  order: -1;
+}
+
+.listaDeLinks div:has(> .iconeDeRede) {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+}
+
+.iconeDeRede {
+  flex: none;
+}
+
+.dicaDoRotulo {
+  font-size: 12px;
   color: var(--dsn-ink-500);
 }

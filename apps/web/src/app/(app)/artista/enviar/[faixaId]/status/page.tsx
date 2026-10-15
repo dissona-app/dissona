@@ -1,10 +1,12 @@
+import Link from 'next/link';
+
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { capaDoEnvio } from '@/componentes/curador/capas';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { BarraProgresso } from '@/componentes/base/BarraProgresso';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
-import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
-import { Painel } from '@/componentes/base/Painel';
 import { prazoRestante } from '@dissona/nucleo/lib/formato';
 import { buscar } from '@/modulos/faixa/repositorio';
 import { lerEnviosDaFaixa } from '@/modulos/selecao/consultas';
@@ -18,14 +20,29 @@ export const metadata: Metadata = {
 };
 
 /** Quanto da jornada `Recebeu → Ouviu → Avaliando → Pronto` já andou. */
-const AVANCO: Readonly<Record<string, number>> = {
-  recebeu: 25,
-  ouviu: 50,
-  avaliando: 75,
-  pronto: 100,
-  devolvido: 100,
-  cancelado: 100,
-};
+/**
+ * As quatro etapas do andamento — `enEtapasMeta` do protótipo aprovado: cada
+ * barra acende na cor da sua etapa até a atual.
+ */
+const ETAPAS = [
+  { chave: 'recebeu', cor: '#B780E7', legenda: 'Curador recebeu sua música' },
+  { chave: 'ouviu', cor: '#7F47DD', legenda: 'O curador ouviu e está avaliando' },
+  { chave: 'avaliando', cor: '#140D1A', legenda: 'Falta pouco, estamos ansiosos junto com você!' },
+  { chave: 'pronto', cor: '#2FA565', legenda: 'Parabéns! Seu feedback está prontinho' },
+] as const;
+
+function indiceDaEtapa(situacao: string): number {
+  const i = ETAPAS.findIndex((etapa) => etapa.chave === situacao);
+  return i === -1 ? ETAPAS.length - 1 : i;
+}
+
+function iniciais(nome: string): string {
+  return nome
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((parte) => parte[0]?.toUpperCase() ?? '')
+    .join('');
+}
 
 /**
  * 3.3 · Status de envio — **versão mínima** da R2.
@@ -49,10 +66,38 @@ export default async function PaginaDoStatus({
 
   return (
     <div className={estilos.base}>
-      <Painel titulo={TEXTOS.titulo} sublegenda={faixa.titulo}>
-        {envios.length === 0 ? (
-          <EstadoVazio titulo={TEXTOS.vazioTitulo} descricao={TEXTOS.vazioDescricao} />
-        ) : (
+      {/* "Minhas faixas" é de outra release; a lista das faixas fica no Perfil. */}
+      <Link href={ROTA.ARTISTA_PERFIL} className={estilos.voltar}>
+        <span aria-hidden="true">‹</span> {TEXTOS.voltar}
+      </Link>
+
+      <div className={estilos.faixa}>
+        <span
+          className={estilos.capa}
+          style={{ backgroundImage: `url('${capaDoEnvio(faixa.id)}')` }}
+          aria-hidden="true"
+        />
+        <span className={estilos.faixaTextos}>
+          <span className={estilos.faixaTitulo}>{faixa.titulo}</span>
+          <span className={estilos.faixaInfo}>{faixa.genero ?? TEXTOS.titulo}</span>
+          <span className={estilos.onda} aria-hidden="true">
+            {Array.from({ length: 28 }, (_, i) => (
+              <span
+                key={i}
+                style={{ height: `${30 + Math.round(70 * Math.abs(Math.sin(i * 0.7)))}%` }}
+              />
+            ))}
+          </span>
+        </span>
+        <BotaoLink href={ROTA.ARTISTA_ENVIAR} variante="tinta" tamanho="sm">
+          {TEXTOS.enviarOutra}
+        </BotaoLink>
+      </div>
+
+      {envios.length === 0 ? (
+        <EstadoVazio titulo={TEXTOS.vazioTitulo} descricao={TEXTOS.vazioDescricao} />
+      ) : (
+        <div className={estilos.moldura}>
           <table className={estilos.tabela}>
             <caption className="dsn-apenas-leitor">{TEXTOS.titulo}</caption>
             <thead>
@@ -66,40 +111,83 @@ export default async function PaginaDoStatus({
             <tbody>
               {envios.map((envio) => {
                 const prazo = prazoRestante(envio.prazoEm, agora);
+                const atual = indiceDaEtapa(envio.situacao);
+                const pronto = envio.situacao === 'pronto';
                 return (
                   <tr key={envio.id}>
                     <th scope="row" className={estilos.curador}>
-                      {envio.curador}
+                      <span className={estilos.avatar} aria-hidden="true">
+                        {iniciais(envio.curador)}
+                      </span>
+                      <span className={estilos.curadorTextos}>
+                        <span className={estilos.curadorNome}>{envio.curador}</span>
+                        {envio.classe === null ? null : (
+                          <span className={estilos.curadorClasse}>
+                            {envio.classe.charAt(0).toUpperCase() + envio.classe.slice(1)}
+                          </span>
+                        )}
+                      </span>
                     </th>
-                    <td className={estilos.andamento}>
-                      <BarraProgresso
-                        percentual={AVANCO[envio.situacao] ?? 0}
-                        rotulo={`${envio.curador}: ${TEXTOS.etapas[envio.situacao]}`}
-                        rotuloOculto
-                        tom={envio.situacao === 'pronto' ? 'sucesso' : 'marca'}
-                      />
+                    <td>
+                      <span className={estilos.barras}>
+                        {ETAPAS.map((etapa, i) => (
+                          <span
+                            key={etapa.chave}
+                            className={estilos.barra}
+                            style={{ background: i <= atual ? etapa.cor : '#EDE8F2' }}
+                          />
+                        ))}
+                      </span>
+                      <span className={estilos.legendas}>
+                        {ETAPAS.map((etapa, i) => (
+                          <span
+                            key={etapa.chave}
+                            className={
+                              i === atual
+                                ? estilos.legendaAtual
+                                : i < atual
+                                  ? estilos.legendaFeita
+                                  : estilos.legenda
+                            }
+                          >
+                            {etapa.legenda}
+                          </span>
+                        ))}
+                      </span>
+                    </td>
+                    <td
+                      className={[
+                        estilos.prazo,
+                        pronto ? estilos.prazoEntregue : undefined,
+                        !pronto && !prazo.vencido && prazo.dias === 0
+                          ? estilos.prazoCurto
+                          : undefined,
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                    >
+                      {pronto
+                        ? 'Entregue'
+                        : prazo.vencido
+                          ? '—'
+                          : prazo.dias > 0
+                            ? `${prazo.dias}d ${prazo.horas}h`
+                            : `${prazo.horas}h`}
                     </td>
                     <td>
-                      {prazo.vencido
-                        ? '—'
-                        : prazo.dias > 0
-                          ? `${prazo.dias}d ${prazo.horas}h`
-                          : `${prazo.horas}h`}
-                    </td>
-                    <td>
-                      <Etiqueta tom={envio.situacao === 'pronto' ? 'sucesso' : 'neutro'}>
+                      <span className={pronto ? estilos.etapaPronta : estilos.etapa}>
                         {TEXTOS.etapas[envio.situacao]}
-                      </Etiqueta>
+                      </span>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-        )}
+        </div>
+      )}
 
-        <p className={estilos.nota}>{TEXTOS.nota}</p>
-      </Painel>
+      <p className={estilos.nota}>{TEXTOS.nota}</p>
     </div>
   );
 }

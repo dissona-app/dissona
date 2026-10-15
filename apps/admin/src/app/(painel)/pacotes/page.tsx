@@ -68,7 +68,7 @@ export default async function Pagina({
       linhas={linhas}
       confirmacaoInicial={confirmacaoDeSalvamento(salvo)}
       resumo={ADMIN_PACOTES.resumo(ativos, total)}
-      baseDaClave={`Base de 1 Clave por ${formatarDinheiro(valorDaClave)}, com desconto progressivo por volume.`}
+      baseDaClave={`1 Clave = ${formatarDinheiro(valorDaClave).replace(/,00$/, '')}`}
       podeEscrever={podeEscrever}
     />
   );

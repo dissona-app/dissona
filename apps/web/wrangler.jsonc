@@ -24,6 +24,13 @@
   // próprio (e se ele cair), sem depender do DNS.
   "workers_dev": true,
   "preview_urls": true,
+  // Builds de branch (Workers Builds) rodam `wrangler preview`, que exige este
+  // bloco. No preview o painel não está em subdomínio próprio, e a URL é a
+  // `*.workers.dev` da versão — por isso a flag vai desligada.
+  "previews": {
+    "vars": { "ADMIN_EM_SUBDOMINIO": "false" },
+    "placement": { "mode": "smart" },
+  },
   // Domínio próprio. Tem de estar aqui, e não só no painel: o wrangler trata
   // este arquivo como a fonte da verdade e remove no deploy o domínio que só
   // existe no painel. Exige a zona dissona.com.br ativa na conta.

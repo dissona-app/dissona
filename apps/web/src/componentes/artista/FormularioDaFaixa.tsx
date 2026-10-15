@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useActionState, useRef, useState, useTransition } from 'react';
+import type { FormEvent } from 'react';
+import { startTransition, useActionState, useEffect, useRef, useState, useTransition } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -51,8 +52,16 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   const [falhaDoUpload, setFalhaDoUpload] = useState<string | null>(null);
 
   const [titulo, setTitulo] = useState(faixa?.titulo ?? '');
-  const [urlSpotify, setUrlSpotify] = useState(faixa?.urlSpotify ?? '');
-  const [urlYoutube, setUrlYoutube] = useState(faixa?.urlYoutube ?? '');
+  // Protótipo aprovado: um campo só para o link. O provedor sai do endereço,
+  // e os dois campos que a ação lê (`urlSpotify`, `urlYoutube`) viajam
+  // escondidos.
+  const [link, setLink] = useState(faixa?.urlSpotify ?? faixa?.urlYoutube ?? '');
+  const ehYoutube = /youtu\.?be/i.test(link);
+  const urlSpotify = ehYoutube ? '' : link;
+  const urlYoutube = ehYoutube ? link : '';
+  // Os detalhes aparecem quando há o que conferir — como no protótipo, que
+  // abre o passo só com o link e o arquivo.
+  const [corrigindo, setCorrigindo] = useState(false);
   const [detectado, setDetectado] = useState<MetadadosDetectados | null>(
     faixa?.metadadosDetectados ?? null,
   );
@@ -66,6 +75,14 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   // `FormData` do envio. Sem isso, "Arraste o arquivo aqui" era uma promessa
   // que a tela não cumpria.
   const entradaDeAudio = useRef<HTMLInputElement>(null);
+
+  // Arquivo escolhido antes da hidratação: o `onChange` ainda não existia e o
+  // React não soube da escolha — os campos de detalhe ficariam escondidos com
+  // o arquivo já no input. Acontece em conexão lenta, e acontecia nos testes.
+  useEffect(() => {
+    const jaEscolhido = entradaDeAudio.current?.files?.[0];
+    if (jaEscolhido !== undefined) setArquivoDeAudio(jaEscolhido);
+  }, []);
   const [arrastando, setArrastando] = useState(false);
 
   function aoSoltarAudio(evento: React.DragEvent<HTMLLabelElement>) {
@@ -129,9 +146,14 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   const naoEncontrada = falhaDaDeteccao !== null && erroDoLink === undefined;
 
   const detectarFaixa = () => {
-    const link = linkLido === 'urlSpotify' ? urlSpotify : urlYoutube;
+    // Sem link, o botão leva ao campo — no protótipo ele nunca fica cinza.
+    if (link.trim() === '') {
+      formulario.current?.querySelector<HTMLInputElement>('input[inputmode="url"]')?.focus();
+      return;
+    }
+    const lido = linkLido === 'urlSpotify' ? urlSpotify : urlYoutube;
     iniciarDeteccao(async () => {
-      const resposta = await detectar(link);
+      const resposta = await detectar(lido);
       if (resposta.ok) {
         setFalhaDaDeteccao(null);
         setDetectado(resposta.dados);
@@ -144,14 +166,18 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
   };
 
   // Trocar o link invalida o que foi detectado com o anterior.
-  const mudarLink = (mudar: (valor: string) => void, valor: string) => {
-    mudar(valor);
+  const mudarLink = (valor: string) => {
+    setLink(valor);
     setDetectado(null);
     setFalhaDaDeteccao(null);
   };
 
   const focarTitulo = () => {
-    formulario.current?.querySelector<HTMLInputElement>('input[name="titulo"]')?.focus();
+    setCorrigindo(true);
+    // O painel pode estar fechado: espera o React abri-lo antes do foco.
+    window.setTimeout(() => {
+      formulario.current?.querySelector<HTMLInputElement>('input[name="titulo"]')?.focus();
+    }, 0);
   };
 
   const aceitos = limites.formatos.map((f) => `.${f}`).join(',');
@@ -174,10 +200,30 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
    * e `salvarFaixa` valida pelo `File`. Os dois caminhos existem, e o de baixo
    * é o que garante que a tela funcione sem hidratação.
    */
+  /**
+   * O envio passa pelo `onSubmit`, e não pelo `<form action>`: o React 19
+   * reseta o formulário depois de toda action, e um erro (título vazio,
+   * arquivo recusado) apagava estilo e data de lançamento. Ver
+   * `useAcaoDoFormulario`. O `action` fica para o envio sem JavaScript.
+   */
+  const aoEnviar = (evento: FormEvent<HTMLFormElement>) => {
+    if (evento.defaultPrevented) return;
+    evento.preventDefault();
+    const botao = (evento.nativeEvent as SubmitEvent).submitter;
+    const dados = new FormData(evento.currentTarget, botao ?? undefined);
+    startTransition(() => enviarComUpload(dados));
+  };
+
   const enviarComUpload = async (dados: FormData) => {
     setFalhaDoUpload(null);
+    // Sem link, sem arquivo e sem faixa gravada não há o que enviar: o passo
+    // fica onde está e diz o que falta — o arquivo, que é sempre exigido.
+    if (arquivoDeAudio === null && faixa === null && detectado === null && link.trim() === '') {
+      setFalhaDoUpload(TEXTOS.erroArquivoAusente);
+      return;
+    }
     if (arquivoDeAudio === null && arquivoDaCapa === null) {
-      enviar(dados);
+      startTransition(() => enviar(dados));
       return;
     }
 
@@ -189,7 +235,7 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
       // Sem sessão legível daqui, deixa a ação recusar: ela tem a resposta
       // certa para isso, e adivinhá-la no cliente daria duas versões da regra.
       if (usuarioId === undefined) {
-        enviar(dados);
+        startTransition(() => enviar(dados));
         return;
       }
 
@@ -238,7 +284,7 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
       setSubindo(false);
     }
 
-    enviar(dados);
+    startTransition(() => enviar(dados));
   };
 
   /** O Storage recusa por tamanho e por MIME — e as mensagens já existem. */
@@ -253,8 +299,22 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
     return TEXTOS.erroArquivoAusente;
   }
 
+  const mostrarDetalhes =
+    corrigindo ||
+    detectado !== null ||
+    naoEncontrada ||
+    arquivoDeAudio !== null ||
+    faixa !== null ||
+    falha !== null;
+
   return (
-    <form ref={formulario} action={enviarComUpload} className={estilos.base} noValidate>
+    <form
+      ref={formulario}
+      action={enviarComUpload}
+      onSubmit={aoEnviar}
+      className={estilos.base}
+      noValidate
+    >
       {faixa !== null ? <input type="hidden" name="faixaId" value={faixa.id} /> : null}
       <input
         type="hidden"
@@ -264,81 +324,108 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
 
       {erroGeral === undefined ? null : <Aviso tom="erro">{erroGeral}</Aviso>}
 
-      <Painel titulo={TEXTOS.enviarArquivo} sublegenda={TEXTOS.enviarArquivoApoio}>
-        <label
-          className={[estilos.dropzone, arrastando ? estilos.dropzoneAtiva : undefined]
-            .filter(Boolean)
-            .join(' ')}
-          onDragOver={(evento) => {
-            evento.preventDefault();
-            setArrastando(true);
-          }}
-          onDragLeave={() => setArrastando(false)}
-          onDrop={aoSoltarAudio}
+      {/* Protótipo aprovado: link à esquerda, arquivo à direita, lado a lado. */}
+      <div className={estilos.duasColunas}>
+        <Painel
+          titulo={TEXTOS.colarLink}
+          sublegenda={TEXTOS.colarLinkApoio}
+          nivel={3}
+          estilo="rotulo"
         >
-          <input
-            ref={entradaDeAudio}
-            type="file"
-            name="audio"
-            accept={aceitos}
-            className={estilos.entradaDeArquivo}
-            onChange={(e) => setArquivoDeAudio(e.target.files?.[0] ?? null)}
-          />
-          <span className={estilos.dropzoneTitulo}>
-            {arrastando
-              ? TEXTOS.dropzoneSoltar
-              : arquivoDeAudio !== null
-                ? TEXTOS.arquivoEscolhido(arquivoDeAudio.name)
-                : faixa?.arquivoCaminho != null
-                  ? TEXTOS.arquivoEscolhido(faixa.arquivoCaminho.split('/').pop() ?? '')
-                  : TEXTOS.dropzoneVazia}
-          </span>
-          <span className={estilos.dropzoneApoio}>{TEXTOS.dropzone(limites.tamanhoMaxMb)}</span>
-        </label>
+          <div className={estilos.linkUnico}>
+            <Campo
+              rotulo={TEXTOS.rotuloLink}
+              value={link}
+              placeholder={TEXTOS.placeholderLink}
+              onChange={(e) => mudarLink(e.target.value)}
+              erro={
+                erroDe('urlSpotify') ??
+                erroDe('urlYoutube') ??
+                (falhaDaDeteccao !== null ? erroDoLink : undefined)
+              }
+              inputMode="url"
+            />
+            <input type="hidden" name="urlSpotify" value={urlSpotify} />
+            <input type="hidden" name="urlYoutube" value={urlYoutube} />
+          </div>
 
-        {(falhaDoUpload ?? erroDe('audio')) !== undefined ? (
-          <Aviso tom="erro">{falhaDoUpload ?? erroDe('audio')}</Aviso>
-        ) : null}
+          <OndaDecorativa className={estilos.onda} barras={64} />
 
-        <Aviso tom="info" estatico>
-          {TEXTOS.arquivoSempreNecessario}
-        </Aviso>
-      </Painel>
+          <div className={estilos.acoes}>
+            <Botao
+              type="button"
+              variante="tinta"
+              tamanho="sm"
+              carregando={detectando}
+              onClick={detectarFaixa}
+            >
+              {detectando ? TEXTOS.detectando : TEXTOS.detectar}
+            </Botao>
+          </div>
 
-      <Painel titulo={TEXTOS.colarLink} sublegenda={TEXTOS.colarLinkApoio} nivel={3}>
-        <div className={estilos.par}>
-          <Campo
-            name="urlSpotify"
-            rotulo={TEXTOS.rotuloSpotify}
-            value={urlSpotify}
-            onChange={(e) => mudarLink(setUrlSpotify, e.target.value)}
-            erro={erroDe('urlSpotify') ?? (linkLido === 'urlSpotify' ? erroDoLink : undefined)}
-            inputMode="url"
-          />
-          <Campo
-            name="urlYoutube"
-            rotulo={TEXTOS.rotuloYoutube}
-            value={urlYoutube}
-            onChange={(e) => mudarLink(setUrlYoutube, e.target.value)}
-            erro={erroDe('urlYoutube') ?? (linkLido === 'urlYoutube' ? erroDoLink : undefined)}
-            inputMode="url"
-          />
-        </div>
-
-        <div className={estilos.acoes}>
-          <Botao
-            type="button"
-            variante="secundario"
-            carregando={detectando}
-            disabled={urlSpotify.trim() === '' && urlYoutube.trim() === ''}
-            onClick={detectarFaixa}
+          {naoEncontrada ? <Aviso tom="alerta">{TEXTOS.naoDetectada}</Aviso> : null}
+        </Painel>
+        <Painel
+          titulo={TEXTOS.enviarArquivo}
+          sublegenda={TEXTOS.enviarArquivoApoio}
+          nivel={3}
+          estilo="rotulo"
+        >
+          <label
+            className={[estilos.dropzone, arrastando ? estilos.dropzoneAtiva : undefined]
+              .filter(Boolean)
+              .join(' ')}
+            onDragOver={(evento) => {
+              evento.preventDefault();
+              setArrastando(true);
+            }}
+            onDragLeave={() => setArrastando(false)}
+            onDrop={aoSoltarAudio}
           >
-            {detectando ? TEXTOS.detectando : TEXTOS.detectar}
-          </Botao>
-        </div>
+            <input
+              ref={entradaDeAudio}
+              type="file"
+              name="audio"
+              accept={aceitos}
+              className={estilos.entradaDeArquivo}
+              onChange={(e) => setArquivoDeAudio(e.target.files?.[0] ?? null)}
+            />
+            <OndaDecorativa className={estilos.ondaDoArquivo} barras={48} />
+            <span className={estilos.dropzoneTitulo}>
+              {arrastando
+                ? TEXTOS.dropzoneSoltar
+                : arquivoDeAudio !== null
+                  ? TEXTOS.arquivoEscolhido(arquivoDeAudio.name)
+                  : faixa?.arquivoCaminho != null
+                    ? TEXTOS.arquivoEscolhido(faixa.arquivoCaminho.split('/').pop() ?? '')
+                    : TEXTOS.dropzoneVazia}
+            </span>
+            <span className={estilos.dropzoneApoio}>{TEXTOS.dropzone(limites.tamanhoMaxMb)}</span>
+          </label>
 
-        {detectado !== null ? (
-          <div className={estilos.detectada} aria-live="polite">
+          {(falhaDoUpload ?? erroDe('audio')) !== undefined ? (
+            <Aviso tom="erro">{falhaDoUpload ?? erroDe('audio')}</Aviso>
+          ) : null}
+        </Painel>
+      </div>
+
+      {/* Protótipo aprovado: a faixa encontrada ganha a largura toda — capa
+          com o vinil saindo por trás, origem, título em Anton e o artista. */}
+      {detectado !== null ? (
+        <div className={estilos.detectada} aria-live="polite">
+          <span
+            className={estilos.detectadaFundo}
+            style={
+              detectado.capaUrl === null
+                ? undefined
+                : { backgroundImage: `url('${detectado.capaUrl}')` }
+            }
+            aria-hidden="true"
+          />
+          <div className={estilos.detectadaArte}>
+            <span className={estilos.detectadaVinil} aria-hidden="true">
+              <span className={estilos.detectadaFuro} />
+            </span>
             {detectado.capaUrl !== null ? (
               <Image
                 // A capa vem do CDN do provedor; `unoptimized` evita abrir
@@ -346,86 +433,121 @@ export function FormularioDaFaixa({ faixa, limites, acao, detectar }: PropsFormu
                 unoptimized
                 src={detectado.capaUrl}
                 alt={TEXTOS.capaDetectada(detectado.titulo)}
-                width={64}
-                height={64}
+                width={160}
+                height={160}
                 className={estilos.capaDetectada}
               />
-            ) : null}
-            <span className={estilos.detectadaTexto}>
-              <span className={estilos.detectadaRotulo}>{TEXTOS.faixaEncontrada}</span>
-              <span className={estilos.detectadaTitulo}>{detectado.titulo}</span>
-              {detectado.artista !== null ? (
-                <span className={estilos.detectadaArtista}>{detectado.artista}</span>
-              ) : null}
+            ) : (
+              <span className={estilos.capaDetectada} aria-hidden="true" />
+            )}
+          </div>
+          <span className={estilos.detectadaTexto}>
+            <span className={estilos.detectadaRotulo}>
+              <span aria-hidden="true">✓ </span>
+              {TEXTOS.faixaEncontradaNo(detectado.provedor === 'spotify' ? 'Spotify' : 'YouTube')}
             </span>
-            <Botao type="button" variante="neutro" tamanho="sm" onClick={focarTitulo}>
+            <span className={estilos.detectadaTitulo}>{detectado.titulo}</span>
+            {detectado.artista !== null ? (
+              <span className={estilos.detectadaArtista}>{detectado.artista}</span>
+            ) : null}
+          </span>
+          <div className={estilos.detectadaLado}>
+            <span>{TEXTOS.dadosConferidos}</span>
+            <Botao type="button" variante="secundario" tamanho="sm" onClick={focarTitulo}>
               {TEXTOS.corrigirDados}
             </Botao>
           </div>
-        ) : null}
-
-        {naoEncontrada ? <Aviso tom="alerta">{TEXTOS.naoDetectada}</Aviso> : null}
-      </Painel>
-
-      <Painel titulo={TEXTOS.detalhesTitulo} nivel={3}>
-        <Campo
-          name="titulo"
-          rotulo={TEXTOS.rotuloTitulo}
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-          erro={erroDe('titulo')}
-          required
-        />
-
-        {/* A capa é opcional — `faixa.capa_caminho` é anulável, e o protótipo
-            não a exige. Bucket `capas`, que é público. */}
-        <label className={estilos.capa}>
-          <input
-            type="file"
-            name="capa"
-            accept="image/jpeg,image/png"
-            className={estilos.entradaDeArquivo}
-            onChange={(e) => setArquivoDaCapa(e.target.files?.[0] ?? null)}
-          />
-          <span className={estilos.capaTitulo}>
-            {arquivoDaCapa?.name ??
-              (faixa?.capaCaminho != null ? TEXTOS.capaTrocar : TEXTOS.capaEnviar)}
-          </span>
-        </label>
-
-        <div className={estilos.par}>
-          <Campo
-            name="estilo"
-            rotulo={TEXTOS.rotuloEstilo}
-            defaultValue={faixa?.estilo ?? ''}
-            erro={erroDe('estilo')}
-          />
-          <Campo
-            name="dataLancamento"
-            type="date"
-            rotulo={TEXTOS.rotuloData(lancada === 'sim' ? true : lancada === 'nao' ? false : null)}
-            defaultValue={faixa?.dataLancamento ?? ''}
-            erro={erroDe('dataLancamento')}
-          />
         </div>
+      ) : null}
 
-        <Grupo
-          rotulo={TEXTOS.perguntaLancada}
-          opcoes={[
-            { valor: 'sim', rotulo: TEXTOS.lancadaSim },
-            { valor: 'nao', rotulo: TEXTOS.lancadaNao },
-          ]}
-          valor={lancada === '' ? 'nao' : lancada}
-          onMudar={(valor) => setLancada(valor as 'sim' | 'nao')}
-        />
-        <input type="hidden" name="lancada" value={lancada} />
-      </Painel>
+      <div hidden={!mostrarDetalhes} className={estilos.detalhes}>
+        <Painel titulo={TEXTOS.detalhesTitulo} nivel={3}>
+          <Campo
+            name="titulo"
+            rotulo={TEXTOS.rotuloTitulo}
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            erro={erroDe('titulo')}
+            required
+          />
+
+          {/* A capa é opcional — `faixa.capa_caminho` é anulável, e o protótipo
+            não a exige. Bucket `capas`, que é público. */}
+          <label className={estilos.capa}>
+            <input
+              type="file"
+              name="capa"
+              accept="image/jpeg,image/png"
+              className={estilos.entradaDeArquivo}
+              onChange={(e) => setArquivoDaCapa(e.target.files?.[0] ?? null)}
+            />
+            <span className={estilos.capaTitulo}>
+              {arquivoDaCapa?.name ??
+                (faixa?.capaCaminho != null ? TEXTOS.capaTrocar : TEXTOS.capaEnviar)}
+            </span>
+          </label>
+
+          <div className={estilos.par}>
+            <Campo
+              name="estilo"
+              rotulo={TEXTOS.rotuloEstilo}
+              defaultValue={faixa?.estilo ?? ''}
+              erro={erroDe('estilo')}
+            />
+            <Campo
+              name="dataLancamento"
+              type="date"
+              rotulo={TEXTOS.rotuloData(
+                lancada === 'sim' ? true : lancada === 'nao' ? false : null,
+              )}
+              defaultValue={faixa?.dataLancamento ?? ''}
+              erro={erroDe('dataLancamento')}
+            />
+          </div>
+
+          <Grupo
+            rotulo={TEXTOS.perguntaLancada}
+            opcoes={[
+              { valor: 'sim', rotulo: TEXTOS.lancadaSim },
+              { valor: 'nao', rotulo: TEXTOS.lancadaNao },
+            ]}
+            valor={lancada === '' ? 'nao' : lancada}
+            onMudar={(valor) => setLancada(valor as 'sim' | 'nao')}
+          />
+          <input type="hidden" name="lancada" value={lancada} />
+        </Painel>
+      </div>
 
       <div className={estilos.acoes}>
-        <Botao type="submit" carregando={pendente || subindo}>
+        <Botao type="submit" tamanho="denso" carregando={pendente || subindo}>
           {TEXTOS.continuar}
         </Botao>
+        <span className={estilos.notaDasAcoes}>
+          {detectado !== null ? TEXTOS.dadosConferidos : TEXTOS.notaInicial}
+        </span>
       </div>
     </form>
+  );
+}
+
+/**
+ * A onda de barras finas do protótipo aprovado — enfeite sob o campo do link e
+ * dentro da área do arquivo. Alturas fixas, para o servidor e o cliente
+ * desenharem a mesma coisa.
+ */
+function OndaDecorativa({
+  barras,
+  className,
+}: {
+  readonly barras: number;
+  readonly className?: string;
+}) {
+  return (
+    <span className={className} aria-hidden="true">
+      {Array.from({ length: barras }, (_, i) => {
+        const altura = 30 + Math.round(70 * Math.abs(Math.sin(i * 0.55) * Math.cos(i * 0.21)));
+        return <span key={i} style={{ height: `${altura}%` }} />;
+      })}
+    </span>
   );
 }

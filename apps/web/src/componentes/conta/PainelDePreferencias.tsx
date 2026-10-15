@@ -3,9 +3,6 @@
 import { useState, useTransition } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
-import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
-import { Grupo } from '@/componentes/base/Grupo';
-import { Painel } from '@/componentes/base/Painel';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import type { Papel } from '@dissona/nucleo/lib/papeis';
 import type { Canal, Idioma, PreferenciaDeEvento } from '@/modulos/preferencias/tipos';
@@ -48,26 +45,51 @@ export function PainelDePreferencias({
   const [idiomaLocal, setIdiomaLocal] = useState<Idioma>(idioma);
   const [erro, setErro] = useState<string | null>(null);
 
-  function alternar(evento: PreferenciaDeEvento, canal: Canal, ligado: boolean) {
+  // As categorias do protótipo, com os eventos que existem para esta conta.
+  const categorias = TEXTOS.categorias[ambiente].map((categoria) => {
+    const doGrupo = locais.filter((evento) =>
+      (categoria.eventos as readonly string[]).includes(evento.evento),
+    );
+    const critica = doGrupo.length > 0 && doGrupo.every((evento) => evento.critico);
+    const ligada = doGrupo.some(
+      (evento) => (evento.temInApp && evento.inApp) || (evento.temEmail && evento.email),
+    );
+    return { ...categoria, doGrupo, critica, ligada };
+  });
+
+  function alternarCategoria(doGrupo: readonly PreferenciaDeEvento[], ligado: boolean) {
     setErro(null);
     const anteriores = locais;
+    const alvos = doGrupo.filter((evento) => !evento.critico);
 
     setLocais((atuais) =>
       atuais.map((cada) =>
-        cada.evento === evento.evento
-          ? { ...cada, [canal === 'in_app' ? 'inApp' : 'email']: ligado }
+        alvos.some((alvo) => alvo.evento === cada.evento)
+          ? {
+              ...cada,
+              inApp: cada.temInApp ? ligado : cada.inApp,
+              email: cada.temEmail ? ligado : cada.email,
+            }
           : cada,
       ),
     );
 
     iniciar(async () => {
-      const resultado = await acaoDeCanal({ evento: evento.evento, canal, ligado });
-      if (!resultado.ok) {
+      const chamadas: Promise<ResultadoDeAcao>[] = [];
+      for (const evento of alvos) {
+        const canais: Canal[] = [];
+        if (evento.temInApp) canais.push('in_app');
+        if (evento.temEmail) canais.push('email');
+        for (const canal of canais) {
+          chamadas.push(acaoDeCanal({ evento: evento.evento, canal, ligado }));
+        }
+      }
+      const resultados = await Promise.all(chamadas);
+      const falha = resultados.find((resultado) => !resultado.ok);
+      if (falha !== undefined && !falha.ok) {
         setLocais(anteriores);
         setErro(
-          resultado.detalhes?.['motivo'] === 'evento_critico'
-            ? TEXTOS.erroCritico
-            : TEXTOS.erroSalvar,
+          falha.detalhes?.['motivo'] === 'evento_critico' ? TEXTOS.erroCritico : TEXTOS.erroSalvar,
         );
       }
     });
@@ -91,74 +113,76 @@ export function PainelDePreferencias({
     <div className={estilos.base}>
       {erro !== null ? <Aviso tom="erro">{erro}</Aviso> : null}
 
-      <Painel
-        titulo={TEXTOS.notificacoesTitulo}
-        sublegenda={TEXTOS.criticoNota}
-        acao={<span className={estilos.auto}>{TEXTOS.salvoAutomaticamente}</span>}
-      >
-        <table className={estilos.tabela}>
-          <caption className="dsn-apenas-leitor">{TEXTOS.notificacoesTitulo}</caption>
-          <thead>
-            <tr>
-              <th scope="col">{TEXTOS.colunaEvento}</th>
-              <th scope="col" className={estilos.canal}>
-                {TEXTOS.colunaInApp}
-              </th>
-              <th scope="col" className={estilos.canal}>
-                {TEXTOS.colunaEmail}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {locais.map((evento) => (
-              <tr key={evento.evento}>
-                <th scope="row" className={estilos.evento}>
-                  <span>{evento.titulo}</span>
-                  {evento.critico ? <Etiqueta tom="info">{TEXTOS.critico}</Etiqueta> : null}
-                </th>
+      {/* Protótipo aprovado: um cartão só — as categorias com interruptor e,
+          no pé, o idioma da interface. */}
+      <section className={estilos.cartao} aria-labelledby="titulo-notificacoes">
+        <div className={estilos.cabecalho}>
+          <h2 id="titulo-notificacoes" className={estilos.overline}>
+            {TEXTOS.notificacoesTitulo}
+          </h2>
+          <span className={estilos.auto}>{TEXTOS.salvoAutomaticamente}</span>
+        </div>
 
-                <td className={estilos.canal}>
-                  {evento.temInApp ? (
-                    <input
-                      type="checkbox"
-                      checked={evento.inApp}
-                      disabled={evento.critico}
-                      aria-label={`${TEXTOS.colunaInApp} · ${evento.titulo}`}
-                      onChange={(e) => alternar(evento, 'in_app', e.target.checked)}
-                    />
+        <ul className={estilos.categorias}>
+          {categorias.map((categoria, indice) => {
+            const semEvento = categoria.doGrupo.length === 0;
+            const travada = categoria.critica || semEvento;
+            const id = `categoria-de-aviso-${indice}`;
+            return (
+              <li key={categoria.titulo} className={estilos.categoria}>
+                <span className={estilos.textos}>
+                  <span className={estilos.titulo} id={id}>
+                    {categoria.titulo}
+                  </span>
+                  <span className={estilos.texto}>{categoria.texto}</span>
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  className={estilos.interruptor}
+                  aria-checked={categoria.critica ? true : categoria.ligada}
+                  aria-labelledby={id}
+                  aria-disabled={travada || undefined}
+                  title={
+                    categoria.critica
+                      ? `${TEXTOS.critico}. ${TEXTOS.criticoNota}`
+                      : semEvento
+                        ? TEXTOS.novidadesPendente
+                        : undefined
+                  }
+                  onClick={() => {
+                    if (travada) return;
+                    alternarCategoria(categoria.doGrupo, !categoria.ligada);
+                  }}
+                >
+                  <span className={estilos.bolinha} />
+                  {categoria.critica ? (
+                    <span className="dsn-apenas-leitor">{` — ${TEXTOS.critico}`}</span>
                   ) : null}
-                </td>
+                </button>
+              </li>
+            );
+          })}
 
-                <td className={estilos.canal}>
-                  {evento.temEmail ? (
-                    <input
-                      type="checkbox"
-                      checked={evento.email}
-                      disabled={evento.critico}
-                      aria-label={`${TEXTOS.colunaEmail} · ${evento.titulo}`}
-                      onChange={(e) => alternar(evento, 'email', e.target.checked)}
-                    />
-                  ) : null}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Painel>
-
-      <Painel
-        titulo={TEXTOS.idiomaTitulo}
-        sublegenda={ambiente === 'artista' ? TEXTOS.idiomaNotaArtista : TEXTOS.idiomaNotaCurador}
-        nivel={3}
-      >
-        <Grupo
-          rotulo={TEXTOS.idiomaTitulo}
-          rotuloOculto
-          opcoes={IDIOMAS.map((cada) => ({ valor: cada, rotulo: TEXTOS.idiomas[cada] }))}
-          valor={idiomaLocal}
-          onMudar={trocarIdioma}
-        />
-      </Painel>
+          <li className={estilos.categoria}>
+            <label className={estilos.titulo} htmlFor="idioma-da-interface">
+              {TEXTOS.idiomaTitulo}
+            </label>
+            <select
+              id="idioma-da-interface"
+              className={estilos.selecao}
+              value={idiomaLocal}
+              onChange={(evento) => trocarIdioma(evento.target.value as Idioma)}
+            >
+              {IDIOMAS.map((cada) => (
+                <option key={cada} value={cada}>
+                  {TEXTOS.idiomas[cada]}
+                </option>
+              ))}
+            </select>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

@@ -19,7 +19,11 @@ export type VarianteBotao =
    * Vermelho com contorno. É o que **abre** a confirmação ("Excluir conta"):
    * diz que a consequência é grave sem ter o peso de um primário.
    */
-  | 'perigoContorno';
+  | 'perigoContorno'
+  /** Tinta sólida — "Detectar faixa" do envio, no protótipo aprovado. */
+  | 'tinta'
+  /** Roxo sólido — "Avançar" da avaliação, no protótipo aprovado. */
+  | 'roxo';
 export type TamanhoBotao = 'md' | 'denso' | 'sm';
 
 export type PropsBotao = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & {
@@ -44,6 +48,8 @@ const CLASSE_VARIANTE: Record<VarianteBotao, string> = {
   destrutivo: estilos.destrutivo ?? '',
   perigo: estilos.perigo ?? '',
   perigoContorno: estilos.perigoContorno ?? '',
+  tinta: estilos.tinta ?? '',
+  roxo: estilos.roxo ?? '',
 };
 
 /** Variantes sem caixa não recebem padding de tamanho. */

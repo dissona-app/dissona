@@ -33,9 +33,11 @@
 
 .titulo {
   margin: 0;
-  font-size: var(--dsn-text-base);
-  font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-snug);
+  font-family: var(--dsn-font-display);
+  font-size: 18px;
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
+  text-transform: uppercase;
   color: var(--dsn-ink);
 }
 
@@ -53,4 +55,25 @@
   display: flex;
   flex-direction: column;
   gap: var(--dsn-space-10);
+}
+
+/* `estilo="rotulo"` — protótipo aprovado, cartões do envio. */
+.comRotulo .titulo {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--dsn-ink-500);
+}
+
+.comRotulo .sublegenda {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--dsn-ink);
+}
+
+.comRotulo .textos {
+  gap: 4px;
 }

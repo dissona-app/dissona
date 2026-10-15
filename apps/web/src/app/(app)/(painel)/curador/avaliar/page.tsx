@@ -6,7 +6,9 @@ import { Painel } from '@/componentes/base/Painel';
 import { TabelaDoHistorico } from '@/componentes/curador/TabelaDoHistorico';
 import type { LinhaDoHistorico } from '@/componentes/curador/TabelaDoHistorico';
 import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
-import { formatarData, formatarNumero } from '@dissona/nucleo/lib/formato';
+import { formatarData, formatarNumero, tempoRelativo } from '@dissona/nucleo/lib/formato';
+import Link from 'next/link';
+import { Abas } from '@dissona/nucleo/componentes/base/Abas';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerHistorico } from '@/modulos/avaliacao/consultas';
 import { PASSO_NO_INDICADOR, passoDoNumero } from '@dissona/nucleo/modulos/avaliacao/tipos';
@@ -38,6 +40,7 @@ function linha(item: ItemDoHistorico): LinhaDoHistorico {
     nota: item.notaSubjetiva === null ? TEXTOS.semValor : formatarNumero(item.notaSubjetiva),
     noPrazo: item.noPrazo,
     valor: item.valorCentavos === null ? TEXTOS.semValor : dinheiro.formatar(item.valorCentavos),
+    editadoEm: tempoRelativo(item.atualizadaEm),
   };
 }
 
@@ -47,7 +50,13 @@ function linha(item: ItemDoHistorico): LinhaDoHistorico {
  * A avaliação em si continua em `/curador/avaliar/<envio>`, aberta a partir da
  * fila; esta é a entrada que faltava para voltar a ela depois.
  */
-export default async function PaginaDoHistorico() {
+export default async function PaginaDoHistorico({
+  searchParams,
+}: {
+  readonly searchParams: Promise<{ readonly aba?: string }>;
+}) {
+  const { aba: bruta } = await searchParams;
+  const aba = bruta === 'concluidas' ? 'concluidas' : 'andamento';
   const { emAndamento, entregues } = await lerHistorico();
 
   if (emAndamento.length === 0 && entregues.length === 0) {
@@ -66,26 +75,58 @@ export default async function PaginaDoHistorico() {
     );
   }
 
+  // Protótipo aprovado: abas com contador, "Ir para a Fila" à direita e a
+  // lista num cartão só.
   return (
     <div className={estilos.base}>
-      <Painel
-        titulo={TEXTOS.emAndamentoTitulo}
-        sublegenda={TEXTOS.emAndamentoResumo(emAndamento.length)}
-      >
-        <TabelaDoHistorico
-          tipo="em_andamento"
-          linhas={emAndamento.map(linha)}
-          vazio={<EstadoVazio titulo={TEXTOS.vazioEmAndamento} />}
+      <div className={estilos.topo}>
+        <Abas
+          abas={[
+            { chave: 'andamento', rotulo: TEXTOS.abaEmAndamento, contador: emAndamento.length },
+            { chave: 'concluidas', rotulo: TEXTOS.abaConcluidas, contador: entregues.length },
+          ]}
+          ativa={aba}
+          caminho={ROTA.CURADOR_AVALIAR}
+          rotulo={TEXTOS.titulo}
+          estilo="botoes"
         />
-      </Painel>
+        <Link href={ROTA.CURADOR_FILA} className={estilos.irParaFila}>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16" />
+            <path d="M4 12h11" />
+            <path d="M4 17h7" />
+          </svg>
+          {TEXTOS.irParaAFila}
+        </Link>
+      </div>
 
-      <Painel titulo={TEXTOS.entreguesTitulo} sublegenda={TEXTOS.entreguesResumo(entregues.length)}>
-        <TabelaDoHistorico
-          tipo="entregues"
-          linhas={entregues.map(linha)}
-          vazio={<EstadoVazio titulo={TEXTOS.vazioEntregues} />}
-        />
-      </Painel>
+      <section
+        className={estilos.cartao}
+        aria-label={aba === 'andamento' ? TEXTOS.emAndamentoTitulo : TEXTOS.entreguesTitulo}
+      >
+        {aba === 'andamento' ? (
+          <TabelaDoHistorico
+            tipo="em_andamento"
+            linhas={emAndamento.map(linha)}
+            vazio={<EstadoVazio titulo={TEXTOS.vazioEmAndamento} />}
+          />
+        ) : (
+          <TabelaDoHistorico
+            tipo="entregues"
+            linhas={entregues.map(linha)}
+            vazio={<EstadoVazio titulo={TEXTOS.vazioEntregues} />}
+          />
+        )}
+      </section>
     </div>
   );
 }

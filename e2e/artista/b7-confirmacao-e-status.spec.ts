@@ -31,13 +31,13 @@ import { ENVIAR, SELECAO, STATUS_DO_ENVIO } from '../apoio/textos';
 
 const MP3 = join(process.cwd(), 'e2e', 'apoio', 'arquivos', 'e2e-faixa.mp3');
 
-/** Wizard inteiro até a revisão. */
-async function ateARevisao(page: Page, info: TestInfo): Promise<string> {
+/** Wizard até a escolha do curador (passo 3 de 4). */
+async function ateASelecao(page: Page, info: TestInfo): Promise<string> {
   const titulo = `e2e_Faixa B7 ${info.workerIndex}-${Date.now().toString(36)}`;
 
   await entrarComo(page, PERSONA.ARTISTA);
   await page.goto('/artista/enviar');
-  await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+  await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
   await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloTitulo) }).fill(titulo);
   await page.getByRole('button', { name: ENVIAR.continuar }).click();
   await page.waitForURL(/\/contexto$/);
@@ -47,7 +47,8 @@ async function ateARevisao(page: Page, info: TestInfo): Promise<string> {
     .getByRole('textbox', { name: new RegExp(ENVIAR.rotuloContexto) })
     .fill('Faixa da suíte automatizada.');
   await page.getByRole('button', { name: ENVIAR.continuar }).click();
-  await page.waitForURL(/\/revisao$/);
+  // Ordem do protótipo aprovado: depois do contexto vem a escolha do curador.
+  await page.waitForURL(/\/curadores$/);
 
   return titulo;
 }
@@ -57,10 +58,7 @@ test.describe('B7 · Confirmação e status', () => {
     'confirmar a seleção leva à confirmação e ao status',
     { tag: ['@RF-040', '@RF-041'] },
     async ({ page }, info) => {
-      const titulo = await ateARevisao(page, info);
-
-      await page.getByRole('link', { name: ENVIAR.enviarParaCuradoria }).click();
-      await page.waitForURL(/\/curadores$/);
+      const titulo = await ateASelecao(page, info);
 
       // O placeholder lista curadores **reais**: a RPC recusa quem não está
       // aprovado (DS011) ou não tem `feedback` ativo (DS012).
@@ -71,7 +69,13 @@ test.describe('B7 · Confirmação e status', () => {
       await expect(primeiro).toBeAttached();
       await primeiro.check({ force: true });
 
-      await page.getByRole('button', { name: SELECAO.confirmar }).click();
+      // Escolher não debita: a escolha segue para a revisão, e é lá que o
+      // "Enviar para curadoria" chama a RPC.
+      await page.getByRole('button', { name: SELECAO.continuarParaRevisao }).click();
+      await page.waitForURL(/\/revisao\?/);
+      await expect(page.getByText(SELECAO.curadoresEscolhidos)).toBeVisible();
+
+      await page.getByRole('button', { name: ENVIAR.enviarParaCuradoria }).click();
       await page.waitForURL(/\/confirmacao$/);
 
       // "Seu envio", nunca "Sua submissão".
@@ -97,13 +101,17 @@ test.describe('B7 · Confirmação e status', () => {
   );
 
   test('a seleção exige ao menos um curador', async ({ page }, info) => {
-    await ateARevisao(page, info);
-
-    await page.getByRole('link', { name: ENVIAR.enviarParaCuradoria }).click();
-    await page.waitForURL(/\/curadores$/);
+    await ateASelecao(page, info);
 
     // Sem ninguém marcado o botão nem fica disponível — a RPC recusaria com
     // DS011, e deixar clicar para ver o erro seria pior.
-    await expect(page.getByRole('button', { name: SELECAO.confirmar })).toBeDisabled();
+    await expect(page.getByRole('button', { name: SELECAO.continuarParaRevisao })).toBeDisabled();
   });
+});
+
+test('revisão sem curador escolhido volta para a seleção', async ({ page }, info) => {
+  await ateASelecao(page, info);
+  const url = new URL(page.url());
+  await page.goto(url.pathname.replace('/curadores', '/revisao'));
+  await page.waitForURL(/\/curadores$/);
 });

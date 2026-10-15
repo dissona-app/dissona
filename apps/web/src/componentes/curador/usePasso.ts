@@ -1,12 +1,19 @@
 'use client';
 
-import { useActionState } from 'react';
+import type { FormEvent } from 'react';
+
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 import type { FalhaDeAcao, ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 
 export type EstadoDoPasso = {
   /** Passar direto para `<form action>`. */
   readonly enviar: (dados: FormData) => void;
+  /**
+   * Passar para o `onSubmit` do mesmo `<form>`: sem ele, um erro do passo
+   * apagava o que a pessoa tinha preenchido (ver `useAcaoDoFormulario`).
+   */
+  readonly aoEnviar: (evento: FormEvent<HTMLFormElement>) => void;
   readonly pendente: boolean;
   /**
    * O código do motivo da falha, quando houve — `genero_obrigatorio`,
@@ -39,7 +46,7 @@ export type EstadoDoPasso = {
  * View, e a validação continua sendo do servidor.
  */
 export function usePasso(acao: (dados: FormData) => Promise<ResultadoDeAcao>): EstadoDoPasso {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -49,6 +56,7 @@ export function usePasso(acao: (dados: FormData) => Promise<ResultadoDeAcao>): E
 
   return {
     enviar,
+    aoEnviar,
     pendente,
     motivo: typeof doDetalhe === 'string' ? doDetalhe : undefined,
     motivos: falhou ? (resultado.campos ?? {}) : {},

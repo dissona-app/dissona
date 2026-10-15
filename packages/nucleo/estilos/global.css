@@ -76,11 +76,36 @@ a:hover {
   outline-offset: var(--dsn-focus-offset);
 }
 
-/* Numerais de KPI, saldo e valor alinham por coluna. */
+/*
+ * Numerais em tabela e lista: alinhados por coluna, em Archivo — como no
+ * protótipo aprovado. Os números de destaque (saldo, métricas) usam Anton no
+ * próprio módulo.
+ */
 .dsn-numeral {
   font-weight: var(--dsn-weight-bold);
   font-variant-numeric: tabular-nums;
   letter-spacing: var(--dsn-tracking-snug);
+}
+
+/*
+ * Títulos do protótipo aprovado: Anton, caixa-alta, peso 400. Vale para todo
+ * `h1` e `h2` — título de página, de painel e das telas de entrada. Quem
+ * precisar de outro desenho (um `h2` que é texto corrido) sobrescreve no
+ * próprio módulo.
+ */
+h1,
+h2,
+.dsn-display {
+  /*
+   * A Anton só tem 400: um módulo que declare 700 num título sai em negrito
+   * sintético. Os `.titulo` dos módulos usam `--dsn-weight-regular` e
+   * `--dsn-tracking-display`; o nome de faixa, que fica em Archivo, declara a
+   * própria família.
+   */
+  font-family: var(--dsn-font-display);
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
+  text-transform: uppercase;
 }
 
 /* Conteúdo só para leitor de tela — rótulo de tabela, live region, skip link. */
@@ -101,6 +126,12 @@ a:hover {
 @keyframes dsnSpin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes dsnOrbitR {
+  to {
+    transform: rotate(-360deg);
   }
 }
 

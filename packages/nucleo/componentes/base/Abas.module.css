@@ -31,3 +31,76 @@
   color: var(--dsn-ink);
   box-shadow: inset 0 -2px 0 var(--dsn-purple-600);
 }
+
+/* No artista o protótipo aprovado sublinha a aba em tinta; curador e admin,
+   em roxo. */
+:global([data-papel='artista']) .ativa {
+  box-shadow: inset 0 -2px 0 var(--dsn-ink);
+}
+
+/* ----------------------------------------------------------- grupo */
+
+.grupo {
+  gap: 2px;
+  width: fit-content;
+  padding: 4px;
+  border: 1px solid var(--dsn-border);
+  border-bottom: 1px solid var(--dsn-border);
+  border-radius: 4px;
+  background: #f2edf5;
+}
+
+.grupo .aba {
+  padding: 7px 12px;
+  border-radius: 3px;
+  font-size: 13px;
+  color: var(--dsn-ink);
+  box-shadow: none;
+}
+
+.grupo .ativa {
+  background: var(--dsn-ink);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------- botoes */
+
+.botoes {
+  gap: 8px;
+  border-bottom: none;
+}
+
+.botoes .aba {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 4px;
+  background: var(--dsn-surface);
+  font-size: 13px;
+  color: var(--dsn-ink);
+  box-shadow: none;
+}
+
+.botoes .ativa {
+  border-color: var(--dsn-ink);
+  background: var(--dsn-ink);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.contador {
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: #f2edf5;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--dsn-purple-600);
+}
+
+.ativa .contador {
+  background: #ffffff;
+  color: var(--dsn-ink);
+}

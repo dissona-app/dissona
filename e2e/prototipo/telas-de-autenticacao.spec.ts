@@ -210,7 +210,7 @@ for (const cenario of CENARIOS) {
       expect(lista, `divergências de tipografia:\n${relatorio(lista)}`).toEqual([]);
     });
 
-    test('títulos renderizam em Inter, e não no fallback do sistema', async ({ page, context }) => {
+    test('títulos renderizam em Anton, e não no fallback do sistema', async ({ page, context }) => {
       const doPrototipo = await context.newPage();
       await abrirPrototipo(doPrototipo, cenario.prototipo, cenario.props);
       if (cenario.depois !== undefined) await cenario.depois(doPrototipo);
@@ -225,8 +225,8 @@ for (const cenario of CENARIOS) {
       const noPrototipo = await fonteRenderizada(doPrototipo, 'h1');
       const naAplicacao = await fonteRenderizada(page, 'h1');
 
-      expect(noPrototipo, 'o protótipo deveria renderizar o h1 em Inter').toEqual(
-        expect.arrayContaining([expect.stringMatching(/^Inter/)]),
+      expect(noPrototipo, 'o protótipo aprovado renderiza o h1 em Anton').toEqual(
+        expect.arrayContaining([expect.stringMatching(/^Anton/)]),
       );
       expect(naAplicacao).toEqual(noPrototipo);
     });

@@ -1,7 +1,12 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-import { avancar, escolherModalidade, preencherObrigatorios } from '../apoio/avaliacao';
+import {
+  avancar,
+  escolherModalidade,
+  preencherObrigatorios,
+  cartaoDaFila,
+} from '../apoio/avaliacao';
 import { envioDaFaixa, garantirAudioDaFaixa } from '../apoio/banco';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
@@ -84,7 +89,7 @@ test.describe('S3 · Estados do envio', { tag: ['@RF-071'] }, () => {
       // recusado em silêncio.
       await entrarComo(page, PERSONA.CURADOR_SLA);
       await page.goto('/curador/fila');
-      await page.getByRole('row').filter({ hasText: FAIXA }).getByRole('link').first().click();
+      await cartaoDaFila(page, FAIXA).getByRole('link').first().click();
       await page.getByRole('button', { name: /^Tocar / }).click();
 
       await expect

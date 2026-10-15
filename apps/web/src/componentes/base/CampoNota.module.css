@@ -8,7 +8,7 @@
 
 .linhaRotulo {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--dsn-space-4);
 }
@@ -21,20 +21,31 @@
   color: var(--dsn-ink-500);
 }
 
+/* Protótipo aprovado: a nota numa caixinha à direita do nome. */
 .valor {
-  font-size: var(--dsn-text-md);
+  min-width: 46px;
+  padding: 3px 8px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 3px;
+  background: var(--dsn-surface);
+  font-size: 13px;
   font-weight: var(--dsn-weight-bold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--dsn-tracking-snug);
+  text-align: center;
   color: var(--dsn-ink);
 }
 
 /* Nota ainda nao dada: a auditoria reprova #B5AFC0 como texto (2,13:1), por
  * isso o placeholder usa --dsn-ink-500 (design-system 4.2). */
 .semNota {
+  min-width: 46px;
+  padding: 3px 8px;
+  border: 1px dashed var(--dsn-border);
+  border-radius: 3px;
   color: var(--dsn-ink-500);
   font-weight: var(--dsn-weight-medium);
-  font-size: var(--dsn-text-xs);
+  font-size: var(--dsn-text-2xs);
+  text-align: center;
 }
 
 .trilha {
@@ -88,4 +99,8 @@
 .erro {
   font-size: var(--dsn-text-xs);
   color: var(--dsn-danger-fg);
+}
+
+.semExtremos {
+  display: none;
 }

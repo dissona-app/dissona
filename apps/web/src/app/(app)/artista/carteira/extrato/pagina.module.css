@@ -1,13 +1,26 @@
-/* 5.3 · Extrato. */
+/* 5.3 · Extrato — valores literais do protótipo aprovado. */
 
 .base {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-6);
+  gap: 14px;
 }
 
-/* A tabela é a única coisa da tela que pode passar da largura em telas
-   estreitas. O contêiner rola só ela, e não o corpo da página. */
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.moldura {
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
 .tabela {
   width: 100%;
   border-collapse: collapse;
@@ -15,19 +28,23 @@
 
 .tabela th,
 .tabela td {
-  padding: var(--dsn-space-3) var(--dsn-space-2);
-  border-bottom: 1px solid var(--dsn-border-faint);
+  padding: 13px 20px;
+  border-bottom: 1px solid #efeaf2;
   text-align: left;
   font-weight: 400;
-  color: var(--dsn-ink);
+  font-size: 13px;
+  color: #6e6478;
 }
 
 .tabela thead th {
-  font-size: var(--dsn-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  padding: 12px 20px;
+  background: #140d1a;
+  border-bottom: 1px solid #140d1a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--dsn-ink-500);
+  color: #b780e7;
 }
 
 .tabela tbody tr:last-child th,
@@ -36,21 +53,57 @@
 }
 
 .origem {
-  font-weight: 500;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #140d1a !important;
 }
 
-/* Tabular e à direita: são colunas de número que se lêem na vertical. */
+.tipo,
+.tipoEntrada {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: 2px;
+  white-space: nowrap;
+  color: #6e6478;
+  background: #f2edf5;
+}
+
+.tipoEntrada {
+  color: #1e7a4a;
+  background: #e6f5ed;
+}
+
 .numerica {
-  text-align: right;
+  text-align: right !important;
   font-variant-numeric: tabular-nums;
 }
 
-.entrada {
-  color: var(--dsn-success-fg);
+.tabela tbody td.numerica:nth-last-child(2) {
+  font-size: 15px;
+  font-weight: 700;
+  color: #140d1a;
+}
+
+.entrada,
+.tabela tbody td.entrada {
+  color: #1e7a4a;
 }
 
 .nota {
-  margin: var(--dsn-space-6) 0 0;
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+  margin: 0;
+  font-size: 12px;
+  color: #6e6478;
+}
+
+.voltar {
+  display: inline-flex;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+  text-decoration: none;
 }

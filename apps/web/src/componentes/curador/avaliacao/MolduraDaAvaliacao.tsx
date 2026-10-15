@@ -6,6 +6,8 @@ import { PASSO_NO_INDICADOR } from '@dissona/nucleo/modulos/avaliacao/tipos';
 import type { PassoDaAvaliacao } from '@dissona/nucleo/modulos/avaliacao/tipos';
 import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 
+import { capaDoEnvio } from '../capas';
+
 import estilos from './MolduraDaAvaliacao.module.css';
 
 /**
@@ -18,9 +20,14 @@ import estilos from './MolduraDaAvaliacao.module.css';
  */
 export const ID_DO_FORMULARIO = 'avaliacao-passo';
 
+/** Onde o passo de notas põe o player — embaixo do cartão da faixa. */
+export const ID_DO_PLAYER = 'player-da-avaliacao';
+
 export type PropsMolduraDaAvaliacao = {
   readonly titulo: string;
   readonly artista: string;
+  /** Para a capa do cartão da faixa — a mesma da Fila e do detalhe. */
+  readonly envioId?: string;
   readonly passo: PassoDaAvaliacao;
   /**
    * Concluída, não há mais o que salvar nem para onde voltar: o cabeçalho
@@ -46,20 +53,22 @@ export type PropsMolduraDaAvaliacao = {
 export function MolduraDaAvaliacao({
   titulo,
   artista,
+  envioId,
   passo,
   concluida = false,
   children,
 }: PropsMolduraDaAvaliacao) {
   const atual = concluida ? AVALIAR.passos.length : PASSO_NO_INDICADOR[passo];
 
+  // Protótipo aprovado: os passos e o "Salvar e sair" numa linha; abaixo, o
+  // cartão da faixa preso à esquerda e o passo à direita.
+  const capa = envioId === undefined ? null : capaDoEnvio(envioId);
   return (
-    <div className={estilos.base}>
-      <header className={estilos.cabecalho}>
-        <div className={estilos.faixa}>
-          <h2 className={estilos.titulo}>{titulo}</h2>
-          <p className={estilos.artista}>{artista}</p>
+    <div className={estilos.base} data-botoes="frase">
+      <div className={estilos.topo}>
+        <div className={estilos.passos}>
+          <Passos passos={[...AVALIAR.passos]} atual={atual} rotulo="Etapas da avaliação" />
         </div>
-
         {concluida ? null : (
           <Botao
             type="submit"
@@ -75,11 +84,41 @@ export function MolduraDaAvaliacao({
             {AVALIAR.salvarESair}
           </Botao>
         )}
-      </header>
+      </div>
 
-      <Passos passos={[...AVALIAR.passos]} atual={atual} rotulo="Etapas da avaliação" />
+      {/* Protótipo aprovado: a capa e o player só no passo 1 (escuta e
+          notas); os outros passos usam a largura toda. */}
+      <div className={passo === 'notas' ? estilos.grade : estilos.gradeSemLateral}>
+        {passo === 'notas' ? (
+          <aside className={estilos.lateral}>
+            <div className={estilos.cartao}>
+              {capa === null ? null : (
+                <span
+                  className={estilos.fundo}
+                  style={{ backgroundImage: `url('${capa}')` }}
+                  aria-hidden="true"
+                />
+              )}
+              <span className={estilos.veu} aria-hidden="true" />
+              <div className={estilos.cartaoCorpo}>
+                <span
+                  className={estilos.capa}
+                  style={capa === null ? undefined : { backgroundImage: `url('${capa}')` }}
+                  aria-hidden="true"
+                />
+                <div className={estilos.faixa}>
+                  <h2 className={estilos.titulo}>{titulo}</h2>
+                  <p className={estilos.artista}>{artista}</p>
+                </div>
+              </div>
+            </div>
+            {/* O passo de notas põe o player aqui (portal); os outros, nada. */}
+            <div id={ID_DO_PLAYER} className={estilos.player} />
+          </aside>
+        ) : null}
 
-      {children}
+        <div className={estilos.conteudo}>{children}</div>
+      </div>
     </div>
   );
 }

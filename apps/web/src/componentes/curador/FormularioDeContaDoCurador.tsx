@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
@@ -17,6 +17,7 @@ import { erroGeralDe } from '@dissona/nucleo/textos/erros';
 import { CADASTRAR } from '@dissona/nucleo/textos/prototipo';
 
 import estilos from './FormularioDeContaDoCurador.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 const ESTADO_INICIAL: ResultadoDeAcao | null = null;
 
@@ -46,7 +47,7 @@ export function FormularioDeContaDoCurador({
 }: {
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
 }) {
-  const [resultado, enviar, pendente] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, pendente, aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     ESTADO_INICIAL,
   );
@@ -102,7 +103,7 @@ export function FormularioDeContaDoCurador({
   );
 
   return (
-    <form action={enviar} className={estilos.campos} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.campos} noValidate>
       {banner !== null ? (
         <Aviso tom="erro" titulo={banner.titulo} acao={banner.acao}>
           {banner.texto}
@@ -114,7 +115,7 @@ export function FormularioDeContaDoCurador({
       <CampoDeFoto
         nome={nome}
         aoMudarEnvio={setSubindoFoto}
-        tamanhoDoBotao="sm"
+        tamanho="xl"
         semDica
         textos={{
           botao: CURADOR_CADASTRO.adicionarFoto,
@@ -184,7 +185,7 @@ export function FormularioDeContaDoCurador({
         <Link className={estilos.voltar} href={ROTA.CURADOR_ENTRAR}>
           {CURADOR_CADASTRO.voltarAoLogin}
         </Link>
-        <Botao type="submit" tamanho="denso" carregando={pendente} disabled={subindoFoto}>
+        <Botao type="submit" tamanho="md" carregando={pendente} disabled={subindoFoto}>
           {pendente ? CADASTRAR.enviando : CURADOR_CADASTRO.continuar}
         </Botao>
       </div>

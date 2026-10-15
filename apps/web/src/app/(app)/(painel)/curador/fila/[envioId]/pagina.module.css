@@ -1,105 +1,293 @@
-/* 13.1 · Detalhe do item da fila. */
+/* 13.1 · Detalhe da faixa — valores literais do protótipo aprovado. */
 
 .base {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--dsn-space-6);
-  max-width: 52rem;
+  gap: 14px;
+  min-width: 0;
 }
 
-.dados {
+.cartao {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.fundo {
+  position: absolute;
+  inset: -80px;
+  background-position: center;
+  background-size: cover;
+  filter: blur(70px) saturate(1.4);
+  opacity: 0.42;
+  transform: scale(1.1);
+  pointer-events: none;
+}
+
+.veu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.72) 48%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+  pointer-events: none;
+}
+
+.grade {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: var(--dsn-space-6);
+  grid-template-columns: minmax(260px, clamp(280px, 42vh, 380px)) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+  padding: clamp(22px, 3.4vh, 36px) clamp(24px, 3.4vw, 48px);
+  align-items: start;
+}
+
+.esquerda,
+.direita {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.8vh, 18px);
+  min-width: 0;
+}
+
+.direita {
+  gap: clamp(18px, 3vh, 30px);
+}
+
+.capa {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #140d1a;
+  background-position: center;
+  background-size: cover;
+  box-shadow:
+    0 2px 6px rgba(20, 13, 26, 0.1),
+    0 24px 48px rgba(20, 13, 26, 0.28);
+}
+
+.status {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 2px;
+  color: #8c3a2c;
+  background: #fbedea;
+}
+
+.status[data-status='nova'] {
+  color: #5b2e8f;
+  background: #efe7f8;
+}
+
+.status[data-status='em_escuta'] {
+  color: #1e7a4a;
+  background: #e6f5ed;
+}
+
+.identidade {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.identidadeTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* O título da faixa é Archivo, e não Anton: no protótipo é o nome da música. */
+.titulo {
   margin: 0;
-  width: 100%;
+  font-family: var(--dsn-font-sans) !important;
+  font-size: 18px;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2;
+  text-transform: none;
+  color: #140d1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artista {
+  font-size: 14px;
+  color: #3a3242;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info {
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5b2e8f;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #e5deea;
+  border-radius: 2px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .rotulo {
-  font-size: var(--dsn-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--dsn-ink-500);
-}
-
-.valor {
-  margin: var(--dsn-space-2) 0 0;
-  color: var(--dsn-ink);
+  color: #6e6478;
 }
 
 .contexto {
   margin: 0;
-  white-space: pre-wrap;
-  color: var(--dsn-ink);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #140d1a;
+  text-wrap: pretty;
+  max-width: 72ch;
 }
 
 .vazio {
   margin: 0;
-  font-style: italic;
-  color: var(--dsn-ink-400);
+  font-size: 15px;
+  color: #6e6478;
 }
 
-.prazo {
+.cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.mini {
+  border: 1px solid #e5deea;
+  border-radius: 5px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.miniAtrasado {
+  border-color: #ebd2cd;
+}
+
+.miniTopo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.prazo,
+.prazoAtrasado {
   margin: 0;
-  font-size: var(--dsn-text-xl);
-  font-weight: 600;
-  color: var(--dsn-ink);
+  font-family: var(--dsn-font-display);
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #3a3242;
 }
 
 .prazoAtrasado {
-  composes: prazo;
-  color: var(--dsn-danger-fg);
+  color: #8c3a2c;
+}
+
+.barra {
+  display: block;
+  height: 5px;
+  border-radius: 2px;
+  background: #efeaf2;
+  overflow: hidden;
+}
+
+.barraValor {
+  display: block;
+  height: 5px;
+  border-radius: 2px;
+  background: #7f47dd;
+}
+
+.miniAtrasado .barraValor {
+  background: #e35336;
+}
+
+.total {
+  font-size: 14px;
+  font-weight: 700;
+  color: #5b2e8f;
+  white-space: nowrap;
 }
 
 .servicos {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dsn-space-3);
-  margin: 0 0 var(--dsn-space-6);
+  margin: 0;
   padding: 0;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .servico {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--dsn-space-3);
-  color: var(--dsn-ink);
+  gap: 10px;
+  font-size: 13px;
 }
 
-/* Nome do serviço sobre a descrição, como o protótipo empilha `sv.nome` e
-   `sv.desc`; o preço continua alinhado à direita, na mesma linha do nome. */
 .servicoNome {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-1);
-  min-width: 0;
+  gap: 2px;
+  font-weight: 600;
+  color: #140d1a;
 }
 
 .servicoDescricao {
-  font-size: var(--dsn-text-sm);
-  color: var(--dsn-ink-500);
+  font-size: 12px;
+  font-weight: 400;
+  color: #6e6478;
 }
 
 .preco {
-  font-variant-numeric: tabular-nums;
-  color: var(--dsn-ink-500);
-}
-
-.total {
-  margin: 0 0 var(--dsn-space-6);
-  padding-top: var(--dsn-space-4);
-  border-top: 1px solid var(--dsn-border-faint);
-  font-weight: 600;
-  color: var(--dsn-ink);
+  color: #3a3242;
+  white-space: nowrap;
 }
 
 .nota {
-  margin: var(--dsn-space-3) 0 0;
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+  margin: 0;
+  font-size: 12px;
+  color: #6e6478;
+}
+
+/* "Voltar para a fila" encosta à esquerda, como no protótipo. */
+.base > a:first-child {
+  align-self: flex-start;
 }

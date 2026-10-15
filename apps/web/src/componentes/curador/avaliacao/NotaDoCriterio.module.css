@@ -1,19 +1,54 @@
 /* Uma linha da tabela de critérios (14).
  *
- * O protótipo põe nota e justificativa em painéis separados, ligados por uma
- * seleção: clicar no critério troca o assunto do único `<textarea>` da tela.
- * Aqui cada critério traz o seu, empilhado logo abaixo da nota — é o que
- * permite preencher onze justificativas sem JavaScript, e o que dá a cada
- * `<textarea>` um rótulo próprio em vez de um que muda de significado. */
+ * Protótipo aprovado: nota e justificativa em painéis separados, ligados por
+ * uma seleção — clicar no critério abre a justificativa dele ao lado. Cada
+ * `<textarea>` continua com o próprio rótulo (ver `JustificativaDoCriterio`). */
 
 .base {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-3);
-  padding: var(--dsn-space-6);
-  border: var(--dsn-border-width) solid var(--dsn-border-faint);
-  border-radius: var(--dsn-radius-lg);
-  background: var(--dsn-surface);
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--dsn-duration-base) var(--dsn-ease-out);
+}
+
+.base:hover {
+  background: #faf8fc;
+}
+
+.ativo {
+  background: var(--dsn-purple-050);
+  box-shadow: inset 2px 0 0 var(--dsn-purple-600);
+}
+
+.ativo:hover {
+  background: var(--dsn-purple-050);
+}
+
+/* Rótulo do protótipo: nome em caixa normal, 13px, peso 600. */
+.base label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--dsn-ink);
+}
+
+.base[data-justificado] label::after {
+  content: ' ✓';
+  color: var(--dsn-success-fg);
+}
+
+.justificativaBloco {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.justificativaBloco[hidden] {
+  display: none;
 }
 
 .linha {
@@ -27,9 +62,11 @@
   min-width: 0;
 }
 
+/* Ao lado esquerdo da caixinha da nota, sem tirar largura do slider. */
 .remover {
-  flex: 0 0 auto;
-  margin-top: var(--dsn-space-1);
+  position: absolute;
+  top: 14px;
+  right: 74px;
   padding: 0;
   border: none;
   background: transparent;
@@ -45,14 +82,16 @@
 }
 
 .rotuloJustificativa {
-  font-size: var(--dsn-text-2xs);
-  font-weight: var(--dsn-weight-medium);
-  color: var(--dsn-ink-500);
+  font-family: var(--dsn-font-display);
+  font-size: 18px;
+  letter-spacing: var(--dsn-tracking-display);
+  text-transform: uppercase;
+  color: var(--dsn-ink);
 }
 
 .justificativa {
   width: 100%;
-  min-height: 5.5rem;
+  min-height: 12rem;
   padding: var(--dsn-space-4) var(--dsn-space-5);
   border: var(--dsn-border-width) solid var(--dsn-border);
   border-radius: var(--dsn-radius-md);
@@ -98,4 +137,23 @@
   composes: contador;
   color: var(--dsn-success-fg);
   font-weight: var(--dsn-weight-semibold);
+}
+
+/* O "?" do protótipo ao lado do nome do critério — em CSS, para não entrar
+   no texto do rótulo. */
+.base label::after {
+  content: '?';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  margin-left: 6px;
+  text-transform: none;
+  border: 1px solid var(--dsn-border);
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--dsn-ink-500);
+  vertical-align: 1px;
 }

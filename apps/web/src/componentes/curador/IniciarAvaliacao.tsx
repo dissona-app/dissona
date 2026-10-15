@@ -34,7 +34,8 @@ export function IniciarAvaliacao({ envioId, acao }: PropsIniciarAvaliacao) {
 
       {falhou ? <Aviso tom="erro">{TEXTOS.erroNaoEstaMaisNaFila}</Aviso> : null}
 
-      <Botao type="submit" carregando={pendente}>
+      {/* Protótipo aprovado: o botão em tinta, sem caixa-alta. */}
+      <Botao type="submit" variante="tinta" tamanho="denso" carregando={pendente}>
         {TEXTOS.iniciarAvaliacao}
       </Botao>
     </form>

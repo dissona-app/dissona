@@ -37,3 +37,190 @@
   flex-wrap: wrap;
   gap: var(--dsn-space-3);
 }
+
+/* Cartão da faixa em destaque e o contexto ao lado — protótipo aprovado. */
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 22px);
+  align-items: start;
+}
+
+.colunaFaixa {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cartaoContexto {
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  padding: clamp(14px, 2vh, 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #ffffff;
+}
+
+.rotuloContexto {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6e6478;
+}
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+.rodape {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 22px);
+  align-items: start;
+}
+
+.notaDoSaldo {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--dsn-ink-500);
+}
+
+.rodape .acoes {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cartaoContexto .contexto {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--dsn-ink-700);
+}
+
+/* -------------------------------------------- curadores escolhidos ---- */
+
+.colunaLateral {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cartaoCuradores {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.curadoresTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(14px, 2vh, 18px) clamp(14px, 2vh, 18px) 8px;
+}
+
+.alterar {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.alterar:hover {
+  text-decoration: underline;
+}
+
+.escolhidos {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 clamp(14px, 2vh, 18px) 10px;
+  list-style: none;
+}
+
+.escolhido {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--dsn-purple-100);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--dsn-purple-700);
+}
+
+.escolhidoTextos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.escolhidoNome {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.escolhidoServico {
+  font-size: 11.5px;
+  color: var(--dsn-ink-500);
+}
+
+.escolhidoClaves {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.totalDosCuradores {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px clamp(14px, 2vh, 18px);
+  border-top: 1px solid #e5deea;
+  background: #f7f3fb;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.totalValores {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.totalReais {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--dsn-ink-500);
+}
+
+.totalClaves {
+  font-family: var(--dsn-font-display);
+  font-size: 22px;
+  font-weight: 400;
+  text-transform: uppercase;
+}

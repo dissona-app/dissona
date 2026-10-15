@@ -46,7 +46,8 @@ export default async function Pagina() {
 
   return (
     <MolduraDaClasse
-      selo={candidato ? CURADOR_CLASSIFICACAO.tituloPrata : CURADOR_CLASSIFICACAO.tituloBronze}
+      icone={candidato ? 'prata' : 'bronze'}
+      largura={520}
       titulo={candidato ? CURADOR_CLASSIFICACAO.tituloPrata : CURADOR_CLASSIFICACAO.tituloBronze}
       subtitulo={
         candidato ? CURADOR_CLASSIFICACAO.subPrata(minimo) : CURADOR_CLASSIFICACAO.subBronze
@@ -76,7 +77,34 @@ export default async function Pagina() {
                 key={credencial.valor}
                 className={comprovada ? estilos.credencialOk : estilos.credencial}
               >
-                <span className={estilos.dot} aria-hidden="true" />
+                <span className={estilos.dot} aria-hidden="true">
+                  {comprovada ? (
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12.5l4.5 4.5L19 7.5" />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    >
+                      <path d="M6 12h12" />
+                    </svg>
+                  )}
+                </span>
                 {credencial.rotulo}
                 {/* A cor não pode ser o único portador da informação (§4.2). */}
                 <span className="dsn-apenas-leitor">

@@ -16,6 +16,16 @@ export function formatarData(data: Date, locale: Locale = 'pt-BR'): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: 'short' }).format(data);
 }
 
+/** "02 abr" — dia e mês abreviado, como nas listas do protótipo aprovado. */
+export function formatarDiaMes(data: Date, locale: Locale = 'pt-BR'): string {
+  const partes = new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' }).formatToParts(
+    data,
+  );
+  const dia = partes.find((p) => p.type === 'day')?.value ?? '';
+  const mes = (partes.find((p) => p.type === 'month')?.value ?? '').replace('.', '');
+  return `${dia} ${mes}`;
+}
+
 export function formatarDataHora(data: Date, locale: Locale = 'pt-BR'): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(data);
 }

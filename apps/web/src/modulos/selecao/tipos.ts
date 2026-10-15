@@ -44,3 +44,52 @@ export type EscolhaDeCurador = {
  * um preço que não corresponde ao que vai ser cobrado.
  */
 export const SERVICO_OBRIGATORIO: TipoServico = 'feedback';
+
+/** Um curador como a tela de seleção o mostra, **já formatado no servidor**. */
+export type CuradorNaLista = {
+  readonly id: string;
+  readonly nome: string;
+  readonly classe: 'bronze' | 'prata' | 'ouro';
+  readonly precoBase: string;
+  /** O mesmo preço em Claves, como número — só para o total exibido. */
+  readonly precoBaseClaves: number;
+  readonly opcionais: readonly {
+    readonly tipo: string;
+    readonly rotulo: string;
+    readonly preco: string;
+    readonly precoClaves: number;
+  }[];
+};
+
+/**
+ * A seleção feita no passo "Escolher curador", carregada na URL até a revisão.
+ *
+ * Fica na URL, e não no banco, porque nada é debitado antes do "Enviar para
+ * curadoria" — e uma escolha que a pessoa abandona não deve deixar rastro.
+ */
+export type SelecaoNaUrl = Readonly<Record<string, readonly string[]>>;
+
+/** `?curador=a&curador=b&servico:a=playlist` → `{ a: ['playlist'], b: [] }`. */
+export function lerSelecaoDaUrl(
+  busca: Readonly<Record<string, string | readonly string[] | undefined>>,
+): SelecaoNaUrl {
+  const lista = (valor: string | readonly string[] | undefined): readonly string[] =>
+    valor === undefined ? [] : typeof valor === 'string' ? [valor] : valor;
+
+  const selecao: Record<string, readonly string[]> = {};
+  for (const id of lista(busca['curador'])) {
+    selecao[id] = lista(busca[`servico:${id}`]);
+  }
+  return selecao;
+}
+
+/** O inverso: a seleção de volta em query string, para o "Voltar" e o "Alterar". */
+export function selecaoEmQuery(selecao: SelecaoNaUrl): string {
+  const parametros = new URLSearchParams();
+  for (const [id, servicos] of Object.entries(selecao)) {
+    parametros.append('curador', id);
+    for (const servico of servicos) parametros.append(`servico:${id}`, servico);
+  }
+  const texto = parametros.toString();
+  return texto === '' ? '' : `?${texto}`;
+}

@@ -5,6 +5,7 @@ import 'server-only';
 import type { Claves } from '@dissona/nucleo/lib/claves';
 import type { Centavos } from '@dissona/nucleo/lib/dinheiro';
 import { lerConfiguracao } from '@dissona/nucleo/lib/configuracao';
+import { criarClienteServidor, usuarioAtual } from '@dissona/nucleo/lib/supabase/servidor';
 
 import { lerMovimentacoes, lerSaldo } from './repositorio';
 import { adquiridas, comSaldoAcumulado, ultimas, usadas } from './servico';
@@ -83,4 +84,23 @@ export async function lerExtrato(filtro: FiltroDoExtrato): Promise<TelaDoExtrato
     filtro,
     vazioPorFiltro: linhas.length === 0 && movimentacoes.length > 0,
   };
+}
+
+export type CobrancaDoArtista = {
+  readonly nome: string | null;
+  readonly documento: string | null;
+};
+
+/** Nome e documento da nota fiscal, guardados na compra (`perfil_artista`). */
+export async function lerCobrancaDoArtista(): Promise<CobrancaDoArtista | null> {
+  const usuario = await usuarioAtual();
+  if (usuario === null) return null;
+  const supabase = await criarClienteServidor();
+  const { data } = await supabase
+    .from('perfil_artista')
+    .select('cobranca_nome, cobranca_documento')
+    .eq('perfil_id', usuario.id)
+    .maybeSingle();
+  if (data === null) return null;
+  return { nome: data.cobranca_nome, documento: data.cobranca_documento };
 }

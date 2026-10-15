@@ -43,22 +43,26 @@
  * onde se põe texto branco em cima dela. Ver 07-pendências e open-questions #26.
  */
 .primario {
-  background: var(--dsn-orange-600);
+  background: var(--dsn-orange-500);
   color: #ffffff;
+  font-weight: var(--dsn-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--dsn-tracking-botao);
 }
 
 .primario:hover:not(:disabled) {
-  background: var(--dsn-orange-700);
+  background: var(--dsn-orange-600);
   box-shadow: var(--dsn-shadow-cta);
 }
 
 .primario:active:not(:disabled) {
-  background: var(--dsn-orange-800);
+  background: var(--dsn-orange-700);
   box-shadow: none;
 }
 
 /* ------------------------------------------------------------ secundário */
 
+/* Protótipo aprovado: contorno e rótulo em `purple-600`, nos três ambientes. */
 .secundario {
   background: var(--dsn-surface);
   color: var(--dsn-purple-600);
@@ -67,6 +71,32 @@
 
 .secundario:hover:not(:disabled) {
   background: var(--dsn-purple-050);
+}
+
+/* No artista, o mesmo botão em tinta (protótipo aprovado, Configurações). */
+:global([data-papel='artista']) .secundario {
+  color: var(--dsn-ink);
+  border-color: var(--dsn-ink);
+}
+
+/* ----------------------------------------------------------------- tinta */
+
+.tinta {
+  background: var(--dsn-ink);
+  color: #ffffff;
+}
+
+.tinta:hover:not(:disabled) {
+  background: #2a1f33;
+}
+
+.roxo {
+  background: var(--dsn-purple-600);
+  color: #ffffff;
+}
+
+.roxo:hover:not(:disabled) {
+  background: #4a2575;
 }
 
 /* ----------------------------------------------------------------- ghost */
@@ -180,6 +210,11 @@
   letter-spacing: var(--dsn-tracking-snug);
 }
 
+/* O CTA grande do protótipo aprovado mantém o tracking de botão (0.06em). */
+.md.primario {
+  letter-spacing: var(--dsn-tracking-botao);
+}
+
 .denso {
   padding: clamp(10px, 1.5vh, 13px) var(--dsn-space-11);
   font-size: var(--dsn-text-base);
@@ -188,6 +223,46 @@
 .sm {
   padding: var(--dsn-space-4) var(--dsn-space-5);
   font-size: var(--dsn-text-sm);
+}
+
+/*
+ * Variações de contexto do protótipo aprovado, ligadas por atributo no
+ * contêiner — o `Botao` não aceita `className` de fora:
+ * - `frase`: o envio do artista usa o primário sem caixa-alta, 15px/600;
+ * - `compacto`: o "Editar cadastro" da capa do perfil desce para 13px.
+ */
+:global([data-botoes='frase']) .primario {
+  font-weight: var(--dsn-weight-semibold);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+:global([data-botoes='frase']) .md {
+  font-size: var(--dsn-text-base);
+}
+
+:global([data-botoes='frase']) .neutro {
+  font-size: var(--dsn-text-xs);
+}
+
+:global([data-botoes='frase'] [data-botoes='caixa-alta']) .primario {
+  /* Os passos 2 em diante do envio voltam ao primário em caixa-alta. */
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-botao);
+  text-transform: uppercase;
+}
+
+:global([data-botoes='frase'] [data-botoes='caixa-alta']) .md {
+  font-size: var(--dsn-text-sm);
+}
+
+:global([data-botoes='cartao']) .sm {
+  /* A ação de um cartão de Conta: 11px 20px no protótipo aprovado. */
+  padding: 11px 20px;
+}
+
+:global([data-botoes='compacto']) .sm {
+  font-size: var(--dsn-text-xs);
 }
 
 .semPadding {

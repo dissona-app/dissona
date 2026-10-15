@@ -34,16 +34,22 @@ export function AcoesDaAvaliacao({ voltarPara, proximoEhRemuneracao }: PropsAcoe
   const { pending } = useFormStatus();
 
   return (
-    <div className={estilos.rodape}>
-      {voltarPara === null ? (
-        <span />
-      ) : (
-        <BotaoLink href={voltarPara} variante="neutro" tamanho="sm">
+    <div className={estilos.rodape} data-botoes="cartao">
+      {/* Protótipo aprovado: Voltar com contorno e Avançar roxo, à esquerda. */}
+      {voltarPara === null ? null : (
+        <BotaoLink href={voltarPara} variante="secundario" tamanho="sm">
           {AVALIAR.voltar}
         </BotaoLink>
       )}
 
-      <Botao type="submit" name="destino" value="avancar" tamanho="denso" carregando={pending}>
+      <Botao
+        type="submit"
+        name="destino"
+        value="avancar"
+        variante="roxo"
+        tamanho="sm"
+        carregando={pending}
+      >
         {proximoEhRemuneracao ? AVALIAR.verRemuneracao : AVALIAR.avancar}
       </Botao>
     </div>

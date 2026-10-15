@@ -16,11 +16,71 @@
   padding: clamp(16px, 2.4vh, 24px);
 }
 
+.capa {
+  position: relative;
+  height: 64px;
+  flex: none;
+  overflow: hidden;
+  background: #140d1a;
+}
+
+.brilhoA,
+.brilhoB {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.brilhoA {
+  width: 360px;
+  height: 320px;
+  left: -60px;
+  top: -140px;
+  background: radial-gradient(circle, rgba(183, 128, 231, 0.42), rgba(183, 128, 231, 0) 64%);
+}
+
+.brilhoB {
+  width: 420px;
+  height: 340px;
+  right: 10%;
+  top: -150px;
+  background: radial-gradient(circle, rgba(127, 71, 221, 0.32), rgba(127, 71, 221, 0) 64%);
+}
+
+/* Separa a vitrine dos campos, como a linha do protótipo. */
 .identidade {
+  margin: calc(-1 * clamp(16px, 2.4vh, 24px)) calc(-1 * clamp(16px, 2.4vh, 24px)) 0;
+  padding: 0 clamp(16px, 2.4vh, 24px) 18px;
+  border-bottom: 1px solid var(--dsn-border);
+}
+
+.quem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.linhaDoNome {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--dsn-space-8);
+  gap: 8px;
+}
+
+.nome {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--dsn-ink);
+}
+
+.cargoEmail {
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--dsn-ink-500);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* O avatar e o botão de foto agora são o `CampoDeFoto` do Design System,
@@ -78,4 +138,9 @@
   padding: clamp(12px, 1.8vh, 16px) clamp(16px, 2.4vh, 24px);
   border-top: 1px solid var(--dsn-border);
   background: var(--dsn-surface-alt);
+}
+
+/* O selo do papel no protótipo aprovado fecha um pouco mais (0.08em). */
+.linhaDoNome > :last-child {
+  letter-spacing: 0.08em;
 }

@@ -1,6 +1,8 @@
 /*
- * Tokens do Design System — extraídos dos protótipos da R2 como valores
- * literais (docs/design-system.md §1).
+ * Tokens do Design System — extraídos como valores literais do protótipo
+ * **aprovado pelo cliente** (`docs/prototipo-aprovado/`, 30/09/2026), que
+ * substitui o da R2: Anton + Archivo, tinta #140D1A, cantos de 2–6px, menu
+ * lateral chapado. Os nomes `--dsn-*` continuam os de docs/design-system.md §1.
  *
  * Os protótipos NÃO usam custom properties: os `--dsn-*` são nomes propostos
  * pela documentação, e os valores são os medidos no HTML. Não invente token
@@ -18,8 +20,8 @@
   --dsn-purple-300: #b79be4;
   --dsn-purple-200: #d9c7f3;
   --dsn-purple-200-alt: #d3c7e8;
-  --dsn-purple-100: #f1eafb;
-  --dsn-purple-050: #f6f3fb;
+  --dsn-purple-100: #efe7f8;
+  --dsn-purple-050: #f2edf5;
   --dsn-purple-025: #fdfcff;
 
   /* ------------------------------------------------- Laranja (ação / CTA) */
@@ -34,14 +36,14 @@
   --dsn-orange-050: #fdf8f7;
 
   /* ------------------------------------------------------------- Neutros */
-  --dsn-ink: #1b1226;
-  --dsn-ink-700: #4a4553;
-  --dsn-ink-500: #6b6675;
+  --dsn-ink: #140d1a;
+  --dsn-ink-700: #3a3242;
+  --dsn-ink-500: #6e6478;
   --dsn-ink-400: #9b93a8;
   --dsn-ink-300: #b5afc0;
   --dsn-ink-250: #c9c3d6;
   --dsn-ink-200: #d9d3e6;
-  --dsn-border: #e7e3ef;
+  --dsn-border: #e5deea;
   /*
    * Borda de componente interativo em repouso — campo, área de texto, seleção.
    *
@@ -54,8 +56,9 @@
    * cartão não identificam componente interativo, não são alcançados pela
    * 1.4.11, e escurecê-los junto pesaria a tela inteira sem necessidade.
    */
-  --dsn-border-campo: #9890a6;
-  --dsn-border-soft: #e2ddec;
+  /* Protótipo aprovado: a borda do campo é a mesma das linhas (#E5DEEA). */
+  --dsn-border-campo: #e5deea;
+  --dsn-border-soft: #efeaf2;
   --dsn-border-faint: #f1eef7;
   --dsn-track: #eeeaf5;
   --dsn-surface: #ffffff;
@@ -63,9 +66,9 @@
 
   /* ------------------------------------------------ Sidebar (tema escuro) */
   --dsn-nav-fg: #ffffff;
-  --dsn-nav-fg-idle: #c6bad9;
-  --dsn-nav-overline: #9b8cb5;
-  --dsn-nav-bg-active: #7f47dd;
+  --dsn-nav-fg-idle: #c6b4de;
+  --dsn-nav-overline: #8a8296;
+  --dsn-nav-bg-active: #b780e7;
   --dsn-nav-bg-hover: rgba(255, 255, 255, 0.08);
   --dsn-nav-divider: rgba(255, 255, 255, 0.08);
   --dsn-nav-card-bg: rgba(255, 255, 255, 0.035);
@@ -114,7 +117,7 @@
   --dsn-senha-media: #a8761c;
 
   /* ------------------------------------------------- Gradientes de marca */
-  --dsn-grad-sidebar: linear-gradient(180deg, #2d1747 0%, #241239 52%, #1b0d2a 100%);
+  --dsn-grad-sidebar: #140d1a;
   --dsn-grad-auth-bg: linear-gradient(180deg, #fdfcff 0%, #f8f5fd 45%, #f1ecfa 100%);
   --dsn-grad-brand-h: linear-gradient(90deg, #5b2e8f, #7f47dd 55%, #e35336);
   --dsn-grad-brand-diag: linear-gradient(145deg, #8a4fe3 0%, #5b2e8f 46%, #e35336 100%);
@@ -123,7 +126,7 @@
   /* ------------------------------------------------------------ Overlays */
   --dsn-focus-ring: rgba(127, 71, 221, 0.16);
   --dsn-focus-ring-slider: rgba(127, 71, 221, 0.14);
-  --dsn-backdrop: rgba(27, 18, 38, 0.42);
+  --dsn-backdrop: rgba(20, 13, 26, 0.42);
   --dsn-topbar-bg: rgba(255, 255, 255, 0.9);
   --dsn-selection: rgba(127, 71, 221, 0.18);
 
@@ -136,7 +139,16 @@
 
   /* ---------------------------------------------------------- Tipografia */
   --dsn-font-sans:
-    Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    Archivo, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Títulos, números de destaque e o hero: sempre caixa-alta, peso 400. */
+  --dsn-font-display: Anton, Impact, 'Arial Narrow', sans-serif;
+  --dsn-tracking-display: 0.01em;
+  --dsn-tracking-botao: 0.06em;
+  /* Item ativo do menu lateral: a cor de fundo gira pela posição do item. */
+  --dsn-nav-ativo-1: #b780e7;
+  --dsn-nav-ativo-2: #efb6a9;
+  --dsn-nav-ativo-3: #c6b4de;
+  --dsn-nav-fg-ativo: #140d1a;
 
   --dsn-text-3xl: clamp(31px, 4.4vh, 42px);
   --dsn-text-2xl: clamp(24px, 3.4vh, 30px);
@@ -218,24 +230,24 @@
   --dsn-pad-nav-item: clamp(7px, 1.2vh, 10px);
 
   /* ------------------------------------------------------ Raio de borda */
-  --dsn-radius-sm: 5px;
-  --dsn-radius-md: 8px;
+  --dsn-radius-sm: 2px;
+  --dsn-radius-md: 3px;
   /* Raio padrão (300 ocorrências). */
-  --dsn-radius-lg: 10px;
-  --dsn-radius-xl: 12px;
-  --dsn-radius-2xl: 14px;
-  --dsn-radius-3xl: 16px;
-  --dsn-radius-full: 999px;
+  --dsn-radius-lg: 4px;
+  --dsn-radius-xl: 4px;
+  --dsn-radius-2xl: 5px;
+  --dsn-radius-3xl: 6px;
+  --dsn-radius-full: 4px;
   --dsn-radius-circle: 50%;
 
   --dsn-border-width: 1px;
 
   /* ----------------------------------------------------------- Elevação */
-  --dsn-shadow-xs: 0 1px 2px rgba(27, 18, 38, 0.04);
-  --dsn-shadow-card: 0 1px 2px rgba(27, 18, 38, 0.04), 0 18px 48px rgba(27, 18, 38, 0.1);
-  --dsn-shadow-menu: 0 2px 4px rgba(27, 18, 38, 0.05), 0 18px 40px rgba(27, 18, 38, 0.12);
-  --dsn-shadow-modal: 0 2px 4px rgba(27, 18, 38, 0.05), 0 18px 40px rgba(27, 18, 38, 0.18);
-  --dsn-shadow-toast: 0 2px 4px rgba(27, 18, 38, 0.05), 0 18px 40px rgba(27, 18, 38, 0.24);
+  --dsn-shadow-xs: 0 1px 2px rgba(20, 13, 26, 0.04);
+  --dsn-shadow-card: 0 1px 2px rgba(20, 13, 26, 0.04), 0 18px 48px rgba(20, 13, 26, 0.1);
+  --dsn-shadow-menu: 0 2px 4px rgba(20, 13, 26, 0.05), 0 18px 40px rgba(20, 13, 26, 0.12);
+  --dsn-shadow-modal: 0 2px 4px rgba(20, 13, 26, 0.05), 0 18px 40px rgba(20, 13, 26, 0.18);
+  --dsn-shadow-toast: 0 2px 4px rgba(20, 13, 26, 0.05), 0 18px 40px rgba(20, 13, 26, 0.24);
   --dsn-shadow-cta: 0 6px 18px rgba(227, 83, 54, 0.26);
   --dsn-shadow-focus: 0 0 0 3px var(--dsn-focus-ring);
   --dsn-shadow-focus-slider: 0 0 0 4px var(--dsn-focus-ring-slider);

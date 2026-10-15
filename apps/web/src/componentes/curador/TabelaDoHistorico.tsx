@@ -6,9 +6,11 @@ import { Etiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
 import { Tabela } from '@dissona/nucleo/componentes/base/Tabela';
 import type { ColunaTabela } from '@dissona/nucleo/componentes/base/Tabela';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
-import { HISTORICO as TEXTOS } from '@dissona/nucleo/textos/avaliacao';
+import { AVALIAR, HISTORICO as TEXTOS } from '@dissona/nucleo/textos/avaliacao';
 
+import { capaDoEnvio } from './capas';
 import estilos from './TabelaDaFila.module.css';
+import estilosNovos from './TabelaDoHistorico.module.css';
 
 /** Uma avaliação do histórico, **já formatada no servidor**. */
 export type LinhaDoHistorico = {
@@ -20,6 +22,8 @@ export type LinhaDoHistorico = {
   readonly nota: string;
   readonly noPrazo: boolean | null;
   readonly valor: string;
+  /** "há 2h" — a última edição do rascunho (em andamento). */
+  readonly editadoEm?: string;
 };
 
 export type PropsTabelaDoHistorico = {
@@ -84,6 +88,62 @@ export function TabelaDoHistorico({ tipo, linhas, vazio }: PropsTabelaDoHistoric
         { chave: 'valor', titulo: TEXTOS.colunas.valor, numerica: true, celula: (l) => l.valor },
         acao,
       ];
+
+  // Em andamento: as linhas do protótipo aprovado — capa, faixa, o passo com
+  // a barra de progresso e o botão de continuar.
+  if (emAndamento) {
+    if (linhas.length === 0) return <>{vazio}</>;
+    return (
+      <ul className={estilosNovos.lista}>
+        {linhas.map((linha) => {
+          const indice = AVALIAR.passos.indexOf(linha.quando as (typeof AVALIAR.passos)[number]);
+          const passo = indice === -1 ? 1 : indice + 1;
+          const total = AVALIAR.passos.length;
+          return (
+            <li key={linha.envioId} className={estilosNovos.linha}>
+              <span
+                className={estilosNovos.capa}
+                style={{ backgroundImage: `url('${capaDoEnvio(linha.envioId)}')` }}
+                aria-hidden="true"
+              />
+              <span className={estilosNovos.faixa}>
+                <span className={estilosNovos.titulo}>{linha.titulo}</span>
+                <span className={estilosNovos.artista}>{linha.artista}</span>
+              </span>
+              <span className={estilosNovos.progresso}>
+                <span className={estilosNovos.progressoTopo}>
+                  <span className={estilosNovos.passo}>
+                    Passo {passo} de {total} · {linha.quando}
+                  </span>
+                  <span className={estilosNovos.pct}>{Math.round((passo / total) * 100)}%</span>
+                </span>
+                <span className={estilosNovos.barras} aria-hidden="true">
+                  {AVALIAR.passos.map((rotulo, i) => (
+                    <span
+                      key={rotulo}
+                      className={i < passo ? estilosNovos.barraFeita : estilosNovos.barra}
+                    />
+                  ))}
+                </span>
+              </span>
+              <span className={estilosNovos.edicao}>
+                <span className={estilosNovos.edicaoRotulo}>{TEXTOS.ultimaEdicao}</span>
+                <span className={estilosNovos.edicaoValor}>
+                  {linha.editadoEm ?? TEXTOS.semValor}
+                </span>
+              </span>
+              <Link
+                className={estilosNovos.continuar}
+                href={`${ROTA.CURADOR_AVALIAR}/${linha.envioId}`}
+              >
+                {TEXTOS.continuar}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
 
   return (
     <Tabela

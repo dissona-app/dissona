@@ -1,0 +1,150 @@
+/* Cartão da faixa com o vinil — passos 2 e 3 do envio, protótipo aprovado. */
+
+.base {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.fundo {
+  position: absolute;
+  inset: -80px;
+  background-position: center;
+  background-size: cover;
+  filter: blur(60px) saturate(1.4);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.veu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.85) 70%);
+  pointer-events: none;
+}
+
+.corpo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.destaque .corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 28px);
+  padding: clamp(18px, 2.6vh, 26px);
+}
+
+.destaque .veu {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.85) 60%);
+}
+
+/* A capa quadrada na frente e o vinil saindo à direita (proporção 1.28:1). */
+.arte {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  max-height: 30vh;
+  aspect-ratio: 1.28 / 1;
+}
+
+.vinil {
+  position: absolute;
+  top: 3%;
+  bottom: 3%;
+  right: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #1b1424 0 2px, #140d1a 2px 4px);
+  box-shadow: 0 10px 24px rgba(20, 13, 26, 0.35);
+  animation: dsnSpin 9s linear infinite;
+}
+
+.brilho {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 45%);
+}
+
+.selo {
+  position: absolute;
+  inset: 33%;
+  border-radius: 50%;
+  background-position: center;
+  background-size: cover;
+}
+
+.furo {
+  position: absolute;
+  left: 48.5%;
+  top: 48.5%;
+  width: 3%;
+  height: 3%;
+  border-radius: 50%;
+  background: #140d1a;
+}
+
+.capa {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 3px;
+  background-color: #140d1a;
+  background-position: center;
+  background-size: cover;
+  box-shadow:
+    0 2px 6px rgba(20, 13, 26, 0.16),
+    0 16px 32px rgba(20, 13, 26, 0.28);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.fonte {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5b2e8f;
+}
+
+.titulo {
+  font-family: var(--dsn-font-display);
+  font-size: 22px;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #140d1a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destaque .titulo {
+  font-size: clamp(22px, 3.2vh, 28px);
+}
+
+.info {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #3a3242;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinil {
+    animation: none;
+  }
+}

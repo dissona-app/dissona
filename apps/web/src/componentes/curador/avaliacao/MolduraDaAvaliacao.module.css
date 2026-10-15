@@ -1,42 +1,128 @@
-/* Moldura das cinco etapas da avaliação — módulo 14.
- *
- * Ao contrário de `MolduraDoWizard` (cadastro do curador), esta vive **dentro**
- * do shell do curador: a avaliação é trabalho do painel, e sair dela é voltar
- * para a fila, que está na sidebar. */
+/* 14 · Avaliação — moldura do protótipo aprovado. */
 
 .base {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-8);
+  gap: 14px;
 }
 
-.cabecalho {
+.topo {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dsn-space-6);
+  gap: 14px;
+}
+
+.passos {
+  flex: 1;
+  min-width: 0;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.lateral {
+  position: sticky;
+  top: 96px;
+  min-width: 0;
+}
+
+.cartao {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.fundo {
+  position: absolute;
+  inset: -60px;
+  background-position: center;
+  background-size: cover;
+  filter: blur(56px) saturate(1.4);
+  opacity: 0.36;
+  pointer-events: none;
+}
+
+.veu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.86) 60%);
+  pointer-events: none;
+}
+
+.cartaoCorpo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.capa {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background-color: #140d1a;
+  background-position: center;
+  background-size: cover;
+  box-shadow:
+    0 2px 6px rgba(20, 13, 26, 0.12),
+    0 16px 32px rgba(20, 13, 26, 0.22);
 }
 
 .faixa {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-1);
+  gap: 2px;
   min-width: 0;
 }
 
+/* Nome da música em Archivo, como no protótipo — não é título de seção. */
 .titulo {
   margin: 0;
-  font-size: var(--dsn-text-lg);
-  font-weight: var(--dsn-weight-semibold);
-  line-height: var(--dsn-leading-title);
-  letter-spacing: var(--dsn-tracking-tight);
-  color: var(--dsn-ink);
+  font-family: var(--dsn-font-sans) !important;
+  font-size: 18px;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none;
+  color: #140d1a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .artista {
   margin: 0;
-  font-size: var(--dsn-text-xs);
-  line-height: var(--dsn-leading-normal);
-  color: var(--dsn-ink-500);
+  font-size: 13.5px;
+  color: #3a3242;
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.player:empty {
+  display: none;
+}
+
+.player {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #e5deea;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.gradeSemLateral {
+  display: block;
 }

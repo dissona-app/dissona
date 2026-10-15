@@ -3,8 +3,14 @@
 .grade {
   display: grid;
   grid-template-columns: var(--dsn-sidebar-largura) 1fr;
+  transition: grid-template-columns 200ms var(--dsn-ease-out);
   align-items: stretch;
   min-height: 100vh;
+}
+
+/* "Recolher menu": a lateral fica só com os ícones. */
+.grade:has(> aside[data-recolhido]) {
+  grid-template-columns: 76px 1fr;
 }
 
 .coluna {
@@ -12,7 +18,9 @@
   flex-direction: column;
   /* Sem isto, conteudo largo estica a coluna e quebra a grade. */
   min-width: 0;
-  background: var(--dsn-surface);
+  /* Protótipo aprovado: os três ambientes trabalham sobre um fundo areia, e
+   * os cartões brancos se destacam dele. O cabeçalho continua branco. */
+  background: var(--dsn-fundo-app, #f4f2ef);
 }
 
 .header {
@@ -22,11 +30,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dsn-space-12);
-  padding: clamp(14px, 2.4vh, 20px) var(--dsn-space-20) clamp(10px, 1.6vh, 14px);
+  gap: 24px;
+  padding: 20px 40px 14px;
   background: var(--dsn-topbar-bg);
   backdrop-filter: blur(10px);
-  border-bottom: var(--dsn-border-width) solid var(--dsn-border);
+}
+
+/* A faixa de quatro cores no topo do header — protótipo aprovado. */
+.header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    #5b2e8f 0 25%,
+    #7f47dd 25% 50%,
+    #b780e7 50% 75%,
+    #e35336 75% 100%
+  );
 }
 
 .textosHeader {
@@ -36,20 +61,43 @@
   min-width: 0;
 }
 
+/* Protótipo aprovado: 11px, 700, roxo, 0.14em — só na Fila e na Avaliação. */
+.sobretitulo {
+  font-size: var(--dsn-text-3xs);
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dsn-purple-500);
+}
+
 .titulo {
   margin: 0;
-  font-size: var(--dsn-text-lg);
-  font-weight: var(--dsn-weight-bold);
-  letter-spacing: var(--dsn-tracking-tight);
+  font-size: 30px;
+  line-height: 1.1;
+  /* No protótipo a caixa do título tem 45px (a área do Anton a 30px); o
+     respiro acima e abaixo reproduz a altura do cabeçalho, 97px. */
+  padding: 6px 0;
+  font-weight: var(--dsn-weight-regular);
+  letter-spacing: var(--dsn-tracking-display);
   color: var(--dsn-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* Com sobretítulo o protótipo não tem o respiro: o bloco fica com 68px. */
+.sobretitulo + .titulo {
+  padding: 0;
+}
+
+.sobretitulo {
+  line-height: 12px;
+}
+
 /* `appSub` do protótipo — a linha sob o título do header. */
 .subtitulo {
   font-size: var(--dsn-text-xs);
+  line-height: 14px;
   color: var(--dsn-ink-500);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -59,7 +107,7 @@
 .acoesHeader {
   display: flex;
   align-items: center;
-  gap: var(--dsn-space-5);
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -91,8 +139,9 @@
 }
 
 .busca:disabled {
-  color: var(--dsn-ink-400);
-  cursor: not-allowed;
+  /* O protótipo desenha os dois em tinta; desabilitado só no cursor. */
+  color: var(--dsn-ink);
+  cursor: default;
 }
 
 .conteudo {
@@ -142,4 +191,10 @@
 
 .atalho:focus {
   transform: translateY(0);
+}
+
+/* No curador o subtítulo do header é meio ponto maior (protótipo aprovado). */
+.grade[data-papel='curador'] .subtitulo {
+  font-size: 13.5px;
+  line-height: 15px;
 }

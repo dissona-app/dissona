@@ -107,3 +107,26 @@
     transition: none;
   }
 }
+
+/* Cadastro do protótipo aprovado: os requisitos em coluna, cada um com uma
+   marca redonda que acende quando atendido. */
+.soRequisitos .requisitos {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.soRequisitos .requisito,
+.soRequisitos .requisitoAtendido {
+  gap: 8px;
+  font-size: 12px;
+}
+
+.soRequisitos .dot {
+  width: 12px;
+  height: 12px;
+  background: var(--dsn-border);
+}
+
+.soRequisitos .requisitoAtendido .dot {
+  background: var(--dsn-success-dot);
+}

@@ -78,11 +78,13 @@
   appearance: none;
   display: inline-flex;
   align-items: center;
-  gap: var(--dsn-space-5);
+  /* Protótipo aprovado: 40px de altura, cantos de 2px, 5px 12px 5px 5px. */
+  gap: 10px;
+  height: 40px;
   border: var(--dsn-border-width) solid var(--dsn-border);
   background: var(--dsn-surface);
-  border-radius: var(--dsn-radius-full);
-  padding: var(--dsn-space-2) var(--dsn-space-5) var(--dsn-space-2) var(--dsn-space-2);
+  border-radius: 2px;
+  padding: 5px 12px 5px 5px;
   color: var(--dsn-ink);
   font: inherit;
   cursor: pointer;

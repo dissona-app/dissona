@@ -52,7 +52,7 @@ export type PropsPasso1 = PropsDoPasso & {
 export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: PropsPasso1) {
   // Sem `pendente`: quem desabilita os botões é o `useFormStatus` dentro de
   // `AcoesDoPasso`, que lê o estado do formulário em que ele está.
-  const { enviar, falha } = usePasso(acao);
+  const { enviar, aoEnviar, falha } = usePasso(acao);
 
   // Enviar com a foto ainda subindo mandaria `foto_caminho` vazio, e a foto se
   // perderia em silêncio — o `CampoDeFoto` avisa, e o passo trava os botões.
@@ -65,7 +65,7 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
   const aviso = erro ?? erroGeral;
 
   return (
-    <form action={enviar} className={estilos.formulario} noValidate>
+    <form action={enviar} onSubmit={aoEnviar} className={estilos.formulario} noValidate>
       {aviso !== undefined ? (
         <Aviso tom="erro" titulo={aviso}>
           {CURADOR_CADASTRO.fotoHint}
@@ -75,7 +75,7 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
       <CampoDeFoto
         nome={estado.nome}
         aoMudarEnvio={setSubindoFoto}
-        tamanhoDoBotao="sm"
+        tamanho="xl"
         semDica
         caminhoAtual={estado.fotoCaminho}
         textos={{

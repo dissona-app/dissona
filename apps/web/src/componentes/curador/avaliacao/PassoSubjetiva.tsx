@@ -1,11 +1,10 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BarraProgresso } from '@/componentes/base/BarraProgresso';
 import { CampoNota, NOTA_MAXIMA } from '@/componentes/base/CampoNota';
-import { Painel } from '@/componentes/base/Painel';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { mediaObjetiva, mediasPorGrupo } from '@/modulos/avaliacao/servico';
 import type {
@@ -18,6 +17,7 @@ import { AVALIAR } from '@dissona/nucleo/textos/avaliacao';
 import { AcoesDaAvaliacao } from './AcoesDaAvaliacao';
 import { ID_DO_FORMULARIO } from './MolduraDaAvaliacao';
 import estilos from './PassoSubjetiva.module.css';
+import { useAcaoDoFormulario } from '@dissona/nucleo/hooks/useAcaoDoFormulario';
 
 export type PropsPassoSubjetiva = {
   readonly envioId: string;
@@ -64,7 +64,7 @@ export function PassoSubjetiva({
   const [nota, setNota] = useState(avaliacao.notaSubjetiva ?? NOTA_INICIAL);
   const [feedback, setFeedback] = useState(avaliacao.feedback ?? '');
 
-  const [resultado, enviar] = useActionState<ResultadoDeAcao | null, FormData>(
+  const [resultado, enviar, , aoEnviar] = useAcaoDoFormulario<ResultadoDeAcao | null>(
     async (_anterior, dados) => acao(dados),
     null,
   );
@@ -76,69 +76,94 @@ export function PassoSubjetiva({
   const rende = escritos >= regras.feedbackMinCaracteres;
 
   return (
-    <form action={enviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
+    <form action={enviar} onSubmit={aoEnviar} id={ID_DO_FORMULARIO} className={estilos.formulario}>
       <input type="hidden" name="envioId" value={envioId} />
 
       {resultado !== null && !resultado.ok ? (
         <Aviso tom="erro">{AVALIAR.erroInesperado}</Aviso>
       ) : null}
 
-      <Painel titulo={AVALIAR.resumoObjetivo} nivel={3}>
-        <p className={estilos.media}>
-          <strong className={estilos.mediaValor}>
-            {media === null ? AVALIAR.semNotaNoGrupo : formatar(media)}
-          </strong>
-          <span className={estilos.mediaApoio}>
-            {AVALIAR.mediaDeCriterios(avaliacao.notas.length)}
-          </span>
-        </p>
-
-        <ul className={estilos.grupos}>
-          {[...porGrupo].map(([grupo, valor]) => (
-            <li key={grupo} className={estilos.grupo}>
-              <BarraProgresso
-                percentual={valor === null ? 0 : (valor / NOTA_MAXIMA) * 100}
-                rotulo={AVALIAR.grupos[grupo]}
-                detalhe={valor === null ? AVALIAR.semNotaNoGrupo : formatar(valor)}
-              />
-            </li>
-          ))}
-        </ul>
-      </Painel>
-
-      <Painel titulo={AVALIAR.notaSubjetiva} sublegenda={AVALIAR.notaSubjetivaApoio} nivel={3}>
-        {/* O rótulo do campo é diferente do título do painel de propósito —
-            ver `notaSubjetivaCampo`. */}
-        <CampoNota rotulo={AVALIAR.notaSubjetivaCampo} valor={nota} onMudar={setNota} />
-        <input type="hidden" name="notaSubjetiva" value={nota} />
-
-        <div className={estilos.campoFeedback}>
-          <label className={estilos.rotulo} htmlFor="feedback">
-            {AVALIAR.feedback}
-          </label>
-
-          <textarea
-            id="feedback"
-            name="feedback"
-            className={estilos.feedback}
-            value={feedback}
-            onChange={(evento) => setFeedback(evento.target.value)}
-            placeholder={AVALIAR.feedbackPlaceholder}
-            rows={8}
-            required
-            aria-describedby="feedback-contador"
-          />
-
-          <div className={estilos.rodapeDoCampo} id="feedback-contador">
-            <span className={rende ? estilos.dicaAtingida : estilos.dica}>
-              {rende ? AVALIAR.feedbackValido : AVALIAR.feedbackDica(regras.feedbackMinCaracteres)}
+      {/* Protótipo aprovado: o resumo num cartão em tinta à esquerda, a nota
+          subjetiva e a devolutiva num cartão branco à direita. */}
+      <div className={estilos.grade}>
+        <section className={estilos.resumo} aria-labelledby="resumo-objetivo">
+          <h3 id="resumo-objetivo" className={estilos.overline}>
+            {AVALIAR.resumoObjetivo}
+          </h3>
+          <p className={estilos.media}>
+            <strong className={estilos.mediaValor}>
+              {media === null ? AVALIAR.semNotaNoGrupo : formatar(media)}
+            </strong>
+            <span className={estilos.mediaApoio}>
+              {AVALIAR.mediaDeCriterios(avaliacao.notas.length)}
             </span>
-            <span className={rende ? estilos.contadorAtingido : estilos.contador}>
-              {escritos} / {regras.feedbackMinCaracteres}
+          </p>
+
+          <ul className={estilos.grupos}>
+            {[...porGrupo].map(([grupo, valor]) => (
+              <li key={grupo} className={estilos.grupo}>
+                <BarraProgresso
+                  percentual={valor === null ? 0 : (valor / NOTA_MAXIMA) * 100}
+                  rotulo={AVALIAR.grupos[grupo]}
+                  detalhe={valor === null ? AVALIAR.semNotaNoGrupo : formatar(valor)}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className={estilos.parecer} aria-labelledby="nota-subjetiva">
+          <div className={estilos.parecerTopo}>
+            <div>
+              <h3 id="nota-subjetiva" className={estilos.overline}>
+                {AVALIAR.notaSubjetiva}
+              </h3>
+              <p className={estilos.apoio}>{AVALIAR.notaSubjetivaApoio}</p>
+            </div>
+            <span className={estilos.notaGrande} aria-hidden="true">
+              {formatar(nota)}
             </span>
           </div>
-        </div>
-      </Painel>
+          {/* O rótulo do campo é diferente do título do painel de propósito —
+            ver `notaSubjetivaCampo`. */}
+          <CampoNota
+            rotulo={AVALIAR.notaSubjetivaCampo}
+            valor={nota}
+            onMudar={setNota}
+            linhaOculta
+          />
+          <input type="hidden" name="notaSubjetiva" value={nota} />
+
+          <div className={estilos.campoFeedback}>
+            <label className={estilos.rotulo} htmlFor="feedback">
+              {AVALIAR.feedback}
+            </label>
+
+            <textarea
+              id="feedback"
+              name="feedback"
+              className={estilos.feedback}
+              value={feedback}
+              onChange={(evento) => setFeedback(evento.target.value)}
+              placeholder={AVALIAR.feedbackPlaceholder}
+              rows={8}
+              required
+              aria-describedby="feedback-contador"
+            />
+
+            <div className={estilos.rodapeDoCampo} id="feedback-contador">
+              <span className={rende ? estilos.dicaAtingida : estilos.dica}>
+                {rende
+                  ? AVALIAR.feedbackValido
+                  : AVALIAR.feedbackDica(regras.feedbackMinCaracteres)}
+              </span>
+              <span className={rende ? estilos.contadorAtingido : estilos.contador}>
+                {escritos} / {regras.feedbackMinCaracteres}
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <AcoesDaAvaliacao voltarPara={voltarPara} proximoEhRemuneracao={false} />
     </form>

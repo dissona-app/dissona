@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { clienteDeServico } from '../apoio/banco';
+import { clienteDeServico, perfilPorEmail } from '../apoio/banco';
 import { PREFIXO_EFEMERO } from '../apoio/contas';
 import { PERSONA, senhaDeTeste } from '../apoio/personas';
 import { CADASTRAR, CURADOR_CADASTRO } from '../apoio/textos';
@@ -109,10 +109,10 @@ test.describe('D7b · Cadastro de conta do curador', () => {
       await page.waitForURL(/\/curador\/cadastro\/2/, { timeout: 25_000 });
       await expect(page.getByRole('heading', { name: CURADOR_CADASTRO.titulos[1] })).toBeVisible();
 
-      const { data } = await clienteDeServico().auth.admin.listUsers({ page: 1, perPage: 200 });
-      const conta = data.users.find((usuario) => usuario.email === email);
-      expect(conta, 'a conta deveria ter sido criada').toBeTruthy();
-      if (conta === undefined) return;
+      const contaId = await perfilPorEmail(email);
+      expect(contaId, 'a conta deveria ter sido criada').toBeTruthy();
+      if (contaId === null) return;
+      const conta = { id: contaId };
 
       try {
         const { data: perfil } = await clienteDeServico()

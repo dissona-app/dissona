@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { abrirAvaliacao, abrirPelaFila, FAIXA_NA_FILA } from '../apoio/avaliacao';
+import { abrirAvaliacao, abrirPelaFila, FAIXA_NA_FILA, cartaoDaFila } from '../apoio/avaliacao';
 import { envioDaFaixa } from '../apoio/banco';
 import { PERSONA } from '../apoio/personas';
 import { entrarComo } from '../apoio/sessao';
@@ -25,12 +25,7 @@ test.describe('C2 · Iniciar avaliação', () => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
-    await page
-      .getByRole('row')
-      .filter({ hasText: FAIXA_NA_FILA })
-      .getByRole('link')
-      .first()
-      .click();
+    await cartaoDaFila(page, FAIXA_NA_FILA).getByRole('link').first().click();
 
     await expect(page.getByRole('heading', { name: FAIXA_NA_FILA })).toBeVisible();
     await expect(page.getByRole('heading', { name: FILA.prazoRestante })).toBeVisible();

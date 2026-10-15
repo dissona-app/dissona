@@ -20,11 +20,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--dsn-space-2);
-  padding: var(--dsn-space-8) var(--dsn-space-6);
-  border: 1px dashed var(--dsn-ink-250);
-  border-radius: var(--dsn-radius-md);
-  background: var(--dsn-purple-025);
+  justify-content: center;
+  gap: 4px;
+  min-height: 124px;
+  padding: 18px 16px;
+  /* Protótipo aprovado: área cinza, tracejado lilás, onda no meio. */
+  border: 1px dashed #d8c8ea;
+  border-radius: 4px;
+  background: #f4f2ef;
   text-align: center;
   cursor: pointer;
   transition:
@@ -64,7 +67,8 @@
 }
 
 .dropzoneTitulo {
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--dsn-ink);
 }
 
@@ -76,7 +80,8 @@
 .acoes {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--dsn-space-3);
+  align-items: center;
+  gap: 12px;
 }
 
 /* Botão de capa — mesmo truque do input escondido da dropzone. */
@@ -108,38 +113,196 @@
 
 /* 3.1 · "Faixa encontrada" — capa, título e artista vindos do oEmbed. */
 .detectada {
-  display: flex;
-  flex-wrap: wrap;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--dsn-space-8);
-  padding: var(--dsn-space-8);
+  gap: clamp(16px, 2.4vw, 28px);
+  overflow: hidden;
+  padding: 18px 22px;
   border: 1px solid var(--dsn-border);
-  border-radius: var(--dsn-radius-md);
-  background: var(--dsn-surface);
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f6eedd 0%, #ffffff 55%);
+}
+
+/* A cor da capa, desfocada, tinge o cartão — como no protótipo. */
+.detectadaFundo {
+  position: absolute;
+  inset: -60px;
+  background-position: center;
+  background-size: cover;
+  filter: blur(60px) saturate(1.3);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.detectadaArte {
+  position: relative;
+  width: 196px;
+  height: 152px;
+}
+
+.detectadaVinil {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  right: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #1b1424 0 2px, #140d1a 2px 4px);
+  box-shadow: 0 10px 24px rgba(20, 13, 26, 0.35);
+  animation: dsnSpin 9s linear infinite;
+}
+
+.detectadaFuro {
+  position: absolute;
+  inset: 46%;
+  border-radius: 50%;
+  background: #f4f2ef;
 }
 
 .capaDetectada {
-  flex: none;
-  border-radius: var(--dsn-radius-md);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 152px;
+  height: 152px;
+  border-radius: 3px;
+  background: #140d1a;
   object-fit: cover;
+  box-shadow:
+    0 2px 6px rgba(20, 13, 26, 0.16),
+    0 16px 32px rgba(20, 13, 26, 0.28);
 }
 
 .detectadaTexto {
+  position: relative;
   display: flex;
-  flex: 1 1 12rem;
   flex-direction: column;
-  gap: var(--dsn-space-1);
+  gap: 4px;
   min-width: 0;
 }
 
-.detectadaRotulo,
-.detectadaArtista {
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+.detectadaRotulo {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1e7a4a;
 }
 
 .detectadaTitulo {
-  font-weight: 500;
+  font-family: var(--dsn-font-display);
+  font-size: clamp(22px, 3vh, 28px);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
   color: var(--dsn-ink);
   overflow-wrap: anywhere;
+}
+
+.detectadaArtista {
+  font-size: 13px;
+  color: var(--dsn-ink-700, #3a3242);
+}
+
+.detectadaLado {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 180px;
+  padding-left: clamp(16px, 2vw, 24px);
+  border-left: 1px solid var(--dsn-border);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--dsn-ink-500);
+}
+
+@media (max-width: 760px) {
+  .detectada {
+    grid-template-columns: 1fr;
+  }
+
+  .detectadaLado {
+    align-items: flex-start;
+    max-width: none;
+    padding-left: 0;
+    border-left: none;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detectadaVinil {
+    animation: none;
+  }
+}
+
+/* Colar link e Enviar arquivo lado a lado — protótipo aprovado. */
+.duasColunas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.duasColunas > * {
+  height: 100%;
+}
+
+/* ------------------------------------------------ passo 1, aprovado ----- */
+
+/* O campo único de link: o rótulo fica para o leitor de tela; na tela, quem
+   diz o que colar é o "Spotify ou YouTube" do cartão. */
+.linkUnico label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A onda de barras finas sob o campo e dentro da área do arquivo. */
+.onda,
+.ondaDoArquivo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  height: 20px;
+}
+
+.onda > span,
+.ondaDoArquivo > span {
+  flex: 1;
+  max-width: 2px;
+  border-radius: 1px;
+  background: #d8c8ea;
+}
+
+.ondaDoArquivo {
+  width: 70%;
+  height: 14px;
+  margin: 0 auto 8px;
+}
+
+.notaDasAcoes {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--dsn-ink-500);
+}
+
+.detalhes[hidden] {
+  display: none;
+}
+
+/* Os dois cartões do passo 1 são mais justos que um Painel comum. */
+.duasColunas > section {
+  gap: 12px;
+  padding: 16px;
 }
