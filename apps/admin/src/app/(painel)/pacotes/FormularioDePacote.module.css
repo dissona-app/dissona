@@ -2,7 +2,8 @@
 
 .tela {
   width: 100%;
-  max-width: 720px;
+  /* Protótipo aprovado: o formulário ocupa a largura da área, sem cartão. */
+  max-width: none;
   margin-right: auto;
   display: flex;
   flex-direction: column;
@@ -32,19 +33,16 @@
  * 21 usa na tabela.
  */
 .card {
-  border: var(--dsn-border-width) solid var(--dsn-border);
-  border-radius: var(--dsn-radius-3xl);
-  background: var(--dsn-surface);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 24px;
 }
 
 .corpo {
   display: flex;
   flex-direction: column;
   gap: clamp(12px, 2vh, 18px);
-  padding: clamp(16px, 2.4vh, 24px);
+  padding: 0 22px;
 }
 
 .trio {
@@ -161,8 +159,9 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--dsn-space-6);
-  padding: clamp(12px, 1.8vh, 16px) clamp(16px, 2.4vh, 24px);
-  border-top: var(--dsn-border-width) solid var(--dsn-border);
+  padding: 14px 22px;
+  border: var(--dsn-border-width) solid var(--dsn-border);
+  border-radius: 6px;
   background: var(--dsn-surface-alt);
 }
 

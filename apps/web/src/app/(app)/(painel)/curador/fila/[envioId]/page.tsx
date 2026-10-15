@@ -80,7 +80,7 @@ export default async function PaginaDoDetalhe({
   return (
     <div className={estilos.base}>
       <BotaoLink href={ROTA.CURADOR_FILA} variante="ghost" tamanho="sm">
-        {TEXTOS.voltarParaFila}
+        <span aria-hidden="true">‹</span> {TEXTOS.voltarParaFila}
       </BotaoLink>
 
       <section className={estilos.cartao} aria-labelledby="titulo-da-faixa">
@@ -149,6 +149,7 @@ export default async function PaginaDoDetalhe({
                     : horas < 24
                       ? TEXTOS.prazoHoras(Math.floor(horas))
                       : TEXTOS.prazoDias(Math.floor(horas / 24), Math.floor(horas % 24))}
+                  {atrasado ? null : ' restantes'}
                 </p>
                 <span className={estilos.barra}>
                   <span
@@ -158,17 +159,17 @@ export default async function PaginaDoDetalhe({
                     }}
                   />
                 </span>
-                <p className={estilos.nota}>
-                  {atrasado ? TEXTOS.notaAtrasado(diasAteDevolucao) : TEXTOS.notaNoPrazo} ·{' '}
-                  {formatarData(item.prazoEm)}
-                </p>
+                {atrasado ? (
+                  <p className={estilos.nota}>{TEXTOS.notaAtrasado(diasAteDevolucao)}</p>
+                ) : null}
               </div>
 
               <div className={estilos.mini}>
                 <div className={estilos.miniTopo}>
                   <h3 className={estilos.rotulo}>{TEXTOS.rotuloServico}</h3>
                   <span className={estilos.total}>
-                    {TEXTOS.totalDaLeitura}: {claves.formatar(total)} {CARTEIRA.saldoUnidade}
+                    <span className="dsn-apenas-leitor">{TEXTOS.totalDaLeitura}: </span>
+                    {claves.formatar(total)} {CARTEIRA.saldoUnidade}
                   </span>
                 </div>
                 <ul className={estilos.servicos}>
@@ -195,10 +196,6 @@ export default async function PaginaDoDetalhe({
           </div>
         </div>
       </section>
-
-      <p className={estilos.nota}>
-        {TEXTOS.nota} · {prazoDeDevolucaoDias} dias
-      </p>
     </div>
   );
 }

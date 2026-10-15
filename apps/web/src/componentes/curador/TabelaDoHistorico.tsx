@@ -22,6 +22,8 @@ export type LinhaDoHistorico = {
   readonly nota: string;
   readonly noPrazo: boolean | null;
   readonly valor: string;
+  /** "há 2h" — a última edição do rascunho (em andamento). */
+  readonly editadoEm?: string;
 };
 
 export type PropsTabelaDoHistorico = {
@@ -122,6 +124,12 @@ export function TabelaDoHistorico({ tipo, linhas, vazio }: PropsTabelaDoHistoric
                       className={i < passo ? estilosNovos.barraFeita : estilosNovos.barra}
                     />
                   ))}
+                </span>
+              </span>
+              <span className={estilosNovos.edicao}>
+                <span className={estilosNovos.edicaoRotulo}>{TEXTOS.ultimaEdicao}</span>
+                <span className={estilosNovos.edicaoValor}>
+                  {linha.editadoEm ?? TEXTOS.semValor}
                 </span>
               </span>
               <Link

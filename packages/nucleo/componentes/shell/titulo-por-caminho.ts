@@ -129,9 +129,11 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
 
   // 14 — a avaliação. As cinco etapas têm segmento dinâmico e caem no prefixo;
   // esta entrada existe para a raiz `/curador/avaliar`, que redireciona.
+  // A raiz `/curador/avaliar` é "Notas e feedback" (o histórico) no protótipo.
   [ROTA.CURADOR_AVALIAR]: {
-    titulo: 'Avaliação',
-    sublegenda: 'Ouça, dê as notas e escreva a devolutiva.',
+    sobretitulo: 'Suas avaliações',
+    titulo: 'Notas e feedback',
+    sublegenda: 'Suas leituras em andamento e as que você já concluiu.',
   },
 
   // 12.6 — derivada: a sidebar do protótipo **não** tem "Meu cadastro", e o
@@ -207,11 +209,18 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
   // troca `appTitle` e `appSub`), e não o da fila.
   [
     `${ROTA.CURADOR_FILA}/`,
-    { titulo: 'Detalhe da faixa', sublegenda: 'Contexto do artista e serviço contratado.' },
+    {
+      sobretitulo: 'Fila · Faixa selecionada',
+      titulo: 'Detalhe da faixa',
+      sublegenda: 'Contexto do artista e serviço contratado.',
+    },
   ],
   // 14 · 14.1 · 14.2 · 14.3 · 14.4 — as cinco etapas, como no envio: o
   // cabeçalho não muda, e quem diz onde a pessoa está é o indicador de passo.
-  [`${ROTA.CURADOR_AVALIAR}/`, EXATOS[ROTA.CURADOR_AVALIAR] as TituloDeModulo],
+  [
+    `${ROTA.CURADOR_AVALIAR}/`,
+    { titulo: 'Avaliação', sublegenda: 'Ouça, dê as notas e escreva a devolutiva.' },
+  ],
 ];
 
 export function tituloDoCaminho(caminho: string, papel: Papel): TituloDeModulo {

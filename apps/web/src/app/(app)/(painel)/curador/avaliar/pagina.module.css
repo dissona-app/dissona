@@ -5,3 +5,32 @@
   flex-direction: column;
   gap: var(--dsn-space-6);
 }
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.irParaFila {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 4px;
+  background: var(--dsn-surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+}
+
+.cartao {
+  overflow: hidden;
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}

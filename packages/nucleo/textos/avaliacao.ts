@@ -284,6 +284,11 @@ export const HISTORICO = {
 
   continuar: 'Continuar',
   ver: 'Ver',
+  // Protótipo aprovado: abas com contador e a coluna de última edição.
+  abaEmAndamento: 'Em andamento',
+  abaConcluidas: 'Concluídas',
+  ultimaEdicao: 'Última edição',
+  irParaAFila: 'Ir para a Fila',
   noPrazo: 'No prazo',
   foraDoPrazo: 'Fora das 72h',
   semValor: '—',

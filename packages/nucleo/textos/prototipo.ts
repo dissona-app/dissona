@@ -770,7 +770,7 @@ export const ADMIN_PACOTE_FORMULARIO = {
 
   salvar: 'Salvar',
   cancelar: 'Cancelar',
-  notaRodape: 'A alteração vale para novas compras e fica registrada em log.',
+  notaRodape: 'Vale para novas compras.',
 
   flashCriado: 'Pacote criado. Já vale na Carteira do artista.',
   flashAtualizado: 'Pacote atualizado. Já vale na Carteira do artista.',
