@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dissona · Guia da apresentação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tinta: #140d1a;
+        --roxo: #5b2e8f;
+        --lilas: #b780e7;
+        --laranja: #e35336;
+        --areia: #f4f2ef;
+        --borda: #e5deea;
+        --cinza: #6e6478;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--areia);
+        color: var(--tinta);
+        font:
+          15px/1.55 Archivo,
+          system-ui,
+          sans-serif;
+      }
+      header {
+        background: var(--tinta);
+        color: #fff;
+        padding: 40px 16px 32px;
+      }
+      header::before {
+        content: '';
+        display: block;
+        height: 4px;
+        margin: -40px -16px 36px;
+        background: linear-gradient(
+          90deg,
+          #5b2e8f 25%,
+          #7f47dd 25% 50%,
+          #b780e7 50% 75%,
+          #e35336 75%
+        );
+      }
+      .miolo {
+        max-width: 1040px;
+        margin: 0 auto;
+      }
+      main {
+        padding: 28px 16px 64px;
+      }
+      h1,
+      h2 {
+        font-family: Anton, sans-serif;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.01em;
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(32px, 6vw, 52px);
+        line-height: 1.05;
+      }
+      h2 {
+        font-size: 24px;
+        margin-bottom: 12px;
+      }
+      .sobre {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--lilas);
+      }
+      header p {
+        color: #c6b4de;
+        max-width: 640px;
+      }
+      section {
+        background: #fff;
+        border: 1px solid var(--borda);
+        border-radius: 6px;
+        padding: 22px;
+        margin-bottom: 18px;
+      }
+      .links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+      .link {
+        display: block;
+        padding: 16px;
+        border: 1px solid var(--borda);
+        border-radius: 4px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .link strong {
+        display: block;
+        color: var(--roxo);
+        font-size: 17px;
+      }
+      .link span {
+        color: var(--cinza);
+        font-size: 13px;
+      }
+      .tabela {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th {
+        text-align: left;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--cinza);
+        padding: 8px;
+        border-bottom: 1px solid var(--borda);
+      }
+      td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #f0ebf4;
+        vertical-align: top;
+      }
+      code {
+        background: #f7f3fb;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 13px;
+        word-break: break-all;
+      }
+      a {
+        color: var(--roxo);
+      }
+      ol {
+        margin: 0;
+        padding-left: 20px;
+      }
+      ol li {
+        margin: 6px 0;
+      }
+      .passos {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 14px;
+      }
+      .passos > div {
+        border-left: 3px solid var(--lilas);
+        padding-left: 14px;
+      }
+      .passos h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+      }
+      .nota {
+        color: var(--cinza);
+        font-size: 13px;
+      }
+      .alerta {
+        background: #fdf3e2;
+        border-color: #f2dcb6;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="miolo">
+        <span class="sobre">Dissona · Release R2 · 15/10/2026</span>
+        <h1>Guia da apresentação</h1>
+        <p>
+          Roteiro da demonstração, endereços oficiais e as contas de acesso de cada perfil —
+          artista, curador e administrador. O visual segue o protótipo aprovado em 30/09.
+        </p>
+      </div>
+    </header>
+
+    <main class="miolo">
+      <section>
+        <h2>Endereços</h2>
+        <div class="links">
+          <a class="link" href="{{WEB}}/artista/entrar"
+            ><strong>Área do artista</strong><span>{{WEB}}/artista/entrar</span></a
+          >
+          <a class="link" href="{{WEB}}/curador/entrar"
+            ><strong>Área do curador</strong><span>{{WEB}}/curador/entrar</span></a
+          >
+          <a class="link" href="{{PAINEL}}/entrar"
+            ><strong>Painel administrativo</strong><span>{{PAINEL}}/entrar</span></a
+          >
+        </div>
+      </section>
+
+      <section>
+        <h2>Contas de acesso</h2>
+        <div class="tabela">
+          <table>
+            <thead>
+              <tr>
+                <th>Perfil</th>
+                <th>E-mail</th>
+                <th>Senha</th>
+                <th>Entrar por</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{CONTAS}}
+              <tr>
+                <td><strong>Artista + Curador (Lucas)</strong></td>
+                <td><code>lucas.andrade+2@fraktalsoftwares.com.br</code></td>
+                <td><span class="nota">senha pessoal do Lucas</span></td>
+                <td><a href="{{WEB}}/curador/entrar">dissona.com.br/curador/entrar</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="nota">
+          Contas de demonstração. Pagamentos estão em modo simulado: nenhuma cobrança real é feita.
+        </p>
+      </section>
+
+      <section>
+        <h2>Roteiro</h2>
+        <div class="passos">
+          <div>
+            <h3>1 · Artista</h3>
+            <ol>
+              <li>Entrar e ver o <strong>Perfil</strong> (capa, faixas, notas).</li>
+              <li>
+                <strong>Carteira</strong> → Comprar Claves → escolher pacote → Pagamento (simulado).
+              </li>
+              <li>
+                <strong>Enviar faixa</strong> em 4 passos: arquivo ou link → contexto →
+                <strong>escolher curador</strong> → revisar e enviar.
+              </li>
+              <li>Ver o <strong>Status do envio</strong> por curador.</li>
+              <li><strong>Configurações</strong>: dados, preferências e segurança.</li>
+            </ol>
+          </div>
+          <div>
+            <h3>2 · Curador</h3>
+            <ol>
+              <li>Entrar pela área do curador: cai direto na <strong>Fila</strong>.</li>
+              <li>Abrir uma faixa → <strong>Iniciar avaliação</strong>.</li>
+              <li>
+                Avaliação em 4 passos: notas por critério → nota e feedback → compartilhamento →
+                <strong>remuneração</strong> (recibo e total).
+              </li>
+              <li><strong>Notas e feedback</strong>: histórico das avaliações.</li>
+              <li><strong>Meu perfil</strong>: a vitrine pública do curador.</li>
+            </ol>
+          </div>
+          <div>
+            <h3>3 · Administrador</h3>
+            <ol>
+              <li>Entrar no painel.</li>
+              <li><strong>Pacotes de Claves</strong>: criar, editar, ativar e desativar.</li>
+              <li><strong>Conta e equipe</strong>: convidar membro e permissões.</li>
+            </ol>
+          </div>
+          <div>
+            <h3>4 · Cadastro</h3>
+            <ol>
+              <li>Criar conta de artista (Criar conta → onboarding de 4 passos).</li>
+              <li>
+                Cadastro de curador em 8 passos → classificação (Bronze ou candidato a Prata).
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="alerta">
+        <h2>Pontos de atenção</h2>
+        <ol>
+          <li>Ranking e calibração dos curadores entram na próxima release (sem dados ainda).</li>
+          <li>Capa do perfil personalizável: em implantação.</li>
+          <li>Curso de curadoria (boas-vindas Bronze): conteúdo do cliente, botão já presente.</li>
+        </ol>
+      </section>
+    </main>
+  </body>
+</html>
