@@ -6,7 +6,7 @@ import { detectarFaixa, salvarFaixa } from '@/modulos/faixa/acoes';
 import { lerLimitesDeUpload } from '@/modulos/faixa/consultas';
 
 export const metadata: Metadata = {
-  title: 'Enviar música',
+  title: 'Enviar faixa',
   robots: { index: false, follow: false },
 };
 

@@ -3,8 +3,9 @@
 .base {
   display: flex;
   flex-direction: column;
-  gap: var(--dsn-space-8);
-  padding: var(--dsn-space-12);
+  /* Protótipo aprovado: 24px de respiro, 20px entre as linhas. */
+  gap: 20px;
+  padding: 24px;
   border: 1px solid var(--dsn-border);
   border-radius: var(--dsn-radius-3xl);
   background: var(--dsn-surface);
@@ -37,15 +38,21 @@
 .titulo {
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: var(--dsn-tracking-snug);
+  letter-spacing: -0.01em;
   /* O e-mail da conta pode ser longo e não tem espaços onde quebrar. */
   overflow-wrap: anywhere;
 }
 
 .nota {
   font-size: var(--dsn-text-sm);
-  line-height: var(--dsn-leading-body);
+  line-height: 1.55;
   color: var(--dsn-ink-700);
+}
+
+.valorLeve {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--dsn-ink);
 }
 
 .acao {

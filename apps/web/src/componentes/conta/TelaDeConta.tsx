@@ -90,6 +90,8 @@ export type PropsTelaDeConta = {
   readonly cartaoSalvo?: CartaoSalvo | null;
   /** Remove o cartão. Vem junto com `cartaoSalvo`. */
   readonly acaoDeRemoverCartao?: ((dados: FormData) => Promise<ResultadoDeAcao>) | undefined;
+  /** Nome da conta, na linha de "Dados de cobrança" do artista. */
+  readonly nome?: string;
   /** Catálogo de avisos e idioma, para a aba Preferências (7.3 / 17.3). */
   readonly preferencias?: Preferencias | null;
 };
@@ -116,6 +118,7 @@ export function TelaDeConta({
   preferencias = null,
   cartaoSalvo = null,
   acaoDeRemoverCartao,
+  nome = '',
 }: PropsTelaDeConta) {
   return (
     <div className={estilos.base}>
@@ -132,25 +135,27 @@ export function TelaDeConta({
             overline={CONTA.emailTitulo}
             titulo={CONTA.emailTitulo}
             valor={email}
-            nota={CONTA.emailNota}
             rotuloDaAcao={CONTA.alterarEmail}
             acao={trocarEmail}
           />
 
-          <CartaoDeConta
-            overline={CONTA.financeiroPendente[ambiente].titulo}
-            titulo={CONTA.financeiroPendente[ambiente].titulo}
-            nota={CONTA.financeiroPendente[ambiente].texto}
-          >
-            <Aviso estatico>{CONTA.pendenteNestaRelease}</Aviso>
-          </CartaoDeConta>
-
-          {/* O cartão guardado é do artista: o bloco do curador é de
-              recebimento, e não tem cartão. Aparece mesmo vazio — é onde a
-              pessoa procura, e o vazio explica quando um cartão aparece. */}
+          {/* Protótipo aprovado: no artista, "Dados de cobrança" traz o
+              cartão salvo dentro; no curador, o recebimento segue pendente. */}
           {ambiente === 'artista' && acaoDeRemoverCartao !== undefined ? (
-            <CartaoSalvoNaConta cartao={cartaoSalvo} acaoDeRemover={acaoDeRemoverCartao} />
-          ) : null}
+            <CartaoSalvoNaConta
+              nome={nome}
+              cartao={cartaoSalvo}
+              acaoDeRemover={acaoDeRemoverCartao}
+            />
+          ) : (
+            <CartaoDeConta
+              overline={CONTA.financeiroPendente[ambiente].titulo}
+              titulo={CONTA.financeiroPendente[ambiente].titulo}
+              nota={CONTA.financeiroPendente[ambiente].texto}
+            >
+              <Aviso estatico>{CONTA.pendenteNestaRelease}</Aviso>
+            </CartaoDeConta>
+          )}
 
           {/* O convite só aparece para quem ainda não é curador — e só no
               ambiente do artista, que é onde o protótipo o desenha. */}

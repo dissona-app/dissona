@@ -15,7 +15,7 @@ import { ehPassoDoEnvio } from '@/modulos/faixa/tipos';
 import { CARTEIRA, ENVIAR } from '@dissona/nucleo/textos/prototipo';
 
 export const metadata: Metadata = {
-  title: 'Enviar música',
+  title: 'Enviar faixa',
   robots: { index: false, follow: false },
 };
 

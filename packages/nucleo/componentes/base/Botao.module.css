@@ -236,6 +236,11 @@
   font-size: var(--dsn-text-xs);
 }
 
+:global([data-botoes='cartao']) .sm {
+  /* A ação de um cartão de Conta: 11px 20px no protótipo aprovado. */
+  padding: 11px 20px;
+}
+
 :global([data-botoes='compacto']) .sm {
   font-size: var(--dsn-text-xs);
 }

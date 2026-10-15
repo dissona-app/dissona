@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { apagarContaEfemera, criarContaEfemera } from '../apoio/contas';
 import type { ContaEfemera } from '../apoio/contas';
 import { entrarComCredenciais } from '../apoio/sessao';
-import { ARTISTA_PERFIL, CONTA, PREFERENCIAS } from '../apoio/textos';
+import { ARTISTA_PERFIL, CARTAO_SALVO, CONTA, PREFERENCIAS } from '../apoio/textos';
 
 /**
  * F1 · Perfil e preferências — módulos 7 e 17, RF-019, RF-021 e RF-022
@@ -194,15 +194,17 @@ test.describe('F1 · Perfil e preferências', () => {
    * esquecer de remover o aviso, este teste falha e diz por quê.
    */
   test(
-    'os dados de cobrança ainda não estão nesta release',
+    'os dados de cobrança mostram o cartão guardado, ou dizem que não há',
     { tag: ['@RF-020'] },
     async ({ page }, info) => {
       const conta = await artista(info.workerIndex);
       await entrarComCredenciais(page, conta.email);
       await page.goto('/artista/conta?aba=dados');
 
+      // Protótipo aprovado: "Dados de cobrança" traz o cartão dentro. A conta
+      // nova não tem cartão, e o bloco diz como ele aparece.
       await expect(page.getByText(CONTA.financeiroPendente.artista.titulo).first()).toBeVisible();
-      await expect(page.getByText(CONTA.pendenteNestaRelease).first()).toBeVisible();
+      await expect(page.getByText(CARTAO_SALVO.vazioEmConta)).toBeVisible();
     },
   );
 });

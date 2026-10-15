@@ -502,7 +502,8 @@ test.describe('B2 · Comprar Claves', () => {
       // 3. Remover, em Dados da conta — guardar sem poder tirar seria guardar
       // sem consentimento revogável.
       await page.goto('/artista/conta?aba=dados');
-      await expect(page.getByText(/···· \d{4}$/)).toBeVisible();
+      // Em Dados de cobrança o número aparece mascarado como no protótipo.
+      await expect(page.getByText(/•••• \d{4}$/)).toBeVisible();
       await page.getByRole('button', { name: CARTAO_SALVO.remover }).click();
       await expect(
         page.getByRole('status').filter({ hasText: CARTAO_SALVO.removido }),

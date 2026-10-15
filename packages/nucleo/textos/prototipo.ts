@@ -681,7 +681,7 @@ export const ONBOARDING = {
 /** Tela 21 — lista de pacotes de Claves (`/admin/pacotes`). */
 export const ADMIN_PACOTES = {
   titulo: 'Pacotes de Claves',
-  subtitulo: 'Pacotes que o artista compra.',
+  subtitulo: 'Preço, desconto e disponibilidade dos pacotes na Carteira do artista.',
   base: 'Base de 1 Clave por R$ 10, com desconto progressivo por volume.',
   novo: 'Novo pacote',
 
@@ -829,6 +829,7 @@ export const NAVEGACAO_DO_CURADOR = {
   metricas: 'Métricas',
   financeiro: 'Financeiro',
   grupoConta: 'Conta',
+  meuPerfil: 'Meu perfil',
   conta: 'Conta e configurações',
 } as const;
 
@@ -1317,20 +1318,20 @@ export const STATUS_DO_ENVIO = {
  */
 export const PAINEIS = {
   artista: {
-    titulo: 'Painel do artista',
-    sublegenda: 'Suas faixas, prazos e devolutivas.',
+    titulo: 'Início',
+    sublegenda: 'Suas faixas em análise, notas recentes e o que fazer agora.',
     vazio: 'O painel do artista entra na Release 4',
     descricao: 'Faixas em análise, devolutivas recentes, saldo de Claves e próximos prazos.',
   },
   curador: {
     titulo: 'Painel do curador',
-    sublegenda: 'Suas leituras, prazos e ganhos do período.',
+    sublegenda: 'Sua fila, leituras em andamento e prazos da semana.',
     vazio: 'O painel do curador entra na Release 4',
     descricao: 'Convites abertos, leituras em andamento, prazos e Claves do período.',
   },
   admin: {
     titulo: 'Painel administrativo',
-    sublegenda: 'Visão geral da plataforma.',
+    sublegenda: 'Envios, devolutivas, receita e o que pede decisão hoje.',
     vazio: 'O painel administrativo entra na Release 4',
     descricao:
       'Volume de envios, devolutivas em atraso, receita do período e alertas de moderação.',
@@ -1480,6 +1481,9 @@ export const CARTAO_SALVO = {
   vazioEmConta: 'Nenhum cartão salvo. O primeiro pagamento com cartão guarda um.',
   nota: 'Guardamos só a referência que o provedor devolve — nunca o número, a validade ou o código de segurança.',
   remover: 'Remover cartão',
+  /** A linha do cartão em Dados de cobrança — protótipo aprovado. */
+  mascarado: (ultimos: string) => `•••• •••• •••• ${ultimos}`,
+  padrao: 'Padrão',
   removido: 'Cartão removido.',
   erroNaoEncontrado: 'Esse cartão não está mais salvo.',
 } as const;

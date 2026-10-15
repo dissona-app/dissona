@@ -1,24 +1,67 @@
-/* O cartão guardado em 7.2 — identificação à esquerda, "Remover" à direita. */
+/* O cartão guardado dentro de "Dados de cobrança" — protótipo aprovado. */
 
 .linha {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--dsn-space-6);
+  gap: 14px;
+  padding: 16px;
+  border-radius: 4px;
+  background: var(--dsn-purple-050);
 }
 
-.identificacao {
-  font-size: var(--dsn-text-base);
-  font-weight: var(--dsn-weight-semibold);
-  letter-spacing: var(--dsn-tracking-snug);
-  font-variant-numeric: tabular-nums;
+.bandeira {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 28px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 5px;
+  background: #ffffff;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+  overflow: hidden;
+}
+
+.textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.numero {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--dsn-ink);
+}
+
+.detalhe {
+  font-size: 12px;
+  color: var(--dsn-ink-500);
+}
+
+.padrao {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: 2px;
+  background: #e6f5ed;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1e7a4a;
 }
 
 .vazio {
   margin: 0;
-  font-size: var(--dsn-text-sm);
+  padding: 16px;
+  border-radius: 4px;
+  background: var(--dsn-purple-050);
+  font-size: 13px;
   color: var(--dsn-ink-500);
-  text-wrap: pretty;
 }

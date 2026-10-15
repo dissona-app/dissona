@@ -3,8 +3,14 @@
 .grade {
   display: grid;
   grid-template-columns: var(--dsn-sidebar-largura) 1fr;
+  transition: grid-template-columns 200ms var(--dsn-ease-out);
   align-items: stretch;
   min-height: 100vh;
+}
+
+/* "Recolher menu": a lateral fica só com os ícones. */
+.grade:has(> aside[data-recolhido]) {
+  grid-template-columns: 68px 1fr;
 }
 
 .coluna {
@@ -24,8 +30,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dsn-space-12);
-  padding: clamp(14px, 2.4vh, 20px) var(--dsn-space-20) clamp(10px, 1.6vh, 14px);
+  gap: 24px;
+  padding: 20px 40px 14px;
   background: var(--dsn-topbar-bg);
   backdrop-filter: blur(10px);
 }
@@ -88,7 +94,7 @@
 .acoesHeader {
   display: flex;
   align-items: center;
-  gap: var(--dsn-space-5);
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -120,8 +126,9 @@
 }
 
 .busca:disabled {
-  color: var(--dsn-ink-400);
-  cursor: not-allowed;
+  /* O protótipo desenha os dois em tinta; desabilitado só no cursor. */
+  color: var(--dsn-ink);
+  cursor: default;
 }
 
 .conteudo {
@@ -171,4 +178,9 @@
 
 .atalho:focus {
   transform: translateY(0);
+}
+
+/* No curador o subtítulo do header é meio ponto maior (protótipo aprovado). */
+.grade[data-papel='curador'] .subtitulo {
+  font-size: 13.5px;
 }

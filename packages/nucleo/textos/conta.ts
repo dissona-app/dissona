@@ -68,8 +68,7 @@ export const CONTA = {
   papeis: {
     overline: 'Papéis da conta',
     titulo: 'Ativar papel de curador',
-    texto:
-      'Os papéis se acumulam: você segue artista e passa a receber faixas para avaliar. Depende de aprovação da curadoria.',
+    texto: 'Você continua artista. A candidatura passa por aprovação da curadoria.',
     acao: 'Quero avaliar faixas',
   },
 

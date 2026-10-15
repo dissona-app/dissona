@@ -41,14 +41,17 @@ export type TituloDeModulo = {
 
 /** Rota exata → título. Consultado antes das regras de prefixo. */
 const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
-  [ROTA.ADMIN]: { titulo: 'Painel administrativo', sublegenda: 'Visão geral da plataforma.' },
+  [ROTA.ADMIN]: {
+    titulo: 'Painel administrativo',
+    sublegenda: 'Envios, devolutivas, receita e o que pede decisão hoje.',
+  },
   [ROTA.ADMIN_USUARIOS]: {
     titulo: 'Curadores e artistas',
-    sublegenda: 'Usuários, aprovações e promoções.',
+    sublegenda: 'Aprovação de classes, suspensões e histórico de cada conta.',
   },
   [ROTA.ADMIN_PACOTES]: {
     titulo: 'Pacotes de Claves',
-    sublegenda: 'Pacotes que o artista compra.',
+    sublegenda: 'Preço, desconto e disponibilidade dos pacotes na Carteira do artista.',
   },
   [ROTA.ADMIN_PACOTES_NOVO]: {
     titulo: 'Novo pacote',
@@ -64,7 +67,7 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   },
   [ROTA.ADMIN_EQUIPE]: {
     titulo: 'Conta e equipe',
-    sublegenda: 'Seus dados, equipe e permissões.',
+    sublegenda: 'Seus dados de acesso, integrantes da equipe e permissões.',
   },
 
   // Conta e configurações (7.2/7.4 e 17.2/17.4). Título e sublegenda literais:
@@ -73,11 +76,11 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   // um texto genérico servindo aos dois.
   [ROTA.ARTISTA_CONTA]: {
     titulo: 'Configurações',
-    sublegenda: 'Conta, preferências e segurança.',
+    sublegenda: 'Acesso, segurança, preferências e privacidade da conta.',
   },
   [ROTA.CURADOR_CONTA]: {
     titulo: 'Conta e configurações',
-    sublegenda: 'Dados de recebimento, preferências e segurança.',
+    sublegenda: 'Acesso, segurança, preferências e dados de recebimento.',
   },
 
   // 7.1 — **duas** telas, como no protótipo: a vitrine ("Perfil", sem
@@ -85,10 +88,13 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   // cadastro", com "Atualize o que os curadores veem."). A frase
   // "Curadores veem essas informações…" é a primeira linha do corpo do
   // formulário, e continua lá, no `Painel`.
-  [ROTA.ARTISTA_PERFIL]: { titulo: ARTISTA_VITRINE.titulo },
+  [ROTA.ARTISTA_PERFIL]: {
+    titulo: ARTISTA_VITRINE.titulo,
+    sublegenda: 'Como os curadores veem você antes de aceitar a faixa.',
+  },
   [ROTA.ARTISTA_PERFIL_EDITAR]: {
     titulo: ARTISTA_PERFIL.titulo,
-    sublegenda: 'Atualize o que os curadores veem.',
+    sublegenda: 'Dados do artista, links e gêneros que você trabalha.',
   },
 
   // 5 e 5.3. O extrato vem **antes** da carteira no objeto por clareza; a
@@ -100,7 +106,7 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   },
   [ROTA.ARTISTA_CARTEIRA]: {
     titulo: 'Carteira',
-    sublegenda: 'Seu saldo e histórico de Claves.',
+    sublegenda: 'Saldo de Claves, compras e o que já foi usado em envios.',
   },
   [ROTA.ARTISTA_PACOTES]: {
     titulo: 'Comprar Claves',
@@ -110,7 +116,7 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   // 3 — o wizard de envio. As subrotas (`/<faixaId>/<passo>`) caem no mapa de
   // prefixo, logo abaixo, porque têm segmento dinâmico.
   [ROTA.ARTISTA_ENVIAR]: {
-    titulo: 'Enviar música',
+    titulo: 'Enviar faixa',
     sublegenda: 'Comece pelo link ou pelo arquivo da faixa.',
   },
 
@@ -181,6 +187,7 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
   // Os passos 2 e 3 do envio — `/artista/enviar/<faixaId>/<passo>`. O título é
   // o mesmo do passo 1: o wizard é uma tela só, e quem diz onde a pessoa está
   // é o indicador de passo, não o cabeçalho.
+  // O status de um envio tem cabeçalho próprio no protótipo aprovado.
   [`${ROTA.ARTISTA_ENVIAR}/`, EXATOS[ROTA.ARTISTA_ENVIAR] as TituloDeModulo],
   // 13.1 — o detalhe tem cabeçalho próprio no protótipo (`naFila && s.filaSel`
   // troca `appTitle` e `appSub`), e não o da fila.

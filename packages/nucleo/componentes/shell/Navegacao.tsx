@@ -2,6 +2,7 @@
 
 import Link, { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { Marca } from '@dissona/nucleo/componentes/base/Marca';
@@ -9,6 +10,7 @@ import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import type { Papel } from '@dissona/nucleo/lib/papeis';
 
 import { useCaminhoInterno, useHrefDoAdmin } from './BaseDoAdmin';
+import { IconeDeNavegacao } from './IconeDeNavegacao';
 import estilos from './Navegacao.module.css';
 import { NAVEGACAO, NOME_AMBIENTE } from './navegacao-por-ambiente';
 
@@ -27,13 +29,35 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
   const hrefDoAdmin = useHrefDoAdmin();
   const grupos = NAVEGACAO[papel];
 
+  // "Recolher menu" do protótipo aprovado: a lateral fica só com os ícones.
+  // A escolha vale para a pessoa neste navegador.
+  const [recolhido, setRecolhido] = useState(false);
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRecolhido(window.localStorage.getItem(CHAVE_RECOLHIDO) === '1');
+    } catch {
+      // Sem storage (aba privada), o menu abre expandido.
+    }
+  }, []);
+  const alternar = () => {
+    setRecolhido((antes) => {
+      try {
+        window.localStorage.setItem(CHAVE_RECOLHIDO, antes ? '0' : '1');
+      } catch {
+        // idem
+      }
+      return !antes;
+    });
+  };
+
   return (
-    <aside className={estilos.aside}>
+    <aside className={estilos.aside} data-recolhido={recolhido || undefined}>
       <Link
         className={estilos.marca}
         href={papel === 'admin' ? hrefDoAdmin(ROTA.ADMIN) : ROTA.HOME}
       >
-        <Marca variante="branca" altura="clamp(28px, 3.8vh, 34px)" />
+        <Marca variante="branca" altura="clamp(36px, 4.8vh, 42px)" />
       </Link>
 
       <nav className={estilos.grupos} aria-label={`Navegação — ${NOME_AMBIENTE[papel]}`}>
@@ -73,25 +97,24 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                         href={hrefDoAdmin(item.caminho)}
                         aria-current={ativo ? 'page' : undefined}
                         data-cor={(item.cor ?? ordem) % 3}
+                        title={recolhido ? item.rotulo : undefined}
                       >
+                        <IconeDeNavegacao nome={item.icone} ativo={ativo} />
                         <span className={estilos.rotulo}>{item.rotulo}</span>
                         <IndicadorDeNavegacao />
                       </Link>
                     ) : (
-                      // Item de release futura: visível para dar noção do
-                      // produto inteiro, mas não navegável. `aria-disabled`
-                      // em vez de remover do DOM, para a navegação não mudar
-                      // de forma a cada entrega. O selo "Em breve" é o aviso
-                      // visível — só o `title` parecia um botão quebrado.
+                      // Item de release futura. O protótipo aprovado o desenha
+                      // igual aos outros, e é assim que ele aparece; não
+                      // navega, e o `title` e o texto para leitor de tela
+                      // dizem por quê.
                       <span
                         className={[estilos.item, estilos.indisponivel].join(' ')}
                         aria-disabled="true"
                         title={item.motivo ?? `Disponível na Release ${item.release}`}
                       >
+                        <IconeDeNavegacao nome={item.icone} />
                         <span className={estilos.rotulo}>{item.rotulo}</span>
-                        <span className={estilos.emBreve} aria-hidden="true">
-                          Em breve
-                        </span>
                         <span className="dsn-apenas-leitor">
                           {` — ${item.motivo ?? `disponível na Release ${item.release}`}`}
                         </span>
@@ -105,10 +128,26 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
         ))}
       </nav>
 
+      <div className={estilos.espaco} aria-hidden="true" />
+
       {rodape !== undefined ? <div className={estilos.rodape}>{rodape}</div> : null}
+
+      <button
+        type="button"
+        className={estilos.recolher}
+        onClick={alternar}
+        aria-label={recolhido ? 'Expandir menu' : 'Recolher menu'}
+        aria-expanded={!recolhido}
+        title={recolhido ? 'Expandir menu' : undefined}
+      >
+        <IconeDeNavegacao nome="recolher" />
+        <span className={estilos.rotulo}>Recolher menu</span>
+      </button>
     </aside>
   );
 }
+
+const CHAVE_RECOLHIDO = 'dsn-menu-recolhido';
 
 /**
  * O retorno imediato do clique: enquanto a rota seguinte carrega, o item

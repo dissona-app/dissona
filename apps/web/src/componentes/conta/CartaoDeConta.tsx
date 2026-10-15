@@ -9,12 +9,14 @@ export type PropsCartaoDeConta = {
   readonly titulo: string;
   /** Valor em destaque no lugar do título — o e-mail da conta, por exemplo. */
   readonly valor?: string;
-  readonly nota: string;
+  readonly nota?: string;
   /** Botão ou link à direita. */
   readonly acao?: ReactNode;
   /** Conteúdo abaixo da linha principal — o aviso de sucesso, por exemplo. */
   readonly children?: ReactNode;
   readonly variante?: VarianteCartaoDeConta;
+  /** O valor em 15px/400 (o nome em "Dados de cobrança"), e não 18px/600. */
+  readonly leve?: boolean;
 };
 
 const CLASSE_VARIANTE: Record<VarianteCartaoDeConta, string | undefined> = {
@@ -48,6 +50,7 @@ export function CartaoDeConta({
   acao,
   children,
   variante = 'padrao',
+  leve = false,
 }: PropsCartaoDeConta) {
   return (
     <section
@@ -57,11 +60,15 @@ export function CartaoDeConta({
       <div className={estilos.linha}>
         <div className={estilos.textos}>
           <span className={estilos.overline}>{overline}</span>
-          <span className={estilos.titulo}>{valor ?? titulo}</span>
-          <span className={estilos.nota}>{nota}</span>
+          <span className={leve ? estilos.valorLeve : estilos.titulo}>{valor ?? titulo}</span>
+          {nota === undefined ? null : <span className={estilos.nota}>{nota}</span>}
         </div>
 
-        {acao !== undefined ? <div className={estilos.acao}>{acao}</div> : null}
+        {acao !== undefined ? (
+          <div className={estilos.acao} data-botoes="cartao">
+            {acao}
+          </div>
+        ) : null}
       </div>
 
       {children}

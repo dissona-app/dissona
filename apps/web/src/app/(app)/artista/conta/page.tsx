@@ -56,6 +56,7 @@ export default async function Pagina({
   return (
     <TelaDeConta
       ambiente="artista"
+      nome={identidade.nome}
       caminho={ROTA.ARTISTA_CONTA}
       aba={aba}
       email={identidade.email}

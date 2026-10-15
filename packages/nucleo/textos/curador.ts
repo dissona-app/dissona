@@ -332,8 +332,8 @@ export const CURADOR_CLASSIFICACAO = {
  * classe.
  */
 export const CURADOR_MANUTENCAO = {
-  titulo: 'Meu cadastro',
-  subtitulo: 'Suas mídias, seus serviços e a classe que você tem hoje.',
+  titulo: 'Meu perfil',
+  subtitulo: 'Como os artistas veem você antes de escolher quem ouve a faixa.',
 
   classeOverline: 'Classe atual',
   /**

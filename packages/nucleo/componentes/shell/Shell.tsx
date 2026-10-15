@@ -89,7 +89,40 @@ function BotaoDeBusca() {
         focusable="false"
       >
         <circle cx="11" cy="11" r="7" />
-        <path d="m16.5 16.5 4 4" />
+        <path d="m20 20-4.3-4.3" />
+      </svg>
+    </button>
+  );
+}
+
+/**
+ * O sino do header, ao lado da busca — nos três protótipos. As notificações
+ * são de uma release futura; como a busca, o botão aparece e fica desabilitado.
+ * Sem contador: um número inventado seria pior que nenhum.
+ */
+function BotaoDeNotificacoes() {
+  return (
+    <button
+      type="button"
+      className={estilos.busca}
+      disabled
+      title="As notificações chegam numa release futura"
+      aria-label="Notificações"
+    >
+      <svg
+        width="17"
+        height="17"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16S18 14 18 9" />
+        <path d="M13.7 19a2 2 0 0 1-3.4 0" />
       </svg>
     </button>
   );
@@ -152,6 +185,7 @@ export function Shell({
           <div className={estilos.acoesHeader}>
             {acoes}
             <BotaoDeBusca />
+            <BotaoDeNotificacoes />
             {identidade !== undefined && acaoDeSair !== undefined ? (
               <MenuDaConta
                 identidade={identidade}
