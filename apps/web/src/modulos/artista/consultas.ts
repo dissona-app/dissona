@@ -72,7 +72,10 @@ export async function lerVitrineDoArtista(): Promise<Vitrine | null> {
     contarIndicacoes(perfil.perfilArtistaId),
   ]);
 
-  const notas = await notasDasFaixas(faixas.slice(0, FAIXAS_NA_VITRINE));
+  // O Perfil é o que os curadores veem: rascunho (faixa começada e não
+  // enviada) não entra. Os rascunhos ficam em "Minhas faixas".
+  const enviadas = faixas.filter((faixa) => faixa.envios > 0);
+  const notas = await notasDasFaixas(enviadas.slice(0, FAIXAS_NA_VITRINE));
 
   return {
     perfil,
@@ -81,14 +84,14 @@ export async function lerVitrineDoArtista(): Promise<Vitrine | null> {
       leituras: leiturasConcluidas(faixas),
       indicacoes,
     },
-    faixas: faixas.slice(0, FAIXAS_NA_VITRINE).map((faixa) => ({
+    faixas: enviadas.slice(0, FAIXAS_NA_VITRINE).map((faixa) => ({
       id: faixa.id,
       titulo: faixa.titulo,
       genero: faixa.genero,
       status: statusDaFaixa(faixa),
       nota: notas.get(faixa.id) ?? null,
     })),
-    temMais: faixas.length > FAIXAS_NA_VITRINE,
+    temMais: enviadas.length > FAIXAS_NA_VITRINE,
   };
 }
 
@@ -105,18 +108,34 @@ export type FaixaNaLista = {
   readonly media: number | null;
 };
 
+export type RascunhoNaLista = {
+  readonly id: string;
+  readonly titulo: string;
+  readonly genero: string | null;
+};
+
+export type MinhasFaixas = {
+  readonly enviadas: readonly FaixaNaLista[];
+  /** Faixas começadas e não enviadas — continuam pelo wizard. */
+  readonly rascunhos: readonly RascunhoNaLista[];
+};
+
 /** Tudo que "Minhas faixas" mostra, numa ida. */
-export async function lerMinhasFaixas(): Promise<readonly FaixaNaLista[] | null> {
+export async function lerMinhasFaixas(): Promise<MinhasFaixas | null> {
   const perfil = await lerMeuPerfil();
   if (perfil === null) return null;
 
-  const faixas = await listarFaixasEnviadas(perfil.perfilArtistaId);
+  const todas = await listarFaixasEnviadas(perfil.perfilArtistaId);
+  const faixas = todas.filter((faixa) => faixa.envios.length > 0);
+  const rascunhos = todas
+    .filter((faixa) => faixa.envios.length === 0)
+    .map((faixa) => ({ id: faixa.id, titulo: faixa.titulo, genero: faixa.genero }));
   const notas = await notasDasFaixas(
     faixas.map((faixa) => ({ id: faixa.id, envioIds: faixa.envios.map((envio) => envio.id) })),
   );
   const agora = new Date();
 
-  return faixas.map((faixa) => {
+  const enviadas = faixas.map((faixa) => {
     const validos = faixa.envios.filter((envio) => envio.situacao !== 'cancelado');
     return {
       id: faixa.id,
@@ -129,4 +148,6 @@ export async function lerMinhasFaixas(): Promise<readonly FaixaNaLista[] | null>
       media: notas.get(faixa.id) ?? null,
     };
   });
+
+  return { enviadas, rascunhos };
 }
