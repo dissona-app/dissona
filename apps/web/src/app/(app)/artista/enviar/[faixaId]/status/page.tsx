@@ -1,3 +1,8 @@
+import Link from 'next/link';
+
+import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
+import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
+import { capaDoEnvio } from '@/componentes/curador/capas';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
@@ -61,18 +66,32 @@ export default async function PaginaDoStatus({
 
   return (
     <div className={estilos.base}>
+      {/* "Minhas faixas" é de outra release; a lista das faixas fica no Perfil. */}
+      <Link href={ROTA.ARTISTA_PERFIL} className={estilos.voltar}>
+        <span aria-hidden="true">‹</span> {TEXTOS.voltar}
+      </Link>
+
       <div className={estilos.faixa}>
-        <span className={estilos.capa} aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18V5l12-2v13" stroke="#140D1A" strokeWidth="1.8" />
-            <circle cx="6" cy="18" r="3" stroke="#140D1A" strokeWidth="1.8" />
-            <circle cx="18" cy="16" r="3" stroke="#140D1A" strokeWidth="1.8" />
-          </svg>
-        </span>
+        <span
+          className={estilos.capa}
+          style={{ backgroundImage: `url('${capaDoEnvio(faixa.id)}')` }}
+          aria-hidden="true"
+        />
         <span className={estilos.faixaTextos}>
           <span className={estilos.faixaTitulo}>{faixa.titulo}</span>
-          <span className={estilos.faixaInfo}>{TEXTOS.titulo}</span>
+          <span className={estilos.faixaInfo}>{faixa.genero ?? TEXTOS.titulo}</span>
+          <span className={estilos.onda} aria-hidden="true">
+            {Array.from({ length: 28 }, (_, i) => (
+              <span
+                key={i}
+                style={{ height: `${30 + Math.round(70 * Math.abs(Math.sin(i * 0.7)))}%` }}
+              />
+            ))}
+          </span>
         </span>
+        <BotaoLink href={ROTA.ARTISTA_ENVIAR} variante="tinta" tamanho="sm">
+          {TEXTOS.enviarOutra}
+        </BotaoLink>
       </div>
 
       {envios.length === 0 ? (
@@ -100,7 +119,14 @@ export default async function PaginaDoStatus({
                       <span className={estilos.avatar} aria-hidden="true">
                         {iniciais(envio.curador)}
                       </span>
-                      <span className={estilos.curadorNome}>{envio.curador}</span>
+                      <span className={estilos.curadorTextos}>
+                        <span className={estilos.curadorNome}>{envio.curador}</span>
+                        {envio.classe === null ? null : (
+                          <span className={estilos.curadorClasse}>
+                            {envio.classe.charAt(0).toUpperCase() + envio.classe.slice(1)}
+                          </span>
+                        )}
+                      </span>
                     </th>
                     <td>
                       <span className={estilos.barras}>

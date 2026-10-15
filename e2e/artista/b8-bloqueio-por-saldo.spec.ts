@@ -50,7 +50,7 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
 
     await entrarComo(page, PERSONA.ARTISTA_SEM_SALDO);
     await page.goto('/artista/enviar');
-    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+    await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
     await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloTitulo) }).fill(titulo);
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
     await page.waitForURL(/\/contexto$/);
@@ -103,7 +103,7 @@ test.describe('B8 · Bloqueio por saldo insuficiente', { tag: ['@RF-049'] }, () 
 
     await entrarComo(page, PERSONA.ARTISTA_SEM_SALDO);
     await page.goto('/artista/enviar');
-    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+    await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
     await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloTitulo) }).fill(titulo);
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
     await page.waitForURL(/\/contexto$/);

@@ -108,11 +108,8 @@ const AMARRAS: readonly Amarra[] = [
   { onde: 'FILA.nota', frase: FILA.nota, esperado: `${PRAZO_AVALIACAO}h` },
   { onde: 'FILA.notaNoPrazo', frase: FILA.notaNoPrazo, esperado: `${PRAZO_AVALIACAO}h` },
   { onde: 'FILA.notaAtrasado', frase: FILA.notaAtrasado(7), esperado: `${PRAZO_AVALIACAO}h` },
-  {
-    onde: 'STATUS_DO_ENVIO.nota',
-    frase: STATUS_DO_ENVIO.nota,
-    esperado: `${PRAZO_AVALIACAO}h`,
-  },
+  // STATUS_DO_ENVIO.nota não cita mais as 72h: o protótipo aprovado ficou só
+  // com os 7 dias (conferidos abaixo).
   {
     onde: 'ONBOARDING.curador (prazo)',
     frase: ONBOARDING.curador.map((passo) => `${passo.texto} ${passo.micro}`).join(' '),

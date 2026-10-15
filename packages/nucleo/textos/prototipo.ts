@@ -1070,8 +1070,7 @@ export const CARTEIRA = {
   vazioPorFiltroTitulo: 'Nada nesse filtro',
   vazioPorFiltroDescricao: 'Troque o tipo de movimentação para ver o restante.',
 
-  notaDevolucao:
-    'Quando um curador não responde em 7 dias, a Clave volta para a sua carteira e aparece aqui como devolvida.',
+  notaDevolucao: 'Devolvida: curador sem resposta em 7 dias.',
 
   /** Rótulo de `tipo_lancamento_clave` na coluna "Tipo". */
   tipos: {
@@ -1299,7 +1298,9 @@ export const STATUS_DO_ENVIO = {
   },
   vazioTitulo: 'Nenhum curador ainda',
   vazioDescricao: 'Confirme a seleção para a faixa entrar na fila de alguém.',
-  nota: 'Cada curador tem 72h para responder com repasse cheio. Sem resposta em 7 dias, a Clave volta para a sua carteira e aparece no extrato.',
+  nota: 'Sem resposta em 7 dias, a Clave volta para a sua carteira.',
+  voltar: 'Voltar para Minhas faixas',
+  enviarOutra: 'Enviar outra faixa',
 } as const;
 
 // ---------------------------------------------------------------------------

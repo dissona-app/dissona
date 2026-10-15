@@ -76,7 +76,7 @@ async function abrirCheckout(page: Page) {
   await page.getByRole('link', { name: CARTEIRA.comprar }).first().click();
   await page.waitForURL(/\/artista\/pacotes$/);
 
-  await expect(page.getByText(PACOTES.chamada)).toBeVisible();
+  await expect(page.getByText(/^1 Clave = R\$\s[\d,]+\. O crédito não expira\.$/)).toBeVisible();
 
   await page
     .getByRole('link', { name: new RegExp(`^${PACOTES.escolher}`) })

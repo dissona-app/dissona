@@ -4,7 +4,8 @@ import { Abas } from '@dissona/nucleo/componentes/base/Abas';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import * as claves from '@dissona/nucleo/lib/claves';
-import { formatarData } from '@dissona/nucleo/lib/formato';
+import { formatarDiaMes } from '@dissona/nucleo/lib/formato';
+import Link from 'next/link';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerExtrato } from '@/modulos/claves/consultas';
 import { FILTROS_DO_EXTRATO, ehFiltroDoExtrato } from '@/modulos/claves/tipos';
@@ -37,15 +38,16 @@ export default async function PaginaDoExtrato({
   return (
     <div className={estilos.base}>
       <div className={estilos.topo}>
-        <BotaoLink href={ROTA.ARTISTA_CARTEIRA} variante="ghost" tamanho="sm">
-          {TEXTOS.voltarParaCarteira}
-        </BotaoLink>
+        <Link href={ROTA.ARTISTA_CARTEIRA} className={estilos.voltar}>
+          <span aria-hidden="true">‹</span> {TEXTOS.voltarParaCarteira}
+        </Link>
         <Abas
           abas={FILTROS_DO_EXTRATO.map((cada) => ({ chave: cada, rotulo: TEXTOS.filtros[cada] }))}
           ativa={filtro}
           caminho={ROTA.ARTISTA_EXTRATO}
           parametro="tipo"
           rotulo={TEXTOS.filtrosRotulo}
+          estilo="grupo"
         />
       </div>
 
@@ -74,7 +76,7 @@ export default async function PaginaDoExtrato({
             <tbody>
               {linhas.map((linha) => (
                 <tr key={linha.id}>
-                  <td>{formatarData(linha.data)}</td>
+                  <td>{formatarDiaMes(linha.data)}</td>
                   <th scope="row" className={estilos.origem}>
                     {linha.origem}
                   </th>
@@ -91,7 +93,7 @@ export default async function PaginaDoExtrato({
                       .filter(Boolean)
                       .join(' ')}
                   >
-                    {claves.formatar(linha.quantidade)}
+                    {`${linha.quantidade > 0n ? '+' : ''}${claves.formatar(linha.quantidade)}`}
                   </td>
                   <td className={estilos.numerica}>{claves.formatar(linha.saldo)}</td>
                 </tr>

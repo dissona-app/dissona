@@ -79,9 +79,15 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                 const raizDoAmbiente =
                   item.caminho ===
                   ROTA[papel === 'admin' ? 'ADMIN' : papel === 'artista' ? 'ARTISTA' : 'CURADOR'];
-                const ativo = raizDoAmbiente
-                  ? caminhoAtual === item.caminho
-                  : caminhoAtual === item.caminho || caminhoAtual.startsWith(`${item.caminho}/`);
+                // O status de um envio é "Minhas faixas" no protótipo aprovado.
+                const ehStatus =
+                  caminhoAtual.startsWith(`${ROTA.ARTISTA_ENVIAR}/`) &&
+                  caminhoAtual.endsWith('/status');
+                const ativo = ehStatus
+                  ? item.caminho === `${ROTA.ARTISTA}/faixas`
+                  : raizDoAmbiente
+                    ? caminhoAtual === item.caminho
+                    : caminhoAtual === item.caminho || caminhoAtual.startsWith(`${item.caminho}/`);
 
                 // `motivo` desabilita o item mesmo quando a release já chegou:
                 // é o caso de uma tela que existe e não tem endereço próprio.
@@ -109,11 +115,18 @@ export function Navegacao({ papel, releaseAtual, rodape }: PropsNavegacao) {
                       // navega, e o `title` e o texto para leitor de tela
                       // dizem por quê.
                       <span
-                        className={[estilos.item, estilos.indisponivel].join(' ')}
+                        className={[
+                          estilos.item,
+                          estilos.indisponivel,
+                          ativo ? estilos.ativo : undefined,
+                        ]
+                          .filter(Boolean)
+                          .join(' ')}
+                        data-cor={(item.cor ?? ordem) % 3}
                         aria-disabled="true"
                         title={item.motivo ?? `Disponível na Release ${item.release}`}
                       >
-                        <IconeDeNavegacao nome={item.icone} />
+                        <IconeDeNavegacao nome={item.icone} ativo={ativo} />
                         <span className={estilos.rotulo}>{item.rotulo}</span>
                         <span className="dsn-apenas-leitor">
                           {` — ${item.motivo ?? `disponível na Release ${item.release}`}`}

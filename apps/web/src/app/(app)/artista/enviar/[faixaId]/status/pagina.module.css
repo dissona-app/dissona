@@ -22,10 +22,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #b780e7;
+  background-color: #140d1a;
+  background-position: center;
+  background-size: cover;
 }
 
 .faixaTextos {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -189,4 +192,41 @@
   margin: 0;
   font-size: 12px;
   color: #6e6478;
+}
+
+.voltar {
+  display: inline-flex;
+  gap: 8px;
+  width: fit-content;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+  text-decoration: none;
+}
+
+.onda {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
+  margin-top: 4px;
+}
+
+.onda > span {
+  width: 3px;
+  border-radius: 1px;
+  background: #b780e7;
+}
+
+.curadorTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.curadorClasse {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--dsn-ink-500);
 }

@@ -96,7 +96,7 @@ export async function listarDisponiveis(): Promise<readonly CuradorDisponivel[]>
  */
 export async function nomesDeCuradores(
   ids: readonly string[],
-): Promise<ReadonlyMap<string, string>> {
+): Promise<ReadonlyMap<string, { readonly nome: string; readonly classe: string }>> {
   if (ids.length === 0) return new Map();
 
   const supabase = await criarClienteServidor();
@@ -119,7 +119,12 @@ export async function nomesDeCuradores(
 
   estourarSeErro(error);
 
-  return new Map((data ?? []).map((linha) => [linha.perfil_curador_id, linha.nome]));
+  return new Map(
+    (data ?? []).map((linha) => [
+      linha.perfil_curador_id,
+      { nome: linha.nome, classe: linha.classe },
+    ]),
+  );
 }
 
 /**

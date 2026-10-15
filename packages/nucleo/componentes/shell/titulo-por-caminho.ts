@@ -101,16 +101,16 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   // resolução é por chave exata, então a ordem não decide nada — quem casaria
   // por prefixo é o mapa de baixo.
   [ROTA.ARTISTA_EXTRATO]: {
-    titulo: 'Extrato',
-    sublegenda: 'O que entrou, o que saiu e o que voltou.',
+    titulo: 'Extrato de Claves',
+    sublegenda: 'Cada Clave que entrou e saiu da sua conta.',
   },
   [ROTA.ARTISTA_CARTEIRA]: {
     titulo: 'Carteira',
     sublegenda: 'Saldo de Claves, compras e o que já foi usado em envios.',
   },
   [ROTA.ARTISTA_PACOTES]: {
-    titulo: 'Comprar Claves',
-    sublegenda: 'Quanto maior o pacote, menor o preço por Clave.',
+    titulo: 'Pacotes de Claves',
+    sublegenda: 'Quanto mais Claves no pacote, menor o preço de cada uma.',
   },
 
   // 3 — o wizard de envio. As subrotas (`/<faixaId>/<passo>`) caem no mapa de
@@ -188,6 +188,12 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
   // o mesmo do passo 1: o wizard é uma tela só, e quem diz onde a pessoa está
   // é o indicador de passo, não o cabeçalho.
   // O status de um envio tem cabeçalho próprio no protótipo aprovado.
+  // O status de um envio — `/artista/enviar/<faixaId>/status` — tem o
+  // cabeçalho próprio do protótipo aprovado.
+  [
+    'status-do-envio',
+    { titulo: 'Status do envio', sublegenda: 'Onde cada curador está na leitura da sua faixa.' },
+  ],
   [`${ROTA.ARTISTA_ENVIAR}/`, EXATOS[ROTA.ARTISTA_ENVIAR] as TituloDeModulo],
   // "Editar perfil" do curador — a manutenção que sai da vitrine "Meu perfil".
   [
@@ -229,6 +235,11 @@ export function tituloDoCaminho(caminho: string, papel: Papel): TituloDeModulo {
   }
 
   for (const [prefixo, titulo] of POR_PREFIXO) {
+    if (prefixo === 'status-do-envio') {
+      if (semBarraFinal.startsWith(`${ROTA.ARTISTA_ENVIAR}/`) && semBarraFinal.endsWith('/status'))
+        return titulo;
+      continue;
+    }
     if (semBarraFinal.startsWith(prefixo)) return titulo;
   }
 

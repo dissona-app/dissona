@@ -6,6 +6,8 @@ export type Aba = {
   /** Valor que viaja na URL. */
   readonly chave: string;
   readonly rotulo: string;
+  /** Número ao lado do rótulo ("Em andamento 2") — protótipo aprovado. */
+  readonly contador?: number;
 };
 
 export type PropsAbas = {
@@ -17,6 +19,12 @@ export type PropsAbas = {
   readonly parametro?: string;
   /** Rótulo do grupo para leitor de tela. */
   readonly rotulo: string;
+  /**
+   * `sublinhado` (padrão): abas de Conta. `grupo`: pílulas num trilho lilás
+   * (filtros do extrato). `botoes`: botões soltos, o ativo em tinta (Notas e
+   * feedback, Fila).
+   */
+  readonly estilo?: 'sublinhado' | 'grupo' | 'botoes';
 };
 
 /**
@@ -41,9 +49,21 @@ export type PropsAbas = {
  * `aria-current="page"` — e não `role="tab"`, que promete ao leitor de tela um
  * painel que troca no lugar, sem sair da página.
  */
-export function Abas({ abas, ativa, caminho, parametro = 'aba', rotulo }: PropsAbas) {
+export function Abas({
+  abas,
+  ativa,
+  caminho,
+  parametro = 'aba',
+  rotulo,
+  estilo = 'sublinhado',
+}: PropsAbas) {
   return (
-    <nav className={estilos.base} aria-label={rotulo}>
+    <nav
+      className={[estilos.base, estilo === 'sublinhado' ? undefined : estilos[estilo]]
+        .filter(Boolean)
+        .join(' ')}
+      aria-label={rotulo}
+    >
       {abas.map((aba) => {
         const atual = aba.chave === ativa;
         return (
@@ -57,6 +77,9 @@ export function Abas({ abas, ativa, caminho, parametro = 'aba', rotulo }: PropsA
             scroll={false}
           >
             {aba.rotulo}
+            {aba.contador === undefined ? null : (
+              <span className={estilos.contador}>{aba.contador}</span>
+            )}
           </Link>
         );
       })}

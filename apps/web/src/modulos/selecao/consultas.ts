@@ -13,6 +13,8 @@ export type SituacaoEnvio = Database['public']['Enums']['situacao_envio'];
 export type EnvioDaFaixa = {
   readonly id: string;
   readonly curador: string;
+  /** "bronze" | "prata" | "ouro", ou `null` quando o curador saiu da view. */
+  readonly classe: string | null;
   readonly situacao: SituacaoEnvio;
   readonly prazoEm: Date;
 };
@@ -50,7 +52,8 @@ export async function lerEnviosDaFaixa(faixaId: string): Promise<readonly EnvioD
     // Curador que saiu de `bronze_aprovado`/`prata_aprovado` some da view. O
     // envio dele continua existindo, e a tabela não pode perder a linha por
     // isso — daí o fallback.
-    curador: nomes.get(envio.perfil_curador_id) ?? '—',
+    curador: nomes.get(envio.perfil_curador_id)?.nome ?? '—',
+    classe: nomes.get(envio.perfil_curador_id)?.classe ?? null,
     situacao: envio.situacao,
     prazoEm: new Date(envio.prazo_em),
   }));

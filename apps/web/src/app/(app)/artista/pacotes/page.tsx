@@ -29,10 +29,11 @@ export const metadata: Metadata = {
  * nenhum número de dinheiro deste produto é formatado fora de `lib/dinheiro`.
  */
 export default async function PaginaDePacotes() {
-  const { pacotes } = await lerVitrine();
+  const { pacotes, valorDaClave } = await lerVitrine();
 
   return (
     <TelaDePacotes
+      umaClave={dinheiro.formatar(valorDaClave).replace(/,00$/, '')}
       simulado={checkoutSimulado()}
       pacotes={pacotes.map((pacote) => ({
         id: pacote.id,
