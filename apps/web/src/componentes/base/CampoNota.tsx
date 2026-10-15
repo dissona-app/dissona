@@ -11,7 +11,9 @@ export const NOTA_MAXIMA = 5;
 export const NOTA_PASSO = 0.1;
 
 export type PropsCampoNota = {
-  readonly rotulo: string;
+  readonly rotulo: React.ReactNode;
+  /** Sem o "0,0 / 5,0" sob a trilha — a avaliação do protótipo aprovado. */
+  readonly semExtremos?: boolean;
   /** `null` significa "ainda não avaliado", que é diferente de nota 0. */
   readonly valor: number | null;
   readonly onMudar: (valor: number) => void;
@@ -43,6 +45,7 @@ export function CampoNota({
   erro,
   desabilitado = false,
   textoSemNota = 'Sem nota',
+  semExtremos = false,
 }: PropsCampoNota) {
   const id = useId();
   const idErro = `${id}-erro`;
@@ -86,11 +89,11 @@ export function CampoNota({
           background:
             valor === null
               ? undefined
-              : `var(--dsn-grad-brand-h) left center / ${preenchimento}% 100% no-repeat, var(--dsn-track)`,
+              : `linear-gradient(var(--dsn-purple-600), var(--dsn-purple-600)) left center / ${preenchimento}% 100% no-repeat, var(--dsn-track)`,
         }}
       />
 
-      <div className={estilos.extremos} aria-hidden="true">
+      <div className={semExtremos ? estilos.semExtremos : estilos.extremos} aria-hidden="true">
         <span>{formatarNota(NOTA_MINIMA)}</span>
         <span>{formatarNota(NOTA_MAXIMA)}</span>
       </div>

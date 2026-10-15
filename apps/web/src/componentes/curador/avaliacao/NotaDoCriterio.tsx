@@ -58,9 +58,16 @@ export function NotaDoCriterio({
   justificado,
   onAtivar,
 }: PropsNotaDoCriterio) {
-  const rotulo = obrigatorio
-    ? `${criterio.rotulo} · ${AVALIAR.criterioObrigatorio}`
-    : criterio.rotulo;
+  // Na tela só o nome, como no protótipo aprovado (o cartão já diz que é
+  // obrigatório); o "· obrig." segue no nome acessível.
+  const rotulo = (
+    <>
+      {criterio.rotulo}
+      {obrigatorio ? (
+        <span className="dsn-apenas-leitor">{` · ${AVALIAR.criterioObrigatorio}`}</span>
+      ) : null}
+    </>
+  );
 
   return (
     // Foco ou clique em qualquer parte da linha abre a justificativa dela no
@@ -77,6 +84,7 @@ export function NotaDoCriterio({
           valor={nota}
           onMudar={onNotaMudar}
           textoSemNota={AVALIAR.semNota}
+          semExtremos
         />
 
         {/* Só aparece depois de haver o que remover, e só no critério aberto:

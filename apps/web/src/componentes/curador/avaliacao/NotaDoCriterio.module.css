@@ -138,3 +138,22 @@
   color: var(--dsn-success-fg);
   font-weight: var(--dsn-weight-semibold);
 }
+
+/* O "?" do protótipo ao lado do nome do critério — em CSS, para não entrar
+   no texto do rótulo. */
+.base label::after {
+  content: '?';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  margin-left: 6px;
+  text-transform: none;
+  border: 1px solid var(--dsn-border);
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--dsn-ink-500);
+  vertical-align: 1px;
+}

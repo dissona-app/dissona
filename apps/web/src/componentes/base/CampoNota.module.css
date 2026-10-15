@@ -100,3 +100,7 @@
   font-size: var(--dsn-text-xs);
   color: var(--dsn-danger-fg);
 }
+
+.semExtremos {
+  display: none;
+}

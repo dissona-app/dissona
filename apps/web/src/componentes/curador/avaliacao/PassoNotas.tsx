@@ -132,7 +132,7 @@ export function PassoNotas({
             cartão: o leitor de tela anuncia "Mixagem" dizendo que é Produção. */}
         {[...new Set(lista.map((criterio) => criterio.grupo))].map((grupo) => (
           <fieldset key={grupo} className={estilos.grupo}>
-            <legend className={estilos.legendaDoGrupo}>{AVALIAR.grupos[grupo]}</legend>
+            <legend className="dsn-apenas-leitor">{AVALIAR.grupos[grupo]}</legend>
             <div className={estilos.linhas}>
               {lista
                 .filter((criterio) => criterio.grupo === grupo)
@@ -177,8 +177,10 @@ export function PassoNotas({
 
       <div className={estilos.grade}>
         <div className={estilos.colunaNotas}>
-          <h3 className={estilos.titulo}>{AVALIAR.tituloNotas}</h3>
-          <p className={estilos.resumo}>
+          {/* O resumo fica para o leitor de tela; o protótipo vai direto aos
+              cartões. */}
+          <h3 className="dsn-apenas-leitor">{AVALIAR.tituloNotas}</h3>
+          <p className="dsn-apenas-leitor">
             {AVALIAR.resumoDosItens(respondidos, criterios.length, emAberto)}
           </p>
           {cartao(

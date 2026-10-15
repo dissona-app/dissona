@@ -197,3 +197,8 @@
   color: var(--dsn-ink);
   border-color: var(--dsn-ink);
 }
+
+/* No artista a dica da foto é 13px (protótipo aprovado). */
+:global([data-papel='artista']) .hint {
+  font-size: var(--dsn-text-xs);
+}

@@ -133,3 +133,12 @@
   color: var(--dsn-ink-500);
   text-wrap: pretty;
 }
+
+.peso {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: #f2edf5;
+  font-size: 9.5px;
+  color: var(--dsn-purple-600);
+}
