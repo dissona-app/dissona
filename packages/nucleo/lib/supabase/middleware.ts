@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
-import { isAuthApiError } from '@supabase/supabase-js';
+import { isAuthApiError, isAuthError, isAuthRetryableFetchError } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -62,20 +62,25 @@ export async function renovarSessao(requisicao: NextRequest): Promise<SessaoDaRe
     error,
   } = await supabase.auth.getUser();
 
-  // Erro da API com status < 500 (sessão inexistente, token inválido) é "sem
-  // sessão" de verdade. O resto — falha de rede, 5xx, 429 — é indeterminado:
-  // deslogar por isso é o que fazia a pessoa cair no login "do nada".
+  // Só é indeterminado o que diz "não consegui perguntar": falha de rede ou
+  // timeout, 5xx e 429 do Auth, ou um erro que nem é do Auth. Sessão ausente
+  // (`AuthSessionMissingError`) e token inválido (4xx) são "sem sessão" de
+  // verdade — deixar seguir aí abriria a página como anônimo.
   const indeterminada =
     user === null &&
     error !== null &&
-    !(isAuthApiError(error) && (error.status ?? 500) < 500 && error.status !== 429);
+    (isAuthRetryableFetchError(error) ||
+      (isAuthApiError(error) && ((error.status ?? 500) >= 500 || error.status === 429)) ||
+      !isAuthError(error));
 
   return { resposta, usuarioId: user?.id ?? null, supabase, indeterminada };
 }
 
-/** A requisição traz o cookie de sessão do Supabase (`sb-<ref>-auth-token`)? */
+/**
+ * A requisição traz o cookie de sessão do Supabase — `sb-<ref>-auth-token`,
+ * inteiro ou em pedaços (`.0`, `.1`)? O `-code-verifier` do PKCE **não** conta:
+ * ele sobrevive ao logout e não prova sessão nenhuma.
+ */
 export function temCookieDeSessao(requisicao: NextRequest): boolean {
-  return requisicao.cookies
-    .getAll()
-    .some(({ name }) => name.startsWith('sb-') && name.includes('-auth-token'));
+  return requisicao.cookies.getAll().some(({ name }) => /^sb-[^.]+-auth-token(\.\d+)?$/.test(name));
 }
