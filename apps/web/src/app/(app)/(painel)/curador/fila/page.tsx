@@ -137,7 +137,6 @@ export default async function PaginaDaFila({
       ) : (
         <PrateleirasDaFila linhas={linhas} />
       )}
-      <p className={estilos.nota}>{TEXTOS.nota}</p>
     </div>
   );
 }

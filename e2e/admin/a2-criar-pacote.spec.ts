@@ -92,7 +92,7 @@ test.describe('A2 · Criar pacote', { tag: ['@RF-051'] }, () => {
     // Nasce ativo — é o padrão do formulário, e a copy da alternância promete
     // que "Ativo aparece na Carteira do artista na hora em que você salva".
     await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
-    await expect(linha).toContainText(ADMIN_PACOTES.subNaCarteira);
+    await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
     // 12,5% de desconto sobrevive com a casa decimal: 45 × R$ 10 = R$ 450,
     // menos 12,5% = R$ 393,75, ou R$ 8,75 por Clave. Se a tela arredondasse o
     // desconto para inteiro, este número não fecharia.

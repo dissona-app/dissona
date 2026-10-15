@@ -189,6 +189,14 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
   // é o indicador de passo, não o cabeçalho.
   // O status de um envio tem cabeçalho próprio no protótipo aprovado.
   [`${ROTA.ARTISTA_ENVIAR}/`, EXATOS[ROTA.ARTISTA_ENVIAR] as TituloDeModulo],
+  // "Editar perfil" do curador — a manutenção que sai da vitrine "Meu perfil".
+  [
+    `${ROTA.CURADOR_MEU_CADASTRO}/`,
+    {
+      titulo: 'Editar perfil',
+      sublegenda: 'Mídias, serviços e preços, e a classe que você tem hoje.',
+    },
+  ],
   // 13.1 — o detalhe tem cabeçalho próprio no protótipo (`naFila && s.filaSel`
   // troca `appTitle` e `appSub`), e não o da fila.
   [

@@ -49,7 +49,10 @@ export type AmbienteDeConta = Extract<Papel, 'artista' | 'curador'>;
 export type AbaDeConta = 'perfil' | (typeof ABAS_COMUNS)[number]['chave'];
 
 function abasDe(ambiente: AmbienteDeConta): readonly { chave: AbaDeConta; rotulo: string }[] {
-  return ambiente === 'curador' ? [ABA_PERFIL, ...ABAS_COMUNS] : ABAS_COMUNS;
+  // Protótipo aprovado: as três abas nos dois ambientes; o perfil do curador
+  // é a tela "Meu perfil".
+  void ambiente;
+  return ABAS_COMUNS;
 }
 
 /**
@@ -92,6 +95,14 @@ export type PropsTelaDeConta = {
   readonly acaoDeRemoverCartao?: ((dados: FormData) => Promise<ResultadoDeAcao>) | undefined;
   /** Nome da conta, na linha de "Dados de cobrança" do artista. */
   readonly nome?: string;
+  /** Nome e documento da nota fiscal (artista) — `perfil_artista`. */
+  readonly cobranca?: { readonly nome: string | null; readonly documento: string | null } | null;
+  /** A chave Pix do curador — `perfil_curador`. */
+  readonly recebimento?: {
+    readonly chave: string | null;
+    readonly tipo: string | null;
+    readonly situacao: string | null;
+  } | null;
   /** Catálogo de avisos e idioma, para a aba Preferências (7.3 / 17.3). */
   readonly preferencias?: Preferencias | null;
 };
@@ -119,6 +130,8 @@ export function TelaDeConta({
   cartaoSalvo = null,
   acaoDeRemoverCartao,
   nome = '',
+  cobranca = null,
+  recebimento = null,
 }: PropsTelaDeConta) {
   return (
     <div className={estilos.base}>
@@ -143,18 +156,12 @@ export function TelaDeConta({
               cartão salvo dentro; no curador, o recebimento segue pendente. */}
           {ambiente === 'artista' && acaoDeRemoverCartao !== undefined ? (
             <CartaoSalvoNaConta
-              nome={nome}
+              nome={linhaDaCobranca(cobranca, nome)}
               cartao={cartaoSalvo}
               acaoDeRemover={acaoDeRemoverCartao}
             />
           ) : (
-            <CartaoDeConta
-              overline={CONTA.financeiroPendente[ambiente].titulo}
-              titulo={CONTA.financeiroPendente[ambiente].titulo}
-              nota={CONTA.financeiroPendente[ambiente].texto}
-            >
-              <Aviso estatico>{CONTA.pendenteNestaRelease}</Aviso>
-            </CartaoDeConta>
+            <CartaoDeRecebimento nome={nome} recebimento={recebimento} />
           )}
 
           {/* O convite só aparece para quem ainda não é curador — e só no
@@ -210,5 +217,61 @@ export function TelaDeConta({
         </div>
       ) : null}
     </div>
+  );
+}
+
+/** "Aurora Menezes · CPF 123.***.***-09" — a linha do protótipo, sem expor o CPF inteiro. */
+function linhaDaCobranca(
+  cobranca: { readonly nome: string | null; readonly documento: string | null } | null,
+  nome: string,
+): string {
+  const quem = cobranca?.nome ?? nome;
+  const doc = cobranca?.documento?.replace(/\D/g, '') ?? '';
+  if (doc.length !== 11) return quem;
+  return `${quem} · CPF ${doc.slice(0, 3)}.***.***-${doc.slice(9)}`;
+}
+
+/**
+ * "Dados de recebimento" do curador — protótipo aprovado: o nome, a nota da
+ * chave e a linha da chave Pix com o selo. Sem chave cadastrada, a linha diz
+ * que o repasse precisa dela.
+ */
+function CartaoDeRecebimento({
+  nome,
+  recebimento,
+}: {
+  readonly nome: string;
+  readonly recebimento: {
+    readonly chave: string | null;
+    readonly tipo: string | null;
+    readonly situacao: string | null;
+  } | null;
+}) {
+  const chave = recebimento?.chave ?? null;
+  return (
+    <CartaoDeConta
+      overline={CONTA.financeiroPendente.curador.titulo}
+      titulo={CONTA.financeiroPendente.curador.titulo}
+      valor={nome}
+      leve
+      nota="Chave para receber os repasses."
+    >
+      <div className={estilos.linhaDaChave}>
+        <span className={estilos.quadradoDaChave} aria-hidden="true" />
+        <span className={estilos.textosDaChave}>
+          <span className={estilos.tituloDaChave}>
+            {chave === null
+              ? 'Nenhuma chave Pix cadastrada'
+              : `Pix · chave de ${recebimento?.tipo ?? 'e-mail'}`}
+          </span>
+          <span className={estilos.detalheDaChave}>
+            {chave ?? 'O repasse das Claves ganhas precisa de uma chave Pix.'}
+          </span>
+        </span>
+        {chave !== null && recebimento?.situacao === 'verificada' ? (
+          <span className={estilos.seloDaChave}>Verificada</span>
+        ) : null}
+      </div>
+    </CartaoDeConta>
   );
 }

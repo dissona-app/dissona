@@ -185,7 +185,8 @@ export function Shell({
           <div className={estilos.acoesHeader}>
             {acoes}
             <BotaoDeBusca />
-            <BotaoDeNotificacoes />
+            {/* O header do admin no protótipo aprovado não tem o sino. */}
+            {ehAdmin ? null : <BotaoDeNotificacoes />}
             {identidade !== undefined && acaoDeSair !== undefined ? (
               <MenuDaConta
                 identidade={identidade}

@@ -65,9 +65,10 @@ test.beforeAll(async () => {
 test.describe('E5 · Meu cadastro', { tag: ['@RF-018'] }, () => {
   test('a tela mostra classe, mídias e serviços, e a regra da classe', async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
-    await page.goto('/curador/meu-cadastro');
+    await page.goto('/curador/meu-cadastro/editar');
 
-    await expect(page.getByRole('heading', { name: CURADOR_MANUTENCAO.titulo })).toBeVisible();
+    // Protótipo aprovado: "Meu perfil" é a vitrine; a manutenção é "Editar perfil".
+    await expect(page.getByRole('heading', { name: 'Editar perfil' })).toBeVisible();
     // `.first()` nos três: a tela repete os rótulos no corpo e nos cabeçalhos
     // de seção, e o que se afirma é que a seção existe.
     await expect(page.getByText(CURADOR_MANUTENCAO.classeOverline).first()).toBeVisible();
@@ -80,7 +81,7 @@ test.describe('E5 · Meu cadastro', { tag: ['@RF-018'] }, () => {
 
   test('inserir mídia não altera a classe', async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
-    await page.goto('/curador/meu-cadastro');
+    await page.goto('/curador/meu-cadastro/editar');
 
     const classeAntes = await classeNaTela(page);
 
@@ -99,7 +100,7 @@ test.describe('E5 · Meu cadastro', { tag: ['@RF-018'] }, () => {
 
   test('editar mídia grava e não altera a classe', async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
-    await page.goto('/curador/meu-cadastro');
+    await page.goto('/curador/meu-cadastro/editar');
 
     const classeAntes = await classeNaTela(page);
 
@@ -130,7 +131,7 @@ test.describe('E5 · Meu cadastro', { tag: ['@RF-018'] }, () => {
    */
   test('excluir mídia exige confirmação, e cancelar não apaga', async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
-    await page.goto('/curador/meu-cadastro');
+    await page.goto('/curador/meu-cadastro/editar');
 
     const linha = page.getByRole('listitem').filter({ hasText: MIDIA_EDITADA });
     await linha.getByRole('button', { name: new RegExp(CURADOR_MANUTENCAO.excluirMidia) }).click();
@@ -154,7 +155,7 @@ test.describe('E5 · Meu cadastro', { tag: ['@RF-018'] }, () => {
 
   test('reeditar serviços salva no lugar, e não altera a classe', async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_MANUTENCAO);
-    await page.goto('/curador/meu-cadastro');
+    await page.goto('/curador/meu-cadastro/editar');
 
     const classeAntes = await classeNaTela(page);
 

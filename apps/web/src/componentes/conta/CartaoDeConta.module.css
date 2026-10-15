@@ -84,3 +84,8 @@
 .perigo .overline {
   color: var(--dsn-danger-fg);
 }
+
+/* Com o valor leve (nome + nota curta), a nota desce para 12px — aprovado. */
+.textos:has(.valorLeve) .nota {
+  font-size: 12px;
+}

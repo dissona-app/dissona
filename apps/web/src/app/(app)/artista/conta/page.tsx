@@ -8,7 +8,7 @@ import {
   lerIdentidadeDaSessao,
 } from '@dissona/nucleo/modulos/autenticacao/consultas';
 import { removerCartaoSalvo } from '@/modulos/claves/acoes';
-import { lerCartaoSalvo } from '@/modulos/claves/consultas';
+import { lerCartaoSalvo, lerCobrancaDoArtista } from '@/modulos/claves/consultas';
 import { lerSessoesDaConta } from '@/modulos/conta/consultas';
 import { lerPreferencias } from '@/modulos/preferencias/consultas';
 
@@ -52,11 +52,13 @@ export default async function Pagina({
   const preferencias = aba === 'preferencias' ? await lerPreferencias('artista') : null;
   // Como as demais leituras desta tela: só na aba que a usa.
   const cartaoSalvo = aba === 'dados' ? await lerCartaoSalvo() : null;
+  const cobranca = aba === 'dados' ? await lerCobrancaDoArtista() : null;
 
   return (
     <TelaDeConta
       ambiente="artista"
       nome={identidade.nome}
+      cobranca={cobranca}
       caminho={ROTA.ARTISTA_CONTA}
       aba={aba}
       email={identidade.email}

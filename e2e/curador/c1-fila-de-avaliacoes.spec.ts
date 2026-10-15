@@ -99,10 +99,12 @@ test.describe('C1 · Fila de avaliações', () => {
     await expect(page.getByText(/[1-9]\d* faixas? na fila( · \d+ com prazo curto)?/)).toBeVisible();
   });
 
-  test('a nota das 72h e dos 7 dias aparece', async ({ page }) => {
+  // Protótipo aprovado: a fila não tem a nota das 72h/7 dias no rodapé; o
+  // prazo aparece em cada cartão (o relógio "1d 22h").
+  test('cada cartão mostra o prazo restante', async ({ page }) => {
     await entrarComo(page, PERSONA.CURADOR_BRONZE);
     await page.goto('/curador/fila');
 
-    await expect(page.getByText(FILA.nota)).toBeVisible();
+    await expect(page.getByText(/^\d+d \d+h$|^\d+h$|^Vencida$/).first()).toBeVisible();
   });
 });

@@ -471,6 +471,8 @@ test.describe('B2 · Comprar Claves', () => {
     'o cartão salvo é reusado na compra seguinte, e some quando removido',
     { tag: ['@RF-045'] },
     async ({ page }) => {
+      // Duas compras e a ida a Conta: o fluxo mais longo do arquivo.
+      test.setTimeout(60_000);
       await entrarComo(page, PERSONA.ARTISTA_COMPRA);
 
       // 1. A compra que gera o token.

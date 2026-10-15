@@ -159,7 +159,8 @@ export function ListaDePacotes({
                       </span>
                     </div>
                     <span className={linha.temDesconto ? estilos.comDesconto : estilos.semDesconto}>
-                      {linha.desconto}
+                      {/* Protótipo aprovado: "−5%" ou "Sem desconto". */}
+                      {linha.temDesconto ? `−${linha.desconto}` : 'Sem desconto'}
                     </span>
                   </div>
 
@@ -178,10 +179,6 @@ export function ListaDePacotes({
                       <dd className={estilos.porClave}>{linha.precoPorClave}</dd>
                     </div>
                   </dl>
-
-                  <span className={estilos.sub}>
-                    {linha.ativo ? ADMIN_PACOTES.subNaCarteira : ADMIN_PACOTES.subForaDaCarteira}
-                  </span>
                 </div>
 
                 <div className={estilos.acoes}>
@@ -227,7 +224,6 @@ export function ListaDePacotes({
         )}
 
         <div className={estilos.rodapeDaTabela}>
-          <span className={estilos.nota}>{ADMIN_PACOTES.nota}</span>
           {confirmacao !== null ? <Aviso tom="sucesso">{confirmacao}</Aviso> : null}
         </div>
       </div>

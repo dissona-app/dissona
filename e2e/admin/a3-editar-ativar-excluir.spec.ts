@@ -107,15 +107,14 @@ test.describe('A3 · Editar / ativar / excluir', () => {
 
       await expect(page.getByText(ADMIN_PACOTES.flashDesativado(nome))).toBeVisible();
       await expect(linha).toContainText(ADMIN_PACOTES.statusInativo);
-      // A promessa da nota de rodapé, do lado do admin: o pacote continua na
-      // lista da equipe e sai da Carteira do artista.
-      await expect(linha).toContainText(ADMIN_PACOTES.subForaDaCarteira);
+      // O pacote continua na lista da equipe, agora oferecendo "Ativar".
+      await expect(linha.getByRole('button', { name: ADMIN_PACOTES.ativar })).toBeVisible();
 
       await linha.getByRole('button', { name: ADMIN_PACOTES.ativar }).click();
 
       await expect(page.getByText(ADMIN_PACOTES.flashAtivado(nome))).toBeVisible();
       await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
-      await expect(linha).toContainText(ADMIN_PACOTES.subNaCarteira);
+      await expect(linha).toContainText(ADMIN_PACOTES.statusAtivo);
     },
   );
 

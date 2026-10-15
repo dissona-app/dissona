@@ -79,18 +79,14 @@ test.describe('A1 · Lista de pacotes', () => {
     async ({ page }) => {
       await abrirPacotes(page);
 
-      // A promessa da nota de rodapé — "Só os pacotes ativos aparecem na
-      // Carteira do artista" — só é verificável se a linha disser em qual dos
-      // dois estados ela está. Status e sublinha têm de concordar: um pacote
-      // "Ativo" marcado como "Fora da Carteira" seria a tela mentindo.
-      await expect(linhasAtivas(page).first()).toContainText(ADMIN_PACOTES.subNaCarteira);
+      // Protótipo aprovado: o estado aparece no status do cartão, e a ação
+      // oferecida concorda com ele — ativo oferece Desativar; inativo, Ativar.
+      await expect(linhasAtivas(page).first()).toContainText(ADMIN_PACOTES.desativar);
 
       const inativas = linhasInativas(page);
       if ((await inativas.count()) > 0) {
-        await expect(inativas.first()).toContainText(ADMIN_PACOTES.subForaDaCarteira);
+        await expect(inativas.first()).toContainText(ADMIN_PACOTES.ativar);
       }
-
-      await expect(page.getByText(ADMIN_PACOTES.nota)).toBeVisible();
     },
   );
 
