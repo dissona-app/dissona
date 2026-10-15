@@ -25,7 +25,7 @@ async function sessao(url, c, telas, prefixo) {
       await p.waitForTimeout(1500);
       await p.screenshot({
         path: `${OUT}/${prefixo}${t.replaceAll('/', '_')}.png`,
-        fullPage: true,
+        fullPage: process.env.FULL !== '0',
       });
       console.log('ok', prefixo, t);
     } catch (e) {
@@ -35,20 +35,30 @@ async function sessao(url, c, telas, prefixo) {
   await ctx.close();
 }
 const alvo = process.argv[3] ?? 'todos';
+const extras = process.argv.slice(4);
 if (alvo === 'todos' || alvo === 'artista')
   await sessao(
     base,
     contas.artista,
-    ['/artista/carteira', '/artista/pacotes', '/artista/enviar', '/artista/conta'],
+    extras.length
+      ? extras
+      : ['/artista/carteira', '/artista/pacotes', '/artista/enviar', '/artista/conta'],
     'artista',
   );
 if (alvo === 'todos' || alvo === 'curador')
   await sessao(
     base,
     contas.curador,
-    ['/curador/fila', '/curador/carteira', '/curador/meu-cadastro', '/curador/conta'],
+    extras.length
+      ? extras
+      : ['/curador/fila', '/curador/carteira', '/curador/meu-cadastro', '/curador/conta'],
     'curador',
   );
 if (alvo === 'todos' || alvo === 'admin')
-  await sessao(painel, contas.admin, ['/', '/pacotes', '/pacotes/novo', '/equipe'], 'admin');
+  await sessao(
+    painel,
+    contas.admin,
+    extras.length ? extras : ['/', '/pacotes', '/pacotes/novo', '/equipe'],
+    'admin',
+  );
 await b.close();
