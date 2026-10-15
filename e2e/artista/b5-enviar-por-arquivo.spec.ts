@@ -42,7 +42,7 @@ test.describe('B5 · Enviar por arquivo', () => {
 
     // O passo 2 é o destino: a faixa foi criada e o arquivo subiu.
     await page.waitForURL(/\/artista\/enviar\/[0-9a-f-]{36}\/contexto/);
-    await expect(page.getByText(ENVIAR.passoDe(2, 3))).toBeVisible();
+    await expect(page.getByText(ENVIAR.passoDe(2, 4))).toBeVisible();
     await expect(page.getByText(ENVIAR.rotuloContexto).first()).toBeVisible();
   });
 

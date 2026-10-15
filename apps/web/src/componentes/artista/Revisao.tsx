@@ -1,4 +1,3 @@
-import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { rotuloDaFonte } from '@/modulos/faixa/servico';
@@ -45,19 +44,18 @@ export function Revisao({ faixa, saldo }: PropsRevisao) {
         </section>
       </div>
 
-      {saldo !== null ? (
-        <Aviso tom="info" estatico>
-          {TEXTOS.avisoSelecao(saldo)}
-        </Aviso>
-      ) : null}
-
-      <div className={estilos.acoes}>
-        <BotaoLink href={`${ROTA.ARTISTA_ENVIAR}/${faixa.id}/contexto`} variante="secundario">
-          {TEXTOS.voltar}
-        </BotaoLink>
-        <BotaoLink href={`${ROTA.ARTISTA_ENVIAR}/${faixa.id}/curadores`}>
-          {TEXTOS.enviarParaCuradoria}
-        </BotaoLink>
+      {/* Protótipo aprovado: a nota do saldo discreta à esquerda e as ações
+          à direita, embaixo do cartão do contexto. */}
+      <div className={estilos.rodape}>
+        <p className={estilos.notaDoSaldo}>{saldo !== null ? TEXTOS.avisoSelecao(saldo) : null}</p>
+        <div className={estilos.acoes} data-botoes="caixa-alta">
+          <BotaoLink href={`${ROTA.ARTISTA_ENVIAR}/${faixa.id}/contexto`} variante="secundario">
+            {TEXTOS.voltar}
+          </BotaoLink>
+          <BotaoLink href={`${ROTA.ARTISTA_ENVIAR}/${faixa.id}/curadores`}>
+            {TEXTOS.enviarParaCuradoria}
+          </BotaoLink>
+        </div>
       </div>
     </div>
   );

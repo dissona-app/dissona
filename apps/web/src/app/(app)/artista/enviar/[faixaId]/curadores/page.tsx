@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+import { MolduraDoEnvio } from '@/componentes/artista/MolduraDoEnvio';
 import { SelecaoDeCuradores } from '@/componentes/artista/SelecaoDeCuradores';
 import type { CuradorNaLista } from '@/componentes/artista/SelecaoDeCuradores';
 import * as claves from '@dissona/nucleo/lib/claves';
+import { lerSaldoDisponivel } from '@/modulos/claves/consultas';
 import { lerFaixaDoPasso } from '@/modulos/faixa/consultas';
 import { confirmarSelecaoDeCuradores } from '@/modulos/selecao/acoes';
 import { listarDisponiveis } from '@/modulos/selecao/repositorio';
@@ -24,6 +26,11 @@ const ROTULO_DO_SERVICO: Readonly<Record<string, string>> = {
   outro: 'Outra divulgação',
 };
 
+/** Claves (bigint em centésimos) → número, só para a soma exibida na tela. */
+function emNumero(valor: claves.Claves): number {
+  return Number(claves.formatar(valor, 'en-US').replace(/,/g, ''));
+}
+
 /**
  * Placeholder da seleção de curadores — entre a revisão (passo 3) e a
  * confirmação.
@@ -43,7 +50,7 @@ export default async function PaginaDaSelecao({
   const estado = await lerFaixaDoPasso(faixaId, 'revisao');
   if (estado.estado !== 'ok') notFound();
 
-  const disponiveis = await listarDisponiveis();
+  const [disponiveis, saldo] = await Promise.all([listarDisponiveis(), lerSaldoDisponivel()]);
 
   const curadores: readonly CuradorNaLista[] = disponiveis
     // Sem `feedback` ativo a RPC recusaria com DS012. Filtrar aqui evita
@@ -56,21 +63,27 @@ export default async function PaginaDaSelecao({
         nome: curador.nome,
         classe: curador.classe,
         precoBase: `${claves.formatar(base?.precoClaves ?? 0n)} ${CARTEIRA.saldoUnidade}`,
+        precoBaseClaves: emNumero(base?.precoClaves ?? 0n),
         opcionais: curador.servicos
           .filter((servico) => servico.tipo !== SERVICO_OBRIGATORIO)
           .map((servico) => ({
             tipo: servico.tipo,
             rotulo: ROTULO_DO_SERVICO[servico.tipo] ?? servico.tipo,
             preco: `${claves.formatar(servico.precoClaves)} ${CARTEIRA.saldoUnidade}`,
+            precoClaves: emNumero(servico.precoClaves),
           })),
       };
     });
 
   return (
-    <SelecaoDeCuradores
-      faixaId={faixaId}
-      curadores={curadores}
-      acao={confirmarSelecaoDeCuradores}
-    />
+    <MolduraDoEnvio passo="curadores">
+      <SelecaoDeCuradores
+        faixaId={faixaId}
+        tituloDaFaixa={estado.faixa.titulo}
+        saldo={saldo === null ? null : `${claves.formatar(saldo)} ${CARTEIRA.saldoUnidade}`}
+        curadores={curadores}
+        acao={confirmarSelecaoDeCuradores}
+      />
+    </MolduraDoEnvio>
   );
 }

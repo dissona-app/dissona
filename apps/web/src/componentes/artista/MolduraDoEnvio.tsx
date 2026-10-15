@@ -8,7 +8,8 @@ import { PASSOS } from '@/modulos/faixa/tipos';
 import estilos from './MolduraDoEnvio.module.css';
 
 export type PropsMolduraDoEnvio = {
-  readonly passo: PassoDoEnvio;
+  /** `curadores` é o quarto passo do indicador — a seleção, depois da revisão. */
+  readonly passo: PassoDoEnvio | 'curadores';
   readonly children: ReactNode;
 };
 
@@ -23,7 +24,7 @@ export type PropsMolduraDoEnvio = {
  * apoiada no `<Passos>` do Design System, cujo docblock já previa "envio em 3".
  */
 export function MolduraDoEnvio({ passo, children }: PropsMolduraDoEnvio) {
-  const indice = PASSOS.indexOf(passo);
+  const indice = passo === 'curadores' ? PASSOS.length : PASSOS.indexOf(passo);
 
   // Protótipo aprovado: um cartão com a faixa escura no topo — título,
   // contador e os passos em barras — e o conteúdo numa área clara embaixo.
@@ -32,7 +33,7 @@ export function MolduraDoEnvio({ passo, children }: PropsMolduraDoEnvio) {
       <header className={estilos.faixa}>
         <div className={estilos.faixaTopo}>
           <h2 className={estilos.heroi}>{ENVIAR.herois[indice]}</h2>
-          <p className={estilos.contador}>{ENVIAR.passoDe(indice + 1, PASSOS.length)}</p>
+          <p className={estilos.contador}>{ENVIAR.passoDe(indice + 1, ENVIAR.passos.length)}</p>
         </div>
         <nav aria-label="Progresso">
           <ol className={estilos.passos}>

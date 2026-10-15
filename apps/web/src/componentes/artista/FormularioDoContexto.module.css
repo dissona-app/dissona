@@ -48,3 +48,44 @@
   gap: 12px;
   min-width: 0;
 }
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+/* Sem cartões: os rótulos em versalete e os campos direto no fundo do
+   wizard, como no protótipo. */
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campos {
+  gap: 16px;
+}
+
+.bloco input + span {
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.bloco input:checked + span {
+  border-color: var(--dsn-ink);
+  background: var(--dsn-ink);
+  color: #ffffff;
+}
+
+.bloco textarea {
+  min-height: 136px;
+}
+
+.contador {
+  margin: 0;
+  font-size: 12px;
+}
+
+.acoes {
+  align-items: center;
+  gap: 8px;
+}

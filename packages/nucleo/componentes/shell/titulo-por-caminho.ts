@@ -169,6 +169,23 @@ const SUBLEGENDA_DA_AVALIACAO: Readonly<Record<PassoDaAvaliacao, string>> = {
   remuneracao: 'Como o repasse foi calculado.',
 };
 
+/** Título e sublegenda de cada passo do envio, literais do protótipo aprovado. */
+const TITULO_DO_PASSO_DO_ENVIO: Readonly<Record<string, TituloDeModulo>> = {
+  contexto: {
+    titulo: 'Enviar faixa',
+    sublegenda: 'Conte ao curador o que ele precisa saber antes de ouvir.',
+  },
+  curadores: {
+    titulo: 'Escolher curador',
+    sublegenda: 'Um ou mais curadores por faixa. Feedback vem incluso em cada um.',
+  },
+  revisao: { titulo: 'Revisar envio', sublegenda: 'Confira os dados antes de enviar.' },
+  confirmacao: {
+    titulo: 'Faixa enviada',
+    sublegenda: 'A faixa já está na fila dos curadores escolhidos.',
+  },
+};
+
 /**
  * Prefixo → título, para as rotas com segmento dinâmico.
  *
@@ -241,6 +258,15 @@ export function tituloDoCaminho(caminho: string, papel: Papel): TituloDeModulo {
         sublegenda: SUBLEGENDA_DA_AVALIACAO[ultimo],
       };
     }
+  }
+
+  // Os passos do envio — `/artista/enviar/<faixaId>/<passo>`. O protótipo
+  // aprovado troca título e sublegenda por passo (`enTitulos` e o mapa de
+  // `appSub` de `naEnviar`).
+  if (semBarraFinal.startsWith(`${ROTA.ARTISTA_ENVIAR}/`)) {
+    const ultimo = semBarraFinal.slice(semBarraFinal.lastIndexOf('/') + 1);
+    const doPasso = TITULO_DO_PASSO_DO_ENVIO[ultimo];
+    if (doPasso !== undefined) return doPasso;
   }
 
   for (const [prefixo, titulo] of POR_PREFIXO) {

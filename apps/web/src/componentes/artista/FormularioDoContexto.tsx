@@ -7,7 +7,6 @@ import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Chips } from '@/componentes/base/Chips';
-import { Painel } from '@/componentes/base/Painel';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import type { FaixaEmEdicao } from '@/modulos/faixa/tipos';
@@ -83,7 +82,7 @@ export function FormularioDoContexto({ faixa, acao }: PropsFormularioDoContexto)
           vinil, à direita. */}
       <div className={estilos.grade}>
         <div className={estilos.campos}>
-          <Painel titulo={TEXTOS.rotuloGenero}>
+          <div className={estilos.bloco}>
             <Chips
               name="genero"
               rotulo={TEXTOS.rotuloGenero}
@@ -92,25 +91,28 @@ export function FormularioDoContexto({ faixa, acao }: PropsFormularioDoContexto)
               maximo={1}
               erro={erroDe('genero')}
             />
-          </Painel>
+          </div>
 
-          <Painel titulo={TEXTOS.rotuloContexto} sublegenda={TEXTOS.contextoApoio} nivel={3}>
+          <div className={estilos.bloco}>
             <AreaTexto
               name="contexto"
               rotulo={TEXTOS.rotuloContexto}
               variante="contexto"
+              placeholder="O refrão sustenta? A produção compete com a voz? Diga onde você quer o ouvido do curador."
               value={contexto}
               onChange={(evento) => setContexto(evento.target.value)}
               erro={erroDe('contexto')}
               required
             />
-            <p className={estilos.contador}>{TEXTOS.contagemContexto(contexto.trim().length)}</p>
-          </Painel>
+            <p className={estilos.contador}>
+              {TEXTOS.contextoApoio} {TEXTOS.contagemContexto(contexto.trim().length)}
+            </p>
+          </div>
         </div>
         <CartaoDaFaixa faixa={faixa} info={descricaoDaFaixa(faixa)} />
       </div>
 
-      <div className={estilos.acoes}>
+      <div className={estilos.acoes} data-botoes="caixa-alta">
         <BotaoLink href={ROTA.ARTISTA_ENVIAR} variante="secundario">
           {TEXTOS.voltar}
         </BotaoLink>

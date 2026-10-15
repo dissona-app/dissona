@@ -245,6 +245,17 @@
   font-size: var(--dsn-text-xs);
 }
 
+:global([data-botoes='frase'] [data-botoes='caixa-alta']) .primario {
+  /* Os passos 2 em diante do envio voltam ao primário em caixa-alta. */
+  font-weight: var(--dsn-weight-bold);
+  letter-spacing: var(--dsn-tracking-botao);
+  text-transform: uppercase;
+}
+
+:global([data-botoes='frase'] [data-botoes='caixa-alta']) .md {
+  font-size: var(--dsn-text-sm);
+}
+
 :global([data-botoes='cartao']) .sm {
   /* A ação de um cartão de Conta: 11px 20px no protótipo aprovado. */
   padding: 11px 20px;

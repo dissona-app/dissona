@@ -1087,13 +1087,19 @@ export const CARTEIRA = {
 // ---------------------------------------------------------------------------
 
 export const ENVIAR = {
-  passos: ['Envio da faixa', 'Contexto', 'Revisar'] as const,
+  /**
+   * Os quatro passos do indicador, como no protótipo aprovado. A ordem dos
+   * dois últimos segue o fluxo do produto (revisar e então escolher o
+   * curador, que é onde as Claves saem); o protótipo os inverte.
+   */
+  passos: ['Envio da faixa', 'Contexto', 'Revisar', 'Escolher curador'] as const,
   passoDe: (atual: number, total: number) => `Passo ${atual} de ${total}`,
 
   herois: [
     'Sua faixa nas mãos de quem entende.',
     'Diga o que você quer descobrir.',
     'Última olhada antes de soltar.',
+    'Escolha quem vai ouvir.',
   ] as const,
 
   // ------------------------------------------------------ passo 1 ---------
@@ -1242,6 +1248,14 @@ export const SELECAO = {
   titulo: 'Escolha quem vai ouvir',
   subtitulo:
     'Versão simplificada. A busca por gênero, o ranking e o detalhe do curador chegam na próxima release.',
+  buscar: 'Buscar curador',
+  disponiveis: (n: number) => `${n} ${n === 1 ? 'curador disponível' : 'curadores disponíveis'}`,
+  selecaoDestaFaixa: 'Seleção desta faixa',
+  dicaDaSelecao:
+    'Toque num curador para montar o envio. Feedback vem incluso e dá para somar outros serviços.',
+  total: 'Total',
+  saldoDisponivel: 'Saldo disponível',
+  cotacao: '1 Clave = R$ 10',
 
   totalDaLeitura: 'Total da seleção',
   saldoApos: (saldo: string) => `Saldo depois da confirmação: ${saldo}`,

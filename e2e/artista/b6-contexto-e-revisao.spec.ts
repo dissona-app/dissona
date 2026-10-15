@@ -39,14 +39,14 @@ async function ateOContexto(page: Page, info: TestInfo): Promise<string> {
 }
 
 test.describe('B6 · Contexto e revisão', () => {
-  test('o wizard mostra os três passos', async ({ page }, info) => {
+  test('o wizard mostra os quatro passos', async ({ page }, info) => {
     await ateOContexto(page, info);
 
     // O indicador é um `<nav>` nomeado com uma `<ol>` de verdade dentro, e o
     // passo atual leva `aria-current="step"`.
     const passos = page.getByRole('navigation', { name: /progresso/i });
-    await expect(passos.getByRole('listitem')).toHaveCount(3);
-    await expect(page.getByText(ENVIAR.passoDe(2, 3))).toBeVisible();
+    await expect(passos.getByRole('listitem')).toHaveCount(4);
+    await expect(page.getByText(ENVIAR.passoDe(2, 4))).toBeVisible();
   });
 
   test('o contexto é obrigatório', { tag: ['@RF-038'] }, async ({ page }, info) => {
@@ -68,7 +68,7 @@ test.describe('B6 · Contexto e revisão', () => {
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
 
     await page.waitForURL(/\/revisao$/);
-    await expect(page.getByText(ENVIAR.passoDe(3, 3))).toBeVisible();
+    await expect(page.getByText(ENVIAR.passoDe(3, 4))).toBeVisible();
 
     await expect(page.getByText(titulo)).toBeVisible();
     await expect(page.getByText('Indie', { exact: true })).toBeVisible();
