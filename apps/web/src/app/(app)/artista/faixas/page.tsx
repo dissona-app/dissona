@@ -44,10 +44,11 @@ export default async function PaginaMinhasFaixas({
 }: {
   readonly searchParams: Promise<{ readonly status?: string }>;
 }) {
-  const [faixas, busca] = await Promise.all([lerMinhasFaixas(), searchParams]);
-  if (faixas === null) redirect(ROTA.ARTISTA_ENTRAR);
+  const [minhas, busca] = await Promise.all([lerMinhasFaixas(), searchParams]);
+  if (minhas === null) redirect(ROTA.ARTISTA_ENTRAR);
+  const { enviadas: faixas, rascunhos } = minhas;
 
-  if (faixas.length === 0) {
+  if (faixas.length === 0 && rascunhos.length === 0) {
     return (
       <EstadoVazio
         titulo="Nenhuma faixa enviada ainda"
@@ -193,6 +194,44 @@ export default async function PaginaMinhasFaixas({
           ))}
         </ul>
       )}
+
+      {/* Faixas começadas e não enviadas: não somem — continuam pelo envio. */}
+      {rascunhos.length > 0 ? (
+        <section className={estilos.andamento} aria-labelledby="rascunhos">
+          <div className={estilos.andamentoTopo}>
+            <h2 id="rascunhos" className={estilos.sobretitulo}>
+              Rascunhos
+            </h2>
+            <span className={estilos.andamentoResumo}>
+              {rascunhos.length}{' '}
+              {rascunhos.length === 1 ? 'faixa ainda não enviada' : 'faixas ainda não enviadas'}
+            </span>
+          </div>
+          <ul className={estilos.andamentoLista}>
+            {rascunhos.map((faixa) => (
+              <li key={faixa.id} className={estilos.rascunhoLinha}>
+                <span
+                  className={estilos.miniCapa}
+                  style={{ backgroundImage: `url('${capaDoEnvio(faixa.id)}')` }}
+                  aria-hidden="true"
+                />
+                <span className={estilos.andamentoTextos}>
+                  <span className={estilos.andamentoTitulo}>{faixa.titulo}</span>
+                  <span className={estilos.andamentoApoio}>
+                    {faixa.genero ?? 'Sem gênero'} · sem envio
+                  </span>
+                </span>
+                <Link
+                  className={estilos.acompanhar}
+                  href={`${ROTA.ARTISTA_ENVIAR}/${faixa.id}/contexto`}
+                >
+                  Continuar envio
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <p className={estilos.nota}>Sem resposta no prazo, a Clave volta para a sua carteira.</p>
     </div>

@@ -264,7 +264,7 @@ export type FaixaEnviada = {
   readonly envios: readonly EnvioDaFaixaNaLista[];
 };
 
-/** As faixas que foram para curadoria, com a situação de cada envio. */
+/** As faixas do artista com a situação de cada envio (sem envio = rascunho). */
 export async function listarFaixasEnviadas(
   perfilArtistaId: string,
 ): Promise<readonly FaixaEnviada[]> {
@@ -278,16 +278,14 @@ export async function listarFaixasEnviadas(
 
   estourarSeErro(error);
 
-  return (data ?? [])
-    .map((linha) => ({
-      id: linha.id,
-      titulo: linha.titulo,
-      genero: linha.genero,
-      envios: (linha.envio ?? []).map((envio) => ({
-        id: envio.id,
-        situacao: envio.situacao,
-        prazoEm: envio.prazo_em,
-      })),
-    }))
-    .filter((faixa) => faixa.envios.length > 0);
+  return (data ?? []).map((linha) => ({
+    id: linha.id,
+    titulo: linha.titulo,
+    genero: linha.genero,
+    envios: (linha.envio ?? []).map((envio) => ({
+      id: envio.id,
+      situacao: envio.situacao,
+      prazoEm: envio.prazo_em,
+    })),
+  }));
 }

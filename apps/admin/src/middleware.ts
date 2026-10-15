@@ -5,7 +5,7 @@ import { urlDoSite } from '@dissona/nucleo/lib/ambiente';
 import type { LeituraDePapeis } from '@dissona/nucleo/lib/papeis';
 import { lerContextoSessao } from '@dissona/nucleo/lib/papeis';
 import type { SessaoDaRequisicao } from '@dissona/nucleo/lib/supabase/middleware';
-import { renovarSessao } from '@dissona/nucleo/lib/supabase/middleware';
+import { renovarSessao, temCookieDeSessao } from '@dissona/nucleo/lib/supabase/middleware';
 
 import { decidirNoPainel } from './lib/decisao';
 
@@ -30,14 +30,23 @@ export async function middleware(requisicao: NextRequest) {
   const resposta = sessao?.resposta ?? NextResponse.next({ request: requisicao });
 
   let leitura: LeituraDePapeis = SEM_SESSAO;
+  let leituraFalhou = false;
   if (sessao !== null) {
     try {
       leitura = await lerContextoSessao(sessao.supabase, sessao.usuarioId);
     } catch (erro) {
+      leituraFalhou = true;
       console.error('[middleware] não foi possível ler o contexto da sessão:', erro);
     }
   }
 
+  // Falha **transitória** (rede, timeout, 5xx, limite de CPU da borda) com o
+  // cookie de sessão presente não é logout: a navegação segue, e a página
+  // valida de novo. Antes, isto caía na guarda como "sem sessão" e mandava a
+  // pessoa ao login no meio do uso.
+  const incerta =
+    temCookieDeSessao(requisicao) && (sessao === null || sessao.indeterminada || leituraFalhou);
+  if (incerta) return resposta;
   const url = requisicao.nextUrl;
   const decisao = decidirNoPainel({
     caminho: url.pathname,
