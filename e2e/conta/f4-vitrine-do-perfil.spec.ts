@@ -76,10 +76,9 @@ test.describe('F4 · Vitrine do perfil', () => {
       await expect(page.getByText(ARTISTA_VITRINE.vazioTitulo)).toBeVisible();
       await expect(page.getByRole('link', { name: ARTISTA_VITRINE.vazioAcao })).toBeVisible();
 
-      // "Ver todas" existe e não navega — o catálogo é o módulo 6, da R4.
-      const verTodas = page.getByText(ARTISTA_VITRINE.verTodas, { exact: true });
-      await expect(verTodas).toBeVisible();
-      await expect(verTodas).toHaveAttribute('aria-disabled', 'true');
+      // "Ver todas" leva a "Minhas faixas".
+      const verTodas = page.getByRole('link', { name: ARTISTA_VITRINE.verTodas, exact: true });
+      await expect(verTodas).toHaveAttribute('href', '/artista/faixas');
     },
   );
 
