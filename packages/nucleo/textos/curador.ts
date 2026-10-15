@@ -276,16 +276,14 @@ export const CURADOR_CLASSIFICACAO = {
     comprovadas >= minimo
       ? `${comprovadas} comprovadas`
       : `${comprovadas} de ${minimo} necessárias`,
-  notaOuro:
-    'Ouro vem por convite ou por desempenho.',
+  notaOuro: 'Ouro vem por convite ou por desempenho.',
   continuar: 'Continuar',
 
   // -------------------------------------------- 12.5 · Bronze aprovado ----
   seloBronze: 'Curador Bronze aprovado',
   boasVindas: (primeiroNome: string) =>
     primeiroNome === '' ? 'Boas-vindas à curadoria' : `Boas-vindas, ${primeiroNome}`,
-  boasVindasTexto:
-    'Seu acesso está liberado. O curso de curadoria é opcional.',
+  boasVindasTexto: 'Seu acesso está liberado. O curso de curadoria é opcional.',
   cursoTitulo: 'Curso de curadoria',
   cursoResumo: '3 módulos · 39 min',
   cursoOpcional: 'Opcional',
