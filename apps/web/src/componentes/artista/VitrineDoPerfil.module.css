@@ -270,7 +270,11 @@
   font-size: 13px;
   font-weight: 600;
   color: #5b2e8f;
-  cursor: default;
+  text-decoration: none;
+}
+
+.verTodas:hover {
+  text-decoration: underline;
 }
 
 .vazio {

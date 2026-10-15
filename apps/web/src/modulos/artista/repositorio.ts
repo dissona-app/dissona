@@ -248,3 +248,46 @@ export async function contarIndicacoes(perfilArtistaId: string): Promise<number>
   estourarSeErro(error);
   return count ?? 0;
 }
+
+/* ------------------------------------------------- minhas faixas (3.4) --- */
+
+export type EnvioDaFaixaNaLista = {
+  readonly id: string;
+  readonly situacao: 'recebeu' | 'ouviu' | 'avaliando' | 'pronto' | 'devolvido' | 'cancelado';
+  readonly prazoEm: string;
+};
+
+export type FaixaEnviada = {
+  readonly id: string;
+  readonly titulo: string;
+  readonly genero: string | null;
+  readonly envios: readonly EnvioDaFaixaNaLista[];
+};
+
+/** As faixas que foram para curadoria, com a situação de cada envio. */
+export async function listarFaixasEnviadas(
+  perfilArtistaId: string,
+): Promise<readonly FaixaEnviada[]> {
+  const supabase = await criarClienteServidor();
+
+  const { data, error } = await supabase
+    .from('faixa')
+    .select('id, titulo, genero, criado_em, envio(id, situacao, prazo_em)')
+    .eq('perfil_artista_id', perfilArtistaId)
+    .order('criado_em', { ascending: false });
+
+  estourarSeErro(error);
+
+  return (data ?? [])
+    .map((linha) => ({
+      id: linha.id,
+      titulo: linha.titulo,
+      genero: linha.genero,
+      envios: (linha.envio ?? []).map((envio) => ({
+        id: envio.id,
+        situacao: envio.situacao,
+        prazoEm: envio.prazo_em,
+      })),
+    }))
+    .filter((faixa) => faixa.envios.length > 0);
+}
