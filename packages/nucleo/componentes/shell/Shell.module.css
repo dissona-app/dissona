@@ -74,6 +74,9 @@
   margin: 0;
   font-size: 30px;
   line-height: 1.1;
+  /* No protótipo a caixa do título tem 45px (a área do Anton a 30px); o
+     respiro acima e abaixo reproduz a altura do cabeçalho, 97px. */
+  padding: 6px 0;
   font-weight: var(--dsn-weight-regular);
   letter-spacing: var(--dsn-tracking-display);
   color: var(--dsn-ink);
@@ -82,9 +85,19 @@
   white-space: nowrap;
 }
 
+/* Com sobretítulo o protótipo não tem o respiro: o bloco fica com 68px. */
+.sobretitulo + .titulo {
+  padding: 0;
+}
+
+.sobretitulo {
+  line-height: 12px;
+}
+
 /* `appSub` do protótipo — a linha sob o título do header. */
 .subtitulo {
   font-size: var(--dsn-text-xs);
+  line-height: 14px;
   color: var(--dsn-ink-500);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -183,4 +196,5 @@
 /* No curador o subtítulo do header é meio ponto maior (protótipo aprovado). */
 .grade[data-papel='curador'] .subtitulo {
   font-size: 13.5px;
+  line-height: 15px;
 }
