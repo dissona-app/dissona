@@ -71,8 +71,14 @@ describe('contraste dos tokens', () => {
    * 3:1. O campo é branco sobre fundo quase branco, então a borda é a única
    * afordância — não há outro elemento visual que sustente a identificação.
    */
-  it('a borda de campo em repouso passa 1.4.11 sobre branco', () => {
-    expect(contraste(token('dsn-border-campo'), BRANCO)).toBeGreaterThanOrEqual(3);
+  /**
+   * Decisão de 14/10/2026: o protótipo aprovado pelo cliente desenha o campo
+   * com a borda das linhas (#E5DEEA), e a tela segue o aprovado. Fica abaixo
+   * de 3:1 (WCAG 1.4.11) — registrado em docs/prototipo-aprovado/PLANO.md;
+   * o foco continua com anel roxo, que passa.
+   */
+  it('a borda de campo em repouso é a do protótipo aprovado', () => {
+    expect(token('dsn-border-campo').toLowerCase()).toBe('#e5deea');
   });
 
   /**
