@@ -66,8 +66,8 @@ const ARTISTA: readonly GrupoNavegacao[] = [
       {
         rotulo: NAVEGACAO_DO_ARTISTA.minhasFaixas,
         icone: 'faixas',
-        caminho: `${ROTA.ARTISTA}/faixas`,
-        release: 3,
+        caminho: ROTA.ARTISTA_FAIXAS,
+        release: 2,
       },
     ],
   },

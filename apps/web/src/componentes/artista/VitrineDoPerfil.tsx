@@ -39,10 +39,7 @@ function tomDoStatus(status: StatusNaVitrine): TomEtiqueta {
  * tela mostra é o que os curadores veem antes de ouvir a pessoa, e é por isso
  * que ela vem **antes** do formulário no protótipo.
  *
- * "Ver todas" e a linha da faixa não navegam: o destino é o catálogo (módulo 6,
- * R4). O botão fica visível e desabilitado, com o motivo no `title`, no mesmo
- * padrão dos itens de release futura da sidebar — some-lo faria a tela mudar de
- * forma quando a R4 chegar.
+ * "Ver todas" leva a "Minhas faixas", a lista completa do que foi enviado.
  */
 export function VitrineDoPerfil({
   vitrine,
@@ -154,9 +151,9 @@ export function VitrineDoPerfil({
           <h2 id="suas-faixas" className={estilos.listaTitulo}>
             {TEXTOS.suasFaixas}
           </h2>
-          <span className={estilos.verTodas} aria-disabled="true" title={TEXTOS.verTodasPendente}>
+          <Link className={estilos.verTodas} href={ROTA.ARTISTA_FAIXAS}>
             {TEXTOS.verTodas}
-          </span>
+          </Link>
         </div>
         {faixas.length === 0 ? (
           <div className={estilos.vazio}>

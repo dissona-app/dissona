@@ -317,6 +317,14 @@ const PARES = [
     contas.curador,
     '/curador/cadastro/bronze',
   ],
+  [
+    'artista-minhas-faixas',
+    'Artista',
+    { telaInicial: 'Minhas faixas' },
+    'artista',
+    contas.artista,
+    '/artista/faixas',
+  ],
 ];
 
 const b = await chromium.launch();

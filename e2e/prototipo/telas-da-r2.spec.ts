@@ -52,15 +52,6 @@ const CENARIOS: readonly Cenario[] = [
     props: { telaInicial: 'Perfil' },
     rota: '/artista/perfil',
     persona: PERSONA.ARTISTA,
-    excecoes: [
-      {
-        texto: 'Ver todas',
-        propriedades: ['cor'],
-        motivo:
-          'O catálogo (Minhas faixas) é de outra release; o link está desabilitado ' +
-          'e por isso cinza, e não o roxo do protótipo.',
-      },
-    ],
   },
   {
     nome: 'editar cadastro do artista',

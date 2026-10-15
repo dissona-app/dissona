@@ -1,4 +1,4 @@
-import type { FaixaNaVitrine } from './repositorio';
+import type { EnvioDaFaixaNaLista, FaixaNaVitrine } from './repositorio';
 
 /**
  * Regra da vitrine do perfil (7.1) — pura, e por isso testável sem banco.
@@ -39,4 +39,57 @@ export function faixasEnviadas(faixas: readonly FaixaNaVitrine[]): number {
 /** "Leituras": curadorias concluídas, somadas em todas as faixas. */
 export function leiturasConcluidas(faixas: readonly FaixaNaVitrine[]): number {
   return faixas.reduce((total, faixa) => total + faixa.leiturasConcluidas, 0);
+}
+
+/* ------------------------------------------------- minhas faixas (3.4) --- */
+
+/** As abas de "Minhas faixas", na ordem do protótipo aprovado. */
+export const SITUACOES_DA_LISTA = [
+  'na_fila',
+  'em_avaliacao',
+  'atrasada',
+  'concluida',
+  'devolvida',
+] as const;
+export type SituacaoNaLista = (typeof SITUACOES_DA_LISTA)[number];
+
+const ATIVOS = new Set<EnvioDaFaixaNaLista['situacao']>(['recebeu', 'ouviu', 'avaliando']);
+
+/**
+ * A situação de uma faixa enviada, pelos envios dela (um por curador).
+ *
+ * - todos devolvidos → `devolvida` (a Clave voltou);
+ * - nenhum em aberto e algum pronto → `concluida`;
+ * - algum em aberto com o prazo vencido → `atrasada`;
+ * - algum curador já ouviu → `em_avaliacao`;
+ * - senão → `na_fila`.
+ */
+export function situacaoNaLista(
+  envios: readonly EnvioDaFaixaNaLista[],
+  agora: Date,
+): SituacaoNaLista {
+  const validos = envios.filter((envio) => envio.situacao !== 'cancelado');
+  const abertos = validos.filter((envio) => ATIVOS.has(envio.situacao));
+  if (validos.length > 0 && validos.every((envio) => envio.situacao === 'devolvido')) {
+    return 'devolvida';
+  }
+  if (abertos.length === 0) return 'concluida';
+  if (abertos.some((envio) => new Date(envio.prazoEm).getTime() < agora.getTime())) {
+    return 'atrasada';
+  }
+  if (abertos.some((envio) => envio.situacao !== 'recebeu')) return 'em_avaliacao';
+  return 'na_fila';
+}
+
+/**
+ * Até onde a leitura chegou, de 1 a 4 (recebeu, ouviu, avaliando, pronto) — as
+ * quatro barras do "Em andamento". É a etapa do curador mais adiantado entre
+ * os que ainda não terminaram.
+ */
+export function etapaDaLeitura(envios: readonly EnvioDaFaixaNaLista[]): 1 | 2 | 3 | 4 {
+  const abertos = envios.filter((envio) => ATIVOS.has(envio.situacao));
+  if (abertos.length === 0) return 4;
+  if (abertos.some((envio) => envio.situacao === 'avaliando')) return 3;
+  if (abertos.some((envio) => envio.situacao === 'ouviu')) return 2;
+  return 1;
 }

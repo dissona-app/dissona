@@ -920,8 +920,6 @@ export const ARTISTA_VITRINE = {
 
   suasFaixas: 'Suas faixas',
   verTodas: 'Ver todas',
-  /** O catálogo é o módulo 6, da R4 — o botão existe e diz por que não abre. */
-  verTodasPendente: 'O catálogo completo entra na Release 4',
 
   /** `trackData` do protótipo, mais o estado que só o produto tem. */
   status: {

@@ -46,6 +46,8 @@ export const ROTA = {
   ARTISTA: '/artista',
   /** "Perfil" na sidebar (7.1) — o que o curador vê antes de ouvir. */
   ARTISTA_PERFIL: '/artista/perfil',
+  /** "Minhas faixas" — tudo que o artista enviou, com a situação e a média. */
+  ARTISTA_FAIXAS: '/artista/faixas',
   /** Carteira (5) e extrato (5.3). O extrato é rota própria porque o protótipo lhe dá endereço ("Ver extrato", "Ver tudo"). */
   ARTISTA_CARTEIRA: '/artista/carteira',
   ARTISTA_EXTRATO: '/artista/carteira/extrato',

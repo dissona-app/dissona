@@ -88,6 +88,10 @@ const EXATOS: Readonly<Record<string, TituloDeModulo>> = {
   // cadastro", com "Atualize o que os curadores veem."). A frase
   // "Curadores veem essas informações…" é a primeira linha do corpo do
   // formulário, e continua lá, no `Painel`.
+  [ROTA.ARTISTA_FAIXAS]: {
+    titulo: 'Minhas faixas',
+    sublegenda: 'Tudo que você enviou, com notas e devolutivas de cada curador.',
+  },
   [ROTA.ARTISTA_PERFIL]: {
     titulo: ARTISTA_VITRINE.titulo,
     sublegenda: 'Como os curadores veem você antes de aceitar a faixa.',

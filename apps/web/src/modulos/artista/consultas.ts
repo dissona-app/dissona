@@ -6,10 +6,17 @@ import {
   contarIndicacoes,
   lerMeuPerfil,
   listarFaixasDoArtista,
+  listarFaixasEnviadas,
   notasDasFaixas,
 } from './repositorio';
-import { faixasEnviadas, leiturasConcluidas, statusDaFaixa } from './servico';
-import type { StatusNaVitrine } from './servico';
+import {
+  etapaDaLeitura,
+  faixasEnviadas,
+  leiturasConcluidas,
+  situacaoNaLista,
+  statusDaFaixa,
+} from './servico';
+import type { SituacaoNaLista, StatusNaVitrine } from './servico';
 import type { PerfilDoArtista } from './tipos';
 
 export type { PerfilDoArtista } from './tipos';
@@ -83,4 +90,43 @@ export async function lerVitrineDoArtista(): Promise<Vitrine | null> {
     })),
     temMais: faixas.length > FAIXAS_NA_VITRINE,
   };
+}
+
+/* ------------------------------------------------- minhas faixas (3.4) --- */
+
+export type FaixaNaLista = {
+  readonly id: string;
+  readonly titulo: string;
+  readonly genero: string | null;
+  readonly situacao: SituacaoNaLista;
+  readonly curadores: number;
+  readonly prontos: number;
+  readonly etapa: 1 | 2 | 3 | 4;
+  readonly media: number | null;
+};
+
+/** Tudo que "Minhas faixas" mostra, numa ida. */
+export async function lerMinhasFaixas(): Promise<readonly FaixaNaLista[] | null> {
+  const perfil = await lerMeuPerfil();
+  if (perfil === null) return null;
+
+  const faixas = await listarFaixasEnviadas(perfil.perfilArtistaId);
+  const notas = await notasDasFaixas(
+    faixas.map((faixa) => ({ id: faixa.id, envioIds: faixa.envios.map((envio) => envio.id) })),
+  );
+  const agora = new Date();
+
+  return faixas.map((faixa) => {
+    const validos = faixa.envios.filter((envio) => envio.situacao !== 'cancelado');
+    return {
+      id: faixa.id,
+      titulo: faixa.titulo,
+      genero: faixa.genero,
+      situacao: situacaoNaLista(faixa.envios, agora),
+      curadores: validos.length,
+      prontos: validos.filter((envio) => envio.situacao === 'pronto').length,
+      etapa: etapaDaLeitura(faixa.envios),
+      media: notas.get(faixa.id) ?? null,
+    };
+  });
 }

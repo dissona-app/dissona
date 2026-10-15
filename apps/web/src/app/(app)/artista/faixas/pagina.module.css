@@ -1,0 +1,373 @@
+/* 3.4 · Minhas faixas — protótipo aprovado. */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 1100px;
+}
+
+/* ------------------------------------------------------- em andamento -- */
+
+.andamento {
+  border: 1px solid var(--dsn-border-faint);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}
+
+.andamentoTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid #f0ebf4;
+}
+
+.sobretitulo {
+  margin: 0;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-700);
+}
+
+.andamentoResumo {
+  font-size: 12px;
+  color: var(--dsn-ink-500);
+}
+
+.andamentoLista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.andamentoLinha {
+  display: grid;
+  grid-template-columns: 40px minmax(160px, 1fr) minmax(200px, 1.4fr) auto;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 11px 18px;
+}
+
+.andamentoLinha + .andamentoLinha {
+  border-top: 1px solid #f0ebf4;
+}
+
+@media (max-width: 900px) {
+  .andamentoLinha {
+    grid-template-columns: 40px 1fr;
+  }
+
+  .progresso,
+  .acompanhar {
+    grid-column: 2;
+  }
+}
+
+.miniCapa {
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center;
+}
+
+.andamentoTextos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.andamentoTitulo {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.andamentoApoio {
+  font-size: 12.5px;
+  color: var(--dsn-ink-500);
+}
+
+.progresso {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.barras {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.barra,
+.barraAcesa {
+  height: 4px;
+  border-radius: 2px;
+  background: #ebe5f1;
+}
+
+.barraAcesa[data-etapa='1'] {
+  background: #b780e7;
+}
+
+.barraAcesa[data-etapa='2'] {
+  background: #7f47dd;
+}
+
+.barraAcesa[data-etapa='3'] {
+  background: #5b2e8f;
+}
+
+.barraAcesa[data-etapa='4'] {
+  background: #1f8a4c;
+}
+
+.frase,
+.fraseAtrasada {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--dsn-ink);
+}
+
+.fraseAtrasada {
+  color: #a3341d;
+}
+
+.acompanhar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border: 1px solid #d9c8f0;
+  border-radius: 4px;
+  background: #faf7fd;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsn-purple-600);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.acompanhar:hover {
+  border-color: var(--dsn-purple-600);
+}
+
+/* ------------------------------------------------------------- abas ---- */
+
+.abas {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-self: flex-start;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--dsn-border-faint);
+  border-radius: 4px;
+  background: var(--dsn-surface);
+}
+
+.aba,
+.abaAtiva {
+  padding: 7px 14px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dsn-ink-700);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.aba:hover {
+  background: var(--dsn-surface-muted);
+}
+
+.abaAtiva {
+  background: var(--dsn-ink);
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ----------------------------------------------------------- cartões --- */
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--dsn-border-faint);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--dsn-duration-base),
+    box-shadow var(--dsn-duration-base);
+}
+
+.cartao:hover {
+  border-color: #d9c8f0;
+  box-shadow: 0 8px 24px rgba(20, 13, 26, 0.08);
+}
+
+/* A capa com o vinil saindo por trás, como no protótipo. */
+.palco {
+  position: relative;
+  display: block;
+  aspect-ratio: 256 / 206;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f7f1ea, #ece6f2);
+}
+
+.capa {
+  position: absolute;
+  left: 8%;
+  top: 10%;
+  width: 64%;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 10px 24px rgba(20, 13, 26, 0.28);
+}
+
+.disco {
+  position: absolute;
+  left: 26%;
+  top: 10%;
+  width: 64%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #e35336 0 5%, #140d1a 5.5% 14%, transparent 14.5%),
+    repeating-radial-gradient(circle, #1d1424 0 2px, #140d1a 2px 4px);
+}
+
+.cartao:hover .disco {
+  transform: translateX(6%);
+  transition: transform 300ms var(--dsn-ease-out);
+}
+
+.selo {
+  position: absolute;
+  z-index: 2;
+  left: 14px;
+  top: 12px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  background: #efe7f8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3a2058;
+}
+
+.selo[data-situacao='atrasada'],
+.selo[data-situacao='devolvida'] {
+  background: #fdeae5;
+  color: #a3341d;
+}
+
+.selo[data-situacao='concluida'] {
+  background: #e3f4ea;
+  color: #1f6b3d;
+}
+
+.media {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 10px 5px;
+  border-radius: 3px;
+  background: #e8f6ee;
+}
+
+.media[data-tom='baixa'] {
+  background: #fdeee9;
+}
+
+.media strong {
+  font-family: var(--dsn-font-display);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+  color: #1f6b3d;
+}
+
+.media[data-tom='baixa'] strong {
+  color: #a3341d;
+}
+
+.media span {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1f6b3d;
+}
+
+.media[data-tom='baixa'] span {
+  color: #a3341d;
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 18px 18px;
+}
+
+.titulo {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+}
+
+.genero {
+  font-size: 13px;
+  color: var(--dsn-ink-500);
+}
+
+.curadores {
+  font-size: 12.5px;
+  color: var(--dsn-ink-400);
+}
+
+.vazio,
+.nota {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--dsn-ink-500);
+}
+
+.play {
+  position: absolute;
+  right: 8%;
+  bottom: 8%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--dsn-orange-500);
+  box-shadow: 0 4px 12px rgba(227, 83, 54, 0.4);
+  color: #ffffff;
+}
