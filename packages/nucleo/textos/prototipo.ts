@@ -947,7 +947,7 @@ export const ARTISTA_PERFIL = {
    * o tamanho mínimo, que é a única linha que declara o formato aceito.
    */
   trocarFoto: 'Trocar foto',
-  fotoHint: 'JPG ou PNG, a partir de 400×400. Aparece nas suas faixas e no perfil.',
+  fotoHint: 'JPG ou PNG, a partir de 400×400.',
   fotoEnviando: 'Enviando a foto…',
   fotoEnviada: 'Foto enviada.',
   erroFotoTipo: 'A foto precisa ser JPG ou PNG.',
@@ -959,6 +959,8 @@ export const ARTISTA_PERFIL = {
   rotuloCidade: 'Cidade',
   rotuloHandle: 'Usuário',
   auxiliarHandle: 'Letras minúsculas, números e _ · de 3 a 30 caracteres',
+  /** Ao lado do rótulo "Usuário", como no protótipo aprovado. */
+  handleUnico: 'Único na plataforma',
   rotuloBio: 'Bio',
   rotuloGeneros: 'Gêneros',
   sufixoGeneros: '· até 3',
@@ -1023,9 +1025,8 @@ export const SALDO_NA_NAVEGACAO = {
 export const CARTEIRA = {
   saldoTitulo: 'Saldo disponível',
   saldoUnidade: 'Claves',
-  /** `caSaldoReais` — o valor da Clave vem de `configuracao`, nunca daqui. */
-  saldoNota: (emReais: string, valorDaClave: string) =>
-    `${emReais} em crédito. Uma Clave equivale a ${valorDaClave}.`,
+  /** Protótipo aprovado — o equivalente em reais saiu da tela. */
+  saldoNota: 'Crédito livre para enviar faixas a qualquer curador da plataforma.',
 
   comprometidas: 'Comprometidas em análise',
   devolvidas: 'Devolvidas por falta de resposta',
@@ -1034,9 +1035,9 @@ export const CARTEIRA = {
   verExtrato: 'Ver extrato',
 
   resumo: {
-    adquiridas: { rotulo: 'Adquiridas', descricao: 'Compradas em pacotes até aqui' },
-    usadas: { rotulo: 'Usadas', descricao: 'Gastas em envios para curadores' },
-    devolvidas: { rotulo: 'Devolvidas', descricao: 'Voltaram por falta de resposta' },
+    adquiridas: { rotulo: 'Adquiridas', descricao: 'Claves compradas em pacotes até aqui' },
+    usadas: { rotulo: 'Usadas', descricao: 'Claves gastas em envios para curadores' },
+    devolvidas: { rotulo: 'Devolvidas', descricao: 'Claves que voltaram por falta de resposta' },
   },
 
   ultimasTitulo: 'Últimas movimentações',
@@ -1107,6 +1108,10 @@ export const ENVIAR = {
   corrigirDados: 'Corrigir dados',
   /** Sem detecção, o protótipo abre o preenchimento manual. */
   naoDetectada: 'Não encontramos a faixa por esse link. Preencha os dados abaixo.',
+  /** O campo único de link do protótipo aprovado. */
+  rotuloLink: 'Link da faixa',
+  placeholderLink: 'https://open.spotify.com/track/...',
+  notaInicial: 'Comece colando o link ou enviando o arquivo.',
   capaDetectada: (titulo: string) => `Capa de ${titulo}`,
   erroLinkVazio: 'Cole o link do Spotify ou do YouTube.',
 
@@ -1130,7 +1135,7 @@ export const ENVIAR = {
   faixaLancada: (data: string) => `lançada em ${data}`,
   faixaSemData: 'sem data definida',
 
-  dropzoneVazia: 'Arraste o arquivo aqui, ou clique para escolher',
+  dropzoneVazia: 'Arraste o mp3 aqui',
   /** O rótulo enquanto o arquivo está sobre a área — `enDropLabel` do protótipo. */
   dropzoneSoltar: 'Solte para carregar',
   arquivoEscolhido: (nome: string) => `Arquivo escolhido: ${nome}`,

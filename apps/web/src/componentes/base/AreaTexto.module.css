@@ -126,3 +126,10 @@
 .contadorExcedido {
   color: var(--dsn-danger-fg);
 }
+
+.linhaDoRotulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}

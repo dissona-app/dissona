@@ -58,15 +58,17 @@ export function TelaDaCarteira({
         <dl className={estilos.paralelos}>
           <div className={estilos.paralelo}>
             <dt>{TEXTOS.comprometidas}</dt>
-            <dd>{comprometido}</dd>
+            <dd>{`${comprometido} ${TEXTOS.saldoUnidade}`}</dd>
           </div>
           <div className={estilos.paralelo}>
             <dt>{TEXTOS.devolvidas}</dt>
-            <dd>{devolvido}</dd>
+            <dd>{`${devolvido} ${TEXTOS.saldoUnidade}`}</dd>
           </div>
         </dl>
         <div className={estilos.acoes}>
-          <BotaoLink href={ROTA.ARTISTA_PACOTES}>{TEXTOS.comprar}</BotaoLink>
+          <BotaoLink href={ROTA.ARTISTA_PACOTES} tamanho="denso">
+            {TEXTOS.comprar}
+          </BotaoLink>
           <Link className={estilos.botaoClaro} href={ROTA.ARTISTA_EXTRATO}>
             {TEXTOS.verExtrato}
           </Link>

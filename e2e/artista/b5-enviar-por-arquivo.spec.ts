@@ -33,7 +33,7 @@ test.describe('B5 · Enviar por arquivo', () => {
     await entrarComo(page, PERSONA.ARTISTA);
     await page.goto('/artista/enviar');
 
-    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+    await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
     await page
       .getByLabel(ENVIAR.rotuloTitulo, { exact: true })
       .fill(`e2e_Faixa B5 ${info.workerIndex}-${Date.now().toString(36)}`);
@@ -53,7 +53,7 @@ test.describe('B5 · Enviar por arquivo', () => {
     // O `accept` do input filtra o seletor e nada mais. Quem recusa é o
     // `allowed_mime_types` do bucket `faixas` — e, no caminho sem JavaScript,
     // `validarAudio`. Os dois produzem a mesma mensagem.
-    await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles({
+    await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles({
       name: 'documento.pdf',
       mimeType: 'application/pdf',
       buffer: Buffer.from('%PDF-1.4'),
@@ -68,7 +68,8 @@ test.describe('B5 · Enviar por arquivo', () => {
     await entrarComo(page, PERSONA.ARTISTA);
     await page.goto('/artista/enviar');
 
-    await page.getByLabel(ENVIAR.rotuloTitulo, { exact: true }).fill('e2e_Sem arquivo');
+    // Protótipo aprovado: o passo abre só com o link e o arquivo; os detalhes
+    // aparecem depois. Continuar sem nada esbarra no arquivo.
     await page.getByRole('button', { name: ENVIAR.continuar }).click();
 
     await expect(page.getByText(ENVIAR.erroArquivoAusente)).toBeVisible();
@@ -99,7 +100,7 @@ test.describe('B5 · Enviar por arquivo', () => {
       await entrarComo(page, PERSONA.ARTISTA);
       await page.goto('/artista/enviar');
 
-      await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(mp3DeTamanho(6));
+      await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(mp3DeTamanho(6));
       await page
         .getByLabel(ENVIAR.rotuloTitulo, { exact: true })
         .fill(`e2e_Faixa B5 6MB ${info.workerIndex}-${Date.now().toString(36)}`);
@@ -140,9 +141,7 @@ test.describe('B5 · Enviar por arquivo', () => {
         if (requisicao.method() === 'POST') houvePost = true;
       });
 
-      await page
-        .getByLabel(/arraste o arquivo|arquivo escolhido/i)
-        .setInputFiles(mp3DeTamanho(limite + 1));
+      await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(mp3DeTamanho(limite + 1));
       await page
         .getByLabel(ENVIAR.rotuloTitulo, { exact: true })
         .fill(`e2e_Faixa B5 grande ${info.workerIndex}-${Date.now().toString(36)}`);

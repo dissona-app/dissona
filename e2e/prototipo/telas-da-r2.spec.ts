@@ -82,10 +82,7 @@ const CENARIOS: readonly Cenario[] = [
     props: { telaInicial: 'Enviar' },
     rota: '/artista/enviar',
     persona: PERSONA.ARTISTA,
-    excecoes: [
-      {
-        texto: 'Detectar faixa',
-        propriedades: ['cor'],
+    excecoes: [],
         motivo:
           'Sem link colado o botão fica desabilitado (cinza); no protótipo ele ' +
           'está sempre ativo, mesmo sem ter o que detectar.',

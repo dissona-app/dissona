@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import * as claves from '@dissona/nucleo/lib/claves';
-import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
-import { formatarData } from '@dissona/nucleo/lib/formato';
+import { formatarDiaMes } from '@dissona/nucleo/lib/formato';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
 import { lerCarteira } from '@/modulos/claves/consultas';
 import { CARTEIRA } from '@dissona/nucleo/textos/prototipo';
@@ -29,20 +28,19 @@ export default async function PaginaDaCarteira() {
   // trocar de papel e a navegação chegar aqui.
   if (dados === null) redirect(ROTA.ARTISTA);
 
-  const { carteira, ultimas, valorDaClave } = dados;
-  const emReais = claves.paraCentavos(carteira.disponivel, valorDaClave);
+  const { carteira, ultimas } = dados;
 
   return (
     <TelaDaCarteira
       saldo={claves.formatar(carteira.disponivel)}
-      saldoNota={CARTEIRA.saldoNota(dinheiro.formatar(emReais), dinheiro.formatar(valorDaClave))}
+      saldoNota={CARTEIRA.saldoNota}
       comprometido={claves.formatar(carteira.comprometido)}
       devolvido={claves.formatar(carteira.devolvido)}
       adquiridas={claves.formatar(carteira.adquiridas)}
       usadas={claves.formatar(carteira.usadas)}
       ultimas={ultimas.map((movimentacao) => ({
         id: String(movimentacao.id),
-        data: formatarData(movimentacao.data),
+        data: formatarDiaMes(movimentacao.data),
         origem: movimentacao.origem,
         tipo: CARTEIRA.tipos[movimentacao.tipo],
         // O sinal é do dado, não da formatação: consumo aparece com "−".

@@ -56,7 +56,8 @@
    * cartão não identificam componente interativo, não são alcançados pela
    * 1.4.11, e escurecê-los junto pesaria a tela inteira sem necessidade.
    */
-  --dsn-border-campo: #9890a6;
+  /* Protótipo aprovado: a borda do campo é a mesma das linhas (#E5DEEA). */
+  --dsn-border-campo: #e5deea;
   --dsn-border-soft: #efeaf2;
   --dsn-border-faint: #f1eef7;
   --dsn-track: #eeeaf5;

@@ -193,7 +193,6 @@ export function TelaDeConta({
             tipo="senha"
             overline={CONTA.senhaTitulo}
             titulo={CONTA.alterarSenha}
-            nota={CONTA.senhaNota}
             rotuloDaAcao={CONTA.alterarSenha}
             acao={trocarSenha}
           />

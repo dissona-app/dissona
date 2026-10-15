@@ -77,7 +77,11 @@ test.describe('F3 · Conta do curador', () => {
 
     // A nota do idioma é a **do curador**, e não a do artista: a faixa e o
     // contexto chegam no idioma de quem enviou.
-    await expect(page.getByText(PREFERENCIAS.idiomaNotaCurador).first()).toBeVisible();
+    // Protótipo aprovado: as categorias do curador e o idioma num seletor.
+    await expect(
+      page.getByRole('switch', { name: PREFERENCIAS.categorias.curador[0].titulo }),
+    ).toBeVisible();
+    await expect(page.getByLabel(PREFERENCIAS.idiomaTitulo)).toBeVisible();
   });
 
   test('a segurança do curador traz senha e sessões', { tag: ['@RF-027'] }, async ({ page }) => {

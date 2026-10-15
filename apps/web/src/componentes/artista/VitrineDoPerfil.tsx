@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { capaDoEnvio } from '@/componentes/curador/capas';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { EstadoVazio } from '@dissona/nucleo/componentes/base/EstadoVazio';
 import type { TomEtiqueta } from '@dissona/nucleo/componentes/base/Etiqueta';
@@ -62,10 +64,33 @@ export function VitrineDoPerfil({
         <div className={estilos.capa} style={{ backgroundImage: `url('${capaPadrao.src}')` }}>
           <span className={estilos.capaVeu} aria-hidden="true" />
           <span className={estilos.capaFaixa} aria-hidden="true" />
-          <div className={estilos.capaAcoes} data-botoes="compacto">
-            <BotaoLink href={ROTA.ARTISTA_PERFIL_EDITAR} variante="secundario" tamanho="sm">
+          {/* Protótipo aprovado: "Editar cadastro" e a engrenagem de
+              Configurações, brancos sobre a capa. */}
+          <div className={estilos.capaAcoes}>
+            <Link className={estilos.botaoCapa} href={ROTA.ARTISTA_PERFIL_EDITAR}>
               {TEXTOS.editar}
-            </BotaoLink>
+            </Link>
+            <Link
+              className={estilos.botaoCapaIcone}
+              href={ROTA.ARTISTA_CONTA}
+              aria-label="Configurações"
+              title="Configurações"
+            >
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M10.6 3h2.8l.42 2.34 1.7.98 2.2-.86 1.4 2.42-1.78 1.56v1.96l1.78 1.56-1.4 2.42-2.2-.86-1.7.98L13.4 21h-2.8l-.42-2.34-1.7-.98-2.2.86-1.4-2.42 1.78-1.56v-1.96L4.88 7.88l1.4-2.42 2.2.86 1.7-.98z" />
+                <circle cx="12" cy="12" r="2.9" />
+              </svg>
+            </Link>
           </div>
         </div>
 
@@ -145,10 +170,16 @@ export function VitrineDoPerfil({
           <ul className={estilos.faixas}>
             {faixas.map((faixa) => (
               <li key={faixa.id} className={estilos.faixa}>
-                <span className={estilos.faixaCapa} aria-hidden="true" />
+                <span
+                  className={estilos.faixaCapa}
+                  style={{ backgroundImage: `url('${capaDoEnvio(faixa.id)}')` }}
+                  aria-hidden="true"
+                />
                 <span className={estilos.faixaTextos}>
                   <span className={estilos.faixaTitulo}>{faixa.titulo}</span>
-                  <span className={estilos.faixaMeta}>{faixa.genero ?? '—'}</span>
+                  <span className={estilos.faixaMeta}>
+                    {`${faixa.genero ?? '—'} · ${rotuloDoStatus(faixa.status).toLowerCase()}`}
+                  </span>
                 </span>
                 <span
                   className={[
@@ -160,6 +191,18 @@ export function VitrineDoPerfil({
                 >
                   {rotuloDoStatus(faixa.status)}
                 </span>
+                {/* A nota final, como no protótipo aprovado ("8,8 NF"). */}
+                {faixa.nota === null ? null : (
+                  <span className={estilos.nota}>
+                    <span className={estilos.notaValor}>
+                      {faixa.nota.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1,
+                      })}
+                    </span>
+                    <span className={estilos.notaRotulo}>NF</span>
+                  </span>
+                )}
               </li>
             ))}
           </ul>

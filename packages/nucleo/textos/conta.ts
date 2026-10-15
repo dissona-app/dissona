@@ -112,8 +112,7 @@ export const CONTA = {
 
   encerrarContaTitulo: 'Encerrar conta',
   excluirConta: 'Excluir conta',
-  excluirContaNota:
-    'Antes de excluir, você exporta seus dados (LGPD). A exclusão é definitiva depois de 30 dias. Nesse prazo, você reverte entrando de novo.',
+  excluirContaNota: 'A exclusão é definitiva depois de 30 dias.',
 
   // -------------------------------------------- modal · alterar senha -----
   modalSenha: {
@@ -242,6 +241,74 @@ export const PREFERENCIAS = {
 
   erroSalvar: 'Não conseguimos salvar agora. Tente de novo em alguns instantes.',
   erroCritico: 'Este aviso é essencial e não pode ser desligado.',
+
+  /**
+   * As categorias do protótipo aprovado — um interruptor cada. Cada uma junta
+   * os eventos do catálogo (`evento_notificacao`) que falam daquilo; ligar ou
+   * desligar vale para todos, nos canais que cada um tem.
+   */
+  categorias: {
+    artista: [
+      {
+        titulo: 'Devolutiva concluída',
+        texto: 'Quando um curador finaliza a leitura de uma faixa sua.',
+        eventos: [
+          'feedback_concluido',
+          'relatorio_musica_disponivel',
+          'musica_recebida_pelo_curador',
+          'selecao_confirmada',
+        ],
+      },
+      {
+        titulo: 'Prazo em risco',
+        texto: 'Quando uma devolutiva passa de cinco dias sem entrega.',
+        eventos: ['claves_devolvidas'],
+      },
+      {
+        titulo: 'Compartilhamento da sua faixa',
+        texto: 'Quando um curador leva sua faixa para playlist, post ou matéria.',
+        eventos: ['musica_compartilhada', 'pedido_detalhes_materia'],
+      },
+      {
+        titulo: 'Saldo de Claves',
+        texto: 'Confirmações de compra e alerta de saldo baixo.',
+        eventos: ['compra_claves_confirmada', 'saldo_claves_baixo'],
+      },
+      {
+        titulo: 'Novidades da Dissona',
+        texto: 'Mudanças no produto e chamadas de curadoria. No máximo uma por mês.',
+        eventos: [],
+      },
+    ],
+    curador: [
+      {
+        titulo: 'Convite de leitura',
+        texto: 'Quando um artista escolhe você para avaliar uma faixa.',
+        eventos: ['nova_musica_na_fila'],
+      },
+      {
+        titulo: 'Prazo de entrega',
+        texto: 'Aviso quando falta um dia para o prazo de uma devolutiva sua.',
+        eventos: ['prazo_72h_proximo'],
+      },
+      {
+        titulo: 'Resposta do artista',
+        texto: 'Quando o artista comenta uma devolutiva que você escreveu.',
+        eventos: ['avaliacao_recebida_do_artista'],
+      },
+      {
+        titulo: 'Repasse confirmado',
+        texto: 'Quando as Claves ganhas no período viram repasse.',
+        eventos: ['credito_liberado', 'saque_solicitado', 'saque_processado', 'saque_pago'],
+      },
+      {
+        titulo: 'Novidades da Dissona',
+        texto: 'Mudanças no produto e chamadas de curadoria. No máximo uma por mês.',
+        eventos: [],
+      },
+    ],
+  },
+  novidadesPendente: 'As novidades por e-mail chegam numa release futura.',
 } as const;
 
 // ---------------------------------------------------------------------------

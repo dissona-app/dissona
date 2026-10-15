@@ -269,8 +269,8 @@
 .verTodas {
   font-size: 13px;
   font-weight: 600;
-  color: #a9a2b4;
-  cursor: not-allowed;
+  color: #5b2e8f;
+  cursor: default;
 }
 
 .vazio {
@@ -300,7 +300,9 @@
   height: 44px;
   border-radius: 3px;
   flex: none;
-  background: linear-gradient(135deg, #5b2e8f, #b780e7);
+  background-color: #140d1a;
+  background-position: center;
+  background-size: cover;
   box-shadow: 0 2px 6px rgba(20, 13, 26, 0.16);
 }
 
@@ -338,4 +340,59 @@
 .statusLida {
   color: #1e7a4a;
   background: #e6f5ed;
+}
+
+/* Os dois botões brancos sobre a capa — protótipo aprovado. */
+.botaoCapa,
+.botaoCapaIcone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  border: 1px solid #e0d6ec;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #140d1a;
+  text-decoration: none;
+  transition: background 200ms;
+}
+
+.botaoCapa {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.botaoCapaIcone {
+  width: 36px;
+  height: 36px;
+}
+
+.botaoCapa:hover,
+.botaoCapaIcone:hover {
+  background: #f2edf5;
+  text-decoration: none;
+}
+
+.nota {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 34px;
+}
+
+.notaValor {
+  font-family: var(--dsn-font-display);
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--dsn-ink);
+}
+
+.notaRotulo {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #a9a2b4;
 }

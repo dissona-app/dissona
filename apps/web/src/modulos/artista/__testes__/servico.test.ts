@@ -19,6 +19,7 @@ function faixa(parcial: Partial<FaixaNaVitrine> = {}): FaixaNaVitrine {
     criadoEm: '2026-09-01T12:00:00Z',
     leiturasConcluidas: 0,
     envios: 0,
+    envioIds: [],
     ...parcial,
   };
 }

@@ -1,4 +1,4 @@
-/* 7.3 / 17.3 · Preferências. */
+/* 7.3 / 17.3 · Preferências — protótipo aprovado: categorias com interruptor. */
 
 .base {
   display: flex;
@@ -6,60 +6,122 @@
   gap: var(--dsn-space-6);
 }
 
-.auto {
-  font-size: var(--dsn-text-xs);
-  color: var(--dsn-ink-500);
+.cartao {
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
 }
 
-.tabela {
-  width: 100%;
-  border-collapse: collapse;
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--dsn-border);
 }
 
-.tabela th,
-.tabela td {
-  padding: var(--dsn-space-3) var(--dsn-space-2);
-  border-bottom: 1px solid var(--dsn-border-faint);
-  text-align: left;
-  font-weight: 400;
-}
-
-.tabela thead th {
-  font-size: var(--dsn-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+.overline {
+  margin: 0;
+  font-family: inherit !important;
+  font-size: 11px;
+  font-weight: 600 !important;
+  letter-spacing: 0.16em !important;
   text-transform: uppercase;
   color: var(--dsn-ink-500);
 }
 
-.tabela tbody tr:last-child th,
-.tabela tbody tr:last-child td {
+.auto {
+  font-size: 12px;
+  color: var(--dsn-ink-500);
+}
+
+.categorias {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.categoria {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--dsn-border);
+}
+
+.categoria:last-child {
   border-bottom: none;
 }
 
-/* O nome do aviso e a etiqueta de "sempre ativo" na mesma linha, quebrando
-   juntos quando a coluna aperta. */
-.evento {
+.textos {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--dsn-space-3);
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.titulo {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--dsn-ink);
 }
 
-/* Colunas de canal estreitas e centradas: são duas caixas, não texto. */
-.canal {
-  width: 6rem;
-  text-align: center;
+.texto {
+  font-size: 12.5px;
+  color: var(--dsn-ink-500);
 }
 
-.canal input {
-  width: 1.125rem;
-  height: 1.125rem;
-  accent-color: var(--dsn-purple-500);
+/* O interruptor do protótipo: trilho lilás, bolinha branca. */
+.interruptor {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: #e5deea;
   cursor: pointer;
+  transition: background 200ms var(--dsn-ease-out);
 }
 
-.canal input:disabled {
-  cursor: not-allowed;
+.interruptor[aria-checked='true'] {
+  background: #b780e7;
+}
+
+.interruptor[aria-disabled='true'] {
+  cursor: default;
+}
+
+.bolinha {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 200ms var(--dsn-ease-out);
+}
+
+.interruptor[aria-checked='true'] .bolinha {
+  transform: translateX(14px);
+}
+
+.interruptor:focus-visible {
+  outline: var(--dsn-focus-outline-width) solid var(--dsn-focus-outline-color);
+  outline-offset: var(--dsn-focus-offset);
+}
+
+.selecao {
+  min-width: 180px;
+  padding: 9px 12px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 4px;
+  background: var(--dsn-surface);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--dsn-ink);
 }

@@ -94,8 +94,22 @@
 }
 
 .corpo {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 18px 18px;
+  background: #f4f2ef;
+}
+
+.orbita {
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.conteudoDoCorpo {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 18px 22px 22px;
 }

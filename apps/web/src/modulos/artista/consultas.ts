@@ -2,7 +2,12 @@ import 'server-only';
 
 /** Leituras do perfil do artista para Server Components. */
 
-import { contarIndicacoes, lerMeuPerfil, listarFaixasDoArtista } from './repositorio';
+import {
+  contarIndicacoes,
+  lerMeuPerfil,
+  listarFaixasDoArtista,
+  notasDasFaixas,
+} from './repositorio';
 import { faixasEnviadas, leiturasConcluidas, statusDaFaixa } from './servico';
 import type { StatusNaVitrine } from './servico';
 import type { PerfilDoArtista } from './tipos';
@@ -28,6 +33,8 @@ export type LinhaDaVitrine = {
   readonly titulo: string;
   readonly genero: string | null;
   readonly status: StatusNaVitrine;
+  /** NF média (0–10) das leituras concluídas; `null` sem leitura. */
+  readonly nota: number | null;
 };
 
 export type Vitrine = {
@@ -58,6 +65,8 @@ export async function lerVitrineDoArtista(): Promise<Vitrine | null> {
     contarIndicacoes(perfil.perfilArtistaId),
   ]);
 
+  const notas = await notasDasFaixas(faixas.slice(0, FAIXAS_NA_VITRINE));
+
   return {
     perfil,
     estatisticas: {
@@ -70,6 +79,7 @@ export async function lerVitrineDoArtista(): Promise<Vitrine | null> {
       titulo: faixa.titulo,
       genero: faixa.genero,
       status: statusDaFaixa(faixa),
+      nota: notas.get(faixa.id) ?? null,
     })),
     temMais: faixas.length > FAIXAS_NA_VITRINE,
   };

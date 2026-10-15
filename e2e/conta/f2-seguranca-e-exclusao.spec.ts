@@ -64,7 +64,6 @@ test.describe('F2 · Segurança e exclusão', () => {
       await page.goto('/artista/conta?aba=seguranca');
 
       await expect(page.getByText(CONTA.senhaTitulo).first()).toBeVisible();
-      await expect(page.getByText(CONTA.senhaNota).first()).toBeVisible();
       await expect(page.getByText(CONTA.sessoesTitulo).first()).toBeVisible();
       await expect(page.getByText(CONTA.encerrarContaTitulo).first()).toBeVisible();
 

@@ -70,9 +70,8 @@ test.describe('F1 · Perfil e preferências', () => {
         await expect(page.getByLabel(rotulo, { exact: true }), `campo "${rotulo}"`).toBeVisible();
       }
 
-      // A nota é o que separa este formulário do de Conta: aqui não há senha nem
-      // e-mail, e a tela diz para onde ir.
-      await expect(page.getByText(ARTISTA_PERFIL.nota).first()).toBeVisible();
+      // Protótipo aprovado: sem nota no rodapé; senha e e-mail ficam fora daqui.
+      await expect(page.getByLabel(/senha/i)).toHaveCount(0);
     },
   );
 
@@ -147,10 +146,11 @@ test.describe('F1 · Perfil e preferências', () => {
     await entrarComCredenciais(page, conta.email);
     await page.goto('/artista/conta?aba=preferencias');
 
-    // A etiqueta "Sempre ativo" é o que substitui o controle: onde ela está,
-    // não há o que desligar.
-    await expect(page.getByText(PREFERENCIAS.critico).first()).toBeVisible();
-    await expect(page.getByText(PREFERENCIAS.criticoNota).first()).toBeVisible();
+    // Protótipo aprovado: a categoria crítica tem o interruptor ligado e
+    // travado — e o nome acessível diz que é "Sempre ativo".
+    const prazo = page.getByRole('switch', { name: PREFERENCIAS.categorias.artista[1].titulo });
+    await expect(prazo).toHaveAttribute('aria-checked', 'true');
+    await expect(prazo).toHaveAttribute('aria-disabled', 'true');
   });
 
   test('o idioma pode ser trocado', { tag: ['@RF-022'] }, async ({ page }, info) => {
@@ -158,8 +158,11 @@ test.describe('F1 · Perfil e preferências', () => {
     await entrarComCredenciais(page, conta.email);
     await page.goto('/artista/conta?aba=preferencias');
 
-    await expect(page.getByRole('heading', { name: PREFERENCIAS.idiomaTitulo })).toBeVisible();
-    await expect(page.getByText(PREFERENCIAS.idiomaNotaArtista).first()).toBeVisible();
+    const idioma = page.getByLabel(PREFERENCIAS.idiomaTitulo);
+    await expect(idioma).toBeVisible();
+    await idioma.selectOption('es');
+    await expect(idioma).toHaveValue('es');
+    await idioma.selectOption('pt-BR');
   });
 
   /**

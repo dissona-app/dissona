@@ -59,14 +59,27 @@ export function AreaTexto({
 
   return (
     <div className={estilos.envolvente}>
-      <label
-        className={[estilos.rotulo, required ? estilos.rotuloObrigatorio : undefined]
-          .filter(Boolean)
-          .join(' ')}
-        htmlFor={id}
-      >
-        {rotulo}
-      </label>
+      {/* Protótipo aprovado: o contador fica na linha do rótulo, à direita. */}
+      <div className={estilos.linhaDoRotulo}>
+        <label
+          className={[estilos.rotulo, required ? estilos.rotuloObrigatorio : undefined]
+            .filter(Boolean)
+            .join(' ')}
+          htmlFor={id}
+        >
+          {rotulo}
+        </label>
+        {limite !== undefined ? (
+          <span
+            className={[estilos.contador, excedido ? estilos.contadorExcedido : undefined]
+              .filter(Boolean)
+              .join(' ')}
+            id={idContador}
+          >
+            {usados}/{limite}
+          </span>
+        ) : null}
+      </div>
 
       <textarea
         {...resto}
@@ -79,21 +92,11 @@ export function AreaTexto({
         aria-describedby={descricoes === '' ? undefined : descricoes}
       />
 
-      {erro !== undefined || limite !== undefined ? (
+      {erro !== undefined ? (
         <div className={estilos.rodape}>
           {erro !== undefined ? (
             <span className={estilos.erro} id={idErro} role="alert">
               {erro}
-            </span>
-          ) : null}
-          {limite !== undefined ? (
-            <span
-              className={[estilos.contador, excedido ? estilos.contadorExcedido : undefined]
-                .filter(Boolean)
-                .join(' ')}
-              id={idContador}
-            >
-              {usados}/{limite}
             </span>
           ) : null}
         </div>

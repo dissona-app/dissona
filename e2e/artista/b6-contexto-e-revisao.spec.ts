@@ -30,7 +30,7 @@ async function ateOContexto(page: Page, info: TestInfo): Promise<string> {
 
   await entrarComo(page, PERSONA.ARTISTA);
   await page.goto('/artista/enviar');
-  await page.getByLabel(/arraste o arquivo|arquivo escolhido/i).setInputFiles(MP3);
+  await page.getByLabel(/arraste o|arquivo escolhido/i).setInputFiles(MP3);
   await page.getByRole('textbox', { name: new RegExp(ENVIAR.rotuloTitulo) }).fill(titulo);
   await page.getByRole('button', { name: ENVIAR.continuar }).click();
   await page.waitForURL(/\/contexto$/);

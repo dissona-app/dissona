@@ -1,3 +1,4 @@
+import { OrbitaDeFundo } from '@dissona/nucleo/componentes/autenticacao/OrbitaDeFundo';
 import type { ReactNode } from 'react';
 
 import { ENVIAR } from '@dissona/nucleo/textos/prototipo';
@@ -53,7 +54,13 @@ export function MolduraDoEnvio({ passo, children }: PropsMolduraDoEnvio) {
         </nav>
       </header>
 
-      <div className={estilos.corpo}>{children}</div>
+      {/* Protótipo aprovado: o corpo é areia com a órbita bem apagada atrás. */}
+      <div className={estilos.corpo}>
+        <span className={estilos.orbita} aria-hidden="true">
+          <OrbitaDeFundo centro="50%" />
+        </span>
+        <div className={estilos.conteudoDoCorpo}>{children}</div>
+      </div>
     </div>
   );
 }

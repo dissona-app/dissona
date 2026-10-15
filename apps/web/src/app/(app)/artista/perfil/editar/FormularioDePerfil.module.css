@@ -5,7 +5,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--dsn-space-6);
-  max-width: 1000px;
+  /* Protótipo aprovado: 976px, centralizado na área de conteúdo. */
+  max-width: 976px;
+  margin: 0 auto;
 }
 
 .cartao {
@@ -50,12 +52,17 @@
 /* Os gêneros do aprovado são menores e mais leves que os chips do wizard:
    13px/500, cinza quando soltos e em tinta quando marcados. */
 .dados label:has(input[type='checkbox']) span {
+  padding: 6px 13px;
+  border-radius: 2px;
+  border-color: var(--dsn-border);
   font-size: 13px;
   font-weight: 500;
   color: var(--dsn-ink-500);
 }
 
 .dados label:has(input[type='checkbox']:checked) span {
+  background: #efe7f8;
+  border-color: #7f47dd;
   color: var(--dsn-ink);
 }
 
@@ -75,7 +82,9 @@
   gap: 12px;
 }
 
-/* Os rótulos dos links são o nome da rede, em caixa normal. */
+/* Os rótulos dos links são o nome da rede, em caixa normal, com o ícone
+   colorido antes. */
+.listaDeLinks label:has(+ .iconeDeRede),
 .listaDeLinks label {
   font-size: 13px;
   font-weight: 400;
@@ -96,7 +105,6 @@
   gap: var(--dsn-space-4);
   padding: 14px 22px;
   border-top: 1px solid var(--dsn-border);
-  background: var(--dsn-surface-alt);
   border-radius: 0 0 6px 6px;
 }
 
@@ -107,5 +115,24 @@
 
 .nota {
   font-size: var(--dsn-text-xs);
+  color: var(--dsn-ink-500);
+}
+
+.listaDeLinks label + .iconeDeRede {
+  order: -1;
+}
+
+.listaDeLinks div:has(> .iconeDeRede) {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+}
+
+.iconeDeRede {
+  flex: none;
+}
+
+.dicaDoRotulo {
+  font-size: 12px;
   color: var(--dsn-ink-500);
 }

@@ -139,7 +139,7 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
               name="handle"
               rotulo={TEXTOS.rotuloHandle}
               defaultValue={perfil.handle ?? ''}
-              auxiliar={TEXTOS.auxiliarHandle}
+              acessorioDoRotulo={<span className={estilos.dicaDoRotulo}>{TEXTOS.handleUnico}</span>}
               erro={erroDe('handle')}
               autoComplete="username"
             />
@@ -160,7 +160,6 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
               opcoes={GENEROS_DO_ARTISTA}
               selecionados={perfil.generos}
               maximo={MAXIMO_DE_GENEROS}
-              contador={(quantos) => TEXTOS.contagemGeneros(quantos, MAXIMO_DE_GENEROS)}
               erro={erroDe('generos')}
             />
           </section>
@@ -174,6 +173,17 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
                 name="linkInstagram"
                 placeholder={TEXTOS.exemploInstagram}
                 rotulo={TEXTOS.rotuloInstagram}
+                acessorioDoRotulo={
+                  <IconeDeRede cor="#c13584">
+                    {
+                      <>
+                        <rect x="3" y="3" width="18" height="18" rx="5" />
+                        <circle cx="12" cy="12" r="4" />
+                        <circle cx="17.5" cy="6.5" r="0.8" />
+                      </>
+                    }
+                  </IconeDeRede>
+                }
                 defaultValue={perfil.linkInstagram ?? ''}
                 erro={erroDe('linkInstagram')}
                 inputMode="url"
@@ -182,6 +192,18 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
                 name="linkSpotify"
                 placeholder={TEXTOS.exemploSpotify}
                 rotulo={TEXTOS.rotuloSpotify}
+                acessorioDoRotulo={
+                  <IconeDeRede cor="#1db954">
+                    {
+                      <>
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M7.5 9.5c3-1 6.5-.7 9 .8" />
+                        <path d="M8 12.5c2.5-.7 5.2-.4 7.3.8" />
+                        <path d="M8.5 15.3c2-.5 4-.3 5.6.6" />
+                      </>
+                    }
+                  </IconeDeRede>
+                }
                 defaultValue={perfil.linkSpotify ?? ''}
                 erro={erroDe('linkSpotify')}
                 inputMode="url"
@@ -190,6 +212,16 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
                 name="linkYoutube"
                 placeholder={TEXTOS.exemploYoutube}
                 rotulo={TEXTOS.rotuloYoutube}
+                acessorioDoRotulo={
+                  <IconeDeRede cor="#ff0033">
+                    {
+                      <>
+                        <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+                        <path d="m10 9.5 4.5 2.5-4.5 2.5z" />
+                      </>
+                    }
+                  </IconeDeRede>
+                }
                 defaultValue={perfil.linkYoutube ?? ''}
                 erro={erroDe('linkYoutube')}
                 inputMode="url"
@@ -198,6 +230,18 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
                 name="linkSite"
                 placeholder={TEXTOS.exemploSite}
                 rotulo={TEXTOS.rotuloSite}
+                acessorioDoRotulo={
+                  <IconeDeRede cor="#b780e7">
+                    {
+                      <>
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18" />
+                        <path d="M12 3c2.5 2.7 2.5 15.3 0 18" />
+                        <path d="M12 3c-2.5 2.7-2.5 15.3 0 18" />
+                      </>
+                    }
+                  </IconeDeRede>
+                }
                 defaultValue={perfil.linkSite ?? ''}
                 erro={erroDe('linkSite')}
                 inputMode="url"
@@ -215,9 +259,34 @@ export function FormularioDePerfil({ perfil, fotoUrl, acao }: PropsFormularioDeP
           <BotaoLink href={ROTA.ARTISTA_PERFIL} variante="neutro" tamanho="denso">
             {TEXTOS.cancelar}
           </BotaoLink>
-          <span className={estilos.nota}>{TEXTOS.nota}</span>
         </div>
       </div>
     </form>
+  );
+}
+
+/** O ícone colorido de cada rede, antes do nome — protótipo aprovado. */
+function IconeDeRede({
+  cor,
+  children,
+}: {
+  readonly cor: string;
+  readonly children: React.ReactNode;
+}) {
+  return (
+    <svg
+      className={estilos.iconeDeRede}
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={cor}
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
   );
 }
