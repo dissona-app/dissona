@@ -1,6 +1,5 @@
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
-import { Painel } from '@/componentes/base/Painel';
 import { SeloClasse } from '@/componentes/base/SeloClasse';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import * as dinheiro from '@dissona/nucleo/lib/dinheiro';
@@ -66,17 +65,25 @@ export function PassoRemuneracao({ tela, voltarPara, acao }: PropsPassoRemunerac
 
   return (
     <div className={estilos.base}>
-      <Painel
-        titulo={AVALIAR.tituloRemuneracao}
-        nivel={3}
-        acao={
+      {/* Protótipo aprovado: "Recibo desta avaliação", com a classe num
+          selo à direita e cada linha num cartão com a marca e o percentual. */}
+      <section className={estilos.recibo} aria-labelledby="titulo-remuneracao">
+        <div className={estilos.reciboTopo}>
+          <span className={estilos.reciboRotulo} aria-hidden="true">
+            Recibo desta avaliação
+          </span>
+          <h3 id="titulo-remuneracao" className="dsn-apenas-leitor">
+            {AVALIAR.tituloRemuneracao}
+          </h3>
           <span className={estilos.classe}>
             <span className={estilos.classeRotulo}>{AVALIAR.suaClasse}</span>
             <SeloClasse classe={classe} />
           </span>
-        }
-      >
+        </div>
         <div className={estilos.linha}>
+          <span className={estilos.marcaAtiva} aria-hidden="true">
+            ✓
+          </span>
           <span className={estilos.linhaTexto}>
             <span className={estilos.linhaRotulo}>
               {remuneracao.penalidadePrazo ? AVALIAR.pisoAtrasado : AVALIAR.pisoNoPrazo}
@@ -116,36 +123,59 @@ export function PassoRemuneracao({ tela, voltarPara, acao }: PropsPassoRemunerac
           })}
         </ul>
 
+        {remuneracao.penalidadePrazo ? null : (
+          <p className={estilos.notaNoPrazo}>Parabéns! Você entregou a curadoria antes das 72h.</p>
+        )}
+
         <p className={estilos.notaTeto}>
           {AVALIAR.tetoNota(rotuloDaClasse, remuneracao.tetoPercentual)}
         </p>
-      </Painel>
+      </section>
 
-      <Painel titulo={AVALIAR.voceRecebe} nivel={3}>
-        <p className={estilos.valor}>{dinheiro.formatar(remuneracao.valorCentavos)}</p>
-        <p className={estilos.valorNota}>
-          {AVALIAR.valorNota(
-            remuneracao.percentualAplicado,
-            dinheiro.formatar(remuneracao.baseCentavos),
-          )}
-        </p>
+      {/* Protótipo aprovado: o total num cartão em tinta, com o valor em
+          verde, e o botão de concluir logo abaixo. */}
+      <div className={estilos.colunaDoTotal}>
+        <section className={estilos.total} aria-labelledby="voce-recebe">
+          <span className={estilos.totalRotulo}>Total da remuneração</span>
+          <h3 id="voce-recebe" className="dsn-apenas-leitor">
+            {AVALIAR.voceRecebe}
+          </h3>
+          <p className={estilos.totalFrase}>
+            Parabéns, você somou{' '}
+            <span className={estilos.totalValor}>
+              {dinheiro.formatar(remuneracao.valorCentavos)}
+            </span>{' '}
+            nesta curadoria.
+          </p>
+          <p className={estilos.totalLembrete}>
+            Lembre-se de que, para aumentar seus ganhos, você deve justificar suas notas. As
+            justificativas são importantes para nossos artistas e fazem de você um curador
+            profissional.
+          </p>
+          <p className={estilos.totalNota}>
+            {AVALIAR.valorNota(
+              remuneracao.percentualAplicado,
+              dinheiro.formatar(remuneracao.baseCentavos),
+            )}
+          </p>
 
-        <dl className={estilos.resumo}>
-          <div className={estilos.item}>
-            <dt className={estilos.itemRotulo}>{AVALIAR.rotuloFaixa}</dt>
-            <dd className={estilos.itemValor}>{item.titulo}</dd>
-          </div>
-          <div className={estilos.item}>
-            <dt className={estilos.itemRotulo}>{AVALIAR.rotuloServico}</dt>
-            <dd className={estilos.itemValor}>
-              {tela.servicos.map((servico) => FILA.servicos[servico.tipo]).join(' + ') || '—'}
-            </dd>
-          </div>
-          <div className={estilos.item}>
-            <dt className={estilos.itemRotulo}>{AVALIAR.rotuloCompartilhamento}</dt>
-            <dd className={estilos.itemValor}>{resumoDoCompartilhamento(tela)}</dd>
-          </div>
-        </dl>
+          <dl className={estilos.resumo}>
+            <div className={estilos.item}>
+              <dt className={estilos.itemRotulo}>{AVALIAR.rotuloFaixa}</dt>
+              <dd className={estilos.itemValor}>{item.titulo}</dd>
+            </div>
+            <div className={estilos.item}>
+              <dt className={estilos.itemRotulo}>{AVALIAR.rotuloServico}</dt>
+              <dd className={estilos.itemValor}>
+                {tela.servicos.map((servico) => FILA.servicos[servico.tipo]).join(' + ') || '—'}
+              </dd>
+            </div>
+            <div className={estilos.item}>
+              <dt className={estilos.itemRotulo}>{AVALIAR.rotuloCompartilhamento}</dt>
+              <dd className={estilos.itemValor}>{resumoDoCompartilhamento(tela)}</dd>
+            </div>
+          </dl>
+        </section>
 
         {avaliacao.concluida ? (
           <div className={estilos.concluida}>
@@ -164,7 +194,7 @@ export function PassoRemuneracao({ tela, voltarPara, acao }: PropsPassoRemunerac
             acao={acao}
           />
         )}
-      </Painel>
+      </div>
 
       {/* O rodapé desta etapa só tem "Voltar": avançar **é** concluir, e
           concluir é o botão do painel acima. Dois caminhos para o mesmo ato
@@ -172,8 +202,8 @@ export function PassoRemuneracao({ tela, voltarPara, acao }: PropsPassoRemunerac
           Concluída, nem o "Voltar" faz sentido — as etapas anteriores estão
           fechadas pelo trigger `avaliacao_concluida_e_final`. */}
       {avaliacao.concluida ? null : (
-        <div className={estilos.rodape}>
-          <BotaoLink href={voltarPara} variante="neutro" tamanho="sm">
+        <div className={estilos.rodape} data-botoes="cartao">
+          <BotaoLink href={voltarPara} variante="secundario" tamanho="sm">
             {AVALIAR.voltar}
           </BotaoLink>
         </div>
