@@ -184,7 +184,7 @@ const POR_PREFIXO: readonly (readonly [string, TituloDeModulo])[] = [
   // como no protótipo aprovado (`caTitulos.checkout`).
   [
     `${ROTA.ARTISTA_PACOTES}/`,
-    { titulo: 'Pagamento', sublegenda: 'Confira o pedido e escolha como pagar.' },
+    { titulo: 'Pagamento', sublegenda: 'Confira o pacote e escolha a forma de pagamento.' },
   ],
   // Os passos 2 e 3 do envio — `/artista/enviar/<faixaId>/<passo>`. O título é
   // o mesmo do passo 1: o wizard é uma tela só, e quem diz onde a pessoa está

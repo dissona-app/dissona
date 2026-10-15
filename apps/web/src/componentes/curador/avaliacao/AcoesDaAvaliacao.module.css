@@ -5,3 +5,8 @@
   align-items: center;
   gap: 8px;
 }
+
+/* Protótipo aprovado: o texto dos dois botões do rodapé em 15px. */
+.rodape :is(a, button) {
+  font-size: 15px;
+}

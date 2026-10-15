@@ -1,6 +1,7 @@
 'use client';
 
 import type { FormEvent } from 'react';
+import Link from 'next/link';
 import { useActionState, useEffect, useState } from 'react';
 
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
@@ -8,7 +9,6 @@ import { Botao } from '@dissona/nucleo/componentes/base/Botao';
 import { BotaoLink } from '@dissona/nucleo/componentes/base/BotaoLink';
 import { Campo } from '@dissona/nucleo/componentes/base/Campo';
 import { Grupo } from '@/componentes/base/Grupo';
-import { Painel } from '@/componentes/base/Painel';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { CodigoErro } from '@dissona/nucleo/lib/erros';
 import { ROTA } from '@dissona/nucleo/lib/guarda-rota';
@@ -236,14 +236,29 @@ export function FormularioDeCheckout({
       ) : null}
       {simulado ? <input type="hidden" name="simulacao" value={simulacao} /> : null}
 
-      <BotaoLink href={ROTA.ARTISTA_PACOTES} variante="ghost" tamanho="sm">
+      {/* Protótipo aprovado: "‹ Trocar de pacote", em tinta, sem moldura. */}
+      <Link href={ROTA.ARTISTA_PACOTES} className={estilos.voltar}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M15 6l-6 6 6 6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
         {TEXTOS.trocarDePacote}
-      </BotaoLink>
+      </Link>
 
       {erroGeral !== null ? <Aviso tom="erro">{erroGeral}</Aviso> : null}
 
       <div className={estilos.colunas}>
-        <Painel titulo={TEXTOS.meioRotulo} nivel={2}>
+        {/* Protótipo aprovado: o cartão do pagamento não tem título visível —
+            o seletor Cartão/Pix já diz o que é. */}
+        <section className={estilos.cartaoBranco} aria-labelledby="checkout-meio">
+          <h2 id="checkout-meio" className="dsn-apenas-leitor">
+            {TEXTOS.meioRotulo}
+          </h2>
           <div className={estilos.pagamento}>
             {pix !== null ? (
               <div className={estilos.pix}>
@@ -272,43 +287,34 @@ export function FormularioDeCheckout({
               </div>
             ) : (
               <>
-                <Grupo
-                  rotulo={TEXTOS.meioRotulo}
-                  rotuloOculto
-                  valor={meio}
-                  onMudar={(valor) => {
-                    // `Grupo` devolve `string`; as opções são montadas logo
-                    // abaixo e só carregam os três valores de `MeioNaTela`.
-                    setMeio(valor as MeioNaTela);
-                    setErros(SEM_ERRO);
-                  }}
-                  opcoes={[
-                    ...(cartaoSalvo === null
-                      ? []
-                      : [
-                          {
-                            valor: 'cartao_salvo',
-                            rotulo: CARTAO_SALVO.opcao(
-                              cartaoSalvo.bandeira,
-                              cartaoSalvo.ultimosDigitos,
-                            ),
-                          },
-                        ]),
-                    { valor: 'cartao', rotulo: TEXTOS.meios.cartao },
-                    { valor: 'pix', rotulo: TEXTOS.meios.pix },
-                  ]}
-                />
-
-                <Campo
-                  name="cpf"
-                  rotulo={TEXTOS.cpf}
-                  placeholder={TEXTOS.cpfDica}
-                  auxiliar={TEXTOS.cpfNota}
-                  inputMode="numeric"
-                  value={valores.cpf}
-                  erro={erroDe('cpf')}
-                  onChange={(evento) => mudar('cpf', mascararCpf(evento.target.value))}
-                />
+                <div className={estilos.segmentado}>
+                  <Grupo
+                    rotulo={TEXTOS.meioRotulo}
+                    rotuloOculto
+                    valor={meio}
+                    onMudar={(valor) => {
+                      // `Grupo` devolve `string`; as opções são montadas logo
+                      // abaixo e só carregam os três valores de `MeioNaTela`.
+                      setMeio(valor as MeioNaTela);
+                      setErros(SEM_ERRO);
+                    }}
+                    opcoes={[
+                      ...(cartaoSalvo === null
+                        ? []
+                        : [
+                            {
+                              valor: 'cartao_salvo',
+                              rotulo: CARTAO_SALVO.opcao(
+                                cartaoSalvo.bandeira,
+                                cartaoSalvo.ultimosDigitos,
+                              ),
+                            },
+                          ]),
+                      { valor: 'cartao', rotulo: TEXTOS.meios.cartao },
+                      { valor: 'pix', rotulo: TEXTOS.meios.pix },
+                    ]}
+                  />
+                </div>
 
                 {meio === 'cartao_salvo' ? (
                   <p className={estilos.nota}>{CARTAO_SALVO.notaNoCheckout}</p>
@@ -389,7 +395,9 @@ export function FormularioDeCheckout({
                       {TEXTOS.cartaoNota}
                     </p>
                   </div>
-                ) : (
+                ) : null}
+
+                {meio === 'pix' ? (
                   <div className={estilos.pix}>
                     <span className={estilos.qr} aria-hidden="true">
                       {TEXTOS.pixQr}
@@ -400,10 +408,21 @@ export function FormularioDeCheckout({
                       <p className={estilos.nota}>{TEXTOS.pixPendente}</p>
                     </div>
                   </div>
-                )}
+                ) : null}
+
+                <Campo
+                  name="cpf"
+                  rotulo={TEXTOS.cpf}
+                  placeholder={TEXTOS.cpfDica}
+                  auxiliar={TEXTOS.cpfNota}
+                  inputMode="numeric"
+                  value={valores.cpf}
+                  erro={erroDe('cpf')}
+                  onChange={(evento) => mudar('cpf', mascararCpf(evento.target.value))}
+                />
 
                 {simulado ? (
-                  <div className={estilos.simulacao}>
+                  <div className={[estilos.simulacao, estilos.segmentado].join(' ')}>
                     <Grupo
                       rotulo={TEXTOS.simularRotulo}
                       valor={simulacao}
@@ -418,28 +437,29 @@ export function FormularioDeCheckout({
               </>
             )}
           </div>
-        </Painel>
+        </section>
 
         <div className={estilos.lateral}>
-          <Painel titulo={TEXTOS.resumoTitulo} nivel={2}>
+          <section className={estilos.cartaoBranco} aria-labelledby="checkout-resumo">
+            <h2 id="checkout-resumo" className={estilos.sobretitulo}>
+              {TEXTOS.resumoTitulo}
+            </h2>
             <dl className={estilos.resumo}>
               <div className={estilos.linha}>
                 <dt>{resumo.quantidade}</dt>
                 <dd>{resumo.bruto}</dd>
               </div>
-              {resumo.desconto !== null ? (
-                <div className={estilos.linha}>
-                  <dt className={estilos.nota}>{TEXTOS.desconto}</dt>
-                  <dd className={estilos.economia}>{resumo.desconto}</dd>
-                </div>
-              ) : null}
+              <div className={estilos.linha}>
+                <dt className={estilos.nota}>{TEXTOS.desconto}</dt>
+                <dd className={estilos.economia}>{resumo.desconto ?? 'Sem desconto'}</dd>
+              </div>
               <div className={[estilos.linha, estilos.totalLinha].join(' ')}>
                 <dt>{TEXTOS.total}</dt>
                 <dd className={estilos.total}>{resumo.total}</dd>
               </div>
             </dl>
             <p className={estilos.nota}>{resumo.porClave}</p>
-          </Painel>
+          </section>
 
           {aprovado !== null ? (
             <Aviso tom="sucesso" titulo={TEXTOS.aprovadoTitulo}>

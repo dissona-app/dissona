@@ -158,3 +158,111 @@
   gap: var(--dsn-space-3);
   margin-top: var(--dsn-space-3);
 }
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dsn-ink);
+  text-decoration: none;
+}
+
+.voltar:hover {
+  text-decoration: underline;
+}
+
+.cartaoBranco {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 16px;
+  border: 1px solid var(--dsn-border-faint);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}
+
+.sobretitulo {
+  margin: 0;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
+}
+
+/* Seletor segmentado do protótipo: compacto, com a opção ativa em tinta. */
+.segmentado [role='radiogroup'] {
+  display: inline-flex;
+  width: auto;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--dsn-border-faint);
+  border-radius: 4px;
+  background: var(--dsn-surface-muted);
+}
+
+.segmentado [role='radio'] {
+  flex: none;
+  min-height: 0;
+  padding: 6px 14px;
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--dsn-ink-700);
+}
+
+.segmentado [role='radio'][aria-checked='true'] {
+  background: var(--dsn-ink);
+  color: #ffffff;
+}
+
+.simulacao {
+  display: flex;
+}
+
+.simulacao > div {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.resumo .linha:first-child dt {
+  font-weight: 700;
+}
+
+.totalLinha {
+  margin-top: 4px;
+  align-items: center;
+}
+
+.totalLinha .total {
+  color: var(--dsn-ink);
+}
+
+.lateral > button[type='submit'] {
+  min-height: 44px;
+}
+
+.segmentado {
+  display: flex;
+}
+
+.segmentado > div {
+  width: auto;
+}
+
+.linha dt.nota {
+  font-weight: 400;
+  color: var(--dsn-ink-500);
+}
+
+.linha dd.economia {
+  color: var(--dsn-success-fg);
+}
