@@ -122,3 +122,7 @@
   border-radius: 6px;
   background: #ffffff;
 }
+
+.gradeSemLateral {
+  display: block;
+}

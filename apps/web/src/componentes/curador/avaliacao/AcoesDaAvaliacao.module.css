@@ -3,8 +3,5 @@
 .rodape {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--dsn-space-5);
-  padding-top: var(--dsn-space-6);
-  border-top: var(--dsn-border-width) solid var(--dsn-border-faint);
+  gap: 8px;
 }

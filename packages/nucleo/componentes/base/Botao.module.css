@@ -90,6 +90,15 @@
   background: #2a1f33;
 }
 
+.roxo {
+  background: var(--dsn-purple-600);
+  color: #ffffff;
+}
+
+.roxo:hover:not(:disabled) {
+  background: #4a2575;
+}
+
 /* ----------------------------------------------------------------- ghost */
 
 .ghost {

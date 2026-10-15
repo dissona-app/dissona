@@ -22,6 +22,13 @@ export type PropsPassoCompartilhamento = {
   readonly avaliacao: AvaliacaoEmEdicao;
   readonly voltarPara: string;
   readonly acao: (dados: FormData) => Promise<ResultadoDeAcao>;
+  /** A previsão da remuneração — o cartão ao lado, como no protótipo aprovado. */
+  readonly previa?: {
+    readonly aplicado: number;
+    readonly piso: number;
+    readonly teto: number;
+    readonly classe: string;
+  } | null;
 };
 
 /**
@@ -42,11 +49,20 @@ export type PropsPassoCompartilhamento = {
  * ⚠️ Para o E2E: o `<input>` fica sob o rótulo pintado, então `locator.check()`
  * é interceptado pelo `<label>`. Clique no texto, ou use `check({ force: true })`.
  */
+/** A sigla de cada forma, no quadradinho lilás da linha (protótipo aprovado). */
+const SIGLA: Readonly<Record<string, string>> = {
+  playlist: 'PL',
+  post: 'IG',
+  materia: 'MT',
+  outros: 'OU',
+};
+
 export function PassoCompartilhamento({
   envioId,
   avaliacao,
   voltarPara,
   acao,
+  previa = null,
 }: PropsPassoCompartilhamento) {
   const [modalidade, setModalidade] = useState<ModalidadeCompartilhamento | ''>(
     avaliacao.compartilhamento?.modalidade ?? '',
@@ -70,51 +86,84 @@ export function PassoCompartilhamento({
         <Aviso tom="erro">{AVALIAR.erroInesperado}</Aviso>
       ) : null}
 
-      <p className={estilos.nota}>{AVALIAR.compartilhamentoNota}</p>
+      {/* Protótipo aprovado: a pergunta em Anton, as formas em linhas e, ao
+          lado, quanto esta entrega rende. */}
+      <div className={estilos.cabecalho}>
+        <h2 className={estilos.pergunta}>Onde a faixa vai circular?</h2>
+        <p className={estilos.nota}>{AVALIAR.compartilhamentoNota}</p>
+      </div>
 
-      <fieldset className={estilos.grupo}>
-        <legend className={estilos.legenda}>{AVALIAR.compartilhamentoRotulo}</legend>
+      <div className={estilos.grade}>
+        <fieldset className={estilos.grupo}>
+          <legend className="dsn-apenas-leitor">{AVALIAR.compartilhamentoRotulo}</legend>
 
-        <div className={estilos.cartoes}>
-          {MODALIDADES_DE_DIVULGACAO.map((chave) => (
-            <label key={chave} className={estilos.cartao}>
-              <input
-                type="radio"
-                name="modalidade"
-                value={chave}
-                className={estilos.entrada}
-                checked={modalidade === chave}
-                onChange={() => setModalidade(chave)}
-                required
-              />
-              <span className={estilos.pintura}>
-                <span className={estilos.rotulo}>{AVALIAR.modalidades[chave].rotulo}</span>
-                <span className={estilos.apoio}>{AVALIAR.modalidades[chave].apoio}</span>
-                <span className={estilos.estado}>
-                  {modalidade === chave ? AVALIAR.selecionado : AVALIAR.marcar}
+          <div className={estilos.linhas}>
+            {MODALIDADES_DE_DIVULGACAO.map((chave) => (
+              <label key={chave} className={estilos.linha}>
+                <input
+                  type="radio"
+                  name="modalidade"
+                  value={chave}
+                  className={estilos.marcador}
+                  checked={modalidade === chave}
+                  onChange={() => setModalidade(chave)}
+                  required
+                />
+                <span className={estilos.sigla} aria-hidden="true">
+                  {SIGLA[chave]}
                 </span>
-              </span>
-            </label>
-          ))}
-        </div>
+                <span className={estilos.textos}>
+                  <span className={estilos.rotulo}>{AVALIAR.modalidades[chave].rotulo}</span>
+                  <span className={estilos.apoio}>{AVALIAR.modalidades[chave].apoio}</span>
+                </span>
+              </label>
+            ))}
+          </div>
 
-        {/* Fora da grade dos quatro, como no protótipo: recusar não é uma
-            quinta forma de divulgar. */}
-        <label className={estilos.recusa}>
-          <input
-            type="radio"
-            name="modalidade"
-            value="nao_compartilhou"
-            className={estilos.entrada}
-            checked={modalidade === 'nao_compartilhou'}
-            onChange={() => setModalidade('nao_compartilhou')}
-          />
-          <span className={estilos.pinturaRecusa}>
-            <span className={estilos.rotulo}>{AVALIAR.modalidades.nao_compartilhou.rotulo}</span>
-            <span className={estilos.apoio}>{AVALIAR.modalidades.nao_compartilhou.apoio}</span>
-          </span>
-        </label>
-      </fieldset>
+          <span className={estilos.ou}>ou</span>
+
+          {/* Fora das formas de divulgar: recusar não é uma quinta forma. */}
+          <label className={estilos.linha}>
+            <input
+              type="radio"
+              name="modalidade"
+              value="nao_compartilhou"
+              className={estilos.marcador}
+              checked={modalidade === 'nao_compartilhou'}
+              onChange={() => setModalidade('nao_compartilhou')}
+            />
+            <span className={estilos.textos}>
+              <span className={estilos.rotulo}>{AVALIAR.modalidades.nao_compartilhou.rotulo}</span>
+              <span className={estilos.apoio}>{AVALIAR.modalidades.nao_compartilhou.apoio}</span>
+            </span>
+          </label>
+        </fieldset>
+
+        {previa === null ? null : (
+          <aside className={estilos.previa} aria-label="Remuneração desta entrega">
+            <span className={estilos.previaRotulo}>Remuneração desta entrega</span>
+            <p className={estilos.previaValor}>
+              {previa.aplicado}%{' '}
+              <span className={estilos.previaApoio}>
+                {previa.aplicado > previa.piso ? 'com acréscimo' : 'sem acréscimo'}
+              </span>
+            </p>
+            <dl className={estilos.previaLinhas}>
+              <div>
+                <dt>Piso da classe</dt>
+                <dd>{previa.piso}%</dd>
+              </div>
+              <div>
+                <dt>Teto da classe {previa.classe}</dt>
+                <dd>{previa.teto}%</dd>
+              </div>
+            </dl>
+            <p className={estilos.previaNota}>
+              Escala da classe {previa.classe}. O crédito é liberado com ou sem compartilhamento.
+            </p>
+          </aside>
+        )}
+      </div>
 
       {aceitaLink ? (
         <Campo

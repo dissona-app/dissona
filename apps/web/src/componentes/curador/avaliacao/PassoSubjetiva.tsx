@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Aviso } from '@dissona/nucleo/componentes/base/Aviso';
 import { BarraProgresso } from '@/componentes/base/BarraProgresso';
 import { CampoNota, NOTA_MAXIMA } from '@/componentes/base/CampoNota';
-import { Painel } from '@/componentes/base/Painel';
 import type { ResultadoDeAcao } from '@dissona/nucleo/lib/acoes';
 import { mediaObjetiva, mediasPorGrupo } from '@/modulos/avaliacao/servico';
 import type {
@@ -84,62 +83,87 @@ export function PassoSubjetiva({
         <Aviso tom="erro">{AVALIAR.erroInesperado}</Aviso>
       ) : null}
 
-      <Painel titulo={AVALIAR.resumoObjetivo} nivel={3}>
-        <p className={estilos.media}>
-          <strong className={estilos.mediaValor}>
-            {media === null ? AVALIAR.semNotaNoGrupo : formatar(media)}
-          </strong>
-          <span className={estilos.mediaApoio}>
-            {AVALIAR.mediaDeCriterios(avaliacao.notas.length)}
-          </span>
-        </p>
-
-        <ul className={estilos.grupos}>
-          {[...porGrupo].map(([grupo, valor]) => (
-            <li key={grupo} className={estilos.grupo}>
-              <BarraProgresso
-                percentual={valor === null ? 0 : (valor / NOTA_MAXIMA) * 100}
-                rotulo={AVALIAR.grupos[grupo]}
-                detalhe={valor === null ? AVALIAR.semNotaNoGrupo : formatar(valor)}
-              />
-            </li>
-          ))}
-        </ul>
-      </Painel>
-
-      <Painel titulo={AVALIAR.notaSubjetiva} sublegenda={AVALIAR.notaSubjetivaApoio} nivel={3}>
-        {/* O rótulo do campo é diferente do título do painel de propósito —
-            ver `notaSubjetivaCampo`. */}
-        <CampoNota rotulo={AVALIAR.notaSubjetivaCampo} valor={nota} onMudar={setNota} />
-        <input type="hidden" name="notaSubjetiva" value={nota} />
-
-        <div className={estilos.campoFeedback}>
-          <label className={estilos.rotulo} htmlFor="feedback">
-            {AVALIAR.feedback}
-          </label>
-
-          <textarea
-            id="feedback"
-            name="feedback"
-            className={estilos.feedback}
-            value={feedback}
-            onChange={(evento) => setFeedback(evento.target.value)}
-            placeholder={AVALIAR.feedbackPlaceholder}
-            rows={8}
-            required
-            aria-describedby="feedback-contador"
-          />
-
-          <div className={estilos.rodapeDoCampo} id="feedback-contador">
-            <span className={rende ? estilos.dicaAtingida : estilos.dica}>
-              {rende ? AVALIAR.feedbackValido : AVALIAR.feedbackDica(regras.feedbackMinCaracteres)}
+      {/* Protótipo aprovado: o resumo num cartão em tinta à esquerda, a nota
+          subjetiva e a devolutiva num cartão branco à direita. */}
+      <div className={estilos.grade}>
+        <section className={estilos.resumo} aria-labelledby="resumo-objetivo">
+          <h3 id="resumo-objetivo" className={estilos.overline}>
+            {AVALIAR.resumoObjetivo}
+          </h3>
+          <p className={estilos.media}>
+            <strong className={estilos.mediaValor}>
+              {media === null ? AVALIAR.semNotaNoGrupo : formatar(media)}
+            </strong>
+            <span className={estilos.mediaApoio}>
+              {AVALIAR.mediaDeCriterios(avaliacao.notas.length)}
             </span>
-            <span className={rende ? estilos.contadorAtingido : estilos.contador}>
-              {escritos} / {regras.feedbackMinCaracteres}
+          </p>
+
+          <ul className={estilos.grupos}>
+            {[...porGrupo].map(([grupo, valor]) => (
+              <li key={grupo} className={estilos.grupo}>
+                <BarraProgresso
+                  percentual={valor === null ? 0 : (valor / NOTA_MAXIMA) * 100}
+                  rotulo={AVALIAR.grupos[grupo]}
+                  detalhe={valor === null ? AVALIAR.semNotaNoGrupo : formatar(valor)}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className={estilos.parecer} aria-labelledby="nota-subjetiva">
+          <div className={estilos.parecerTopo}>
+            <div>
+              <h3 id="nota-subjetiva" className={estilos.overline}>
+                {AVALIAR.notaSubjetiva}
+              </h3>
+              <p className={estilos.apoio}>{AVALIAR.notaSubjetivaApoio}</p>
+            </div>
+            <span className={estilos.notaGrande} aria-hidden="true">
+              {formatar(nota)}
             </span>
           </div>
-        </div>
-      </Painel>
+          {/* O rótulo do campo é diferente do título do painel de propósito —
+            ver `notaSubjetivaCampo`. */}
+          <CampoNota
+            rotulo={AVALIAR.notaSubjetivaCampo}
+            valor={nota}
+            onMudar={setNota}
+            linhaOculta
+          />
+          <input type="hidden" name="notaSubjetiva" value={nota} />
+
+          <div className={estilos.campoFeedback}>
+            <label className={estilos.rotulo} htmlFor="feedback">
+              {AVALIAR.feedback}
+            </label>
+
+            <textarea
+              id="feedback"
+              name="feedback"
+              className={estilos.feedback}
+              value={feedback}
+              onChange={(evento) => setFeedback(evento.target.value)}
+              placeholder={AVALIAR.feedbackPlaceholder}
+              rows={8}
+              required
+              aria-describedby="feedback-contador"
+            />
+
+            <div className={estilos.rodapeDoCampo} id="feedback-contador">
+              <span className={rende ? estilos.dicaAtingida : estilos.dica}>
+                {rende
+                  ? AVALIAR.feedbackValido
+                  : AVALIAR.feedbackDica(regras.feedbackMinCaracteres)}
+              </span>
+              <span className={rende ? estilos.contadorAtingido : estilos.contador}>
+                {escritos} / {regras.feedbackMinCaracteres}
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <AcoesDaAvaliacao voltarPara={voltarPara} proximoEhRemuneracao={false} />
     </form>

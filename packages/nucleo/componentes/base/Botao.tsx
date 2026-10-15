@@ -21,7 +21,9 @@ export type VarianteBotao =
    */
   | 'perigoContorno'
   /** Tinta sólida — "Detectar faixa" do envio, no protótipo aprovado. */
-  | 'tinta';
+  | 'tinta'
+  /** Roxo sólido — "Avançar" da avaliação, no protótipo aprovado. */
+  | 'roxo';
 export type TamanhoBotao = 'md' | 'denso' | 'sm';
 
 export type PropsBotao = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & {
@@ -47,6 +49,7 @@ const CLASSE_VARIANTE: Record<VarianteBotao, string> = {
   perigo: estilos.perigo ?? '',
   perigoContorno: estilos.perigoContorno ?? '',
   tinta: estilos.tinta ?? '',
+  roxo: estilos.roxo ?? '',
 };
 
 /** Variantes sem caixa não recebem padding de tamanho. */

@@ -17,7 +17,7 @@
   font-family: var(--dsn-font-display);
   font-weight: var(--dsn-weight-regular);
   letter-spacing: var(--dsn-tracking-display);
-  font-size: var(--dsn-text-2xl);
+  font-size: 36px;
   line-height: var(--dsn-leading-none);
   color: var(--dsn-ink);
   font-variant-numeric: tabular-nums;
@@ -102,4 +102,94 @@
   composes: contador;
   color: var(--dsn-success-fg);
   font-weight: var(--dsn-weight-semibold);
+}
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1000px) {
+  .grade {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* O resumo em tinta: os tokens trocam aqui dentro, e as barras herdam. */
+.resumo {
+  --dsn-ink: #ffffff;
+  --dsn-ink-500: #c6b4de;
+  --dsn-ink-700: #ffffff;
+  --dsn-track: rgba(255, 255, 255, 0.14);
+  --dsn-grad-brand-h: linear-gradient(90deg, #b780e7, #b780e7);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 16px;
+  border-radius: 6px;
+  background: #140d1a;
+  color: #ffffff;
+}
+
+.parecer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 16px;
+  border: 1px solid var(--dsn-border);
+  border-radius: 6px;
+  background: var(--dsn-surface);
+}
+
+.parecerTopo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* O traço antes do rótulo — "— Suas notas objetivas". */
+.overline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-family: inherit !important;
+  font-size: 10px;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+  color: var(--dsn-ink);
+}
+
+.overline::before {
+  content: '';
+  width: 16px;
+  height: 2px;
+  background: #b780e7;
+}
+
+.apoio {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--dsn-ink-500);
+}
+
+.notaGrande {
+  font-family: var(--dsn-font-display);
+  font-size: 30px;
+  line-height: 1;
+  color: var(--dsn-purple-600);
+}
+
+.parecer .rotulo {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dsn-ink-500);
 }

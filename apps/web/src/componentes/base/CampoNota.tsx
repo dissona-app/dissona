@@ -14,6 +14,8 @@ export type PropsCampoNota = {
   readonly rotulo: React.ReactNode;
   /** Sem o "0,0 / 5,0" sob a trilha — a avaliação do protótipo aprovado. */
   readonly semExtremos?: boolean;
+  /** Rótulo e valor só para o leitor de tela — quem mostra o número é a tela. */
+  readonly linhaOculta?: boolean;
   /** `null` significa "ainda não avaliado", que é diferente de nota 0. */
   readonly valor: number | null;
   readonly onMudar: (valor: number) => void;
@@ -46,6 +48,7 @@ export function CampoNota({
   desabilitado = false,
   textoSemNota = 'Sem nota',
   semExtremos = false,
+  linhaOculta = false,
 }: PropsCampoNota) {
   const id = useId();
   const idErro = `${id}-erro`;
@@ -60,7 +63,7 @@ export function CampoNota({
 
   return (
     <div className={estilos.envolvente}>
-      <div className={estilos.linhaRotulo}>
+      <div className={linhaOculta ? 'dsn-apenas-leitor' : estilos.linhaRotulo}>
         <label className={estilos.rotulo} htmlFor={id}>
           {rotulo}
         </label>

@@ -86,32 +86,36 @@ export function MolduraDaAvaliacao({
         )}
       </div>
 
-      <div className={estilos.grade}>
-        <aside className={estilos.lateral}>
-          <div className={estilos.cartao}>
-            {capa === null ? null : (
-              <span
-                className={estilos.fundo}
-                style={{ backgroundImage: `url('${capa}')` }}
-                aria-hidden="true"
-              />
-            )}
-            <span className={estilos.veu} aria-hidden="true" />
-            <div className={estilos.cartaoCorpo}>
-              <span
-                className={estilos.capa}
-                style={capa === null ? undefined : { backgroundImage: `url('${capa}')` }}
-                aria-hidden="true"
-              />
-              <div className={estilos.faixa}>
-                <h2 className={estilos.titulo}>{titulo}</h2>
-                <p className={estilos.artista}>{artista}</p>
+      {/* Protótipo aprovado: a capa e o player só no passo 1 (escuta e
+          notas); os outros passos usam a largura toda. */}
+      <div className={passo === 'notas' ? estilos.grade : estilos.gradeSemLateral}>
+        {passo === 'notas' ? (
+          <aside className={estilos.lateral}>
+            <div className={estilos.cartao}>
+              {capa === null ? null : (
+                <span
+                  className={estilos.fundo}
+                  style={{ backgroundImage: `url('${capa}')` }}
+                  aria-hidden="true"
+                />
+              )}
+              <span className={estilos.veu} aria-hidden="true" />
+              <div className={estilos.cartaoCorpo}>
+                <span
+                  className={estilos.capa}
+                  style={capa === null ? undefined : { backgroundImage: `url('${capa}')` }}
+                  aria-hidden="true"
+                />
+                <div className={estilos.faixa}>
+                  <h2 className={estilos.titulo}>{titulo}</h2>
+                  <p className={estilos.artista}>{artista}</p>
+                </div>
               </div>
             </div>
-          </div>
-          {/* O passo de notas põe o player aqui (portal); os outros, nada. */}
-          <div id={ID_DO_PLAYER} className={estilos.player} />
-        </aside>
+            {/* O passo de notas põe o player aqui (portal); os outros, nada. */}
+            <div id={ID_DO_PLAYER} className={estilos.player} />
+          </aside>
+        ) : null}
 
         <div className={estilos.conteudo}>{children}</div>
       </div>
