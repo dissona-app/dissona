@@ -43,6 +43,8 @@ export default async function Pagina() {
   return (
     <MolduraDaClasse
       selo={CURADOR_CLASSIFICACAO.seloBronze}
+      icone="bronzeAprovado"
+      largura={560}
       titulo={CURADOR_CLASSIFICACAO.boasVindas(primeiroNome)}
       texto={CURADOR_CLASSIFICACAO.boasVindasTexto}
       tom="bronze"
@@ -71,6 +73,9 @@ export default async function Pagina() {
       </div>
 
       <div className={estilos.acoes}>
+        {/* Protótipo aprovado: "Começar o curso" é o primário e "Ir para o
+            painel" fica ao lado, com contorno. O curso é conteúdo do cliente e
+            entra numa release própria — o botão existe, desligado. */}
         <button
           type="button"
           className={estilos.cursoBotao}
@@ -80,7 +85,7 @@ export default async function Pagina() {
           {CURADOR_CLASSIFICACAO.comecarCurso}
         </button>
 
-        <BotaoLink href={ROTA.CURADOR} tamanho="denso" blocoInteiro>
+        <BotaoLink href={ROTA.CURADOR} variante="secundario" tamanho="denso">
           {CURADOR_CLASSIFICACAO.irAoPainel}
         </BotaoLink>
       </div>

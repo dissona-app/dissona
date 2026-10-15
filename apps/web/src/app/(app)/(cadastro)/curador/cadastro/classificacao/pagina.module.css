@@ -81,3 +81,78 @@
   color: var(--dsn-ink-500);
   text-wrap: pretty;
 }
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+.painel {
+  overflow: hidden;
+  padding: 0;
+  gap: 0;
+  border: 1px solid #e5deea;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.painelCabecalho {
+  padding: 9px 12px;
+  border-bottom: 1px solid #e5deea;
+  background: #fbfafe;
+}
+
+.painelTitulo {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: #5b2e8f;
+}
+
+.contagemOk,
+.contagemFalta {
+  padding: 4px 9px;
+  border-radius: 2px;
+  font-size: 11px;
+}
+
+.credenciais {
+  gap: 0;
+}
+
+.credencial,
+.credencialOk {
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0ebf4;
+  font-size: 13px;
+}
+
+.credenciais > :last-child {
+  border-bottom: 0;
+}
+
+.dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #efeaf2;
+  color: #a9a2b6;
+}
+
+.credencialOk .dot {
+  background: #e3f4ea;
+  color: #1f8a4c;
+}
+
+.notaOuro {
+  font-size: 12px;
+  text-align: center;
+}
+
+.contagemFalta {
+  background: #fdf3e2;
+}
+
+.contagemOk {
+  background: #e3f4ea;
+}

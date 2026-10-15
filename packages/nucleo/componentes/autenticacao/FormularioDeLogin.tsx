@@ -174,6 +174,7 @@ export function FormularioDeLogin({
           placeholder={textos.placeholderEmail}
           autoComplete="email"
           required
+          semMarcador
           erro={erroDeCampo('email')}
         />
 
@@ -184,6 +185,7 @@ export function FormularioDeLogin({
           placeholder={textos.placeholderSenha}
           autoComplete="current-password"
           required
+          semMarcador
           erro={erroDeCampo('senha')}
           acessorioDoRotulo={
             <Link className={estilos.esqueci} href={textos.hrefEsqueciSenha}>

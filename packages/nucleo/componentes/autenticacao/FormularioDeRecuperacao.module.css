@@ -93,3 +93,21 @@
 .rodapeLink:hover {
   text-decoration: underline;
 }
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+/* Cabeçalho centrado e um fio separando o rodapé, como no protótipo. */
+.cabecalho {
+  align-items: center;
+  text-align: center;
+}
+
+.overline {
+  align-self: center;
+}
+
+.rodape {
+  padding-top: 14px;
+  border-top: 1px solid var(--dsn-border-faint);
+  gap: 6px;
+}

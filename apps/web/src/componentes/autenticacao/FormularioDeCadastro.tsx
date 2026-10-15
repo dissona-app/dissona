@@ -161,6 +161,7 @@ export function FormularioDeCadastro({
           placeholder={textos.placeholderNome}
           autoComplete="name"
           required
+          semMarcador
           erro={erroDeCampo('nome')}
         />
 
@@ -171,6 +172,7 @@ export function FormularioDeCadastro({
           placeholder={textos.placeholderEmail}
           autoComplete="email"
           required
+          semMarcador
           erro={erroDeCampo('email')}
         />
 
@@ -182,6 +184,7 @@ export function FormularioDeCadastro({
             placeholder={textos.placeholderSenha}
             autoComplete="new-password"
             required
+            semMarcador
             value={senha}
             onChange={(evento) => setSenha(evento.target.value)}
             erro={erroDeCampo('senha')}
@@ -202,6 +205,7 @@ export function FormularioDeCadastro({
           <MedidorDeSenha
             senha={senha}
             rotulos={textos.forcaDaSenha}
+            soRequisitos
             requisitos={{
               tamanho: textos.requisitoTamanho,
               numero: textos.requisitoNumero,
@@ -216,6 +220,7 @@ export function FormularioDeCadastro({
           placeholder={textos.placeholderConfirmar}
           autoComplete="new-password"
           required
+          semMarcador
           erro={erroDeCampo('confirmar')}
         />
 

@@ -40,7 +40,8 @@
 .campos {
   display: flex;
   flex-direction: column;
-  gap: clamp(var(--dsn-space-5), 1.6vh, var(--dsn-space-7));
+  /* Protótipo aprovado: 11px entre um campo e o rótulo do seguinte. */
+  gap: 11px;
 }
 
 /* O campo de senha e o medidor são uma unidade: o medidor descreve aquele

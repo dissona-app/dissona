@@ -115,7 +115,6 @@ export function FormularioDeRecuperacao({
           {enviado ? SENHA.enviadoTitulo : SENHA.recuperarTitulo}
         </h1>
         <p className={estilos.texto}>{enviado ? SENHA.enviadoTexto : SENHA.recuperarTexto}</p>
-        {enviado ? null : <p className={estilos.nota}>{SENHA.recuperarNota}</p>}
       </div>
 
       {falhou && resultado.codigo === CodigoErro.LIMITE_DE_ENVIO ? (
@@ -138,6 +137,7 @@ export function FormularioDeRecuperacao({
             placeholder={SENHA.placeholderEmail}
             autoComplete="email"
             required
+            semMarcador
             erro={erroDeEmail}
           />
         </div>

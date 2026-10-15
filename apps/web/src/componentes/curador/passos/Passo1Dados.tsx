@@ -75,6 +75,7 @@ export function Passo1Dados({ estado, passo, acao, acaoDeVoltar, acaoDePular }: 
       <CampoDeFoto
         nome={estado.nome}
         aoMudarEnvio={setSubindoFoto}
+        tamanho="xl"
         semDica
         caminhoAtual={estado.fotoCaminho}
         textos={{

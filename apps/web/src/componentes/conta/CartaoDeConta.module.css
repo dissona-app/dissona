@@ -85,7 +85,9 @@
   color: var(--dsn-danger-fg);
 }
 
-/* Com o valor leve (nome + nota curta), a nota desce para 12px — aprovado. */
+/* Com o valor leve (nome + nota curta), a nota é 13px em cinza — aprovado
+   ("Chave para receber os repasses."). */
 .textos:has(.valorLeve) .nota {
-  font-size: 12px;
+  font-size: 13px;
+  color: #6e6478;
 }

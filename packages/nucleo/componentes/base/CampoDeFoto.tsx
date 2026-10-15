@@ -22,10 +22,11 @@ export type TextosDoCampoDeFoto = {
 };
 
 /** `sm` é a base do módulo CSS, e por isso não tem classe própria. */
-const CLASSE_DO_TAMANHO: Record<'sm' | 'md' | 'lg', string | undefined> = {
+const CLASSE_DO_TAMANHO: Record<'sm' | 'md' | 'lg' | 'xl', string | undefined> = {
   sm: undefined,
   md: estilos.avatarMd,
   lg: estilos.avatarLg,
+  xl: estilos.avatarXl,
 };
 
 export type PropsCampoDeFoto = {
@@ -56,7 +57,7 @@ export type PropsCampoDeFoto = {
    * `sm` é o passo 1 do curador (56px/17px), `md` os dados do membro admin
    * (27.1) e `lg` o perfil do artista (7.1), que é o maior. Ver o módulo CSS.
    */
-  readonly tamanho?: 'sm' | 'md' | 'lg';
+  readonly tamanho?: 'sm' | 'md' | 'lg' | 'xl';
   /**
    * Sem a linha de dica ao lado do botão. O passo 1 do curador no protótipo não
    * tem dica nenhuma: o retorno de "escolhi uma foto" é o próprio avatar, que
@@ -150,7 +151,11 @@ export function CampoDeFoto({
       {foto.erro === undefined ? null : <Aviso tom="erro">{foto.erro}</Aviso>}
 
       <div
-        className={[estilos.base, vitrine === undefined ? undefined : estilos.emVitrine]
+        className={[
+          estilos.base,
+          vitrine === undefined ? undefined : estilos.emVitrine,
+          tamanho === 'xl' ? estilos.baseXl : undefined,
+        ]
           .filter(Boolean)
           .join(' ')}
       >

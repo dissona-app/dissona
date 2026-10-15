@@ -124,3 +124,88 @@
     transition: none;
   }
 }
+
+/* ---------------------------------------------- protótipo aprovado ---- */
+
+/* "Pular" no topo da coluna, à direita da marca — ver a página. */
+.pular {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  padding: 8px 10px;
+  border-radius: 4px;
+  color: #c6b4de;
+}
+
+.pular:hover:not(:disabled) {
+  color: #ffffff;
+}
+
+.conteudo {
+  gap: 14px;
+}
+
+.icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 63px;
+  height: 63px;
+  border: 1px solid #e2d6f5;
+  border-radius: 6px;
+  background: #efe7f8;
+  color: #5b2e8f;
+}
+
+.titulo {
+  font-size: 39.6px;
+  line-height: 1.04;
+}
+
+.texto {
+  font-size: 17px;
+  line-height: 1.55;
+  color: #6e6478;
+}
+
+.micro {
+  padding-top: 0;
+  border-top: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #3a3242;
+}
+
+/* O progresso em quatro barras de 4px, e não em pontos. */
+.dots {
+  gap: 6px;
+}
+
+.dot {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #e5deea;
+}
+
+.dotAtivo {
+  background: #5b2e8f;
+}
+
+.acoes {
+  gap: 12px;
+}
+
+.formularioFinal {
+  flex: none;
+}
+
+.acoes button {
+  min-height: 45px;
+  padding: 14px 26px;
+}
+
+.nota {
+  font-size: 13px;
+  text-align: left;
+}

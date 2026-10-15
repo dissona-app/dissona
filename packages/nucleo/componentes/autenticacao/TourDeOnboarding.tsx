@@ -98,6 +98,21 @@ export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourD
       </div>
 
       <div className={estilos.conteudo}>
+        {/* Protótipo aprovado: um ícone por passo, num quadrado lilás. */}
+        <span className={estilos.icone} aria-hidden="true">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {ICONES_DOS_PASSOS[indice % ICONES_DOS_PASSOS.length]}
+          </svg>
+        </span>
         <h1 className={estilos.titulo}>{passo.titulo}</h1>
         <p className={estilos.texto}>{passo.texto}</p>
         <p className={estilos.micro}>{passo.micro}</p>
@@ -131,12 +146,12 @@ export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourD
 
         {ultimo ? (
           <form action={encerrar} className={estilos.formularioFinal}>
-            <Botao type="submit" carregando={pendente} blocoInteiro>
+            <Botao type="submit" carregando={pendente}>
               {ONBOARDING.finalizar}
             </Botao>
           </form>
         ) : (
-          <Botao type="button" onClick={() => irPara(indice + 1)} blocoInteiro disabled={pendente}>
+          <Botao type="button" onClick={() => irPara(indice + 1)} disabled={pendente}>
             {ONBOARDING.avancar}
           </Botao>
         )}
@@ -146,3 +161,25 @@ export function TourDeOnboarding({ passos, acaoDeEncerrar, revendo }: PropsTourD
     </>
   );
 }
+
+/** Ondas e seta, folha, gráfico e alto-falante — um ícone por passo do tour. */
+const ICONES_DOS_PASSOS = [
+  <>
+    <path d="M4 15V11" />
+    <path d="M8 18V9" />
+    <path d="M12 16v-5" />
+    <path d="M16 6v12" />
+    <path d="M20 3v4M18 5l2-2 2 2" />
+  </>,
+  <>
+    <path d="M7 3h7l4 4v14H7z" />
+    <path d="M14 3v4h4M10 12h5M10 16h5" />
+  </>,
+  <>
+    <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+  </>,
+  <>
+    <path d="M11 5L6 9H3v6h3l5 4z" />
+    <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
+  </>,
+] as const;

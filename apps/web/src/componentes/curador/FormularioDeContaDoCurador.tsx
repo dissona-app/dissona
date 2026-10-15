@@ -115,6 +115,7 @@ export function FormularioDeContaDoCurador({
       <CampoDeFoto
         nome={nome}
         aoMudarEnvio={setSubindoFoto}
+        tamanho="xl"
         semDica
         textos={{
           botao: CURADOR_CADASTRO.adicionarFoto,

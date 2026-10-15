@@ -202,3 +202,21 @@
 :global([data-papel='artista']) .hint {
   font-size: var(--dsn-text-xs);
 }
+
+/* 12 · passo 1 do curador, no protótipo aprovado: avatar de 72px, 16px até o
+   botão, e o botão com o contorno lilás claro. */
+.avatarXl,
+.avatarXl.avatarImagem {
+  width: 72px;
+  height: 72px;
+}
+
+.baseXl {
+  gap: 16px;
+}
+
+.baseXl .botao {
+  padding: 11px 18px;
+  border-color: #d6cbe4;
+  border-radius: 4px;
+}
